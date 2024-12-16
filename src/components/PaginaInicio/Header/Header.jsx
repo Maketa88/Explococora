@@ -11,7 +11,7 @@ export const Header = () => {
 
   return (
     <header className="bg-green-400 shadow-lg z-50">
-      <nav className="container mx-auto px-4 py-3 flex justify-between items-center relative">
+      <nav className="container mx-auto px-1 py-3 flex justify-between items-center relative">
         {/* Logo */}
         <Logo />
 
