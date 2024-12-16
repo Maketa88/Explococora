@@ -2,9 +2,9 @@
 import React, { useState } from "react";
 import { BotonNav } from "./BotonCarrusel";
 import { Indicadores } from "./Indicadores";
-import Cocora from "../../../assets/Images/cocora.jpg";
-import Cocora1 from "../../../assets/Images/cocora1.jpg";
-import Cocora3 from "../../../assets/Images/cocora3.jpg";
+import Cocora from "../../../assets/Images/carrusel1.webp";
+import Cocora1 from "../../../assets/Images/carrusel2.webp";
+import Cocora3 from "../../../assets/Images/carrusel3.webp";
 
 export const Carrusel = () => {
   // Array de imágenes
