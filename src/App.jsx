@@ -1,10 +1,11 @@
 import "./App.css";
-import { Header } from "./components/PaginaInicio/Header/Header";
+import { PaginaInicio } from "./pages/PaginaInicio/PaginaInicio";
+PaginaInicio;
 
 function App() {
   return (
     <>
-      <Header />
+      <PaginaInicio />
     </>
   );
 }
