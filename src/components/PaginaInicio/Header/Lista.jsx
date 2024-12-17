@@ -1,10 +1,9 @@
-import React from "react";
+import { NavLink } from "react-router-dom";
 
-// Props: tipo (enlace, boton, imagen), contenido, enlace, onClick, estilos, imgSrc, alt
 export const NavItem = ({
   tipo,
   contenido,
-  enlace,
+  to,
   onClick,
   estilos,
   imgSrc,
@@ -13,12 +12,16 @@ export const NavItem = ({
   if (tipo === "enlace") {
     return (
       <li>
-        <a
-          href={enlace}
-          className={`text-gray-950 font-bold hover:underline hover:text-black text-lg font-nunito  ${estilos}`}
+        <NavLink
+          to={to}
+          className={({ isActive }) =>
+            `text-gray-950 font-bold hover:underline hover:text-black text-lg font-nunito ${
+              isActive ? "text-blue-600" : ""
+            } ${estilos}`
+          }
         >
           {contenido}
-        </a>
+        </NavLink>
       </li>
     );
   }

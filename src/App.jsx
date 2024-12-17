@@ -1,17 +1,12 @@
-import "./App.css";
-import  Carta  from "./components/HistoriaCultura/Main/HistoriaCultura";
-
-import { PaginaInicio } from "./pages/PaginaInicio/PaginaInicio";
-
+import { Header } from "./components/PaginaInicio/Header/Header";
+import { RutasExplococora } from "./routes/RutaHistoria/RutasExplococora";
 
 
 function App() {
   return (
     <>
-      <PaginaInicio />
-      <Carta/>
-      
-     
+      <Header />
+      <RutasExplococora />
     </>
   );
 }

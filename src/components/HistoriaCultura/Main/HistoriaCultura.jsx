@@ -1,5 +1,5 @@
 import React from "react";
-import Card from "./Carta";
+import {Card} from "./Carta";
 import Carta1 from "../../../assets/Images/historia1.webp";
 import Carta2 from "../../../assets/Images/carrusel2.webp";
 import Carta3 from "../../../assets/Images/historia3.webp";
@@ -9,7 +9,7 @@ import Carta6 from "../../../assets/Images/historia6.webp";
 import Carta7 from "../../../assets/Images/historia7.webp";
 import Carta8 from "../../../assets/Images/historia8.webp";
 
-const Carta = () => {
+export const Carta = () => {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-10">
       <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-20">
@@ -100,4 +100,4 @@ const Carta = () => {
   );
 };
 
-export default Carta;
+
