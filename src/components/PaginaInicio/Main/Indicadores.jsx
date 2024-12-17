@@ -8,7 +8,7 @@ export const Indicadores = ({ images, currentImage }) => {
         <span
           key={index}
           className={`block w-3 h-3 rounded-full ${
-            index === currentImage ? "bg-green-400" : "bg-white bg-opacity-50"
+            index === currentImage ? "bg-gray-950" : "bg-white bg-opacity-50"
           }`}
         ></span>
       ))}
