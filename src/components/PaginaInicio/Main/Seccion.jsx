@@ -30,7 +30,7 @@ export const Carrusel = () => {
 
   return (
     <div>
-      <section className="relative w-full h-[50vh] sm:h-[70vh] lg:h-[90vh] overflow-hidden">
+      <section className="relative w-full h-[50vh] sm:h-[70vh] lg:h-[85vh] overflow-hidden">
         <img
           src={images[currentImage]}
           alt={`Slide ${currentImage + 1}`}
