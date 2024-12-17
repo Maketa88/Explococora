@@ -1,8 +1,8 @@
 import React from "react";
 
-const Card = ({ image, title, text }) => {
+export const Card = ({ image, title, text }) => {
   return (
-    <div className="max-w-screen-sm mx-auto bg-white rounded-lg shadow-md overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-lg">
+    <div className="max-w-screen-sm mx-auto bg-white rounded-lg shadow-md overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-lg cursor-pointer font-nunito">
       <img
         className="w-full h-96 object-cover"
         src={image}
@@ -20,4 +20,4 @@ const Card = ({ image, title, text }) => {
   );
 };
 
-export default Card;
+
