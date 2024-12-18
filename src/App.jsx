@@ -1,4 +1,4 @@
-import { Header } from "./components/PaginaInicio/Header/Header";
+
 import { RutasExplococora } from "./routes/RutaHistoria/RutasExplococora";
 
 
