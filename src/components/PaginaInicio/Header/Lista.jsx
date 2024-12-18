@@ -29,12 +29,15 @@ export const NavItem = ({
   if (tipo === "boton") {
     return (
       <li>
-        <button onClick={onClick} className={`px-4 py-1 rounded ${estilos}`}>
-          {contenido}
-        </button>
+        <NavLink to={to}>
+          <button onClick={onClick} className={`px-4 py-1 rounded ${estilos}`}>
+            {contenido}
+          </button>
+        </NavLink>
       </li>
     );
   }
+  
 
   if (tipo === "imagen") {
     return (

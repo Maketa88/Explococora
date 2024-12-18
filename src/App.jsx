@@ -5,7 +5,7 @@ import { RutasExplococora } from "./routes/RutaHistoria/RutasExplococora";
 function App() {
   return (
     <>
-      <Header />
+      
       <RutasExplococora />
     </>
   );
