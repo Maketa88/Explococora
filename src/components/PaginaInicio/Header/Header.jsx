@@ -31,6 +31,7 @@ export const Header = () => {
             tipo="boton"
             contenido="Ingresar"
             estilos="bg-blue-600 text-white hover:bg-blue-800 font-nunito"
+            to="/Ingreso"
           />
           <NavItem
             tipo="boton"

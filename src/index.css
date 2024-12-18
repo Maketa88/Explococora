@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Para eliminar el icono de ojo en Edge y Chrome */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+/* Para eliminar el icono de ojo en Firefox */
+input[type="password"]::-moz-password {
+  appearance: none;
+}
+
