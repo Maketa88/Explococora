@@ -19,7 +19,7 @@ export const Header = () => {
         <ul
           className={`lg:flex lg:space-x-6 ${
             menuAbierto ? "block" : "hidden"
-          } absolute lg:relative bg-green-400 lg:bg-transparent w-full lg:w-auto top-20 left-0 lg:top-0 lg:flex-row space-y-4 lg:space-y-0 text-center z-50`}
+          } absolute lg:relative bg-green-400 lg:bg-transparent w-full lg:w-auto top-24 left-0 lg:top-0 lg:flex-row space-y-4 lg:space-y-0 text-center z-50`}
         >
           <NavItem tipo="enlace" contenido="Inicio" to="/" />
           <NavItem tipo="enlace" contenido="Historia" to="/Historia" />
