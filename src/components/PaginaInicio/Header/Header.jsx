@@ -1,5 +1,5 @@
 import React from "react";
-import { MenuIcon, XIcon } from "@heroicons/react/outline"; // Importamos los iconos
+import { FaBars, FaTimes } from "react-icons/fa";
 import { useAlternarMenu } from "../../../hooks/MenuHamburguesa";
 import Colombia from "../../../assets/Images/Colombia.png";
 import Estados from "../../../assets/Images/estados-unidos.png";
@@ -51,9 +51,9 @@ export const Header = () => {
           onClick={alternarMenu}
         >
           {menuAbierto ? (
-            <XIcon className="w-8 h-8 text-white border-2 border-transparent hover:border-gray-500 transition-all duration-300" />
+            <FaTimes className="w-8 h-8 text-white border-2 border-transparent hover:border-gray-500 transition-all duration-300" />
           ) : (
-            <MenuIcon className="w-8 h-8 text-white" />
+            <FaBars className="w-8 h-8 text-white" />
           )}
         </button>
       </nav>

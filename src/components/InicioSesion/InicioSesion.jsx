@@ -1,5 +1,5 @@
 import React from "react";
-import { MailIcon } from "@heroicons/react/outline";
+import { FaEnvelope } from "react-icons/fa";
 import { PasswordField } from "../../hooks/HooksPassword";
 import { IconoExplo } from "./IconoExplo";
 
@@ -35,7 +35,7 @@ export const Login = ({
             </label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                <MailIcon className="h-5 w-5 text-gray-400" />
+                <FaEnvelope className="h-5 w-5 text-gray-400" />
               </span>
               <input
                 type="email"
@@ -62,7 +62,10 @@ export const Login = ({
         {/* Enlace para registrarse/iniciar sesión */}
         <p className="mt-6 text-center text-gray-600">
           {linkText}{" "}
-          <a href={linkHref} className="text-green-400 font-bold hover:underline">
+          <a
+            href={linkHref}
+            className="text-green-400 font-bold hover:underline"
+          >
             Aquí
           </a>
         </p>

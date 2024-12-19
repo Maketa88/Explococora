@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { LockClosedIcon, EyeIcon, EyeOffIcon } from "@heroicons/react/outline";
+import { FaEyeSlash, FaLock, FaEye } from "react-icons/fa"; // Para ojo cerrado
 
 export const PasswordField = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -18,7 +18,7 @@ export const PasswordField = () => {
       </label>
       <div className="relative">
         <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-          <LockClosedIcon className="h-5 w-5 text-gray-400" />
+          <FaLock className="h-5 w-5 text-gray-400" />
         </span>
         <input
           type={showPassword ? "text" : "password"}
@@ -32,9 +32,9 @@ export const PasswordField = () => {
           className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
         >
           {showPassword ? (
-            <EyeIcon className="h-5 w-5 text-gray-400" />
+            <FaEye className="h-5 w-5 text-gray-400" />
           ) : (
-            <EyeOffIcon className="h-5 w-5 text-gray-400" />
+            <FaEyeSlash className="h-5 w-5 text-gray-400" />
           )}
         </span>
       </div>
