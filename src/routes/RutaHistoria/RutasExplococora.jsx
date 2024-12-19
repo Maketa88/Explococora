@@ -1,26 +1,28 @@
 import React from "react";
-import { Routes, Route, useLocation } from "react-router-dom";  // Importamos useLocation
+import { Routes, Route, useLocation } from "react-router-dom";
 import { PaginaInicio } from "../../pages/PaginaInicio/PaginaInicio";
 import { Carta } from "../../components/HistoriaCultura/Body/HistoriaCultura";
 import { Login } from "../../components/InicioSesion/InicioSesion";
-import { Header } from "../../components/PaginaInicio/Header/Header"; // Asegúrate de importar el Header
+import { Header } from "../../components/PaginaInicio/Header/Header";
+import { Register } from "../../components/Registro/Registro";
 
 export const RutasExplococora = () => {
   const location = useLocation(); // Obtén la ruta actual
 
-  // Verifica si la ruta actual es la de inicio de sesión
-  const isLoginPage = location.pathname === "/Ingreso"; // Si la ruta es /Ingreso, no mostramos el Header
+  // Verifica si estamos en una ruta donde el Header no debe mostrarse
+  const hideHeader = ["/Ingreso", "/register"].includes(location.pathname);
 
   return (
     <div>
-      {/* Si no es la página de inicio de sesión, mostramos el Header */}
-      {!isLoginPage && <Header />}
+      {/* Mostramos el Header solo si no estamos en las rutas de inicio de sesión o registro */}
+      {!hideHeader && <Header />}
 
       {/* Definimos las rutas */}
       <Routes>
         <Route path="/" element={<PaginaInicio />} />
         <Route path="/Historia" element={<Carta />} />
         <Route path="/Ingreso" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </div>
   );

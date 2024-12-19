@@ -1,5 +1,7 @@
 
+
 import { RutasExplococora } from "./routes/RutaHistoria/RutasExplococora";
+
 
 
 function App() {
@@ -7,6 +9,7 @@ function App() {
     <>
       
       <RutasExplococora />
+      
     </>
   );
 }

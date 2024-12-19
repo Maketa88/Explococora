@@ -1,5 +1,5 @@
-import { LockClosedIcon, EyeIcon, EyeOffIcon } from "@heroicons/react/outline";
 import React, { useState } from "react";
+import { LockClosedIcon, EyeIcon, EyeOffIcon } from "@heroicons/react/outline";
 
 export const PasswordField = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -17,26 +17,16 @@ export const PasswordField = () => {
         Contraseña
       </label>
       <div className="relative">
-        {/* Icono de candado al inicio */}
         <span className="absolute inset-y-0 left-0 flex items-center pl-3">
           <LockClosedIcon className="h-5 w-5 text-gray-400" />
         </span>
-
-        {/* Campo de entrada */}
         <input
           type={showPassword ? "text" : "password"}
           id="password"
           placeholder="********"
           className="w-full pl-10 pr-10 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           required
-          style={{
-            WebkitTextSecurity: "none", // Chrome, Safari, Edge
-            MozAppearance: "textfield", // Firefox
-            appearance: "none", // Navegadores que soporten esta propiedad
-          }}
         />
-
-        {/* Icono de ojo para alternar visibilidad */}
         <span
           onClick={togglePasswordVisibility}
           className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
@@ -51,5 +41,3 @@ export const PasswordField = () => {
     </div>
   );
 };
-
-
