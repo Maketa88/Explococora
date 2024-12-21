@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaEyeSlash, FaLock, FaEye } from "react-icons/fa"; // Para ojo cerrado
 
-export const PasswordField = () => {
+export const PasswordField = ({ value, onChange }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
@@ -10,10 +10,7 @@ export const PasswordField = () => {
 
   return (
     <div className="mb-6">
-      <label
-        htmlFor="password"
-        className="block text-gray-700 font-medium mb-2"
-      >
+      <label htmlFor="password" className="block text-gray-700 font-medium mb-2">
         Contraseña
       </label>
       <div className="relative">
@@ -23,6 +20,8 @@ export const PasswordField = () => {
         <input
           type={showPassword ? "text" : "password"}
           id="password"
+          value={value} // Vinculamos el valor con el estado en el componente padre
+          onChange={onChange} // Llamamos al callback para actualizar el estado en el componente padre
           placeholder="********"
           className="w-full pl-10 pr-10 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           required

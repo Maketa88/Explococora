@@ -1,0 +1,38 @@
+import React from "react";
+
+export const InputField = ({
+  label,
+  type = "text",
+  id,
+  placeholder,
+  value,
+  onChange,
+  required = false,
+  icon: Icon,
+}) => {
+  return (
+    <div className="mb-2">
+      <label htmlFor={id} className="block text-gray-700 font-medium mb-2">
+        {label}
+      </label>
+      <div className="relative">
+        {Icon && (
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+            <Icon className="h-5 w-5 text-gray-400" />
+          </span>
+        )}
+        <input
+          type={type}
+          id={id}
+          placeholder={placeholder}
+          value={value}
+          onChange={onChange}
+          required={required}
+          className={`w-full ${
+            Icon ? "pl-10" : ""
+          } px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent`}
+        />
+      </div>
+    </div>
+  );
+};
