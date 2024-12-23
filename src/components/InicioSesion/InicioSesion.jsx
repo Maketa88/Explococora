@@ -1,14 +1,14 @@
 import React from "react";
 import { FaEnvelope } from "react-icons/fa";
-import { PasswordField } from "../../hooks/HooksPassword";
+import { HookContrasenia } from "../../hooks/HookContrasenia";
 import { IconoExplo } from "./IconoExplo";
 
-export const Login = ({
+export const InicioSesion = ({
   title = "Bienvenido a Explococora",
   subtitle = "Inicia sesión para explorar las maravillas del Valle del Cocora.",
   buttonText = "Iniciar Sesión",
   linkText = "¿No tienes cuenta? Regístrate aquí",
-  linkHref = "/register",
+  linkHref = "/Registro",
   onSubmit,
 }) => {
   return (
@@ -48,7 +48,7 @@ export const Login = ({
           </div>
 
           {/* Campo de contraseña */}
-          <PasswordField />
+          <HookContrasenia />
 
           {/* Botón de acción */}
           <button

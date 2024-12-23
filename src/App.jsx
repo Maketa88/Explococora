@@ -1,15 +1,9 @@
-
-
-import { RutasExplococora } from "./routes/RutaHistoria/RutasExplococora";
-
-
+import { RutasExplococora } from "./routes/RutasExplococora/RutasExplococora";
 
 function App() {
   return (
     <>
-      
       <RutasExplococora />
-      
     </>
   );
 }

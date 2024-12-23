@@ -2,7 +2,7 @@
 import React from "react";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
 
-export const BotonNav = ({ direction, onClick }) => {
+export const BotonCarrusel = ({ direction, onClick }) => {
   const Icon = direction === "left" ? HiChevronLeft : HiChevronRight;
 
   return (

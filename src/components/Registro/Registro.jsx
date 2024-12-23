@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { InputField } from "../../components/InicioSesion/Input";
-import { PasswordField } from "../../hooks/HooksPassword";
+import { InputRegistro } from "../../components/InicioSesion/Input";
+import { HookContrasenia } from "../../hooks/HookContrasenia";
 import { IconoExplo } from "../../components/InicioSesion/IconoExplo";
 import { FaUser, FaIdCard, FaEnvelope } from "react-icons/fa";
-import Swal from "sweetalert2"; // Importa SweetAlert2
+import Swal from "sweetalert2";
+import { RegistroCliente } from "../../services/RegistroCliente";
 
-export const Register = () => {
+export const Registro = () => {
   const [formData, setFormData] = useState({
     cedula: "",
     primerNombre: "",
@@ -17,14 +17,11 @@ export const Register = () => {
     contrasenia: "",
   });
 
-  const [errors, setErrors] = useState([]); // Para manejar errores del formulario
+  const [errors, setErrors] = useState([]);
 
-  // Usamos useEffect para limpiar el formulario o hacer cualquier otro efecto al montar el componente
   useEffect(() => {
-    // Limpia los datos de registro si es necesario, o carga datos previos
-    // Ejemplo de limpiar errores cuando se monta el componente
     setErrors([]);
-  }, []); // Solo se ejecuta al montar el componente
+  }, []);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -34,18 +31,15 @@ export const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:10101/cliente/registrar", formData);
-      console.log("Datos registrados:", response.data);
-  
-      // Mostrar alerta de éxito con SweetAlert2
+      const response = await RegistroCliente(formData);
+
       Swal.fire({
         title: "Registro exitoso",
         text: "Usuario registrado con éxito",
         icon: "success",
         confirmButtonText: "Aceptar",
       });
-  
-      // Limpiar los campos del formulario
+
       setFormData({
         cedula: "",
         primerNombre: "",
@@ -55,51 +49,30 @@ export const Register = () => {
         email: "",
         contrasenia: "",
       });
-  
-      // Limpiar los errores
+
       setErrors([]);
-  
     } catch (error) {
-      if (error.response) {
-        // Verificar si el backend devuelve un mensaje específico para el correo electrónico duplicado
-        const errorMessage = error.response.data.message;
-        
-        // Si el mensaje es sobre correo electrónico duplicado, agregamos el error al estado
-        if (errorMessage === "El correo electrónico ya está registrado") {
-          setErrors([{ msg: "El correo electrónico ya está registrado. Por favor, usa otro." }]);
-        } else {
-          const errors = error.response.data.errors || [];
-          setErrors(errors); // Guardar otros errores
-        }
+      if (error.message === "El correo electrónico ya está registrado") {
+        setErrors([
+          {
+            msg: "El correo electrónico ya está registrado. Por favor, usa otro.",
+          },
+        ]);
       } else {
-        console.error("Error en el registro:", error.message);
-        Swal.fire({
-          title: "Error",
-          text: "Hubo un error en la solicitud",
-          icon: "error",
-          confirmButtonText: "Aceptar",
-        });
+        setErrors(error.errors || []);
       }
     }
   };
-  
-  
-  
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 font-nunito">
       <div className="bg-white shadow-2xl rounded-lg p-5 w-full max-w-lg border border-gray-200">
-        {/* Icono Explococora */}
         <IconoExplo />
-
-        {/* Título */}
         <h2 className="text-center text-2xl font-bold text-gray-700 mb-2">
           Regístrate en Explococora
         </h2>
-        
-
-        {/* Formulario */}
         <form onSubmit={handleRegister}>
-          <InputField
+          <InputRegistro
             label="Cédula"
             id="cedula"
             placeholder="Ingrese su cédula"
@@ -108,7 +81,7 @@ export const Register = () => {
             required
             icon={FaIdCard}
           />
-          <InputField
+          <InputRegistro
             label="Primer Nombre"
             id="primerNombre"
             placeholder="Ingrese su primer nombre"
@@ -117,14 +90,14 @@ export const Register = () => {
             required
             icon={FaUser}
           />
-          <InputField
+          <InputRegistro
             label="Segundo Nombre"
             id="segundoNombre"
-            placeholder="Ingrese su segundo nombre"
+            placeholder="Ingrese su segundo nombre ( Opcional )"
             value={formData.segundoNombre}
             onChange={handleChange}
           />
-          <InputField
+          <InputRegistro
             label="Primer Apellido"
             id="primerApellido"
             placeholder="Ingrese su primer apellido"
@@ -133,14 +106,14 @@ export const Register = () => {
             required
             icon={FaUser}
           />
-          <InputField
+          <InputRegistro
             label="Segundo Apellido"
             id="segundoApellido"
-            placeholder="Ingrese su segundo apellido"
+            placeholder="Ingrese su segundo apellido ( Opcional )"
             value={formData.segundoApellido}
             onChange={handleChange}
           />
-          <InputField
+          <InputRegistro
             label="Correo Electrónico"
             type="email"
             id="email"
@@ -150,14 +123,12 @@ export const Register = () => {
             required
             icon={FaEnvelope}
           />
-          <PasswordField
+          <HookContrasenia
             value={formData.contrasenia}
             onChange={(e) =>
               setFormData({ ...formData, contrasenia: e.target.value })
             }
           />
-
-          {/* Mostrar mensajes de error */}
           {errors.length > 0 && (
             <div className="text-red-500 mb-4">
               {errors.map((error, index) => (
@@ -165,8 +136,6 @@ export const Register = () => {
               ))}
             </div>
           )}
-
-          {/* Botón de acción */}
           <button
             type="submit"
             className="w-full bg-green-400 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-300"
@@ -174,8 +143,6 @@ export const Register = () => {
             Registrarse
           </button>
         </form>
-
-        {/* Enlace para iniciar sesión */}
         <p className="mt-3 text-center text-gray-600">
           ¿Ya tienes cuenta?{" "}
           <a

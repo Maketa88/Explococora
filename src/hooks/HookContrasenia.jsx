@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaEyeSlash, FaLock, FaEye } from "react-icons/fa"; // Para ojo cerrado
 
-export const PasswordField = ({ value, onChange }) => {
+export const HookContrasenia = ({ value, onChange }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
@@ -10,7 +10,10 @@ export const PasswordField = ({ value, onChange }) => {
 
   return (
     <div className="mb-6">
-      <label htmlFor="password" className="block text-gray-700 font-medium mb-2">
+      <label
+        htmlFor="password"
+        className="block text-gray-700 font-medium mb-2"
+      >
         Contraseña
       </label>
       <div className="relative">

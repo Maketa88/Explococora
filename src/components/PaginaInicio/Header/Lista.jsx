@@ -37,7 +37,6 @@ export const NavItem = ({
       </li>
     );
   }
-  
 
   if (tipo === "imagen") {
     return (

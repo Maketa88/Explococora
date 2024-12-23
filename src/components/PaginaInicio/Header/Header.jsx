@@ -37,7 +37,7 @@ export const Header = () => {
             tipo="boton"
             contenido="Crear Cuenta"
             estilos="bg-blue-600 text-white hover:bg-blue-800 font-nunito"
-            to="/register"
+            to="/Registro"
           />
 
           {/* Banderas */}
