@@ -5,6 +5,8 @@ import { HistoriaCultura } from "../../components/HistoriaCultura/Body/HistoriaC
 import { InicioSesion } from "../../components/InicioSesion/InicioSesion";
 import { Header } from "../../components/PaginaInicio/Header/Header";
 import { Registro } from "../../components/Registro/Registro";
+import { PaginaNoEncontrada } from "../../components/HistoriaCultura/Body/PaginanoEncontrada/paginaNoEncontrada";
+
 
 export const RutasExplococora = () => {
   const location = useLocation(); // Obtén la ruta actual
@@ -23,6 +25,7 @@ export const RutasExplococora = () => {
         <Route path="/Historia" element={<HistoriaCultura />} />
         <Route path="/Ingreso" element={<InicioSesion />} />
         <Route path="/Registro" element={<Registro />} />
+        <Route path="/*" element={<PaginaNoEncontrada />} />
       </Routes>
     </div>
   );
