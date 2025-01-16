@@ -6,6 +6,11 @@ import { InicioSesion } from "../../components/InicioSesion/InicioSesion";
 import { Header } from "../../components/PaginaInicio/Header/Header";
 import { Registro } from "../../components/Registro/Registro";
 import { PaginaNoEncontrada } from "../../components/HistoriaCultura/Body/PaginanoEncontrada/paginaNoEncontrada";
+import ContactForm from "../../components/ContactForm/ContactForm";
+import  { NuestrosGuias }  from "../../components/NuestrosGuias/NuestrosGuias";
+import Footer from "../../components/PaginaInicio/Footer/Footer";
+
+
 
 
 export const RutasExplococora = () => {
@@ -23,10 +28,15 @@ export const RutasExplococora = () => {
       <Routes>
         <Route path="/" element={<PaginaInicio />} />
         <Route path="/Historia" element={<HistoriaCultura />} />
+        <Route path="/NuestrosGuias" element={<NuestrosGuias />} />
         <Route path="/Ingreso" element={<InicioSesion />} />
         <Route path="/Registro" element={<Registro />} />
+        <Route path="/ContactForm" element={<ContactForm />} />
         <Route path="/*" element={<PaginaNoEncontrada />} />
       </Routes>
+      {!hideHeader && <Footer />}
+
+      
     </div>
   );
 };

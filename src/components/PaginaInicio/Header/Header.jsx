@@ -24,7 +24,8 @@ export const Header = () => {
           <NavItem tipo="enlace" contenido="Inicio" to="/" />
           <NavItem tipo="enlace" contenido="Historia" to="/Historia" />
           <NavItem tipo="enlace" contenido="Nuestras Rutas" enlace="#routes" />
-          <NavItem tipo="enlace" contenido="Contáctanos" enlace="#contact" />
+          <NavItem tipo="enlace" contenido="Nuestros Guías" to="/NuestrosGuias" />
+          <NavItem tipo="enlace" contenido="Contáctanos" to="/ContactForm" />
 
           {/* Botones */}
           <NavItem
@@ -41,7 +42,8 @@ export const Header = () => {
           />
 
           {/* Banderas */}
-          <NavItem tipo="imagen" imgSrc={Colombia} alt="Bandera de USA" />
+          <NavItem tipo="imagen" imgSrc={Colombia} alt="Bandera de USA"  />
+          <p>|</p>
           <NavItem tipo="imagen" imgSrc={Estados} alt="Bandera de Colombia" />
         </ul>
 
