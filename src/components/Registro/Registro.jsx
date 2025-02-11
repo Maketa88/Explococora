@@ -52,15 +52,9 @@ export const Registro = () => {
 
       setErrors([]);
     } catch (error) {
-      if (error.message === "El correo electrónico ya está registrado") {
-        setErrors([
-          {
-            msg: "El correo electrónico ya está registrado. Por favor, usa otro.",
-          },
-        ]);
-      } else {
-        setErrors(error.errors || []);
-      }
+      // Manejar errores del backend
+      const errorList = error.errors || [];
+      setErrors([{ msg: error.message }, ...errorList]);
     }
   };
 
