@@ -1,4 +1,4 @@
-import { Carrusel } from '../../components/PaginaInicio/Carrusel/Carrusel';
+import { Carrusel } from "../../components/PaginaInicio/Body/Carrusel";
 
 export const PaginaInicio = () => {
   return (
