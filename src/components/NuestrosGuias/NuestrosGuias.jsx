@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Card } from './Card'; // Asegúrate de tener el componente Card y CardList ya implementados
 import { CardList } from './Cardlist'; // Asegúrate de tener el componente Card y CardList ya implementados
-
+import { useTranslation } from 'react-i18next';
 
 const NuestrosGuias = () => {
+  const { t } = useTranslation();
   const [guias, setGuias] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -28,8 +29,9 @@ const NuestrosGuias = () => {
   }
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Nuestros Guías</h2>
+    <div className="guias-container">
+      <h1>{t('tituloGuias')}</h1>
+      <p>{t('descripcionGuias')}</p>
       <CardList guias={guias} />
     </div>
   );

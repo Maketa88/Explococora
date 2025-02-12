@@ -1,12 +1,12 @@
 import React from "react";
-import { FaEnvelope } from "react-icons/fa";
+import { IconoExplo } from "../InicioSesion/IconoExplo";
+import { Input } from "../InicioSesion/Input";
 import { HookContrasenia } from "../../hooks/HookContrasenia";
-import { IconoExplo } from "./IconoExplo";
 import { useTranslation } from 'react-i18next';
-import Colombia from '../../assets/Images/Colombia.png';
-import Usa from '../../assets/Images/Usa.png';
+import Colombia from "../../assets/Images/Colombia.png";
+import Usa from "../../assets/Images/Usa.png";
 
-export const InicioSesion = () => {
+export const Login = () => {
   const { t, i18n } = useTranslation();
 
   const cambiarIdioma = () => {
@@ -52,21 +52,11 @@ export const InicioSesion = () => {
           {t('iniciaSesion')}
         </p>
         <form>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              {t('correoElectronico')}
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-2 text-gray-400">
-                <FaEnvelope />
-              </span>
-              <input
-                type="email"
-                placeholder="Cocora@correo.com"
-                className="pl-10 w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400"
-              />
-            </div>
-          </div>
+          <Input
+            label={t('correoElectronico')}
+            type="email"
+            placeholder="Cocora@correo.com"
+          />
           <HookContrasenia label={t('contrasena')} />
           <button
             type="submit"
@@ -86,4 +76,4 @@ export const InicioSesion = () => {
       </div>
     </div>
   );
-};
+}; 

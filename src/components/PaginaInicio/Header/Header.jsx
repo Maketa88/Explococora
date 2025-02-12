@@ -1,13 +1,19 @@
-import React from "react";
+import { useTranslation } from 'react-i18next';
 import { FaBars, FaTimes } from "react-icons/fa";
 import { useAlternarMenu } from "../../../hooks/MenuHamburguesa";
 import Colombia from "../../../assets/Images/Colombia.png";
-import Estados from "../../../assets/Images/estados-unidos.png";
+import Usa from "../../../assets/Images/Usa.png";
 import { NavItem } from "./Lista";
 import { Logo } from "./Logo";
 
 export const Header = () => {
   const { menuAbierto, alternarMenu } = useAlternarMenu();
+  const { t, i18n } = useTranslation();
+
+  const cambiarIdioma = () => {
+    const nuevoIdioma = i18n.language === 'es' ? 'en' : 'es';
+    i18n.changeLanguage(nuevoIdioma);
+  };
 
   return (
     <header className="bg-green-400 shadow-lg z-50">
@@ -21,30 +27,50 @@ export const Header = () => {
             menuAbierto ? "block" : "hidden"
           } absolute lg:relative bg-green-400 lg:bg-transparent w-full lg:w-auto top-24 left-0 lg:top-0 lg:flex-row space-y-4 lg:space-y-0 text-center z-50`}
         >
-          <NavItem tipo="enlace" contenido="Inicio" to="/" />
-          <NavItem tipo="enlace" contenido="Historia" to="/Historia" />
-          <NavItem tipo="enlace" contenido="Nuestras Rutas" enlace="#routes" />
-          <NavItem tipo="enlace" contenido="Nuestros Guías" to="/NuestrosGuias" />
-          <NavItem tipo="enlace" contenido="Contáctanos" to="/ContactForm" />
+          <NavItem tipo="enlace" contenido={t('inicio')} to="/" />
+          <NavItem tipo="enlace" contenido={t('historia')} to="/Historia" />
+          <NavItem tipo="enlace" contenido={t('nuestrasRutas')} enlace="#routes" />
+          <NavItem tipo="enlace" contenido={t('nuestrosGuias')} to="/NuestrosGuias" />
+          <NavItem tipo="enlace" contenido={t('contactanos')} to="/ContactForm" />
 
           {/* Botones */}
           <NavItem
             tipo="boton"
-            contenido="Ingresar"
+            contenido={t('ingresar')}
             estilos="bg-blue-600 text-white hover:bg-blue-800 font-nunito"
             to="/Ingreso"
           />
           <NavItem
             tipo="boton"
-            contenido="Crear Cuenta"
+            contenido={t('crearCuenta')}
             estilos="bg-blue-600 text-white hover:bg-blue-800 font-nunito"
             to="/Registro"
           />
 
           {/* Banderas */}
-          <NavItem tipo="imagen" imgSrc={Colombia} alt="Bandera de USA"  />
-          <p>|</p>
-          <NavItem tipo="imagen" imgSrc={Estados} alt="Bandera de Colombia" />
+          <div className="flex items-center space-x-2">
+            <button 
+              onClick={cambiarIdioma} 
+              className={`transition-opacity ${i18n.language === 'es' ? 'opacity-100' : 'opacity-50'}`}
+            >
+              <NavItem 
+                tipo="imagen" 
+                imgSrc={Colombia} 
+                alt="Bandera de Colombia"  
+              />
+            </button>
+            <span className="text-gray-500">|</span>
+            <button 
+              onClick={cambiarIdioma}
+              className={`transition-opacity ${i18n.language === 'en' ? 'opacity-100' : 'opacity-50'}`}
+            >
+              <NavItem 
+                tipo="imagen" 
+                imgSrc={Usa} 
+                alt="USA Flag"  
+              />
+            </button>
+          </div>
         </ul>
 
         {/* Menú Hamburguesa */}

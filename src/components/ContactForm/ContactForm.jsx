@@ -1,8 +1,10 @@
 import { useState } from "react";
 import emailjs from "@emailjs/browser";
 import Swal from "sweetalert2";
+import { useTranslation } from 'react-i18next';
 
 const ContactForm = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     nombre: "",
     correo: "",
@@ -22,7 +24,7 @@ const ContactForm = () => {
   const validateForm = () => {
     for (const key in formData) {
       if (formData[key].trim() === "") {
-        setErrorMessage("Todos los campos son obligatorios");
+        setErrorMessage(t('camposObligatorios'));
         return false;
       }
     }
@@ -57,8 +59,8 @@ const ContactForm = () => {
           // Mostrar mensaje de éxito con SweetAlert2
           Swal.fire({
             icon: "success",
-            title: "Mensaje enviado correctamente",
-            text: "Nos pondremos en contacto contigo pronto.",
+            title: t('mensajeEnviado'),
+            text: t('contactaremosProonto'),
             confirmButtonColor: "#38a169", // Botón verde
           });
           setFormData({ nombre: "", correo: "", telefono: "", razon: "", mensaje: "" }); // Limpiar los campos
@@ -68,8 +70,8 @@ const ContactForm = () => {
           // Mostrar mensaje de error con SweetAlert2
           Swal.fire({
             icon: "error",
-            title: "Error al enviar el mensaje",
-            text: "Por favor, intenta de nuevo más tarde.",
+            title: t('errorEnvio'),
+            text: t('intentarNuevamente'),
             confirmButtonColor: "#e53e3e", // Botón rojo
           });
         }
@@ -78,79 +80,100 @@ const ContactForm = () => {
 
   return (
     <div
-      className="bg-cover bg-center min-h-screen flex items-center justify-center"
+      className="min-h-screen bg-cover bg-center flex items-center justify-center p-8"
       style={{ backgroundImage: "url('/assets/carrusel1.webp')" }}
     >
-      <div className="bg-teal-600 bg-opacity-50 text-white rounded-lg p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-4 text-center">Contacta con nosotros</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block mb-1 font-semibold">Nombre Completo</label>
-            <input
-              type="text"
-              name="nombre"
-              placeholder="Escribe tu nombre"
-              value={formData.nombre}
-              onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg bg-teal-800 bg-opacity-50 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
+      <div className="bg-teal-600 bg-opacity-50 backdrop-blur-sm rounded-xl shadow-2xl p-8 w-full max-w-2xl">
+        <h2 className="text-3xl font-bold mb-8 text-white text-center">
+          {t('contactaConNosotros')}
+        </h2>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-4">
+            <div className="bg-white bg-opacity-20 rounded-lg p-4">
+              <label className="block text-white font-semibold mb-2">
+                {t('nombreCompleto')}
+              </label>
+              <input
+                type="text"
+                name="nombre"
+                placeholder={t('escribeTuNombre')}
+                value={formData.nombre}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg bg-white bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all"
+              />
+            </div>
+
+            <div className="bg-white bg-opacity-20 rounded-lg p-4">
+              <label className="block text-white font-semibold mb-2">
+                {t('correoElectronico')}
+              </label>
+              <input
+                type="email"
+                name="correo"
+                placeholder={t('escribeTuCorreo')}
+                value={formData.correo}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg bg-white bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all"
+              />
+            </div>
+
+            <div className="bg-white bg-opacity-20 rounded-lg p-4">
+              <label className="block text-white font-semibold mb-2">
+                {t('telefono')}
+              </label>
+              <input
+                type="tel"
+                name="telefono"
+                placeholder={t('escribeTuTelefono')}
+                value={formData.telefono}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg bg-white bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all"
+              />
+            </div>
+
+            <div className="bg-white bg-opacity-20 rounded-lg p-4">
+              <label className="block text-white font-semibold mb-2">
+                {t('razon')}
+              </label>
+              <select
+                name="razon"
+                value={formData.razon}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg bg-white bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all"
+              >
+                <option value="">{t('selecciona')}</option>
+                <option value="consulta">{t('consulta')}</option>
+                <option value="reserva">{t('reserva')}</option>
+                <option value="otro">{t('otro')}</option>
+              </select>
+            </div>
+
+            <div className="bg-white bg-opacity-20 rounded-lg p-4">
+              <label className="block text-white font-semibold mb-2">
+                {t('mensaje')}
+              </label>
+              <textarea
+                name="mensaje"
+                placeholder={t('escribeTuMensaje')}
+                rows={4}
+                value={formData.mensaje}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg bg-white bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all"
+              ></textarea>
+            </div>
           </div>
-          <div>
-            <label className="block mb-1 font-semibold">Correo Electrónico</label>
-            <input
-              type="email"
-              name="correo"
-              placeholder="Escribe tu correo"
-              value={formData.correo}
-              onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg bg-teal-800 bg-opacity-50 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
-          </div>
-          <div>
-            <label className="block mb-1 font-semibold">Teléfono</label>
-            <input
-              type="number"
-              name="telefono"
-              placeholder="Escribe tu teléfono"
-              value={formData.telefono}
-              onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg bg-teal-800 bg-opacity-50 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
-          </div>
-          <div>
-            <label className="block mb-1 font-semibold">Razón</label>
-            <select
-              name="razon"
-              value={formData.razon}
-              onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg bg-teal-800 bg-opacity-50 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-            >
-              <option value="" disabled>
-                Selecciona
-              </option>
-              <option>Más Información</option>
-              <option>Reclamo</option>
-              <option>Ayuda</option>
-            </select>
-          </div>
-          <div>
-            <label className="block mb-1 font-semibold">Mensaje</label>
-            <textarea
-              name="mensaje"
-              placeholder="Escribe tu mensaje"
-              rows={4}
-              value={formData.mensaje}
-              onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg bg-teal-800 bg-opacity-50 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-            ></textarea>
-          </div>
+
           <button
             type="submit"
-            className="w-full py-2 px-4 bg-teal-700 hover:bg-teal-600 rounded-lg font-semibold text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+            className="w-full py-3 px-6 bg-teal-700 hover:bg-teal-600 rounded-lg font-semibold text-white transition-colors duration-300 shadow-lg hover:shadow-xl"
           >
-            Enviar
+            {t('enviar')}
           </button>
-          {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
+
+          {errorMessage && (
+            <p className="text-red-200 text-sm mt-2">{errorMessage}</p>
+          )}
         </form>
       </div>
     </div>
