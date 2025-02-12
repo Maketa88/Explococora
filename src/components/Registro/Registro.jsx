@@ -69,7 +69,7 @@ export const Registro = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 font-nunito">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 font-nunito p-6">
       <div className="bg-white shadow-2xl rounded-lg p-5 w-full max-w-lg border border-gray-200">
         <div className="flex justify-end mb-4">
           <div className="flex items-center space-x-2">
