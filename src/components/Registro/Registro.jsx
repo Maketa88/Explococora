@@ -149,7 +149,7 @@ export const Registro = () => {
             label={t('email')}
             type="email"
             id="email"
-            placeholder={t('emailPlaceholder')}
+            placeholder={t('email')}
             value={formData.email}
             onChange={handleChange}
             required
