@@ -1,35 +1,46 @@
 import React, { useState } from "react";
-import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa"; // Para ojo cerrado
 import { useTranslation } from 'react-i18next';
 
-export const HookContrasenia = () => {
-  const [mostrarContrasenia, setMostrarContrasenia] = useState(false);
+export const HookContrasenia = ({ value, onChange }) => {
+  const [showPassword, setShowPassword] = useState(false);
   const { t } = useTranslation();
 
-  const toggleMostrarContrasenia = () => {
-    setMostrarContrasenia(!mostrarContrasenia);
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
-    <div className="mb-4">
-      <label className="block text-gray-700 text-sm font-bold mb-2">
-        {t('contrasena')}
+    <div className="mb-6">
+      <label
+        htmlFor="password"
+        className="block text-gray-700 font-medium mb-2"
+      >
+         {t('contrasena')}
       </label>
       <div className="relative">
-        <span className="absolute left-3 top-2 text-gray-400">
-          <FaLock />
+        <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+          <FaLock className="h-5 w-5 text-gray-400" />
         </span>
         <input
-          type={mostrarContrasenia ? "text" : "password"}
-          className="pl-10 w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400"
+          type={showPassword ? "text" : "password"}
+          id="password"
+          value={value} // Vinculamos el valor con el estado en el componente padre
+          onChange={onChange} // Llamamos al callback para actualizar el estado en el componente padre
+          placeholder="********"
+          className="w-full pl-10 pr-10 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          required
         />
-        <button
-          type="button"
-          onClick={toggleMostrarContrasenia}
-          className="absolute right-3 top-2 text-gray-400"
+        <span
+          onClick={togglePasswordVisibility}
+          className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
         >
-          {mostrarContrasenia ? <FaEyeSlash /> : <FaEye />}
-        </button>
+          {showPassword ? (
+            <FaEye className="h-5 w-5 text-gray-400" />
+          ) : (
+            <FaEyeSlash className="h-5 w-5 text-gray-400" />
+          )}
+        </span>
       </div>
     </div>
   );

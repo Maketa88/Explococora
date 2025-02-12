@@ -168,9 +168,10 @@ export const Registro = () => {
               ))}
             </div>
           )}
-          <div>
-            <input type="checkbox" />
-            <label>{t('terminos')}</label>
+          <div className="pb-3">
+            <input type="checkbox" 
+            className="w-6 h-6 "/>
+            <label className="px-3">{t('terminos')}</label>
           </div>
           <button
             type="submit"
