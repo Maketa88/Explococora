@@ -15,7 +15,7 @@ export const NavItem = ({
         <NavLink
           to={to}
           className={({ isActive }) =>
-            `text-gray-950 font-bold hover:underline hover:text-black text-lg font-nunito ${
+            `text-white font-extrabold hover:underline hover:text-black text-lg font-nunito ${
               isActive ? "text-blue-600" : ""
             } ${estilos}`
           }

@@ -19,7 +19,12 @@ export const HistoriaCultura = () => {
         <TituloExplo />
       </div>
 
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-10">
+      <div className="min-h-screen bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300 flex items-center justify-center p-10">
+  {/* Contenido */}
+
+
+
+
         <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-20">
           <Carta
             image={Carta1}

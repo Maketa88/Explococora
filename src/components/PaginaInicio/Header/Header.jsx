@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { useAlternarMenu } from "../../../hooks/MenuHamburguesa";
 import Colombia from "../../../assets/Images/Colombia.png";
@@ -11,12 +11,12 @@ export const Header = () => {
   const { t, i18n } = useTranslation();
 
   const cambiarIdioma = () => {
-    const nuevoIdioma = i18n.language === 'es' ? 'en' : 'es';
+    const nuevoIdioma = i18n.language === "es" ? "en" : "es";
     i18n.changeLanguage(nuevoIdioma);
   };
 
   return (
-    <header className="bg-green-400 shadow-lg z-50">
+    <header className="bg-tropicalCanopy shadow-lg z-50">
       <nav className="container mx-auto px-1 py-8 flex justify-between items-center relative">
         {/* Logo */}
         <Logo />
@@ -25,50 +25,62 @@ export const Header = () => {
         <ul
           className={`lg:flex lg:space-x-6 ${
             menuAbierto ? "block" : "hidden"
-          } absolute lg:relative bg-green-400 lg:bg-transparent w-full lg:w-auto top-24 left-0 lg:top-0 lg:flex-row space-y-4 lg:space-y-0 text-center z-50`}
+          } absolute lg:relative bg-tropicalCanopy lg:bg-transparent w-full lg:w-auto top-24 left-0 lg:top-0 lg:flex-row space-y-4 lg:space-y-0 text-center z-50`}
         >
-          <NavItem tipo="enlace" contenido={t('inicio')} to="/" />
-          <NavItem tipo="enlace" contenido={t('historia')} to="/Historia" />
-          <NavItem tipo="enlace" contenido={t('nuestrasRutas')} enlace="#routes" />
-          <NavItem tipo="enlace" contenido={t('nuestrosGuias')} to="/NuestrosGuias" />
-          <NavItem tipo="enlace" contenido={t('contactanos')} to="/ContactForm" />
+          <NavItem tipo="enlace" contenido={t("inicio")} to="/" />
+          <NavItem tipo="enlace" contenido={t("historia")} to="/Historia" />
+          <NavItem
+            tipo="enlace"
+            contenido={t("nuestrasRutas")}
+            enlace="#routes"
+          />
+          <NavItem
+            tipo="enlace"
+            contenido={t("nuestrosGuias")}
+            to="/NuestrosGuias"
+          />
+          <NavItem
+            tipo="enlace"
+            contenido={t("contactanos")}
+            to="/ContactForm"
+          />
 
           {/* Botones */}
           <NavItem
             tipo="boton"
-            contenido={t('ingresar')}
+            contenido={t("ingresar")}
             estilos="bg-blue-600 text-white hover:bg-blue-800 font-nunito"
             to="/Ingreso"
           />
           <NavItem
             tipo="boton"
-            contenido={t('crearCuenta')}
+            contenido={t("crearCuenta")}
             estilos="bg-blue-600 text-white hover:bg-blue-800 font-nunito"
             to="/Registro"
           />
 
           {/* Banderas */}
           <div className="flex items-center space-x-2">
-            <button 
-              onClick={cambiarIdioma} 
-              className={`transition-opacity ${i18n.language === 'es' ? 'opacity-100' : 'opacity-50'}`}
+            <button
+              onClick={cambiarIdioma}
+              className={`transition-opacity ${
+                i18n.language === "es" ? "opacity-100" : "opacity-50"
+              }`}
             >
-              <NavItem 
-                tipo="imagen" 
-                imgSrc={Colombia} 
-                alt="Bandera de Colombia"  
+              <NavItem
+                tipo="imagen"
+                imgSrc={Colombia}
+                alt="Bandera de Colombia"
               />
             </button>
             <span className="text-gray-500">|</span>
-            <button 
+            <button
               onClick={cambiarIdioma}
-              className={`transition-opacity ${i18n.language === 'en' ? 'opacity-100' : 'opacity-50'}`}
+              className={`transition-opacity ${
+                i18n.language === "en" ? "opacity-100" : "opacity-50"
+              }`}
             >
-              <NavItem 
-                tipo="imagen" 
-                imgSrc={Usa} 
-                alt="USA Flag"  
-              />
+              <NavItem tipo="imagen" imgSrc={Usa} alt="USA Flag" />
             </button>
           </div>
         </ul>
