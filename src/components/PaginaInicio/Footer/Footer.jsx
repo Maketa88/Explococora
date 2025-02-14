@@ -1,52 +1,75 @@
-import { FaWhatsapp, FaFacebook, FaYoutube, FaInstagram, FaTiktok } from "react-icons/fa";
-import { MdPlace, MdEmail, MdSchedule } from "react-icons/md";
+import React from "react";
+import { FaFacebookSquare, FaInstagram } from "react-icons/fa";
+import { FaTiktok } from "react-icons/fa";
+import logo from "../../../assets/Images/logo.webp";
+import { IconoRedes } from "./IconoRedes";
+import { LinkFooter } from "./LinkFooter";
+import { FooterSeccion } from "./FooterSeccion";
 
-const Footer = () => {
+export const Footer = () => {
   return (
-    <footer className="bg-teal-800 text-white py-4">
-      <div className="container mx-auto flex flex-wrap justify-between items-center px-4">
-        {/* Ubicación */}
-        <div className="flex items-center space-x-2">
-          <MdPlace className="text-lg" />
-          <span>Colombia</span>
-        </div>
+    <footer className="bg-teal-800">
+      <div className="max-w-7xl mx-auto  py-2">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 p-3 ">
+          {/* Logo Section */}
+          <div className="flex flex-col items-start">
+            <img
+              src={logo}
+              alt="Valle del Cocora Logo"
+              className="h-16 w-auto mb-4"
+            />
+            <p className="text-white font-medium text-lg">
+              Descubre la magia del Valle del Cocora, hogar de las majestuosas
+              palmas de cera y experiencias únicas en la naturaleza.
+            </p>
+          </div>
 
-        {/* Horario */}
-        <div className="flex items-center space-x-2">
-          <MdSchedule className="text-lg" />
-          <span>¡Programa tu ruta hoy!</span>
-        </div>
+          {/* Links Sections */}
+          <FooterSeccion title="Acerca de Nosotros">
+            <LinkFooter href="/quienes-somos">Quiénes Somos</LinkFooter>
 
-        {/* Teléfono */}
-        <div className="flex items-center space-x-2">
-          <FaWhatsapp className="text-lg" />
-          <span>+57 1234567890</span>
-        </div>
+            <LinkFooter href="/ContactForm">Contacto</LinkFooter>
+          </FooterSeccion>
 
-        {/* Correo */}
-        <div className="flex items-center space-x-2">
-          <MdEmail className="text-lg" />
-          <span>Explococora@gmail.com</span>
-        </div>
+          <FooterSeccion title="Políticas">
+            <LinkFooter href="/privacidad">
+              Políticas de Privacidad
+            </LinkFooter>
+            <LinkFooter href="/seguridad">
+              Seguridad en Caminatas y Cabalgatas
+            </LinkFooter>
+            <LinkFooter href="/terminos">Términos y Condiciones</LinkFooter>
+          </FooterSeccion>
 
-        {/* Redes Sociales */}
-        <div className="flex space-x-3">
-          <a href="#" target="_blank" className="hover:text-gray-300">
-            <FaTiktok className="text-xl" />
-          </a>
-          <a href="#" target="_blank" className="hover:text-gray-300">
-            <FaYoutube className="text-xl" />
-          </a>
-          <a href="https://www.facebook.com/share/15mgyn1xN5/" target="_blank" className="hover:text-gray-300">
-            <FaFacebook className="text-xl" />
-          </a>
-          <a href="#" target="_blank" className="hover:text-gray-300">
-            <FaInstagram className="text-xl" />
-          </a>
+          <FooterSeccion title="Síguenos">
+            <div className="flex gap-6 items-center">
+              <IconoRedes
+                Icon={FaFacebookSquare}
+                href="https://facebook.com/valledelcocora"
+                label="Síguenos en Facebook"
+                color="#1877F2" // Color oficial de Facebook
+              />
+              <IconoRedes
+                Icon={FaInstagram}
+                href="https://instagram.com/valledelcocora"
+                label="Síguenos en Instagram"
+                color="#E4405F" // Color oficial de Instagram
+              />
+              <IconoRedes
+                Icon={FaTiktok}
+                href="https://tiktok.com/@valledelcocora"
+                label="Síguenos en TikTok"
+                color="#000000" // Color oficial de TikTok
+              />
+            </div>
+            <p className="text-lg text-white font-medium mt-4">
+              Mantente conectado con nuestras últimas aventuras y novedades
+            </p>
+          </FooterSeccion>
         </div>
       </div>
     </footer>
   );
 };
 
-export default Footer;

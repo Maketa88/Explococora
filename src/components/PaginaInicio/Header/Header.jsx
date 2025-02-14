@@ -16,7 +16,7 @@ export const Header = () => {
   };
 
   return (
-    <header className="bg-tropicalCanopy shadow-lg z-50">
+    <header className="bg-teal-800 shadow-lg z-50">
       <nav className="container mx-auto px-1 py-8 flex justify-between items-center relative">
         {/* Logo */}
         <Logo />
@@ -25,7 +25,7 @@ export const Header = () => {
         <ul
           className={`lg:flex lg:space-x-6 ${
             menuAbierto ? "block" : "hidden"
-          } absolute lg:relative bg-tropicalCanopy lg:bg-transparent w-full lg:w-auto top-24 left-0 lg:top-0 lg:flex-row space-y-4 lg:space-y-0 text-center z-50`}
+          } absolute lg:relative bg-teal-800 lg:bg-transparent w-full lg:w-auto top-24 left-0 lg:top-0 lg:flex-row space-y-4 lg:space-y-0 text-center z-50`}
         >
           <NavItem tipo="enlace" contenido={t("inicio")} to="/" />
           <NavItem tipo="enlace" contenido={t("historia")} to="/Historia" />

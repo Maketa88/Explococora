@@ -8,7 +8,7 @@ import { Registro } from "../../components/Registro/Registro";
 import { PaginaNoEncontrada } from "../../components/HistoriaCultura/Body/PaginanoEncontrada/paginaNoEncontrada";
 import ContactForm from "../../components/ContactForm/ContactForm";
 import { NuestrosGuias } from "../../components/NuestrosGuias/NuestrosGuias";
-import Footer from "../../components/PaginaInicio/Footer/Footer";
+import { Footer } from "../../components/PaginaInicio/Footer/Footer";
 
 export const RutasExplococora = () => {
   // Verifica si estamos en una ruta donde el Header no debe mostrarse

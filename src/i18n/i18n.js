@@ -28,7 +28,7 @@ i18n
           // Página de Registro
           tituloRegistro: "Crear una cuenta",
           subtituloRegistro: "Únete a nuestra comunidad de viajeros",
-          nombre: "Nombre completo",
+          nombre: "Identificacion",
           email: "Correo electrónico",
           password: "Contraseña",
           confirmarPassword: "Confirmar contraseña",
@@ -184,7 +184,7 @@ i18n
           // Registration Page
           tituloRegistro: "Create an Account",
           subtituloRegistro: "Join our travel community",
-          nombre: "Full name",
+          nombre: "Id",
           email: "Email",
           password: "Password",
           confirmarPassword: "Confirm password",
