@@ -3,8 +3,7 @@ import { FaEnvelope } from "react-icons/fa";
 import { HookContrasenia } from "../../hooks/HookContrasenia";
 import { IconoExplo } from "./IconoExplo";
 import { useTranslation } from 'react-i18next';
-import Colombia from '../../assets/Images/Colombia.png';
-import Usa from '../../assets/Images/Usa.png';
+
 
 export const InicioSesion = () => {
   const { t, i18n } = useTranslation();
@@ -24,22 +23,6 @@ export const InicioSesion = () => {
               onClick={cambiarIdioma} 
               className={`transition-opacity ${i18n.language === 'es' ? 'opacity-100' : 'opacity-50'}`}
             >
-              <img 
-                src={Colombia} 
-                alt="Bandera de Colombia"
-                className="w-8 h-8 object-cover rounded"
-              />
-            </button>
-            <span className="text-gray-500">|</span>
-            <button 
-              onClick={cambiarIdioma}
-              className={`transition-opacity ${i18n.language === 'en' ? 'opacity-100' : 'opacity-50'}`}
-            >
-              <img 
-                src={Usa} 
-                alt="USA Flag"
-                className="w-8 h-8 object-cover rounded"
-              />
             </button>
           </div>
         </div>
