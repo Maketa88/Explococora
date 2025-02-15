@@ -13,3 +13,12 @@ input[type="password"]::-moz-password {
   appearance: none;
 }
 
+@layer utilities {
+  .clip-path-wave-top {
+    clip-path: polygon(0 0, 100% 0, 100% 60%, 0 100%);
+  }
+  
+  .clip-path-wave-bottom {
+    clip-path: polygon(0 40%, 100% 0, 100% 100%, 0 60%);
+  }
+}
