@@ -161,6 +161,11 @@ i18n
           
           ruta3Titulo: "Mirador del Cóndor",
           ruta3Descripcion: "Asciende hasta el punto más alto del valle para disfrutar de vistas panorámicas impresionantes. En días despejados, podrías avistar cóndores andinos sobrevolando el majestuoso paisaje.",
+          
+            title: "Explococora",
+            slogan: "Disfruta de la naturaleza y la aventura"
+          
+          
         }
       },
       en: {
@@ -317,6 +322,10 @@ i18n
           
           ruta3Titulo: "Condor Viewpoint",
           ruta3Descripcion: "Climb to the highest point of the valley to enjoy impressive panoramic views. On clear days, you might spot Andean condors soaring over the majestic landscape.",
+          
+          title: "Explococora",
+          slogan: "Enjoy nature and adventure"
+          
         }
       }
     },

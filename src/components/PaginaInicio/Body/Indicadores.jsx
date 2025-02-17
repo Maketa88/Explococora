@@ -1,5 +1,6 @@
 // src/components/Seccion/Indicadores.jsx
 import React from "react";
+import PropTypes from "prop-types";
 
 export const Indicadores = ({ images, currentImage }) => {
   return (
@@ -14,4 +15,9 @@ export const Indicadores = ({ images, currentImage }) => {
       ))}
     </div>
   );
+};
+
+Indicadores.propTypes = {
+  images: PropTypes.array.isRequired,
+  currentImage: PropTypes.number.isRequired,
 };

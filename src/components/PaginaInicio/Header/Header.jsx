@@ -5,6 +5,8 @@ import Colombia from "../../../assets/Images/Colombia.png";
 import Usa from "../../../assets/Images/Usa.png";
 import { NavItem } from "./Lista";
 import { Logo } from "./Logo";
+import React from "react";
+import i18n from "i18next";
 
 export const Header = () => {
   const { menuAbierto, alternarMenu } = useAlternarMenu();

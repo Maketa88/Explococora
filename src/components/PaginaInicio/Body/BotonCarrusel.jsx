@@ -1,6 +1,7 @@
 // src/components/Seccion/BotonNav.jsx
 import React from "react";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
+import PropTypes from "prop-types";
 
 export const BotonCarrusel = ({ direction, onClick }) => {
   const Icon = direction === "left" ? HiChevronLeft : HiChevronRight;
@@ -14,4 +15,9 @@ export const BotonCarrusel = ({ direction, onClick }) => {
       <Icon className="w-8 h-8" />
     </button>
   );
+};
+
+BotonCarrusel.propTypes = {
+  direction: PropTypes.oneOf(["left", "right"]).isRequired,
+  onClick: PropTypes.func.isRequired,
 };
