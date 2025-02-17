@@ -53,16 +53,78 @@ const ContactForm = () => {
         },
         "U9gZjMo6b1XTuBzbd" // Tu Public Key
       )
-      .then(
-        (response) => {
-          console.log("Correo enviado exitosamente", response.status, response.text);
-          // Mostrar mensaje de éxito con SweetAlert2
-          Swal.fire({
-            icon: "success",
-            title: t('mensajeEnviado'),
-            text: t('contactaremosProonto'),
-            confirmButtonColor: "#38a169", // Botón verde
-          });
+      .then((response) => {
+        console.log("Correo enviado exitosamente", response.status, response.text);
+      
+        // Mostrar mensaje de éxito con SweetAlert2
+        Swal.fire({
+          html: `
+            <div style="
+              display: flex; 
+              flex-direction: column; 
+              align-items: center;
+              border: 4px solid #004d40; /* Borde verde externo */
+              border-radius: 12px;
+              padding: 20px;
+              background-color: #ffffff; /* Fondo blanco */
+              box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Sombra ligera */
+            ">
+              <div style="
+                display: flex; 
+                flex-direction: column; 
+                align-items: center;
+                border-radius: 8px;
+                padding: 10px;
+              ">
+                <img src="https://i.pinimg.com/originals/bf/fc/c2/bffcc2de14a013a2e7a795668846cae5.gif" 
+                    alt="Caballo corriendo" 
+                    width="150" 
+                    style="margin-bottom: 10px; border-radius: 8px;">
+                <img src="https://i.pinimg.com/736x/10/3e/44/103e4418d4a3675326fbc9273f9af62a.jpg" 
+                    alt="Logo ExploCocora" 
+                    width="120" 
+                    style="border-radius: 8px;">
+              </div>
+              <h2 style="
+                font-size: 28px; 
+                font-weight: bold; 
+                font-family: Arial, Helvetica, sans-serif; 
+                color: #004d40; 
+                margin-top: 15px;
+                text-align: center;
+                white-space: nowrap;
+              ">
+                Mensaje enviado correctamente
+              </h2>
+              <p style="
+                font-size: 18px; 
+                font-family: Arial, Helvetica, sans-serif; 
+                color: #004d40; 
+                text-align: center; 
+                margin-top: 10px;
+              ">
+                Nos pondremos en contacto contigo pronto
+              </p>
+              <button style="
+                margin-top: 15px;
+                padding: 10px 20px;
+                background-color: #38a169; /* Verde */
+                color: white;
+                border: none;
+                border-radius: 6px;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+              " onclick="Swal.close()">
+                OK
+              </button>
+            </div>
+          `,
+          showConfirmButton: false, // Ocultar botón por defecto de SweetAlert2
+        });
+      
+      
           setFormData({ nombre: "", correo: "", telefono: "", razon: "", mensaje: "" }); // Limpiar los campos
         },
         (err) => {
