@@ -63,11 +63,13 @@ const ContactForm = () => {
               display: flex; 
               flex-direction: column; 
               align-items: center;
-              border: 4px solid #004d40; /* Borde verde externo */
+              border: 4px solid #004d40;
               border-radius: 12px;
               padding: 20px;
-              background-color: #ffffff; /* Fondo blanco */
-              box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Sombra ligera */
+              background-color: #ffffff;
+              box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+              max-width: 100%;
+              width: 100%;
             ">
               <div style="
                 display: flex; 
@@ -75,54 +77,72 @@ const ContactForm = () => {
                 align-items: center;
                 border-radius: 8px;
                 padding: 10px;
+                width: 100%;
               ">
                 <img src="https://i.pinimg.com/originals/bf/fc/c2/bffcc2de14a013a2e7a795668846cae5.gif" 
-                    alt="Caballo corriendo" 
-                    width="150" 
-                    style="margin-bottom: 10px; border-radius: 8px;">
+                  alt="Caballo corriendo" 
+                  style="
+                    max-width: 150px;
+                    width: 100%;
+                    height: auto;
+                    margin-bottom: 10px;
+                    border-radius: 8px;
+                  ">
                 <img src="https://i.pinimg.com/736x/10/3e/44/103e4418d4a3675326fbc9273f9af62a.jpg" 
-                    alt="Logo ExploCocora" 
-                    width="120" 
-                    style="border-radius: 8px;">
+                  alt="Logo ExploCocora" 
+                  style="
+                    max-width: 120px;
+                    width: 100%;
+                    height: auto;
+                    border-radius: 8px;
+                  ">
               </div>
               <h2 style="
-                font-size: 28px; 
+                font-size: clamp(20px, 5vw, 28px);
                 font-weight: bold; 
                 font-family: Arial, Helvetica, sans-serif; 
                 color: #004d40; 
                 margin-top: 15px;
                 text-align: center;
-                white-space: nowrap;
+                word-wrap: break-word;
+                width: 100%;
               ">
                 Mensaje enviado correctamente
               </h2>
               <p style="
-                font-size: 18px; 
+                font-size: clamp(16px, 4vw, 18px);
                 font-family: Arial, Helvetica, sans-serif; 
                 color: #004d40; 
                 text-align: center; 
                 margin-top: 10px;
+                width: 100%;
               ">
                 Nos pondremos en contacto contigo pronto
               </p>
-              <button style="
+              <button id="cerrarAlerta" style="
                 margin-top: 15px;
                 padding: 10px 20px;
-                background-color: #38a169; /* Verde */
+                background-color: #38a169;
                 color: white;
                 border: none;
                 border-radius: 6px;
-                font-size: 16px;
+                font-size: clamp(14px, 3vw, 16px);
                 font-weight: bold;
                 cursor: pointer;
                 transition: background-color 0.3s ease;
-              " onclick="Swal.close()">
+              ">
                 OK
               </button>
             </div>
           `,
-          showConfirmButton: false, // Ocultar botón por defecto de SweetAlert2
+          showConfirmButton: false,
+          didOpen: () => {
+            document.getElementById("cerrarAlerta").addEventListener("click", () => {
+              Swal.close();
+            });
+          }
         });
+        
       
       
           setFormData({ nombre: "", correo: "", telefono: "", razon: "", mensaje: "" }); // Limpiar los campos

@@ -39,10 +39,75 @@ export const Registro = () => {
       const response = await RegistroCliente(formData);
 
       Swal.fire({
-        title: t('registroExitoso'),
-        text: t('usuarioRegistrado'),
-        icon: "success",
-        confirmButtonText: t('aceptar'),
+        html: `
+          <div style="
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            border: 4px solid #004d40;
+            border-radius: 12px;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+          ">
+            <div style="
+              display: flex; 
+              flex-direction: column; 
+              align-items: center;
+              border-radius: 8px;
+              padding: 10px;
+            ">
+              <img src="https://i.pinimg.com/originals/bf/fc/c2/bffcc2de14a013a2e7a795668846cae5.gif" 
+                  alt="Caballo corriendo" 
+                  width="150" 
+                  style="margin-bottom: 10px; border-radius: 8px;">
+              <img src="https://i.pinimg.com/736x/10/3e/44/103e4418d4a3675326fbc9273f9af62a.jpg" 
+                  alt="Logo ExploCocora" 
+                  width="120" 
+                  style="border-radius: 8px;">
+            </div>
+            <h2 style="
+              font-size: 28px; 
+              font-weight: bold; 
+              font-family: Arial, Helvetica, sans-serif; 
+              color: #004d40; 
+              margin-top: 15px;
+              text-align: center;
+              white-space: nowrap;
+            ">
+              ${t('registroExitoso')}
+            </h2>
+            <p style="
+              font-size: 18px; 
+              font-family: Arial, Helvetica, sans-serif; 
+              color: #004d40; 
+              text-align: center; 
+              margin-top: 10px;
+            ">
+              ${t('usuarioRegistrado')}
+            </p>
+            <button id="cerrarAlerta" style="
+              margin-top: 15px;
+              padding: 10px 20px;
+              background-color: #38a169;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              font-size: 16px;
+              font-weight: bold;
+              cursor: pointer;
+              transition: background-color 0.3s ease;
+            ">
+              OK
+            </button>
+          </div>
+        `,
+        showConfirmButton: false,
+        didOpen: () => {
+          document.getElementById("cerrarAlerta").addEventListener("click", () => {
+            Swal.close();
+          });
+        }
       });
 
       setFormData({
