@@ -1,3 +1,4 @@
+// Explococora/src/App.jsx
 import React from "react";
 import { AuthProvider } from './context/AuthContext';
 import { Routes, Route } from "react-router-dom";
@@ -14,6 +15,7 @@ import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
 import GuiaDashboard from "./pages/GuiaDashboard/GuiaDashboard";
 import OperadorDashboard from "./pages/OperadorDashboard/OperadorDashboard";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import Chatbot from "./components/Chatbot/Chatbot"; // Asegúrate de que la ruta sea correcta
 
 const App = () => {
   return (
@@ -61,6 +63,7 @@ const App = () => {
           <Route path="/*" element={<PaginaNoEncontrada />} />
         </Routes>
         <Footer />
+        <Chatbot /> {/* Agrega el componente del chatbot aquí */}
       </div>
     </AuthProvider>
   );
