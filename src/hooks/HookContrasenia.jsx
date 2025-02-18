@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa"; // Para ojo cerrado
 import { useTranslation } from 'react-i18next';
 
-export const HookContrasenia = ({ value, onChange }) => {
+export const HookContrasenia = ({ label, onChange }) => {
   const [showPassword, setShowPassword] = useState(false);
   const { t } = useTranslation();
 
@@ -16,7 +16,7 @@ export const HookContrasenia = ({ value, onChange }) => {
         htmlFor="password"
         className="block text-gray-700 font-medium mb-2"
       >
-         {t('contrasena')}
+        {label}
       </label>
       <div className="relative">
         <span className="absolute inset-y-0 left-0 flex items-center pl-3">
@@ -25,8 +25,8 @@ export const HookContrasenia = ({ value, onChange }) => {
         <input
           type={showPassword ? "text" : "password"}
           id="password"
-          value={value} // Vinculamos el valor con el estado en el componente padre
-          onChange={onChange} // Llamamos al callback para actualizar el estado en el componente padre
+          name="contrasenia" // Asegúrate de que el nombre coincida
+          onChange={onChange} // Llama al callback para actualizar el estado en el componente padre
           placeholder="********"
           className="w-full pl-10 pr-10 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           required
