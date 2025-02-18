@@ -1,14 +1,27 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Condorito from "../../assets/Images/MascotExplococora.ico";
 import AyudaImg from "../../assets/Images/En_que_te_ayuda-removebg-preview.png";
 
 export const ChatBot = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [question, setQuestion] = useState('');
+  const [question, setQuestion] = useState("");
   const [history, setHistory] = useState([]);
+  const chatContainerRef = useRef(null);
 
   const toggleChat = () => {
-    setIsChatOpen((prev) => !prev);
+    setIsChatOpen((prev) => {
+      // Agregar mensaje de bienvenida cuando se abre el chat por primera vez
+      if (!prev && history.length === 0) {
+        setHistory([
+          {
+            role: "chatbot",
+            parts:
+              "¡Hola! Soy Condorito, tu asistente virtual. ¿En qué puedo ayudarte hoy? 😊",
+          },
+        ]);
+      }
+      return !prev;
+    });
   };
 
   const enviarPregunta = async (e) => {
@@ -16,68 +29,121 @@ export const ChatBot = () => {
     if (!question.trim()) return;
 
     try {
-        const response = await fetch('https://bot-condorito-1.onrender.com/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ question, history }),
-        });
-
-        if (!response.ok) {
-            throw new Error(`Error en la respuesta del servidor: ${response.statusText}`);
+      const response = await fetch(
+        "https://bot-condorito-1.onrender.com/chat",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question, history }),
         }
+      );
 
-        const data = await response.json();
-        if (data && data.answer) {
-            setHistory((prev) => [
-                ...prev,
-                { role: "user", parts: question },
-                { role: "chatbot", parts: formatAnswer(data.answer) },
-            ]);
-        }
-        setQuestion('');
+      if (!response.ok) {
+        throw new Error(
+          `Error en la respuesta del servidor: ${response.statusText}`
+        );
+      }
+
+      const data = await response.json();
+      if (data && data.answer) {
+        setHistory((prev) => [
+          ...prev,
+          { role: "user", parts: question + " ❤️" },
+          { role: "chatbot", parts: formatAnswer(data.answer) },
+        ]);
+      }
+      setQuestion("");
     } catch (error) {
-        console.error('Error al enviar la pregunta:', error);
+      console.error("Error al enviar la pregunta:", error);
+      // Mostrar mensaje de error al usuario
+      setHistory((prev) => [
+        ...prev,
+        { role: "user", parts: question },
+        {
+          role: "chatbot",
+          parts:
+            "Lo siento, hubo un error al procesar tu pregunta. Por favor, intenta nuevamente.",
+        },
+      ]);
+      setQuestion("");
     }
   };
 
   const formatAnswer = (answer) => {
     return answer
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Convertir negritas
-      .replace(/\*/g, '') // Eliminar asteriscos innecesarios
-      .replace(/\n/g, '<br/>'); // Añadir saltos de línea
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*/g, "")
+      .replace(/\n/g, "<br/>");
   };
+
+  // Auto-scroll al último mensaje
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  }, [history]);
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
       <div className="relative">
         <div className="fixed bottom-5 right-5 flex items-center justify-center">
           <div className="relative">
-            <img
-              src={AyudaImg}
-              alt="¿En qué te ayudamos?"
-              className={`absolute -top-12 left-1/5 transform -translate-x-1/2 transition-opacity duration-300 w-16 ${isChatOpen ? "opacity-0" : "opacity-100"}`}
-            />
-            <button onClick={toggleChat} className="bg-transparent rounded-full shadow-lg hover:animate-bounce">
-              <img src={Condorito} alt="Cóndor animado" className="w-16 h-16 object-contain rounded-full" />
+            <button
+              onClick={toggleChat}
+              className="bg-transparent rounded-full shadow-lg hover:animate-pulse transition-transform duration-300"
+            >
+              <img
+                src={Condorito}
+                alt="Chatbot"
+                className="w-16 h-16 object-contain rounded-full border-4 border-neonGreen shadow-neon"
+              />
             </button>
           </div>
         </div>
 
         {isChatOpen && (
           <div className="fixed bottom-24 right-5 w-[300px] h-[450px] border border-gray-300 rounded-lg shadow-lg bg-white overflow-hidden">
-            <div className="bg-green-700 p-3 flex items-center space-x-2">
-              <img src={Condorito} alt="Logo Explococora" className="w-6 h-6 rounded-full" />
+            <div className="bg-teal-800 p-3 flex items-center space-x-2">
+              <img
+                src={Condorito}
+                alt="Logo Explococora"
+                className="w-8 h-8 rounded-full"
+              />
               <span className="text-white font-bold text-base">Condorito</span>
             </div>
             <div className="h-[calc(100%-3rem)] flex flex-col">
-              <div className="flex-1 overflow-y-auto p-2 space-y-2">
-                {history.map((msg, index) => (
-                  <div key={index} className={`p-2 rounded-lg text-white max-w-[85%] text-sm leading-tight ${msg.role === 'user' ? "bg-blue-500 self-end text-right px-3 py-1" : "bg-green-500 self-start text-left px-3 py-2"}`}>
-                    <strong>{msg.role === 'user' ? '🧑‍💻 Usuario:' : '🤖 Chatbot:'}</strong>
-                    <p className="mt-1" dangerouslySetInnerHTML={{ __html: msg.parts }} />
-                  </div>
-                ))}
-              </div>
+              
+            <div
+  ref={chatContainerRef}
+  className="flex-1 overflow-y-auto p-2 space-y-2"
+>
+  {history.map((msg, index) => (
+    <div
+      key={index}
+      className={`p-4 rounded-tl-3xl rounded-br-3xl max-w-[85%] text-sm leading-tight transition-all transform duration-300 ${
+        msg.role === "user"
+          ? "self-end text-right bg-gradient-to-r from-gray-400 to-gray-600 text-white ml-auto shadow-lg border-2 border-gray-900"
+          : "self-start text-left bg-gradient-to-r from-teal-600 to-teal-800 text-white shadow-lg border-2 border-teal-300"
+      }`}
+    >
+      <strong
+        className={
+          msg.role === "user"
+            ? "text-white font-bold"
+            : "text-white font-semibold"
+        }
+      >
+        {msg.role === "user" ? "🧑‍💻 Usuario:" : "🤖 Chatbot:"}
+      </strong>
+      <p
+        className="mt-2 text-gray-100"
+        dangerouslySetInnerHTML={{ __html: msg.parts }}
+      />
+    </div>
+  ))}
+</div>
+
 
               <form onSubmit={enviarPregunta} className="flex border-t">
                 <input
@@ -85,9 +151,14 @@ export const ChatBot = () => {
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
                   placeholder="Escribe tu pregunta..."
-                  className="border-none p-2 flex-1 outline-none"
+                  className="border-none p-2 flex-1 outline-none "
                 />
-                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600">➤</button>
+                <button
+                  type="submit"
+                  className="bg-teal-700 text-white px-3 py-4  hover:bg-teal-900 transition-colors duration-300 "
+                >
+                  ➤
+                </button>
               </form>
             </div>
           </div>
