@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import Condorito from "../../assets/Images/MascotExplococora.ico";
-import AyudaImg from "../../assets/Images/En_que_te_ayuda-removebg-preview.png";
 
 export const ChatBot = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -113,37 +112,35 @@ export const ChatBot = () => {
               <span className="text-white font-bold text-base">Condorito</span>
             </div>
             <div className="h-[calc(100%-3rem)] flex flex-col">
-              
-            <div
-  ref={chatContainerRef}
-  className="flex-1 overflow-y-auto p-2 space-y-2"
->
-  {history.map((msg, index) => (
-    <div
-      key={index}
-      className={`p-4 rounded-tl-3xl rounded-br-3xl max-w-[85%] text-sm leading-tight transition-all transform duration-300 ${
-        msg.role === "user"
-          ? "self-end text-right bg-gradient-to-r from-gray-400 to-gray-600 text-white ml-auto shadow-lg border-2 border-gray-900"
-          : "self-start text-left bg-gradient-to-r from-teal-600 to-teal-800 text-white shadow-lg border-2 border-teal-300"
-      }`}
-    >
-      <strong
-        className={
-          msg.role === "user"
-            ? "text-white font-bold"
-            : "text-white font-semibold"
-        }
-      >
-        {msg.role === "user" ? "🧑‍💻 Usuario:" : "🤖 Chatbot:"}
-      </strong>
-      <p
-        className="mt-2 text-gray-100"
-        dangerouslySetInnerHTML={{ __html: msg.parts }}
-      />
-    </div>
-  ))}
-</div>
-
+              <div
+                ref={chatContainerRef}
+                className="flex-1 overflow-y-auto p-2 space-y-2"
+              >
+                {history.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`p-4 rounded-tl-3xl rounded-br-3xl max-w-[85%] text-sm leading-tight transition-all transform duration-300 ${
+                      msg.role === "user"
+                        ? "self-end text-right bg-gradient-to-r from-gray-400 to-gray-600 text-white ml-auto shadow-lg border-2 border-gray-900"
+                        : "self-start text-left bg-gradient-to-r from-teal-600 to-teal-800 text-white shadow-lg border-2 border-teal-300"
+                    }`}
+                  >
+                    <strong
+                      className={
+                        msg.role === "user"
+                          ? "text-white font-bold"
+                          : "text-white font-semibold"
+                      }
+                    >
+                      {msg.role === "user" ? "🧑‍💻 Usuario:" : "🤖 Chatbot:"}
+                    </strong>
+                    <p
+                      className="mt-2 text-gray-100"
+                      dangerouslySetInnerHTML={{ __html: msg.parts }}
+                    />
+                  </div>
+                ))}
+              </div>
 
               <form onSubmit={enviarPregunta} className="flex border-t">
                 <input
