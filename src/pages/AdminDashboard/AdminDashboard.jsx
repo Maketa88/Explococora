@@ -1,5 +1,12 @@
-const AdminDashboard = () => {
-    return <h1>Panel de Administrador</h1>;
-};
+import React from 'react';
 
-export default AdminDashboard;
+const AdminDashboard = () => {
+  console.log("UserScreen se ha montado");
+  return (
+    <div>
+      <h1>yo soy un admin</h1>
+      {/* Aquí puedes agregar más contenido específico para el usuario */}
+    </div>
+  );
+};
+export default AdminDashboard; 
