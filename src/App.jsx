@@ -11,9 +11,9 @@ import { PaginaNoEncontrada } from "./components/HistoriaCultura/Body/PaginanoEn
 import ContactForm from "./components/ContactForm/ContactForm";
 import { NuestrosGuias } from "./components/NuestrosGuias/NuestrosGuias";
 import { Footer } from "./components/PaginaInicio/Footer/Footer";
-import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
-import GuiaDashboard from "./pages/GuiaDashboard/GuiaDashboard";
-import OperadorDashboard from "./pages/OperadorDashboard/OperadorDashboard";
+import VistaAdmin from "./pages/VistaAdmin/VistaAdmin";
+import VistaGuia from "./pages/VistaGuia/VistaGuia";
+import VistaOperador from "./pages/VistaOperador/VistaOperador";
 import Chatbot from "./components/Chatbot/Chatbot";
 
 const App = () => {
@@ -28,9 +28,9 @@ const App = () => {
           <Route path="/Ingreso" element={<InicioSesion />} />
           <Route path="/Registro" element={<Registro />} />
           <Route path="/ContactForm" element={<ContactForm />} />
-          <Route path="/AdminDashboard" element={<AdminDashboard />} />
-          <Route path="/GuiaDashboard" element={<GuiaDashboard />} />
-          <Route path="/OperadorDashboard" element={<OperadorDashboard />} />
+          <Route path="/VistaAdmin" element={<VistaAdmin />} />
+          <Route path="/VistaGuia" element={<VistaGuia />} />
+          <Route path="/VistaOperador" element={<VistaOperador />} />
           <Route path="/*" element={<PaginaNoEncontrada />} />
         </Routes>
         <Footer />

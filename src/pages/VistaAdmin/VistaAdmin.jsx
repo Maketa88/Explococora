@@ -1,7 +1,7 @@
 import React from 'react';
 
 const AdminDashboard = () => {
-  console.log("UserScreen se ha montado");
+  console.log("AdminScreen se ha montado");
   return (
     <div>
       <h1>yo soy un admin</h1>
