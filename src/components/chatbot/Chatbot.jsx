@@ -1,26 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import Condorito from "../../assets/Images/MascotExplococora.ico";
 
+
 export const ChatBot = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [question, setQuestion] = useState("");
+  const [question, setQuestion] = useState('');
   const [history, setHistory] = useState([]);
   const chatContainerRef = useRef(null);
 
   const toggleChat = () => {
-    setIsChatOpen((prev) => {
-      // Agregar mensaje de bienvenida cuando se abre el chat por primera vez
-      if (!prev && history.length === 0) {
-        setHistory([
-          {
-            role: "chatbot",
-            parts:
-              "¡Hola! Soy Condorito, tu asistente virtual. ¿En qué puedo ayudarte hoy? 😊",
-          },
-        ]);
-      }
-      return !prev;
-    });
+    setIsChatOpen((prev) => !prev);
   };
 
   const enviarPregunta = async (e) => {
@@ -28,60 +17,36 @@ export const ChatBot = () => {
     if (!question.trim()) return;
 
     try {
-      const response = await fetch(
-        "https://bot-condorito-1.onrender.com/chat",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question, history }),
+        const response = await fetch('https://bot-condorito-1.onrender.com/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question, history }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error en la respuesta del servidor: ${response.statusText}`);
         }
-      );
 
-      if (!response.ok) {
-        throw new Error(
-          `Error en la respuesta del servidor: ${response.statusText}`
-        );
-      }
-
-      const data = await response.json();
-      if (data && data.answer) {
-        setHistory((prev) => [
-          ...prev,
-          { role: "user", parts: question + " ❤️" },
-          { role: "chatbot", parts: formatAnswer(data.answer) },
-        ]);
-      }
-      setQuestion("");
+        const data = await response.json();
+        if (data && data.answer) {
+            setHistory((prev) => [
+                ...prev,
+                { role: "user", parts: question },
+                { role: "chatbot", parts: formatAnswer(data.answer) },
+            ]);
+        }
+        setQuestion('');
     } catch (error) {
-      console.error("Error al enviar la pregunta:", error);
-      // Mostrar mensaje de error al usuario
-      setHistory((prev) => [
-        ...prev,
-        { role: "user", parts: question },
-        {
-          role: "chatbot",
-          parts:
-            "Lo siento, hubo un error al procesar tu pregunta. Por favor, intenta nuevamente.",
-        },
-      ]);
-      setQuestion("");
+        console.error('Error al enviar la pregunta:', error);
     }
   };
 
   const formatAnswer = (answer) => {
     return answer
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-      .replace(/\*/g, "")
-      .replace(/\n/g, "<br/>");
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Convertir negritas
+      .replace(/\*/g, '') // Eliminar asteriscos innecesarios
+      .replace(/\n/g, '<br/>'); // Añadir saltos de línea
   };
-
-  // Auto-scroll al último mensaje
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
-    }
-  }, [history]);
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
@@ -163,6 +128,7 @@ export const ChatBot = () => {
       </div>
     </div>
   );
+
 };
 
 export default ChatBot;
