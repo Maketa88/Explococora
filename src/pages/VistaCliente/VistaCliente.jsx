@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Dashboard = () => {
+const VistaCliente = () => {
   console.log("Cliente se ha montado"); // Verifica que se monte el componente
   return (
     <div>
@@ -10,4 +10,4 @@ const Dashboard = () => {
   );
 };
 
-export default ClienteDashboard;
+export default VistaCliente;

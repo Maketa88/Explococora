@@ -1,6 +1,6 @@
 import React from 'react';
 
-const GuiaDashboard = () => {
+const VistaGuia = () => {
   console.log("GuiaScreen se ha montado"); // Verifica que se monte el componente
   return (
     <div>
@@ -10,4 +10,4 @@ const GuiaDashboard = () => {
   );
 };
 
-export default GuiaDashboard;
+export default VistaGuia;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AdminDashboard = () => {
+const VistaAdmin = () => {
   console.log("AdminScreen se ha montado");
   return (
     <div>
@@ -9,4 +9,4 @@ const AdminDashboard = () => {
     </div>
   );
 };
-export default AdminDashboard; 
+export default VistaAdmin; 

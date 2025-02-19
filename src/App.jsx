@@ -14,6 +14,7 @@ import { Footer } from "./components/PaginaInicio/Footer/Footer";
 import VistaAdmin from "./pages/VistaAdmin/VistaAdmin";
 import VistaGuia from "./pages/VistaGuia/VistaGuia";
 import VistaOperador from "./pages/VistaOperador/VistaOperador";
+import VistaCliente from "./pages/VistaCliente/VistaCliente";
 import Chatbot from "./components/Chatbot/Chatbot";
 
 const App = () => {
@@ -31,6 +32,7 @@ const App = () => {
           <Route path="/VistaAdmin" element={<VistaAdmin />} />
           <Route path="/VistaGuia" element={<VistaGuia />} />
           <Route path="/VistaOperador" element={<VistaOperador />} />
+          <Route path="/VistaCliente" element={<VistaCliente />} />
           <Route path="/*" element={<PaginaNoEncontrada />} />
         </Routes>
         <Footer />
