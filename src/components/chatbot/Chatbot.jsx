@@ -47,6 +47,13 @@ export const ChatBot = () => {
       .replace(/\*/g, '') // Eliminar asteriscos innecesarios
       .replace(/\n/g, '<br/>'); // Añadir saltos de línea
   };
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  }, [history]);
+
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
