@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { PaginaInicio } from "../../pages/PaginaInicio/PaginaInicio";
 import { HistoriaCultura } from "../../components/HistoriaCultura/Body/HistoriaCultura";
 import { InicioSesion } from "../../components/InicioSesion/InicioSesion";
@@ -16,14 +16,20 @@ import VistaGuia from "../../pages/VistaGuia/VistaGuia";
 import ChatBot from "../../components/Chatbot/Chatbot";
 
 export const RutasExplococora = () => {
-  // Verifica si estamos en una ruta donde el Header no debe mostrarse
+  const location = useLocation();
+  const isOperadorRoute = location.pathname.includes('/VistaOperador');
+
+  if (isOperadorRoute) {
+    return (
+      <Routes>
+        <Route path="/VistaOperador/*" element={<VistaOperador />} />
+      </Routes>
+    );
+  }
 
   return (
-    <div>
-      {/* Mostramos el Header solo si no estamos en las rutas de inicio de sesión o registro */}
+    <div className="min-h-screen">
       <Header />
-
-      {/* Definimos las rutas */}
       <Routes>
         <Route path="/" element={<PaginaInicio />} />
         <Route path="/Historia" element={<HistoriaCultura />} />
@@ -33,7 +39,6 @@ export const RutasExplococora = () => {
         <Route path="/ContactForm" element={<ContactForm />} />
         <Route path="/VistaAdmin" element={<VistaAdmin />} />
         <Route path="/VistaGuia" element={<VistaGuia />} />
-        <Route path="/VistaOperador" element={<VistaOperador />} />
         <Route path="/VistaCliente" element={<VistaCliente />} />
         <Route path="/*" element={<PaginaNoEncontrada />} />
       </Routes>
@@ -42,3 +47,5 @@ export const RutasExplococora = () => {
     </div>
   );
 };
+
+export default RutasExplococora;

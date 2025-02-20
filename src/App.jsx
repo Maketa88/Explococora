@@ -6,9 +6,9 @@ import { RutasExplococora } from "./routes/RutasExplococora/RutasExplococora";
 const App = () => {
   return (
     <>
-    <AuthProvider>
-      <RutasExplococora />
-    </AuthProvider>
+      <AuthProvider>
+        <RutasExplococora />
+      </AuthProvider>
     </>
   );
 };
