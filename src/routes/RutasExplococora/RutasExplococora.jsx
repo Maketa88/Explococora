@@ -9,6 +9,11 @@ import { PaginaNoEncontrada } from "../../components/HistoriaCultura/Body/Pagina
 import ContactForm from "../../components/ContactForm/ContactForm";
 import { NuestrosGuias } from "../../components/NuestrosGuias/NuestrosGuias";
 import { Footer } from "../../components/PaginaInicio/Footer/Footer";
+import VistaAdmin from "../../pages/VistaAdmin/VistaAdmin";
+import VistaCliente from "../../pages/VistaCliente/VistaCliente";
+import VistaOperador from "../../pages/VistaOperador/VistaOperador";
+import VistaGuia from "../../pages/VistaGuia/VistaGuia";
+import ChatBot from "../../components/Chatbot/Chatbot";
 
 export const RutasExplococora = () => {
   // Verifica si estamos en una ruta donde el Header no debe mostrarse
@@ -16,7 +21,7 @@ export const RutasExplococora = () => {
   return (
     <div>
       {/* Mostramos el Header solo si no estamos en las rutas de inicio de sesión o registro */}
-      {<Header />}
+      <Header />
 
       {/* Definimos las rutas */}
       <Routes>
@@ -26,9 +31,14 @@ export const RutasExplococora = () => {
         <Route path="/Ingreso" element={<InicioSesion />} />
         <Route path="/Registro" element={<Registro />} />
         <Route path="/ContactForm" element={<ContactForm />} />
+        <Route path="/VistaAdmin" element={<VistaAdmin />} />
+        <Route path="/VistaGuia" element={<VistaGuia />} />
+        <Route path="/VistaOperador" element={<VistaOperador />} />
+        <Route path="/VistaCliente" element={<VistaCliente />} />
         <Route path="/*" element={<PaginaNoEncontrada />} />
       </Routes>
-      {<Footer />}
+      <Footer />
+      <ChatBot />
     </div>
   );
 };
