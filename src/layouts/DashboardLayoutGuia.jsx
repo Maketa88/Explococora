@@ -18,7 +18,7 @@ import {
   Sun
 } from 'lucide-react';
 
-const DashboardLayout = ({ children }) => {
+const DashboardLayoutGuia = ({ children }) => {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
@@ -31,55 +31,55 @@ const DashboardLayout = ({ children }) => {
     {
       title: "Dashboard",
       icon: <LayoutDashboard className="w-5 h-5" />,
-      path: "/VistaOperador",
+      path: "/VistaGuia",
       section: "Dashboard"
     },
     {
       title: "Analytics",
       icon: <BarChart2 className="w-5 h-5" />,
-      path: "/VistaOperador/analytics",
+      path: "/VistaGuia/analytics",
       section: "Dashboard"
     },
     {
       title: "Reports",
       icon: <FileText className="w-5 h-5" />,
-      path: "/VistaOperador/reports",
+      path: "/VistaGuia/reports",
       section: "Dashboard"
     },
     {
       title: "Customers",
       icon: <Users className="w-5 h-5" />,
-      path: "/VistaOperador/customers",
+      path: "/VistaGuia/customers",
       section: "Customers"
     },
     {
       title: "New Customer",
       icon: <UserPlus className="w-5 h-5" />,
-      path: "/VistaOperador/new-customer",
+      path: "/VistaGuia/new-customer",
       section: "Customers"
     },
     {
       title: "Verified Customers",
       icon: <UserCheck className="w-5 h-5" />,
-      path: "/VistaOperador/verified-customers",
+      path: "/VistaGuia/verified-customers",
       section: "Customers"
     },
     {
       title: "Products",
       icon: <Package className="w-5 h-5" />,
-      path: "/VistaOperador/products",
+      path: "/VistaGuia/products",
       section: "Products"
     },
     {
       title: "New Product",
       icon: <PackagePlus className="w-5 h-5" />,
-      path: "/VistaOperador/new-product",
+      path: "/VistaGuia/new-product",
       section: "Products"
     },
     {
       title: "Inventory",
       icon: <PackageSearch className="w-5 h-5" />,
-      path: "/VistaOperador/inventory",
+      path: "/VistaGuia/inventory",
       section: "Products"
     }
   ];
@@ -97,19 +97,16 @@ const DashboardLayout = ({ children }) => {
         border-r ${darkMode ? 'border-gray-800' : 'border-gray-200'}
         h-screen sticky top-0
       `}>
-        <div className="mb-8 flex flex-col items-start">
-          <div className="flex items-center">
-            {!collapsed && <h1 className={`text-2xl font-bold text-white`}>Explococora</h1>}
-            <button 
-              onClick={() => setCollapsed(!collapsed)}
-              className="p-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white ml-2"
-            >
-              {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-            </button>
-          </div>
-          {!collapsed && <h1 className={`text-lg font-bold text-white mt-1 text-center w-40`}>Operador</h1>}
+        <div className="mb-8 flex items-center justify-between">
+          {!collapsed && <h1 className={`text-2xl font-bold text-white`}>Explococora</h1>}
+          <button 
+            onClick={() => setCollapsed(!collapsed)}
+            className="p-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+          </button>
         </div>
-        
+
         <nav className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
           {sections.map((section) => (
             <div key={section} className="mb-4">
@@ -132,14 +129,14 @@ const DashboardLayout = ({ children }) => {
                   </Link>
                 ))}
             </div>
-          ))}
+          ))} 
         </nav>
 
         <div className={`border-t ${darkMode ? 'border-gray-800' : 'border-gray-200'} pt-4 mt-4`}>
           <Link
-            to="/VistaOperador/settings"
+            to="/VistaGuia/settings"
             className={`flex items-center gap-2 w-full p-2 mb-2 rounded-lg ${
-              location.pathname === '/VistaOperador/settings'
+              location.pathname === '/VistaGuia/settings'
                 ? "bg-blue-600 text-white"
                 : "text-gray-400"
             }`}
@@ -208,4 +205,4 @@ const DashboardLayout = ({ children }) => {
   );
 };
 
-export default DashboardLayout; 
+export default DashboardLayoutGuia;

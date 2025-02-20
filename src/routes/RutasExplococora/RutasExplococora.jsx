@@ -14,10 +14,12 @@ import VistaCliente from "../../pages/VistaCliente/VistaCliente";
 import VistaOperador from "../../pages/VistaOperador/VistaOperador";
 import VistaGuia from "../../pages/VistaGuia/VistaGuia";
 import ChatBot from "../../components/Chatbot/Chatbot";
+import QuienesSomos from "../../components/QuienesSomos/QuienesSomos";
 
 export const RutasExplococora = () => {
   const location = useLocation();
   const isOperadorRoute = location.pathname.includes('/VistaOperador');
+  const isGuiaRoute = location.pathname.includes('/VistaGuia');
 
   if (isOperadorRoute) {
     return (
@@ -27,6 +29,14 @@ export const RutasExplococora = () => {
     );
   }
 
+  if (isGuiaRoute) {
+    return (
+      <Routes>
+        <Route path="/VistaGuia/*" element={<VistaGuia />} />
+      </Routes>
+    );
+  }
+  
   return (
     <div className="min-h-screen">
       <Header />
@@ -37,6 +47,7 @@ export const RutasExplococora = () => {
         <Route path="/Ingreso" element={<InicioSesion />} />
         <Route path="/Registro" element={<Registro />} />
         <Route path="/ContactForm" element={<ContactForm />} />
+        <Route path="/QuienesSomos" element={<QuienesSomos />} />
         <Route path="/VistaAdmin" element={<VistaAdmin />} />
         <Route path="/VistaGuia" element={<VistaGuia />} />
         <Route path="/VistaCliente" element={<VistaCliente />} />

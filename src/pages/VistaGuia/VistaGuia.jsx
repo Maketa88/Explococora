@@ -1,13 +1,8 @@
 import React from 'react';
+import RutasGuia from '../../routes/VistaGuia/RutasGuia';
 
 const VistaGuia = () => {
-  console.log("GuiaScreen se ha montado"); // Verifica que se monte el componente
-  return (
-    <div>
-      <h1>yo soy un guia</h1>
-      {/* Aquí puedes agregar más contenido específico para el usuario */}
-    </div>
-  );
+  return <RutasGuia />;
 };
 
-export default VistaGuia;
+export default VistaGuia;
