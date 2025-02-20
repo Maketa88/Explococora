@@ -192,7 +192,7 @@ const DashboardLayout = ({ children }) => {
           {/* Footer */}
           <div className={`p-4 ${darkMode ? 'bg-[#0f172a] text-gray-400' : 'bg-white text-gray-600'} sticky bottom-0`}>
             <div className="flex justify-between items-center text-sm">
-              <span>© 2024 XD Code All Rights Reserved</span>
+              <span>© 2025 ExploCocora. Todos los derechos reservados.</span>
               <div className="flex gap-6">
                 <a href="#" className="hover:text-blue-600">Privacy Policy</a>
                 <a href="#" className="hover:text-blue-600">Terms of Service</a>
