@@ -163,16 +163,16 @@ const ContactForm = () => {
   return (
     <div
       className="min-h-screen bg-cover bg-center flex items-center justify-center p-8"
-      style={{ backgroundImage: "url('/assets/carrusel1.webp')" }}
+      style={{ backgroundImage: "linear-gradient(500deg, #0f767b, #ffffff)" }}
     >
-      <div className="bg-teal-600 bg-opacity-50 backdrop-blur-sm rounded-xl shadow-2xl p-8 w-full max-w-2xl">
+      <div className="bg-teal-700 backdrop-blur-sm rounded-xl shadow-2xl p-8 w-full max-w-2xl">
         <h2 className="text-3xl font-bold mb-8 text-white text-center">
           {t('contactaConNosotros')}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
-            <div className="bg-white bg-opacity-20 rounded-lg p-4">
+            <div className="bg-white bg-opacity-5 border-2 border-white rounded-lg p-4">
               <label className="block text-white font-semibold mb-2">
                 {t('nombreCompleto')}
               </label>
@@ -186,7 +186,7 @@ const ContactForm = () => {
               />
             </div>
 
-            <div className="bg-white bg-opacity-20 rounded-lg p-4">
+            <div className="bg-white bg-opacity-5 border-2 border-white rounded-lg p-4">
               <label className="block text-white font-semibold mb-2">
                 {t('correoElectronico')}
               </label>
@@ -200,7 +200,7 @@ const ContactForm = () => {
               />
             </div>
 
-            <div className="bg-white bg-opacity-20 rounded-lg p-4">
+            <div className="bg-white bg-opacity-5 border-2 border-white rounded-lg p-4">
               <label className="block text-white font-semibold mb-2">
                 {t('telefono')}
               </label>
@@ -214,7 +214,7 @@ const ContactForm = () => {
               />
             </div>
 
-            <div className="bg-white bg-opacity-20 rounded-lg p-4">
+            <div className="bg-white bg-opacity-5 border-2 border-white rounded-lg p-4">
               <label className="block text-white font-semibold mb-2">
                 {t('razon')}
               </label>
@@ -225,13 +225,13 @@ const ContactForm = () => {
                 className="w-full px-4 py-3 rounded-lg bg-white bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all"
               >
                 <option value="">{t('selecciona')}</option>
-                <option value="consulta">{t('consulta')}</option>
-                <option value="reserva">{t('reserva')}</option>
-                <option value="otro">{t('otro')}</option>
+                <option value="Consulta">{t('consulta')}</option>
+                <option value="Reserva">{t('reserva')}</option>
+                <option value="Otro">{t('otro')}</option>
               </select>
             </div>
 
-            <div className="bg-white bg-opacity-20 rounded-lg p-4">
+            <div className="bg-white bg-opacity-5 border-2 border-white rounded-lg p-4">
               <label className="block text-white font-semibold mb-2">
                 {t('mensaje')}
               </label>
@@ -248,7 +248,7 @@ const ContactForm = () => {
 
           <button
             type="submit"
-            className="w-full py-3 px-6 bg-teal-700 hover:bg-teal-600 rounded-lg font-semibold text-white transition-colors duration-300 shadow-lg hover:shadow-xl"
+            className="w-full py-3 px-6 bg-teal-700 border-2 border-white hover:bg-teal-600 rounded-lg font-semibold text-white transition-colors duration-300 shadow-lg hover:shadow-xl"
           >
             {t('enviar')}
           </button>

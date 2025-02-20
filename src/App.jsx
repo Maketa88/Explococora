@@ -16,6 +16,8 @@ import VistaGuia from "./pages/VistaGuia/VistaGuia";
 import VistaOperador from "./pages/VistaOperador/VistaOperador";
 import VistaCliente from "./pages/VistaCliente/VistaCliente";
 import Chatbot from "./components/Chatbot/Chatbot";
+import QuienesSomos from "./components/QuienesSomos/QuienesSomos";
+
 
 const App = () => {
   return (
@@ -29,6 +31,7 @@ const App = () => {
           <Route path="/Ingreso" element={<InicioSesion />} />
           <Route path="/Registro" element={<Registro />} />
           <Route path="/ContactForm" element={<ContactForm />} />
+          <Route path="/QuienesSomos" element={<QuienesSomos />} />
           <Route path="/VistaAdmin" element={<VistaAdmin />} />
           <Route path="/VistaGuia" element={<VistaGuia />} />
           <Route path="/VistaOperador" element={<VistaOperador />} />

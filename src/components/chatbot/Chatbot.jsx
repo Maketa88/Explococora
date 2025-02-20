@@ -8,6 +8,17 @@ export const ChatBot = () => {
   const [history, setHistory] = useState([]);
   const chatContainerRef = useRef(null);
 
+  useEffect(() => {
+    if (isChatOpen && history.length === 0) {
+      setHistory([
+        {
+          role: "chatbot",
+          parts: "¡Hola! 👋 Soy Condorito, tu asistente virtual de ExploCocora. \n\nEstoy aquí para ayudarte a planificar tu aventura en el Valle de Cocora. 🌳\n\nPuedo ayudarte con:\n- Información sobre nuestras rutas y senderos 🥾\n- Detalles de precios y servicios 💰\n- Recomendaciones personalizadas 🎯\n- Consejos de seguridad y preparación 🔒\n\n¿En qué puedo ayudarte hoy? 😊"
+        }
+      ]);
+    }
+  }, [isChatOpen]);
+
   const toggleChat = () => {
     setIsChatOpen((prev) => !prev);
   };
@@ -54,6 +65,32 @@ export const ChatBot = () => {
     }
   }, [history]);
 
+  // Detectar saludos
+  const isSaludo = (text) => {
+    const saludos = ['hola', 'buenos días', 'buenas tardes', 'buenas noches', 'como estas', 'que tal', 'saludos', 
+                     'como te encuentras', 'como andas', 'como va', 'como te va', 'como has estado'];
+    const respuestasComoEstas = [
+        '¡Muy bien, gracias por preguntar! 😊', 
+        '¡Excelente! Listo para ayudarte con tu aventura. 🌟', 
+        '¡Genial! ¿En qué puedo ayudarte hoy? 🌳',
+        '¡De maravilla! Ansioso por ayudarte a explorar el Valle de Cocora 🌿',
+        '¡Fantástico! Listo para guiarte en tu próxima aventura 🏔️'
+    ];
+    
+    const comoEstasVariants = ['como estas', 'como te encuentras', 'como andas', 'como va', 'como te va', 'como has estado'];
+    
+    if (comoEstasVariants.some(variant => text.toLowerCase().includes(variant))) {
+        return {
+            esSaludo: true,
+            respuesta: respuestasComoEstas[Math.floor(Math.random() * respuestasComoEstas.length)]
+        };
+    }
+    
+    return {
+        esSaludo: saludos.some(saludo => text.toLowerCase().includes(saludo)),
+        respuesta: ''
+    };
+  };
 
   return (
     <div className="fixed bottom-4 right-4 z-50">

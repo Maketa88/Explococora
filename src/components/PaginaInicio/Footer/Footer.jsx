@@ -27,7 +27,7 @@ export const Footer = () => {
 
           {/* Links Sections */}
           <FooterSeccion title="Acerca de Nosotros">
-            <LinkFooter href="/quienes-somos">Quiénes Somos</LinkFooter>
+            <LinkFooter href="/QuienesSomos">Quiénes Somos</LinkFooter>
 
             <LinkFooter href="/ContactForm">Contacto</LinkFooter>
           </FooterSeccion>
