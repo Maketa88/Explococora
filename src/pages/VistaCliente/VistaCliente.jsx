@@ -1,15 +1,13 @@
 import React from "react";
-import PerfilCliente from "./PerfilCliente";
-import ActualizarDatosCliente from "./ActualizarCliente";
 
+import RutasCliente from "../../routes/RutasCliente/RutasCliente";
 
 const VistaCliente = () => {
   return (
-    <div>
-      <PerfilCliente />
-      <ActualizarDatosCliente/>
-    </div>
-  );
+  <>
+  <RutasCliente />
+  </>
+  )
 };
 
 export default VistaCliente;

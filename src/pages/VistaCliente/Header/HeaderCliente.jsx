@@ -3,12 +3,14 @@ import { FaBars, FaTimes } from "react-icons/fa";
 import { useAlternarMenu } from "../../../hooks/MenuHamburguesa";
 import Colombia from "../../../assets/Images/Colombia.png";
 import Usa from "../../../assets/Images/Usa.png";
-import { NavItem } from "./Lista";
-import { Logo } from "./Logo";
+import Avatar from "../../../assets/Images/avatar.png";
+
+
 import React from "react";
+import { NavItem } from "../../../components/PaginaInicio/Header/Lista";
+import { Logo } from "../../../components/PaginaInicio/Header/Logo";
 
-
-export const Header = () => {
+export const HeaderCliente = () => {
   const { menuAbierto, alternarMenu } = useAlternarMenu();
   const { t, i18n } = useTranslation();
 
@@ -31,8 +33,8 @@ export const Header = () => {
             menuAbierto ? "block" : "hidden"
           } absolute lg:relative bg-teal-800 lg:bg-transparent w-full lg:w-auto top-24 left-0 lg:top-0 lg:flex-row space-y-4 lg:space-y-0 text-center z-50`}
         >
-          <NavItem tipo="enlace" contenido={t("inicio")} to="/" />
-          <NavItem tipo="enlace" contenido={t("historia")} to="/Historia" />
+          <NavItem tipo="enlace" contenido={t("inicio")} to="/VistaCliente" />
+          <NavItem tipo="enlace" contenido={t("historia")} to="/VistaCliente/Historia" />
           <NavItem
             tipo="enlace"
             contenido={t("nuestrasRutas")}
@@ -46,7 +48,7 @@ export const Header = () => {
           <NavItem
             tipo="enlace"
             contenido={t("contactanos")}
-            to="/ContactForm"
+            to="/VistaCliente/Contacto"
           />
 
           {/* Botones */}
@@ -85,7 +87,17 @@ export const Header = () => {
               }`}
             >
               <NavItem tipo="imagen" imgSrc={Usa} alt="USA Flag" />
+              
             </button>
+            <div className="flex items-center space-x-2">
+                <NavItem
+                  tipo="imagen"
+                  imgSrc={Avatar} // Aquí pones la URL del perfil del usuario
+                  alt="Perfil de Usuario"
+                  estilos="h-8 w-8 rounded-full "
+                  to="/VistaCliente/PerfilCliente"
+                />
+              </div>
           </div>
         </ul>
 

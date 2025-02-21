@@ -40,6 +40,7 @@ export const NavItem = ({
 
   if (tipo === "imagen") {
     return (
+      <NavLink to={to}>
       <li className="flex justify-center gap-2">
         <img
           src={imgSrc}
@@ -47,6 +48,7 @@ export const NavItem = ({
           className={`h-8 w-8 rounded-md ${estilos}`}
         />
       </li>
+      </NavLink>
     );
   }
 
