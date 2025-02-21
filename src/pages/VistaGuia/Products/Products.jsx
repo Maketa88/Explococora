@@ -1,14 +1,14 @@
 import React from 'react';
-import DashboardLayout from '../../../layouts/DashboardLayout';
+import DashboardLayoutGuia from '../../../layouts/DashboardLayoutGuia';
 
 const Products = () => {
   return (
-    <DashboardLayout>
+    <DashboardLayoutGuia>
       <div className="flex flex-col gap-4">
         <h1 className="text-2xl font-bold text-white">Products</h1>
         {/* Contenido específico de Products */}
       </div>
-    </DashboardLayout>
+    </DashboardLayoutGuia>
   );
 };
 

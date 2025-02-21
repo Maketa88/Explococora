@@ -36,7 +36,7 @@ export const RutasExplococora = () => {
       </Routes>
     );
   }
-  
+
   return (
     <div className="min-h-screen">
       <Header />

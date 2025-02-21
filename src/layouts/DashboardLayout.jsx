@@ -98,17 +98,17 @@ const DashboardLayout = ({ children }) => {
         h-screen sticky top-0
       `}>
         <div className="mb-8 flex flex-col items-start">
-          <div className="flex items-center">
-            {!collapsed && <h1 className={`text-2xl font-bold text-white`}>Explococora</h1>}
-            <button 
-              onClick={() => setCollapsed(!collapsed)}
-              className="p-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white ml-2"
-            >
-              {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-            </button>
-          </div>
-          {!collapsed && <h1 className={`text-lg font-bold text-white mt-1 text-center w-40`}>Operador</h1>}
-        </div>
+  <div className="flex items-center">
+    {!collapsed && <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>Explococora</h1>} 
+    <button 
+      onClick={() => setCollapsed(!collapsed)}
+      className="p-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white ml-2"
+    >
+      {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+    </button>
+  </div>
+  {!collapsed && <h1 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-black'} mt-1 text-center w-40`}>Operador</h1>}
+  </div>
         
         <nav className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
           {sections.map((section) => (

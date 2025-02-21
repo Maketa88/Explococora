@@ -1,8 +1,8 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Dashboard from '../../pages/VistaGuia/Dashboard/Dashboard';
-import Analytics from '../../pages/VistaGuia/Analytics/Analytics';
-import Reports from '../../pages/VistaGuia/Reports/Reports';
+import VisualizarRutas from '../../pages/VistaGuia/VisualizarRutas/VisualizarRutas';
+import RutasAsignadas from '../../pages/VistaGuia/RutasAsignadas/RutasAsignadas';
 import Customers from '../../pages/VistaGuia/Customers/Customers';
 import NewCustomer from '../../pages/VistaGuia/Customers/NewCustomer';
 import VerifiedCustomers from '../../pages/VistaGuia/Customers/VerifiedCustomers';
@@ -13,12 +13,11 @@ import Settings from '../../pages/VistaGuia/Settings/Settings';
 
 // ... existing code ...
 
-const RutasOperador = () => {
+const RutasGuia = () => {
   return (
     <Routes>
       <Route path="/" element={<Dashboard />} />
-      <Route path="/analytics" element={<Analytics />} />
-      <Route path="/reports" element={<Reports />} />
+      <Route path="/RutasAsignadas" element={<RutasAsignadas />} />
       <Route path="/customers" element={<Customers />} />
       <Route path="/new-customer" element={<NewCustomer />} />
       <Route path="/verified-customers" element={<VerifiedCustomers />} />
@@ -26,8 +25,9 @@ const RutasOperador = () => {
       <Route path="/new-product" element={<NewProduct />} />
       <Route path="/inventory" element={<Inventory />} />
       <Route path="/settings" element={<Settings />} />
+      <Route path="/VisualizarRutas" element={<VisualizarRutas />} />
     </Routes>
   );
 };
 
-export default RutasOperador; 
+export default RutasGuia; 

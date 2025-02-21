@@ -35,15 +35,15 @@ const DashboardLayoutGuia = ({ children }) => {
       section: "Dashboard"
     },
     {
-      title: "Analytics",
+      title: "VisualizarRutas",
       icon: <BarChart2 className="w-5 h-5" />,
-      path: "/VistaGuia/analytics",
+      path: "/VistaGuia/VisualizarRutas",
       section: "Dashboard"
     },
     {
-      title: "Reports",
+      title: "RutasAsignadas",
       icon: <FileText className="w-5 h-5" />,
-      path: "/VistaGuia/reports",
+      path: "/VistaGuia/RutasAsignadas",
       section: "Dashboard"
     },
     {
@@ -97,15 +97,18 @@ const DashboardLayoutGuia = ({ children }) => {
         border-r ${darkMode ? 'border-gray-800' : 'border-gray-200'}
         h-screen sticky top-0
       `}>
-        <div className="mb-8 flex items-center justify-between">
-          {!collapsed && <h1 className={`text-2xl font-bold text-white`}>Explococora</h1>}
-          <button 
-            onClick={() => setCollapsed(!collapsed)}
-            className="p-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-          </button>
-        </div>
+       <div className="mb-8 flex flex-col items-start">
+  <div className="flex items-center">
+    {!collapsed && <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>Explococora</h1>} 
+    <button 
+      onClick={() => setCollapsed(!collapsed)}
+      className="p-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white ml-2"
+    >
+      {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+    </button>
+  </div>
+  {!collapsed && <h1 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-black'} mt-1 text-center w-40`}>Guia</h1>}
+  </div>
 
         <nav className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
           {sections.map((section) => (

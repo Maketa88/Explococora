@@ -1,5 +1,5 @@
 import React from 'react';
-import DashboardLayout from '../../../layouts/DashboardLayout';
+import DashboardLayoutGuia from '../../../layouts/DashboardLayoutGuia';
 import { 
   Package, 
   Users, 
@@ -57,7 +57,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <DashboardLayout>
+    <DashboardLayoutGuia>
       <div className="flex flex-col gap-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {cardData.map((card, index) => (
@@ -118,7 +118,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </DashboardLayoutGuia>
   );
 };
 
