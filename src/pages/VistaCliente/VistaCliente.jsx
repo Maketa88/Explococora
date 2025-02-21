@@ -1,13 +1,15 @@
-import React from 'react';
+import React from "react";
+import PerfilCliente from "./PerfilCliente";
+import ActualizarDatosCliente from "./ActualizarCliente";
+
 
 const VistaCliente = () => {
-  console.log("ClienteScreen se ha montado"); // Verifica que se monte el componente
   return (
     <div>
-      <h1>yo soy un Cliente</h1>
-      {/* Aquí puedes agregar más contenido específico para el usuario */}
+      <PerfilCliente />
+      <ActualizarDatosCliente/>
     </div>
   );
 };
 
-export default VistaCliente;
+export default VistaCliente;

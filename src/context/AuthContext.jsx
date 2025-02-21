@@ -24,10 +24,12 @@ export const AuthProvider = ({ children }) => {
 
     console.log('Respuesta del servidor:', response.data); // Verifica la respuesta
     console.log('Rol del usuario:', response.data.role); // Verifica el rol
+    console.log('cedula:', response.data.cedula); // Verifica el rol
 
     if (response.data.status === 'Autenticación exitosa') {
       localStorage.setItem('token', response.data.token); // Almacena el token
       setIsAuthenticated(true); // Actualiza el estado de autenticación
+      localStorage.setItem('cedula', response.data.cedula); // Guarda la cédula
       
       // Nueva lógica para redirigir según el rol
       if (response.data.role === 'admin') {
@@ -36,7 +38,7 @@ export const AuthProvider = ({ children }) => {
         navigate('/VistaGuia');
       } else if (response.data.role === 'operador') {
         navigate('/VistaOperador');
-      } else if (response.data.role === 'cliente') {
+      } else if (response.data.role === 'Cliente') {
         navigate('/VistaCliente');
       } else {
         setErrorMessage('Rol no reconocido');
