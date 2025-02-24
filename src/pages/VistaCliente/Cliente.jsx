@@ -66,7 +66,8 @@ const ProfileDropdown = ({ imgSrc, alt, cerrarSesion }) => {
       />
   
       {isOpen && (
-       <div className="absolute left-0 md:right-0 md:left-auto top-12 w-56 max-w-[calc(100vw-20px)] bg-teal-800 border-2 border-gray-900 rounded-tl-xl rounded-br-xl shadow-xl py-2 z-50 transform transition-all duration-300 ease-in-out">
+        <div className="absolute left-0 md:right-0 md:left-auto top-12 w-56 max-w-[calc(100vw-20px)] bg-teal-800 border-2 border-gray-900 rounded-xl shadow-xl py-2 z-50 transform transition-all duration-300 ease-in-out">
+
 
 
           {menuOptions.map((option, index) => (
@@ -82,8 +83,8 @@ const ProfileDropdown = ({ imgSrc, alt, cerrarSesion }) => {
               }}
               className={`group px-4 py-3 text-white ${
                 index === menuOptions.length - 1
-                  ? "mt-1 text-red-400 hover:text-white hover:bg-red-600 active:bg-red-700 font-semibold"
-                  : "hover:bg-teal-700 active:bg-teal-600"
+                  ? "mt-1 text-red-400 hover:text-white hover:bg-red-600 active:bg-red-700 font-bold"
+                  : "hover:bg-teal-600 active:bg-teal-500"
               } flex items-center cursor-pointer transition-all duration-200 text-sm md:text-base relative overflow-hidden`}
             >
               <span className="relative z-10">{option.label}</span>
