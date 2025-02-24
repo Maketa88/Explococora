@@ -62,7 +62,7 @@ const ProfileDropdown = ({ imgSrc, alt, cerrarSesion }) => {
       <img
         src={imgSrc}
         alt={alt}
-        className="h-11 w-11 rounded-full object-cover border-2 border-white transform transition hover:scale-110 active:scale-95"
+        className="h-11 w-11 rounded-full object-cover  transform transition hover:scale-110 active:scale-95"
       />
   
       {isOpen && (
