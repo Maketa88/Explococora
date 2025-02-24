@@ -9,6 +9,7 @@ import Avatar from "../../../assets/Images/avatar.png";
 import React from "react";
 import { NavItem } from "../../../components/PaginaInicio/Header/Lista";
 import { Logo } from "../../../components/PaginaInicio/Header/Logo";
+import ProfileDropdown from "../Cliente";
 
 export const HeaderCliente = () => {
   const { menuAbierto, alternarMenu } = useAlternarMenu();
@@ -21,7 +22,7 @@ export const HeaderCliente = () => {
 
   return (
     <header className="bg-teal-800 shadow-lg z-50">
-      <nav className="container mx-auto px-4 py-8 flex justify-between items-center relative">
+      <nav className="container mx-auto px-4 py-8 flex justify-around items-center relative">
         {/* Logo */}
         <a href="/" onClick={() => window.location.reload()} className="mx-2">
           <Logo />
@@ -31,10 +32,14 @@ export const HeaderCliente = () => {
         <ul
           className={`lg:flex lg:space-x-6 ${
             menuAbierto ? "block" : "hidden"
-          } absolute lg:relative bg-teal-800 lg:bg-transparent w-full lg:w-auto top-24 left-0 lg:top-0 lg:flex-row space-y-4 lg:space-y-0 text-center z-50`}
+          } absolute lg:relative bg-teal-800 lg:bg-transparent w-full lg:w-auto top-24 left-0 lg:top-0 lg:flex-row space-y-4 lg:space-y-0 text-center z-50 items-center`}
         >
           <NavItem tipo="enlace" contenido={t("inicio")} to="/VistaCliente" />
-          <NavItem tipo="enlace" contenido={t("historia")} to="/VistaCliente/Historia" />
+          <NavItem
+            tipo="enlace"
+            contenido={t("historia")}
+            to="/VistaCliente/Historia"
+          />
           <NavItem
             tipo="enlace"
             contenido={t("nuestrasRutas")}
@@ -52,21 +57,9 @@ export const HeaderCliente = () => {
           />
 
           {/* Botones */}
-          <NavItem
-            tipo="boton"
-            contenido={t("ingresar")}
-            estilos="bg-blue-600 text-white hover:bg-blue-800 font-nunito"
-            to="/Ingreso"
-          />
-          <NavItem
-            tipo="boton"
-            contenido={t("crearCuenta")}
-            estilos="bg-blue-600 text-white hover:bg-blue-800 font-nunito"
-            to="/Registro"
-          />
 
           {/* Banderas */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-4 ">
             <button
               onClick={cambiarIdioma}
               className={`transition-opacity ${
@@ -87,17 +80,17 @@ export const HeaderCliente = () => {
               }`}
             >
               <NavItem tipo="imagen" imgSrc={Usa} alt="USA Flag" />
-              
             </button>
-            <div className="flex items-center space-x-2">
-                <NavItem
-                  tipo="imagen"
-                  imgSrc={Avatar} // Aquí pones la URL del perfil del usuario
-                  alt="Perfil de Usuario"
-                  estilos="h-8 w-8 rounded-full "
-                  to="/VistaCliente/PerfilCliente"
-                />
-              </div>
+            <div className="flex items-center">
+              <ProfileDropdown
+                imgSrc={Avatar}
+                alt="Perfil de Usuario"
+                cerrarSesion={() => {
+                  // Aquí coloca tu función para cerrar sesión
+                  console.log("Cerrando sesión...");
+                }}
+              />
+            </div>
           </div>
         </ul>
 
