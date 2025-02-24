@@ -10,6 +10,8 @@ import Products from '../../pages/VistaGuia/Products/Products';
 import NewProduct from '../../pages/VistaGuia/Products/NewProduct';
 import Inventory from '../../pages/VistaGuia/Products/Inventory';
 import Settings from '../../pages/VistaGuia/Settings/Settings';
+import PerfilGuia from '../../pages/VistaGuia/PerfilGuia/PerfilGuia';
+import CambioEstado from '../../pages/VistaGuia/CambioEstado/CambioEstado';
 
 // ... existing code ...
 
@@ -26,6 +28,8 @@ const RutasGuia = () => {
       <Route path="/inventory" element={<Inventory />} />
       <Route path="/settings" element={<Settings />} />
       <Route path="/VisualizarRutas" element={<VisualizarRutas />} />
+      <Route path="/PerfilGuia" element={<PerfilGuia />} />
+      <Route path="/CambioEstado" element={<CambioEstado />} />
     </Routes>
   );
 };

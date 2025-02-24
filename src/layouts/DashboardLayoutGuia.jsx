@@ -1,3 +1,4 @@
+// Explococora/src/layouts/DashboardLayoutGuia.jsx
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
@@ -22,6 +23,7 @@ const DashboardLayoutGuia = ({ children }) => {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
+  const [estado, setEstado] = useState("Estado 1"); // Nuevo estado para gestionar el estado seleccionado
   
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -81,6 +83,12 @@ const DashboardLayoutGuia = ({ children }) => {
       icon: <PackageSearch className="w-5 h-5" />,
       path: "/VistaGuia/inventory",
       section: "Products"
+    },
+    {
+      title: "Perfil",
+      icon: <Users className="w-5 h-5" />,
+      path: "/VistaGuia/PerfilGuia",
+      section: "Perfil"
     }
   ];
 
@@ -98,17 +106,17 @@ const DashboardLayoutGuia = ({ children }) => {
         h-screen sticky top-0
       `}>
        <div className="mb-8 flex flex-col items-start">
-  <div className="flex items-center">
-    {!collapsed && <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>Explococora</h1>} 
-    <button 
-      onClick={() => setCollapsed(!collapsed)}
-      className="p-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white ml-2"
-    >
-      {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-    </button>
-  </div>
-  {!collapsed && <h1 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-black'} mt-1 text-center w-40`}>Guia</h1>}
-  </div>
+          <div className="flex items-center">
+            {!collapsed && <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>Explococora</h1>} 
+            <button 
+              onClick={() => setCollapsed(!collapsed)}
+              className="p-1.5 rounded-lg bg-blue-600  text-white ml-2"
+            >
+              {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+            </button>
+          </div>
+          {!collapsed && <h1 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-black'} mt-1 text-center w-40`}>Guia</h1>}
+        </div>
 
         <nav className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
           {sections.map((section) => (
@@ -165,6 +173,16 @@ const DashboardLayoutGuia = ({ children }) => {
               />
             </div>
             <div className="flex items-center gap-4">
+              
+              <select 
+                value={estado} 
+                onChange={(e) => setEstado(e.target.value)} // Manejar el cambio de estado
+                className={`p-1 rounded-lg ${estado === "Disponible" ? 'bg-green-500 text-white' : estado === "Ocupado" ? 'bg-yellow-500 text-black' : estado === "Inactivo" ? 'bg-red-500 text-white' : darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-900'} hover:bg-gray-300`}
+              >
+                <option value="Disponible" className="bg-green-500 text-white">Disponible</option>
+                <option value="Ocupado" className="bg-yellow-500 text-black">Ocupado</option>
+                <option value="Inactivo" className="bg-red-500 text-white">Inactivo</option>
+              </select>
               <button 
                 onClick={() => setDarkMode(!darkMode)}
                 className={`p-2 rounded-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
@@ -174,13 +192,15 @@ const DashboardLayoutGuia = ({ children }) => {
               <button className={`p-2 rounded-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                 <Bell className="w-5 h-5" />
               </button>
-              <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                <img 
-                  src="https://ui-avatars.com/api/?name=User&background=random" 
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
-              </div>
+               <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                 <Link to="/VistaGuia/Perfil">
+                   <img 
+                     src="https://ui-avatars.com/api/?name=User&background=random" 
+                     alt="Profile"
+                     className="w-full h-full object-cover"
+                   />
+                 </Link>
+               </div>
             </div>
           </div>
         </div>
