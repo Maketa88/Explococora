@@ -4,9 +4,6 @@ import { useAlternarMenu } from "../../../hooks/MenuHamburguesa";
 import Colombia from "../../../assets/Images/Colombia.png";
 import Usa from "../../../assets/Images/Usa.png";
 import Avatar from "../../../assets/Images/avatar.png";
-
-
-import React from "react";
 import { NavItem } from "../../../components/PaginaInicio/Header/Lista";
 import { Logo } from "../../../components/PaginaInicio/Header/Logo";
 import ProfileDropdown from "../Cliente";
