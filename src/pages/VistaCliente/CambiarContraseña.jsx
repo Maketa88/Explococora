@@ -90,10 +90,14 @@ const CambiarContraseña = () => {
       setConfirmarContrasenia('');
       setErroresValidacion([]);
     } catch (error) {
-      setMensaje({ 
-        texto: error.response?.data?.message || 'Error al cambiar la contraseña', 
-        tipo: 'error' 
-      });
+      if (error.response?.status === 400 || error.response?.status === 404) {
+        setMensaje({ texto: 'Datos incorrectos', tipo: 'error' });
+      } else {
+        setMensaje({ 
+          texto: 'Error al cambiar la contraseña', 
+          tipo: 'error' 
+        });
+      }
     } finally {
       setCargando(false);
     }
