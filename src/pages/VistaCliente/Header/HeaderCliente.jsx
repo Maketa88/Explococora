@@ -1,11 +1,11 @@
 import { useTranslation } from "react-i18next";
 import { FaBars, FaTimes } from "react-icons/fa";
-import { useAlternarMenu } from "../../../hooks/MenuHamburguesa";
 import Colombia from "../../../assets/Images/Colombia.png";
 import Usa from "../../../assets/Images/Usa.png";
 import Avatar from "../../../assets/Images/avatar.png";
 import { NavItem } from "../../../components/PaginaInicio/Header/Lista";
 import { Logo } from "../../../components/PaginaInicio/Header/Logo";
+import { useAlternarMenu } from "../../../hooks/MenuHamburguesa";
 import ProfileDropdown from "../Cliente";
 
 export const HeaderCliente = () => {
@@ -82,10 +82,6 @@ export const HeaderCliente = () => {
               <ProfileDropdown
                 imgSrc={Avatar}
                 alt="Perfil de Usuario"
-                cerrarSesion={() => {
-                  // Aquí coloca tu función para cerrar sesión
-                  console.log("Cerrando sesión...");
-                }}
               />
             </div>
           </div>

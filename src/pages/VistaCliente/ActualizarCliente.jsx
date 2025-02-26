@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import Avatar from "../../assets/Images/avatar.png";
 
 const ActualizarDatosCliente = () => {
@@ -18,7 +19,6 @@ const ActualizarDatosCliente = () => {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState(null);
-  const [mensaje, setMensaje] = useState("");
   const [foto, setFoto] = useState(null);
   const [subiendoFoto, setSubiendoFoto] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -150,8 +150,98 @@ const ActualizarDatosCliente = () => {
         setCliente(clienteActualizado);
         localStorage.setItem("cliente", JSON.stringify(clienteActualizado));
         localStorage.setItem("foto_perfil", fotoPath);
+
+        Swal.fire({
+          html: `
+            <div style="
+              display: flex; 
+              flex-direction: column; 
+              align-items: center;
+              border: 4px solid #004d40;
+              border-radius: 12px;
+              padding: clamp(10px, 3vw, 20px);
+              background-color: #ffffff;
+              box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+              width: 100%;
+              max-width: 500px;
+              margin: auto;
+            ">
+              <div style="
+                display: flex; 
+                flex-direction: column; 
+                align-items: center;
+                border-radius: 8px;
+                padding: clamp(5px, 2vw, 10px);
+                width: 100%;
+              ">
+                <img src="https://i.gifer.com/7efs.gif" 
+                    alt="Actualización exitosa" 
+                    style="
+                      width: clamp(100px, 30vw, 150px);
+                      margin-bottom: clamp(5px, 2vw, 10px);
+                      border-radius: 8px;
+                    ">
+                <img src="https://i.pinimg.com/736x/10/3e/44/103e4418d4a3675326fbc9273f9af62a.jpg" 
+                    alt="Logo ExploCocora" 
+                    style="
+                      width: clamp(80px, 25vw, 120px);
+                      border-radius: 8px;
+                    ">
+              </div>
+              <h2 style="
+                font-size: clamp(20px, 5vw, 28px);
+                font-weight: bold; 
+                font-family: Arial, Helvetica, sans-serif; 
+                color: #004d40; 
+                margin-top: clamp(10px, 3vw, 15px);
+                text-align: center;
+                white-space: normal;
+                width: 100%;
+                padding: 0 10px;
+              ">
+                ¡Foto Actualizada!
+              </h2>
+              <p style="
+                font-size: clamp(14px, 4vw, 18px);
+                font-family: Arial, Helvetica, sans-serif; 
+                color: #004d40; 
+                text-align: center; 
+                margin-top: clamp(5px, 2vw, 10px);
+                padding: 0 10px;
+                width: 100%;
+              ">
+                Tu foto de perfil ha sido actualizada correctamente
+              </p>
+              <button id="cerrarAlerta" style="
+                margin-top: clamp(10px, 3vw, 15px);
+                padding: clamp(8px, 2vw, 10px) clamp(15px, 4vw, 20px);
+                background-color: #38a169;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                font-size: clamp(14px, 3vw, 16px);
+                font-weight: bold;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+                width: auto;
+                min-width: 100px;
+              ">
+                OK
+              </button>
+            </div>
+          `,
+          showConfirmButton: false,
+          customClass: {
+            popup: 'swal2-popup-custom',
+            container: 'swal2-container-custom'
+          },
+          didOpen: () => {
+            document.getElementById("cerrarAlerta").addEventListener("click", () => {
+              Swal.close();
+            });
+          }
+        });
         
-        setMensaje("Foto actualizada correctamente");
         setFoto(null);
         setPreviewUrl(null);
         
@@ -170,7 +260,6 @@ const ActualizarDatosCliente = () => {
     e.preventDefault();
     setUpdating(true);
     setError(null);
-    setMensaje("");
 
     const cedula = localStorage.getItem("cedula");
     const token = localStorage.getItem("token");
@@ -206,10 +295,98 @@ const ActualizarDatosCliente = () => {
           email: formData.email,
         });
 
-        setMensaje("Datos actualizados correctamente");
+        Swal.fire({
+          html: `
+            <div style="
+              display: flex; 
+              flex-direction: column; 
+              align-items: center;
+              border: 4px solid #004d40;
+              border-radius: 12px;
+              padding: clamp(10px, 3vw, 20px);
+              background-color: #ffffff;
+              box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+              width: 100%;
+              max-width: 500px;
+              margin: auto;
+            ">
+              <div style="
+                display: flex; 
+                flex-direction: column; 
+                align-items: center;
+                border-radius: 8px;
+                padding: clamp(5px, 2vw, 10px);
+                width: 100%;
+              ">
+                <img src="https://i.gifer.com/7efs.gif" 
+                    alt="Actualización exitosa" 
+                    style="
+                      width: clamp(100px, 30vw, 150px);
+                      margin-bottom: clamp(5px, 2vw, 10px);
+                      border-radius: 8px;
+                    ">
+                <img src="https://i.pinimg.com/736x/10/3e/44/103e4418d4a3675326fbc9273f9af62a.jpg" 
+                    alt="Logo ExploCocora" 
+                    style="
+                      width: clamp(80px, 25vw, 120px);
+                      border-radius: 8px;
+                    ">
+              </div>
+              <h2 style="
+                font-size: clamp(20px, 5vw, 28px);
+                font-weight: bold; 
+                font-family: Arial, Helvetica, sans-serif; 
+                color: #004d40; 
+                margin-top: clamp(10px, 3vw, 15px);
+                text-align: center;
+                white-space: normal;
+                width: 100%;
+                padding: 0 10px;
+              ">
+                ¡Actualización Exitosa!
+              </h2>
+              <p style="
+                font-size: clamp(14px, 4vw, 18px);
+                font-family: Arial, Helvetica, sans-serif; 
+                color: #004d40; 
+                text-align: center; 
+                margin-top: clamp(5px, 2vw, 10px);
+                padding: 0 10px;
+                width: 100%;
+              ">
+                Tus datos han sido actualizados correctamente
+              </p>
+              <button id="cerrarAlerta" style="
+                margin-top: clamp(10px, 3vw, 15px);
+                padding: clamp(8px, 2vw, 10px) clamp(15px, 4vw, 20px);
+                background-color: #38a169;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                font-size: clamp(14px, 3vw, 16px);
+                font-weight: bold;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+                width: auto;
+                min-width: 100px;
+              ">
+                OK
+              </button>
+            </div>
+          `,
+          showConfirmButton: false,
+          customClass: {
+            popup: 'swal2-popup-custom',
+            container: 'swal2-container-custom'
+          },
+          didOpen: () => {
+            document.getElementById("cerrarAlerta").addEventListener("click", () => {
+              Swal.close();
+            });
+          }
+        });
+
         await cargarDatosCliente();
-      } else {
-        setMensaje("Actualización exitosa, pero no se recibieron datos.");
       }
     } catch (error) {
       console.error("Error al actualizar:", error);
@@ -229,7 +406,7 @@ const ActualizarDatosCliente = () => {
 
   return (
     <div className="max-w-lg mx-auto mt-10 mb-20 p-6 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-400 rounded-xl shadow-lg">
-      <div className="bg-teal-800 -mx-6 -mt-6 p-6 rounded-t-xl text-white">
+      <div className="bg-teal-700 -mx-6 -mt-6 p-6 rounded-t-xl text-white">
         <h1 className="text-2xl font-bold text-center flex items-center justify-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -250,7 +427,6 @@ const ActualizarDatosCliente = () => {
       </div>
       
       {error && <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-lg shadow-sm">{error}</div>}
-      {mensaje && <div className="mt-4 p-3 bg-green-100 text-green-700 rounded-lg shadow-sm">{mensaje}</div>}
 
       {/* Sección de foto de perfil */}
       <div className="flex justify-center mt-6 mb-8">

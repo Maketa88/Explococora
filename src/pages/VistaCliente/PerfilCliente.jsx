@@ -112,7 +112,7 @@ const PerfilCliente = () => {
         className="max-w-lg mx-auto mt-10 mb-20 p-6 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-400
  rounded-xl shadow-lg "
       >
-        <div className="bg-teal-800 -mx-6 -mt-6 p-6 rounded-t-xl text-white">
+        <div className="bg-teal-700 -mx-6 -mt-6 p-6 rounded-t-xl text-white">
           <h1 className="text-2xl font-bold text-center flex items-center justify-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
