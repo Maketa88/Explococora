@@ -27,6 +27,14 @@ const Rutas = () => {
     onConfirm: null
   });
   const rutaToDeleteRef = useRef(null);
+  const [filtros, setFiltros] = useState({
+    dificultad: '',
+    duracion: '',
+    estado: '',
+    tipo: ''
+  });
+  const [mostrarFiltros, setMostrarFiltros] = useState(false);
+  const [rutasFiltradas, setRutasFiltradas] = useState([]);
 
   const fetchRutas = async () => {
     try {
@@ -44,6 +52,10 @@ const Rutas = () => {
   useEffect(() => {
     fetchRutas();
   }, []);
+
+  useEffect(() => {
+    setRutasFiltradas(rutas);
+  }, [rutas]);
 
   // Mostrar alerta
   const showAlert = (message, type = 'info', onConfirm = null) => {
@@ -405,10 +417,152 @@ const Rutas = () => {
     );
   };
 
+  const aplicarFiltros = () => {
+    let resultado = [...rutas];
+    
+    if (filtros.dificultad) {
+      resultado = resultado.filter(ruta => ruta.dificultad === filtros.dificultad);
+    }
+    
+    if (filtros.estado) {
+      resultado = resultado.filter(ruta => ruta.estado === filtros.estado);
+    }
+    
+    if (filtros.tipo) {
+      resultado = resultado.filter(ruta => ruta.tipo === filtros.tipo);
+    }
+    
+    if (filtros.duracion) {
+      // Para la duración, podemos hacer un filtro más flexible
+      switch(filtros.duracion) {
+        case 'corta':
+          // Menos de 1 hora o contiene "minutos"
+          resultado = resultado.filter(ruta => 
+            ruta.duracion.includes('minuto') || 
+            (parseInt(ruta.duracion) < 1 && ruta.duracion.includes('hora'))
+          );
+          break;
+        case 'media':
+          // Entre 1 y 3 horas
+          resultado = resultado.filter(ruta => {
+            const horas = parseInt(ruta.duracion);
+            return horas >= 1 && horas <= 3 && ruta.duracion.includes('hora');
+          });
+          break;
+        case 'larga':
+          // Más de 3 horas
+          resultado = resultado.filter(ruta => {
+            const horas = parseInt(ruta.duracion);
+            return horas > 3 && ruta.duracion.includes('hora');
+          });
+          break;
+        default:
+          break;
+      }
+    }
+    
+    setRutasFiltradas(resultado);
+  };
+
+  const limpiarFiltros = () => {
+    setFiltros({
+      dificultad: '',
+      duracion: '',
+      estado: '',
+      tipo: ''
+    });
+    setRutasFiltradas(rutas);
+  };
+
   return (
     <DashboardLayout>
       <div className="flex flex-col gap-4">
-        <h1 className="text-2xl font-bold text-white">Rutas</h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-white">Rutas</h1>
+          <button
+            onClick={() => setMostrarFiltros(!mostrarFiltros)}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+          >
+            {mostrarFiltros ? 'Ocultar Filtros' : 'Mostrar Filtros'}
+          </button>
+        </div>
+        
+        {mostrarFiltros && (
+          <div className="bg-gray-800 p-4 rounded-lg">
+            <h2 className="text-white font-semibold mb-3">Filtrar Rutas</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-white text-sm mb-1">Dificultad</label>
+                <select
+                  value={filtros.dificultad}
+                  onChange={(e) => setFiltros({...filtros, dificultad: e.target.value})}
+                  className="w-full p-2 rounded bg-gray-700 text-white"
+                >
+                  <option value="">Todas</option>
+                  <option value="Facil">Fácil</option>
+                  <option value="Moderada">Moderada</option>
+                  <option value="Desafiante">Desafiante</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-white text-sm mb-1">Duración</label>
+                <select
+                  value={filtros.duracion}
+                  onChange={(e) => setFiltros({...filtros, duracion: e.target.value})}
+                  className="w-full p-2 rounded bg-gray-700 text-white"
+                >
+                  <option value="">Todas</option>
+                  <option value="corta">Corta (menos de 1 hora)</option>
+                  <option value="media">Media (1-3 horas)</option>
+                  <option value="larga">Larga (más de 3 horas)</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-white text-sm mb-1">Estado</label>
+                <select
+                  value={filtros.estado}
+                  onChange={(e) => setFiltros({...filtros, estado: e.target.value})}
+                  className="w-full p-2 rounded bg-gray-700 text-white"
+                >
+                  <option value="">Todos</option>
+                  <option value="Activa">Activa</option>
+                  <option value="Inactiva">Inactiva</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-white text-sm mb-1">Tipo</label>
+                <select
+                  value={filtros.tipo}
+                  onChange={(e) => setFiltros({...filtros, tipo: e.target.value})}
+                  className="w-full p-2 rounded bg-gray-700 text-white"
+                >
+                  <option value="">Todos</option>
+                  <option value="Cabalgata">Cabalgata</option>
+                  <option value="Caminata">Caminata</option>
+                  <option value="Cabalgata y Caminata">Cabalgata y Caminata</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="flex justify-end mt-4 gap-2">
+              <button
+                onClick={limpiarFiltros}
+                className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+              >
+                Limpiar
+              </button>
+              <button
+                onClick={aplicarFiltros}
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              >
+                Aplicar Filtros
+              </button>
+            </div>
+          </div>
+        )}
         
         <button
           onClick={() => handleOpenModal()}
@@ -417,9 +571,9 @@ const Rutas = () => {
           <Plus className="h-5 w-5" />
           Nueva Ruta
         </button>
-        <ul className="overflow-y-auto max-h-[calc(100vh-250px)]">
-          {rutas.length > 0 ? (
-            rutas.map(ruta => {
+        <ul className="overflow-y-auto max-h-[calc(100vh-350px)]">
+          {rutasFiltradas.length > 0 ? (
+            rutasFiltradas.map(ruta => {
                 return (
                     <li key={ruta.id || ruta.idRuta} className="text-white flex flex-col bg-gray-800 p-4 rounded-lg mb-2">
                         {ruta.imagen && (
@@ -455,7 +609,7 @@ const Rutas = () => {
                 );
             })
           ) : (
-            <p className="text-white">No hay rutas disponibles.</p>
+            <p className="text-white">No hay rutas disponibles con los filtros seleccionados.</p>
           )}
         </ul>
 
