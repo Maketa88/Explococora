@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   BarChart2, 
@@ -15,13 +15,16 @@ import {
   ChevronRight,
   Settings,
   Moon,
-  Sun
+  Sun,
+  Search
 } from 'lucide-react';
 
 const DashboardLayout = ({ children }) => {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
   
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -35,9 +38,9 @@ const DashboardLayout = ({ children }) => {
       section: "Dashboard"
     },
     {
-      title: "Analytics",
+      title: "Rutas",
       icon: <BarChart2 className="w-5 h-5" />,
-      path: "/VistaOperador/analytics",
+      path: "/VistaOperador/Rutas",
       section: "Dashboard"
     },
     {
@@ -85,6 +88,32 @@ const DashboardLayout = ({ children }) => {
   ];
 
   const sections = ["Dashboard", "Customers", "Products"];
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    
+    // Convertir a minúsculas para hacer la búsqueda insensible a mayúsculas/minúsculas
+    const term = searchTerm.toLowerCase();
+    
+    // Mapeo de términos de búsqueda a rutas
+    if (term.includes('ruta') || term.includes('camino')) {
+      navigate('/VistaOperador/Rutas');
+    } else if (term.includes('reporte') || term.includes('informe')) {
+      navigate('/VistaOperador/Reports');
+    } else if (term.includes('cliente') || term.includes('usuario')) {
+      navigate('/VistaOperador/Customers');
+    } else if (term.includes('producto') || term.includes('inventario')) {
+      navigate('/VistaOperador/Products');
+    } else if (term.includes('dashboard') || term.includes('inicio')) {
+      navigate('/VistaOperador/Dashboard');
+    } else {
+      // Si no hay coincidencias, podemos mostrar un mensaje o simplemente no hacer nada
+      alert('No se encontraron resultados para: ' + searchTerm);
+    }
+    
+    // Limpiar el campo de búsqueda
+    setSearchTerm('');
+  };
 
   return (
     <div className={`flex h-screen overflow-hidden ${darkMode ? 'bg-[#0f172a]' : 'bg-white'}`}>
@@ -156,13 +185,23 @@ const DashboardLayout = ({ children }) => {
         <div className={`${darkMode ? 'bg-[#0f172a]' : 'bg-white'} sticky top-0 z-10`}>
           <div className="flex items-center justify-between p-4">
             <div className="flex-1 max-w-xl">
-              <input
-                type="search"
-                placeholder="Buscar..."
-                className={`w-full px-4 py-2 rounded-lg ${
-                  darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-900'
-                }`}
-              />
+              <form onSubmit={handleSearch} className="flex items-center">
+                <input
+                  type="text"
+                  placeholder="Buscar..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className={`w-full px-4 py-2 rounded-lg ${
+                    darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-900'
+                  }`}
+                />
+                <button 
+                  type="submit"
+                  className={`p-2 rounded-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
+                >
+                  <Search className="w-5 h-5" />
+                </button>
+              </form>
             </div>
             <div className="flex items-center gap-4">
               <button 

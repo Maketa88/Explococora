@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import Condorito from "../../assets/Images/MascotExplococora.ico";
 
-
 export const ChatBot = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [question, setQuestion] = useState('');
   const [history, setHistory] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const chatContainerRef = useRef(null);
 
   useEffect(() => {
@@ -27,28 +27,61 @@ export const ChatBot = () => {
     e.preventDefault();
     if (!question.trim()) return;
 
+    // Añadir mensaje del usuario inmediatamente para mejor UX
+    const userMessage = { role: "user", parts: question };
+    setHistory((prev) => [...prev, userMessage]);
+    
+    // Guardar la pregunta y limpiar el input
+    const currentQuestion = question;
+    setQuestion('');
+    setIsLoading(true);
+    
+    // Verificar si es un saludo simple para respuesta rápida
+    const saludoCheck = isSaludo(currentQuestion);
+    if (saludoCheck.esSaludo && saludoCheck.respuesta) {
+      // Respuesta automática para saludos básicos
+      setTimeout(() => {
+        setHistory((prev) => [
+          ...prev,
+          { role: "chatbot", parts: formatAnswer(saludoCheck.respuesta) }
+        ]);
+        setIsLoading(false);
+      }, 500);
+      return;
+    }
+
     try {
-        const response = await fetch('https://bot-condorito-1.onrender.com/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ question, history }),
-        });
+      const response = await fetch('https://bot-condorito-1.onrender.com/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          question: currentQuestion, 
+          history: history.map(msg => ({
+            role: msg.role === "chatbot" ? "model" : "user",
+            parts: msg.parts
+          }))
+        }),
+      });
 
-        if (!response.ok) {
-            throw new Error(`Error en la respuesta del servidor: ${response.statusText}`);
-        }
+      if (!response.ok) {
+        throw new Error(`Error en la respuesta del servidor: ${response.statusText}`);
+      }
 
-        const data = await response.json();
-        if (data && data.answer) {
-            setHistory((prev) => [
-                ...prev,
-                { role: "user", parts: question },
-                { role: "chatbot", parts: formatAnswer(data.answer) },
-            ]);
-        }
-        setQuestion('');
+      const data = await response.json();
+      if (data && data.answer) {
+        setHistory((prev) => [
+          ...prev,
+          { role: "chatbot", parts: formatAnswer(data.answer) }
+        ]);
+      }
     } catch (error) {
-        console.error('Error al enviar la pregunta:', error);
+      console.error('Error al enviar la pregunta:', error);
+      setHistory((prev) => [
+        ...prev,
+        { role: "chatbot", parts: "Lo siento, tuve un problema al procesar tu pregunta. ¿Podrías intentarlo de nuevo?" }
+      ]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -58,23 +91,23 @@ export const ChatBot = () => {
       .replace(/\*/g, '') // Eliminar asteriscos innecesarios
       .replace(/\n/g, '<br/>'); // Añadir saltos de línea
   };
+
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [history]);
 
   // Detectar saludos
   const isSaludo = (text) => {
     const saludos = ['hola', 'buenos días', 'buenas tardes', 'buenas noches', 'como estas', 'que tal', 'saludos', 
-                     'como te encuentras', 'como andas', 'como va', 'como te va', 'como has estado'];
+                    'como te encuentras', 'como andas', 'como va', 'como te va', 'como has estado'];
     const respuestasComoEstas = [
-        '¡Muy bien, gracias por preguntar! 😊', 
-        '¡Excelente! Listo para ayudarte con tu aventura. 🌟', 
+        '¡Muy bien, gracias por preguntar! 😊 ¿En qué puedo ayudarte con tu visita al Valle de Cocora?', 
+        '¡Excelente! Listo para ayudarte con tu aventura. 🌟 ¿Qué te gustaría saber?', 
         '¡Genial! ¿En qué puedo ayudarte hoy? 🌳',
-        '¡De maravilla! Ansioso por ayudarte a explorar el Valle de Cocora 🌿',
-        '¡Fantástico! Listo para guiarte en tu próxima aventura 🏔️'
+        '¡De maravilla! Ansioso por ayudarte a explorar el Valle de Cocora 🌿 ¿Qué información necesitas?',
+        '¡Fantástico! Listo para guiarte en tu próxima aventura 🏔️ ¿Qué te interesa saber?'
     ];
     
     const comoEstasVariants = ['como estas', 'como te encuentras', 'como andas', 'como va', 'como te va', 'como has estado'];
@@ -149,6 +182,12 @@ export const ChatBot = () => {
                     />
                   </div>
                 ))}
+                {isLoading && (
+                  <div className="self-start text-left bg-gradient-to-r from-teal-600 to-teal-800 text-white p-4 rounded-tl-3xl rounded-br-3xl max-w-[85%] shadow-lg border-2 border-teal-300">
+                    <strong className="text-white font-semibold">🤖 Chatbot:</strong>
+                    <p className="mt-2 text-gray-100">Escribiendo...</p>
+                  </div>
+                )}
               </div>
 
               <form onSubmit={enviarPregunta} className="flex border-t">
@@ -157,13 +196,14 @@ export const ChatBot = () => {
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
                   placeholder="Escribe tu pregunta..."
-                  className="border-none p-2 flex-1 outline-none "
+                  className="border-none p-2 flex-1 outline-none"
                 />
                 <button
                   type="submit"
-                  className="bg-teal-700 text-white px-3 py-4  hover:bg-teal-900 transition-colors duration-300 "
+                  className="bg-teal-700 text-white px-3 py-4 hover:bg-teal-900 transition-colors duration-300"
+                  disabled={isLoading}
                 >
-                  ➤
+                  {isLoading ? "..." : "➤"}
                 </button>
               </form>
             </div>
@@ -172,7 +212,6 @@ export const ChatBot = () => {
       </div>
     </div>
   );
-
 };
 
 export default ChatBot;
