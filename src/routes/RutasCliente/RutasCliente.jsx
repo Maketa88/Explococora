@@ -1,6 +1,4 @@
-import React from "react";
 import { Routes, Route } from "react-router-dom";
-
 import { HeaderCliente } from "../../pages/VistaCliente/Header/HeaderCliente";
 import PerfilCliente from "../../pages/VistaCliente/PerfilCliente";
 import { PaginaInicio } from "../../pages/PaginaInicio/PaginaInicio";
@@ -10,12 +8,7 @@ import { HistoriaCultura } from "../../components/HistoriaCultura/Body/HistoriaC
 import ContactForm from "../../components/ContactForm/ContactForm";
 import ActualizarDatosCliente from "../../pages/VistaCliente/ActualizarCliente";
 import CambiarContraseña from "../../pages/VistaCliente/CambiarContraseña";
-
-
-
-
-
-
+import {BorrarCuenta} from "../../pages/VistaCliente/BorrarCuenta";
 
 // ... existing code ...
 
@@ -29,8 +22,8 @@ const RutasCliente = () => {
         <Route path="/Historia" element={<HistoriaCultura />} />
         <Route path="/Contacto" element={<ContactForm />} />
         <Route path="/ActualizarPerfil" element={<ActualizarDatosCliente />} />
-        <Route path="/ActualizarContrasenia" element={<CambiarContraseña/>} />
-        
+        <Route path="/ActualizarContrasenia" element={<CambiarContraseña />} />
+        <Route path="/EliminarCuenta" element={<BorrarCuenta />} />
       </Routes>
       <Footer />
       <ChatBot />
