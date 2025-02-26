@@ -35,9 +35,9 @@ const DashboardLayout = ({ children }) => {
       section: "Dashboard"
     },
     {
-      title: "Analytics",
+      title: "Rutas",
       icon: <BarChart2 className="w-5 h-5" />,
-      path: "/VistaOperador/analytics",
+      path: "/VistaOperador/Rutas",
       section: "Dashboard"
     },
     {

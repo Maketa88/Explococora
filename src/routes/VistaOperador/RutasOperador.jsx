@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Dashboard from '../../pages/VistaOperador/Dashboard/Dashboard';
-import Analytics from '../../pages/VistaOperador/Analytics/Analytics';
+import Rutas from '../../pages/VistaOperador/Rutas/Rutas';
 import Reports from '../../pages/VistaOperador/Reports/Reports';
 import Customers from '../../pages/VistaOperador/Customers/Customers';
 import NewCustomer from '../../pages/VistaOperador/Customers/NewCustomer';
@@ -15,7 +15,7 @@ const RutasOperador = () => {
   return (
     <Routes>
       <Route path="/" element={<Dashboard />} />
-      <Route path="/analytics" element={<Analytics />} />
+      <Route path="/rutas" element={<Rutas />} />
       <Route path="/reports" element={<Reports />} />
       <Route path="/customers" element={<Customers />} />
       <Route path="/new-customer" element={<NewCustomer />} />
