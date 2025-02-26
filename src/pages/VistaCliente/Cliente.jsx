@@ -177,7 +177,7 @@ const ProfileDropdown = ({ imgSrc, alt }) => {
   const menuOptions = [
     { label: "Ver perfil", path: "/VistaCliente/PerfilCliente" },
     { label: "Actualizar perfil", path: "/VistaCliente/ActualizarPerfil" },
-    { label: "Cambiar contraseña", path: "/VistaCliente/CambiarContrasena" },
+    { label: "Cambiar contraseña", path: "/VistaCliente/ActualizarContrasenia" },
     { label: "Eliminar cuenta", path: "/VistaCliente/EliminarCuenta" },
     { label: "Cerrar sesión", path: null },
   ];

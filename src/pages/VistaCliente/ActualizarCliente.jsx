@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
+import { FaCamera, FaEnvelope, FaIdCard, FaSave, FaUser } from 'react-icons/fa';
 import Swal from "sweetalert2";
 import Avatar from "../../assets/Images/avatar.png";
 
@@ -405,296 +406,192 @@ const ActualizarDatosCliente = () => {
   }
 
   return (
-    <div className="max-w-lg mx-auto mt-10 mb-20 p-6 bg-gradient-to-b from-green-50 to-teal-100 rounded-2xl shadow-xl border border-green-200">
-      <div className="bg-teal-700 -mx-6 -mt-6 p-6 rounded-t-xl text-white">
-        <h1 className="text-2xl font-bold text-center flex items-center justify-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-7 w-7 mr-3"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="#4ade80"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-            />
-          </svg>
-          Actualizar Perfil
-        </h1>
-      </div>
-      
-      {error && <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-lg shadow-sm">{error}</div>}
+    <div className="min-h-screen bg-gradient-to-b from-teal-800/10 to-white py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+      <div className="max-w-md w-full space-y-8 bg-white rounded-2xl shadow-2xl p-8 transform hover:scale-[1.02] transition-transform duration-300">
+        <div className="text-center">
+          <div className="mx-auto h-16 w-16 bg-teal-800 rounded-full flex items-center justify-center mb-4 shadow-lg">
+            <FaUser className="h-8 w-8 text-white" />
+          </div>
+          <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            Actualizar Perfil
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Mantén tu información personal actualizada
+          </p>
+        </div>
 
-      {/* Sección de foto de perfil */}
-      <div className="flex justify-center mt-8 mb-10">
-      <div className="relative">
-        <div className="p-3 bg-white rounded-full shadow-lg ring-4 ring-teal-100">
-          <img
-            key={cliente.foto_perfil}
-            src={
-              previewUrl ||
-              (cliente.foto_perfil ? `http://localhost:10101/images/${cliente.foto_perfil}` : Avatar)
-            }
-            alt="Foto de perfil"
-            className="w-40 h-40 rounded-full object-cover cursor-pointer hover:opacity-90 transition-all duration-300 transform hover:scale-105 border-4 border-teal-50"
-          />
-          <label
-            htmlFor="upload-photo"
-            className="absolute -bottom-3 -right-3 bg-teal-600 text-white p-3 rounded-full shadow-lg transform hover:rotate-12 hover:scale-110 transition-transform duration-300 cursor-pointer"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+        {error && (
+          <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 shadow-sm">
+            {error}
+          </div>
+        )}
+
+        {/* Sección de foto de perfil */}
+        <div className="flex justify-center mt-8">
+          <div className="relative">
+            <div className="p-3 bg-white rounded-full shadow-lg ring-4 ring-teal-100">
+              <img
+                key={cliente.foto_perfil}
+                src={
+                  previewUrl ||
+                  (cliente.foto_perfil ? `http://localhost:10101/images/${cliente.foto_perfil}` : Avatar)
+                }
+                alt="Foto de perfil"
+                className="w-32 h-32 rounded-full object-cover cursor-pointer hover:opacity-90 transition-all duration-300 transform hover:scale-105 border-4 border-teal-50"
               />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+              <label
+                htmlFor="upload-photo"
+                className="absolute -bottom-3 -right-3 bg-teal-600 text-white p-2.5 rounded-full shadow-lg transform hover:rotate-12 hover:scale-110 transition-transform duration-300 cursor-pointer"
+              >
+                <FaCamera className="h-5 w-5" />
+              </label>
+              <input
+                type="file"
+                id="upload-photo"
+                onChange={handleFileChange}
+                className="hidden"
+                accept="image/*"
               />
-            </svg>
-          </label>
-          <input
-            type="file"
-            id="upload-photo"
-            onChange={handleFileChange}
-            className="hidden"
-            accept="image/*"
-          />
-        </div>
-      </div>
-    </div>
-      {foto && (
-        <div className="flex justify-center mb-6">
-          <button 
-            onClick={handleSubmitFoto}
-            className="px-6 py-2 bg-teal-700 text-white rounded-lg flex items-center hover:bg-teal-800 transition-colors shadow-md"
-            disabled={subiendoFoto}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            {subiendoFoto ? 'Subiendo...' : 'Guardar foto'}
-          </button>
-        </div>
-      )}
-      
-      {/* Formulario de datos personales */}
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white p-4 rounded-lg shadow-sm flex items-center">
-          <div className="mr-4 bg-green-100 p-3 rounded-lg">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-green-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"
-              />
-            </svg>
-          </div>
-          <div className="flex-1">
-            <span className="text-teal-800 text-sm font-medium block">Cédula</span>
-            <input 
-              type="text" 
-              value={cliente.cedula || ""} 
-              disabled 
-              className="font-medium text-gray-800 w-full bg-transparent border-none p-0 focus:ring-0"
-            />
-          </div>
-        </div>
-        
-        <div className="bg-white p-4 rounded-lg shadow-sm flex items-center">
-          <div className="mr-4 bg-blue-100 p-3 rounded-lg">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-blue-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
-          </div>
-          <div className="flex-1">
-            <span className="text-teal-800 text-sm font-medium block">Primer Nombre</span>
-            <input 
-              type="text" 
-              name="primerNombre" 
-              value={formData.primerNombre} 
-              onChange={handleInputChange} 
-              className="font-medium text-gray-800 w-full bg-transparent border-none p-0 focus:ring-0"
-              required
-            />
-          </div>
-        </div>
-        
-        <div className="bg-white p-4 rounded-lg shadow-sm flex items-center">
-          <div className="mr-4 bg-blue-100 p-3 rounded-lg">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-blue-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
-          </div>
-          <div className="flex-1">
-            <span className="text-teal-800 text-sm font-medium block">Segundo Nombre</span>
-            <input 
-              type="text" 
-              name="segundoNombre" 
-              value={formData.segundoNombre} 
-              onChange={handleInputChange} 
-              className="font-medium text-gray-800 w-full bg-transparent border-none p-0 focus:ring-0"
-            />
-          </div>
-        </div>
-        
-        <div className="bg-white p-4 rounded-lg shadow-sm flex items-center">
-          <div className="mr-4 bg-purple-100 p-3 rounded-lg">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-purple-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-          </div>
-          <div className="flex-1">
-            <span className="text-teal-800 text-sm font-medium block">Primer Apellido</span>
-            <input 
-              type="text" 
-              name="primerApellido" 
-              value={formData.primerApellido} 
-              onChange={handleInputChange} 
-              className="font-medium text-gray-800 w-full bg-transparent border-none p-0 focus:ring-0"
-              required
-            />
+            </div>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg shadow-sm flex items-center">
-          <div className="mr-4 bg-purple-100 p-3 rounded-lg">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-purple-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-          </div>
-          <div className="flex-1">
-            <span className="text-teal-800 text-sm font-medium block">Segundo Apellido</span>
-            <input 
-              type="text" 
-              name="segundoApellido" 
-              value={formData.segundoApellido} 
-              onChange={handleInputChange} 
-              className="font-medium text-gray-800 w-full bg-transparent border-none p-0 focus:ring-0"
-            />
-          </div>
-        </div>
-        
-        <div className="bg-white p-4 rounded-lg shadow-sm flex items-center">
-          <div className="mr-4 bg-amber-100 p-3 rounded-lg">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-amber-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-          <div className="flex-1">
-            <span className="text-teal-800 text-sm font-medium block">Email</span>
-            <input 
-              type="email" 
-              name="email" 
-              value={formData.email} 
-              onChange={handleInputChange} 
-              className="font-medium text-gray-800 w-full bg-transparent border-none p-0 focus:ring-0"
-              required
-            />
-          </div>
-        </div>
-        
-        <div className="mt-8 pt-6 border-t border-gray-950">
+        {foto && (
           <div className="flex justify-center">
             <button 
-              type="submit" 
-              className="px-6 py-3 bg-teal-700 text-white rounded-lg flex items-center hover:bg-teal-800 transition-colors shadow-md"
-              disabled={updating}
+              onClick={handleSubmitFoto}
+              className="px-6 py-2 bg-teal-700 text-white rounded-xl flex items-center hover:bg-teal-800 transition-all duration-300 shadow-md transform hover:scale-[1.02]"
+              disabled={subiendoFoto}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 mr-2"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-              {updating ? "Actualizando..." : "Guardar Cambios"}
+              <FaSave className="h-5 w-5 mr-2" />
+              {subiendoFoto ? 'Subiendo...' : 'Guardar foto'}
             </button>
           </div>
-        </div>
-      </form>
+        )}
+
+        {/* Formulario de datos personales */}
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          <div className="space-y-6">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaIdCard className="h-5 w-5 text-teal-800" />
+              </div>
+              <input
+                type="text"
+                value={cliente.cedula || ""}
+                disabled
+                className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 bg-gray-50"
+              />
+              <label className="absolute left-10 -top-2 bg-white px-2 text-xs font-medium text-teal-800">
+                Cédula
+              </label>
+            </div>
+
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaUser className="h-5 w-5 text-teal-800" />
+              </div>
+              <input
+                type="text"
+                name="primerNombre"
+                value={formData.primerNombre}
+                onChange={handleInputChange}
+                className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                required
+              />
+              <label className="absolute left-10 -top-2 bg-white px-2 text-xs font-medium text-teal-800">
+                Primer Nombre
+              </label>
+            </div>
+
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaUser className="h-5 w-5 text-teal-800" />
+              </div>
+              <input
+                type="text"
+                name="segundoNombre"
+                value={formData.segundoNombre}
+                onChange={handleInputChange}
+                className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+              />
+              <label className="absolute left-10 -top-2 bg-white px-2 text-xs font-medium text-teal-800">
+                Segundo Nombre
+              </label>
+            </div>
+
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaUser className="h-5 w-5 text-teal-800" />
+              </div>
+              <input
+                type="text"
+                name="primerApellido"
+                value={formData.primerApellido}
+                onChange={handleInputChange}
+                className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                required
+              />
+              <label className="absolute left-10 -top-2 bg-white px-2 text-xs font-medium text-teal-800">
+                Primer Apellido
+              </label>
+            </div>
+
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaUser className="h-5 w-5 text-teal-800" />
+              </div>
+              <input
+                type="text"
+                name="segundoApellido"
+                value={formData.segundoApellido}
+                onChange={handleInputChange}
+                className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+              />
+              <label className="absolute left-10 -top-2 bg-white px-2 text-xs font-medium text-teal-800">
+                Segundo Apellido
+              </label>
+            </div>
+
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaEnvelope className="h-5 w-5 text-teal-800" />
+              </div>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                required
+              />
+              <label className="absolute left-10 -top-2 bg-white px-2 text-xs font-medium text-teal-800">
+                Email
+              </label>
+            </div>
+          </div>
+
+          <div className="pt-6">
+            <button
+              type="submit"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-teal-800 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl"
+              disabled={updating}
+            >
+              <span className="flex items-center">
+                {updating ? (
+                  <svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : (
+                  <FaSave className="h-5 w-5 mr-2" />
+                )}
+                {updating ? "Actualizando..." : "Guardar Cambios"}
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

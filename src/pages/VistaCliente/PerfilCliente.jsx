@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { FaCamera, FaEnvelope, FaIdCard, FaUser, FaUserEdit } from 'react-icons/fa';
 import Avatar from "../../assets/Images/avatar.png";
 
 const PerfilCliente = () => {
@@ -86,316 +87,154 @@ const PerfilCliente = () => {
 
   if (loading)
     return (
-      <div className="text-center text-gray-500 mt-10">Cargando perfil...</div>
+      <div className="min-h-screen bg-gradient-to-b from-teal-800/10 to-white flex items-center justify-center">
+        <div className="text-teal-800 text-xl font-semibold flex items-center">
+          <svg className="animate-spin h-8 w-8 mr-3 text-teal-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Cargando perfil...
+        </div>
+      </div>
     );
+
   if (error)
-    return <div className="text-center text-red-500 mt-10">{error}</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-teal-800/10 to-white flex items-center justify-center">
+        <div className="text-red-600 text-xl font-semibold bg-red-50 p-4 rounded-xl shadow-lg border border-red-200">
+          {error}
+        </div>
+      </div>
+    );
 
   if (!cliente)
     return (
-      <div className="text-center text-gray-500 mt-10">
-        No se encontraron datos del cliente.
+      <div className="min-h-screen bg-gradient-to-b from-teal-800/10 to-white flex items-center justify-center">
+        <div className="text-teal-800 text-xl font-semibold bg-teal-50 p-4 rounded-xl shadow-lg border border-teal-200">
+          No se encontraron datos del cliente.
+        </div>
       </div>
     );
 
-  const { nombres, apellidos } = separarNombreCompleto(
-    cliente.nombre_del_cliente
-  );
-
-  const fotoUrl = cliente.foto_perfil
-    ? `http://localhost:10101/images/${cliente.foto_perfil}`
-    : Avatar;
+  const { nombres, apellidos } = separarNombreCompleto(cliente.nombre_del_cliente);
+  const fotoUrl = cliente.foto_perfil ? `http://localhost:10101/images/${cliente.foto_perfil}` : Avatar;
 
   return (
     <>
-      <div
-        className="max-w-lg mx-auto mt-10 mb-20 p-6 bg-gradient-to-b from-green-50 to-teal-100 rounded-2xl shadow-xl border border-green-200 "
-      >
-        <div className="bg-teal-700 -mx-6 -mt-6 p-6 rounded-t-xl text-white">
-          <h1 className="text-2xl font-bold text-center flex items-center justify-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-7 w-7 mr-3"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="#4ade80"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
-            Datos del Cliente
-          </h1>
-        </div>
-
-        
-      <div className="flex justify-center mt-8 mb-10">
-        <div className="relative">
-          <div className="p-3 bg-white rounded-full shadow-lg ring-4 ring-teal-100">
-            <img
-              src={fotoUrl}
-              alt="Foto de perfil"
-              className="w-40 h-40 rounded-full object-cover cursor-pointer hover:opacity-90 transition-all duration-300 transform hover:scale-105 border-4 border-teal-50"
-              onClick={abrirModal}
-            />
-            <div className="absolute -bottom-3 -right-3 bg-teal-600 text-white p-3 rounded-full shadow-lg transform hover:rotate-12 hover:scale-110 transition-transform duration-300 cursor-pointer">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+      <div className="min-h-screen bg-gradient-to-b from-teal-800/10 to-white py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+        <div className="max-w-md w-full space-y-8 bg-white rounded-2xl shadow-2xl p-8 transform hover:scale-[1.02] transition-transform duration-300">
+          <div className="text-center">
+            <div className="relative mx-auto">
+              <div className="mx-auto h-32 w-32 relative">
+                <img
+                  src={fotoUrl}
+                  alt="Foto de perfil"
+                  className="h-32 w-32 rounded-full object-cover shadow-xl ring-4 ring-teal-500/30"
+                  onClick={abrirModal}
                 />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
+                <button 
+                  onClick={abrirModal}
+                  className="absolute bottom-0 right-0 bg-teal-800 text-white p-2.5 rounded-full shadow-lg transform hover:scale-110 transition-all duration-300 hover:bg-teal-700"
+                >
+                  <FaCamera className="h-5 w-5" />
+                </button>
+              </div>
             </div>
+            <h2 className="mt-8 text-3xl font-extrabold text-gray-900 tracking-tight">
+              Perfil del Cliente
+            </h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Información personal de tu cuenta
+            </p>
           </div>
-        </div>
-      </div>
-        <div className="space-y-6">
-          <div className="bg-white p-4 rounded-lg shadow-sm flex items-center">
-            <div className="mr-4 bg-green-100 p-3 rounded-lg">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-green-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"
-                />
-              </svg>
+
+          <div className="mt-8 space-y-6">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaIdCard className="h-5 w-5 text-teal-800" />
+              </div>
+              <div className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50">
+                <label className="block text-xs font-medium text-teal-800 mb-1">
+                  Cédula
+                </label>
+                <p className="text-gray-900 font-medium">
+                  {cliente.cedula || "No disponible"}
+                </p>
+              </div>
             </div>
-            <div className="flex-1">
-              <span className="text-teal-800 text-sm font-medium block">
-                Cédula
-              </span>
-              <span className="font-medium text-gray-800">
-                {cliente.cedula || "No disponible"}
-              </span>
+
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaUser className="h-5 w-5 text-teal-800" />
+              </div>
+              <div className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50">
+                <label className="block text-xs font-medium text-teal-800 mb-1">
+                  Nombres
+                </label>
+                <p className="text-gray-900 font-medium">
+                  {nombres || "No disponible"}
+                </p>
+              </div>
             </div>
-            <div className="hidden sm:block text-green-500 opacity-20">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-16 w-16"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1}
-                  d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-                />
-              </svg>
+
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaUser className="h-5 w-5 text-teal-800" />
+              </div>
+              <div className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50">
+                <label className="block text-xs font-medium text-teal-800 mb-1">
+                  Apellidos
+                </label>
+                <p className="text-gray-900 font-medium">
+                  {apellidos || "No disponible"}
+                </p>
+              </div>
+            </div>
+
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaEnvelope className="h-5 w-5 text-teal-800" />
+              </div>
+              <div className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50">
+                <label className="block text-xs font-medium text-teal-800 mb-1">
+                  Email
+                </label>
+                <p className="text-gray-900 font-medium">
+                  {cliente.email || "No disponible"}
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-lg shadow-sm flex items-center">
-            <div className="mr-4 bg-blue-100 p-3 rounded-lg">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-blue-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <span className="text-teal-800 text-sm font-medium block">
-                Nombres
-              </span>
-              <span className="font-medium text-gray-800">
-                {nombres || "No disponible"}
-              </span>
-            </div>
-            <div className="hidden sm:block text-blue-500 opacity-20">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-16 w-16"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1}
-                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                />
-              </svg>
-            </div>
-          </div>
-
-          <div className="bg-white p-4 rounded-lg shadow-sm flex items-center">
-            <div className="mr-4 bg-purple-100 p-3 rounded-lg">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-purple-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <span className="text-teal-800 text-sm font-medium block">
-                Apellidos
-              </span>
-              <span className="font-medium text-gray-800">
-                {apellidos || "No disponible"}
-              </span>
-            </div>
-            <div className="hidden sm:block text-purple-500 opacity-20">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-16 w-16"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1}
-                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                />
-              </svg>
-            </div>
-          </div>
-
-          <div className="bg-white p-4 rounded-lg shadow-sm flex items-center">
-            <div className="mr-4 bg-amber-100 p-3 rounded-lg">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-amber-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <span className="text-teal-800 text-sm font-medium block">
-                Email
-              </span>
-              <span className="font-medium text-gray-800">
-                {cliente.email || "No disponible"}
-              </span>
-            </div>
-            <div className="hidden sm:block text-amber-500 opacity-20">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-16 w-16"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1}
-                  d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
-                />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8 pt-6 border-t border-gray-950">
-          <div className="flex justify-center">
+          <div>
             <a
-              href={`/VistaCliente/ActualizarPerfil`}
-              className="px-6 py-3 bg-teal-700 text-white rounded-lg flex items-center hover:bg-teal-800 transition-colors shadow-md"
+              href="/VistaCliente/ActualizarPerfil"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-teal-800 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 mr-2"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                />
-              </svg>
-              Editar
+              <span className="flex items-center">
+                <FaUserEdit className="mr-2" />
+                Editar Perfil
+              </span>
             </a>
           </div>
         </div>
       </div>
 
-      {/* Modal para mostrar la imagen grande */}
       {modalAbierto && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          onClick={cerrarModal}
-        >
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 backdrop-blur-sm" onClick={cerrarModal}>
           <div className="relative max-w-4xl max-h-[90vh] p-2">
             <button
-              className="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-70"
+              className="absolute -top-12 right-0 text-white bg-teal-800 rounded-full p-2 hover:bg-teal-700 transition-colors duration-300 shadow-lg"
               onClick={cerrarModal}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
             <img
               src={fotoUrl}
               alt="Foto de perfil ampliada"
-              className="max-h-[85vh] rounded-lg shadow-xl"
+              className="max-h-[85vh] rounded-2xl shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             />
           </div>

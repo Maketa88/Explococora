@@ -9,6 +9,8 @@ import ChatBot from "../../components/Chatbot/Chatbot";
 import { HistoriaCultura } from "../../components/HistoriaCultura/Body/HistoriaCultura";
 import ContactForm from "../../components/ContactForm/ContactForm";
 import ActualizarDatosCliente from "../../pages/VistaCliente/ActualizarCliente";
+import CambiarContraseña from "../../pages/VistaCliente/CambiarContraseña";
+
 
 
 
@@ -27,6 +29,7 @@ const RutasCliente = () => {
         <Route path="/Historia" element={<HistoriaCultura />} />
         <Route path="/Contacto" element={<ContactForm />} />
         <Route path="/ActualizarPerfil" element={<ActualizarDatosCliente />} />
+        <Route path="/ActualizarContrasenia" element={<CambiarContraseña/>} />
         
       </Routes>
       <Footer />
