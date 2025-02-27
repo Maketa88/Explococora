@@ -164,7 +164,14 @@ const DashboardLayoutGuia = ({ children }) => {
       icon: <Users className="w-5 h-5" />,
       path: "/VistaGuia/PerfilGuia",
       section: "Products"
+    },
+    {
+      title: "ActualizarGuia",
+      icon: <Users className="w-5 h-5" />,
+      path: "/VistaGuia/ActualizarGuia",
+      section: "ActualizarGuia"
     }
+
     
 
   ];
@@ -210,7 +217,7 @@ const DashboardLayoutGuia = ({ children }) => {
     { label: "Actualizar perfil", path: "/VistaCliente/ActualizarPerfil" },
     { label: "Cambiar contraseña", path: "/VistaGuia/CambiarContraseña" },
     { label: "Eliminar cuenta", path: "/VistaCliente/EliminarCuenta" },
-    { label: "Cerrar sesión", path: null },
+    { label: "Cerrar sesión", path: "/" },
   ];
 
   // Función para separar nombre si existe

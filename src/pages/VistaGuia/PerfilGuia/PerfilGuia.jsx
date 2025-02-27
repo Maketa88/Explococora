@@ -8,6 +8,7 @@ const PerfilGuia = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(true); // Por defecto modo oscuro como en el dashboard
+  const [previewFoto, setPreviewFoto] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,6 +20,12 @@ const PerfilGuia = () => {
 
     const cedula = localStorage.getItem("cedula");
     const token = localStorage.getItem("token");
+
+    // Recuperar la foto del localStorage si existe
+    const storedFoto = localStorage.getItem("foto_perfil");
+    if (storedFoto) {
+      setPreviewFoto(storedFoto);
+    }
 
     if (!cedula) {
       setError("No se encontró la cédula del guia.");
@@ -118,13 +125,23 @@ const PerfilGuia = () => {
           {/* Imagen de perfil */}
           <div className="flex flex-col items-center">
             <div className="w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-blue-500">
-              <img
-                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto)}&size=200&background=0D8ABC&color=fff`}
-                alt="Perfil del guía"
-                className="h-full w-full object-cover"
-              />
+              {previewFoto ? (
+                <img
+                  src={previewFoto}
+                  alt="Foto de perfil"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <img
+                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto)}&size=200&background=0D8ABC&color=fff`}
+                  alt="Perfil del guía"
+                  className="h-full w-full object-cover"
+                />
+              )}
             </div>
-            <button className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white font-medium transition-colors duration-200`}>
+            <button 
+              onClick={() => navigate("/VistaGuia/ActualizarGuia")}
+              className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white font-medium transition-colors duration-200`}>
               Cambiar foto
             </button>
           </div>
@@ -164,8 +181,10 @@ const PerfilGuia = () => {
             </div>
             
             <div className="mt-6 flex flex-wrap gap-3">
-              <button className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white font-medium transition-colors duration-200`}>
-                Editar información
+              <button 
+                onClick={() => navigate("/VistaGuia/ActualizarGuia")}
+                className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white font-medium transition-colors duration-200`}>
+                Actualizar información
               </button>
               <button 
                 onClick={() => navigate("/VistaGuia/CambiarContraseña")}
