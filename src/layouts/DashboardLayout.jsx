@@ -30,10 +30,49 @@ const DashboardLayout = ({ children }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [fotoPerfil, setFotoPerfil] = useState(localStorage.getItem('fotoPerfilURL') || null);
+  const [nombreUsuario, setNombreUsuario] = useState("");
   
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
+
+  // Escuchar el evento de actualización de perfil
+  useEffect(() => {
+    const handlePerfilActualizado = (event) => {
+      if (event.detail.foto) {
+        setFotoPerfil(event.detail.foto);
+        localStorage.setItem('fotoPerfilURL', event.detail.foto);
+      }
+      if (event.detail.nombre) {
+        setNombreUsuario(event.detail.nombre);
+      }
+    };
+    
+    // Añadir el listener
+    window.addEventListener('perfilActualizado', handlePerfilActualizado);
+    
+    // Cargar datos iniciales
+    const operadorData = localStorage.getItem('operadorData');
+    if (operadorData) {
+      try {
+        const datos = JSON.parse(operadorData);
+        if (datos.foto) {
+          setFotoPerfil(datos.foto);
+        }
+        if (datos.primerNombre && datos.primerApellido) {
+          setNombreUsuario(`${datos.primerNombre} ${datos.primerApellido}`);
+        }
+      } catch (e) {
+        console.error("Error al parsear datos del operador:", e);
+      }
+    }
+    
+    // Limpiar el listener al desmontar
+    return () => {
+      window.removeEventListener('perfilActualizado', handlePerfilActualizado);
+    };
+  }, []);
 
   const menuItems = [
     {
@@ -230,11 +269,17 @@ const DashboardLayout = ({ children }) => {
                   onClick={() => setProfileMenuOpen(!profileMenuOpen)}
                   className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden cursor-pointer"
                 >
-                  <img 
-                    src="https://ui-avatars.com/api/?name=User&background=random" 
-                    alt="Profile"
-                    className="w-full h-full object-cover"
-                  />
+                  {fotoPerfil ? (
+                    <img 
+                      src={fotoPerfil} 
+                      alt="Foto de perfil" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                      {nombreUsuario ? nombreUsuario.charAt(0) : "U"}
+                    </div>
+                  )}
                 </button>
                 
                 {/* Menú desplegable de perfil */}
@@ -251,6 +296,22 @@ const DashboardLayout = ({ children }) => {
                     >
                       <User className="w-4 h-4" />
                       Ver Perfil
+                    </Link>
+                    <Link 
+                      to="/VistaOperador/perfil/actualizar" 
+                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} flex items-center gap-2`}
+                      onClick={() => setProfileMenuOpen(false)}
+                    >
+                      <Edit className="w-4 h-4" />
+                      Actualizar Información
+                    </Link>
+                    <Link 
+                      to="/VistaOperador/perfil/cambiar-contrasena" 
+                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} flex items-center gap-2`}
+                      onClick={() => setProfileMenuOpen(false)}
+                    >
+                      <Key className="w-4 h-4" />
+                      Cambiar Contraseña
                     </Link>
                     <button 
                       onClick={() => {

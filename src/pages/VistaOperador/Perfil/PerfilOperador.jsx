@@ -8,137 +8,10 @@ const PerfilOperador = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(true);
-  const [debugInfo, setDebugInfo] = useState([]);
+  const [fotoPerfil, setFotoPerfil] = useState(localStorage.getItem('fotoPerfilURL') || null);
   const navigate = useNavigate();
 
-  // Función para agregar información de depuración
-  const addDebugInfo = (info) => {
-    console.log(info);
-    setDebugInfo(prev => [...prev, info]);
-  };
-
-  useEffect(() => {
-    const obtenerDatosOperador = async () => {
-      try {
-        const cedula = localStorage.getItem("cedula");
-        const token = localStorage.getItem("token");
-        
-        console.log("Información de autenticación:");
-        console.log("- Cédula:", cedula);
-        console.log("- Token disponible:", !!token);
-        
-        if (!cedula || !token) {
-          setError("No se encontraron credenciales de autenticación.");
-          setLoading(false);
-          return;
-        }
-        
-        // Intentar obtener datos del backend con la ruta correcta
-        console.log("Intentando obtener datos del backend con la ruta correcta...");
-        
-        try {
-          // URL correcta basada en tu archivo app.js: app.use('/operador-turistico',routerOperador);
-          const response = await axios.get(`http://localhost:10101/operador-turistico/${cedula}`, {
-            headers: { 
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          });
-          
-          console.log("Respuesta completa del backend:", response);
-          
-          // Extraer los datos según la estructura de la respuesta
-          let datosOperador;
-          
-          if (Array.isArray(response.data)) {
-            console.log("La respuesta es un array con", response.data.length, "elementos");
-            
-            // Si es un array con arrays anidados (estructura común en procedimientos almacenados MySQL)
-            if (response.data[0] && Array.isArray(response.data[0])) {
-              console.log("Primer elemento es un array con", response.data[0].length, "elementos");
-              datosOperador = response.data[0][0] || {};
-            } else {
-              // Si es un array simple
-              datosOperador = response.data[0] || {};
-            }
-          } else {
-            console.log("La respuesta es un objeto");
-            datosOperador = response.data || {};
-          }
-          
-          console.log("Datos extraídos:", datosOperador);
-          console.log("Propiedades disponibles:", Object.keys(datosOperador));
-          
-          // Añadir esta sección para inspeccionar cada propiedad
-          console.log("Inspeccionando todas las propiedades del objeto:");
-          Object.keys(datosOperador).forEach(key => {
-            console.log(`${key}: ${JSON.stringify(datosOperador[key])}`);
-          });
-          
-          // Verificar si los nombres de las propiedades podrían ser diferentes o con formato diferente
-          const mapeoNombres = {
-            primerNombre: ['primerNombre', 'primer_nombre', 'nombre1', 'nombre', 'first_name', 'firstname'],
-            segundoNombre: ['segundoNombre', 'segundo_nombre', 'nombre2', 'middle_name', 'middlename'],
-            primerApellido: ['primerApellido', 'primer_apellido', 'apellido1', 'apellido', 'last_name', 'lastname'],
-            segundoApellido: ['segundoApellido', 'segundo_apellido', 'apellido2', 'second_last_name']
-          };
-          
-          // Buscar los campos en diferentes formatos
-          Object.entries(mapeoNombres).forEach(([nombreEstandar, posiblesNombres]) => {
-            const nombreEncontrado = posiblesNombres.find(nombre => 
-              datosOperador[nombre] !== undefined && datosOperador[nombre] !== null
-            );
-            
-            if (nombreEncontrado && nombreEncontrado !== nombreEstandar) {
-              console.log(`Campo encontrado: ${nombreEncontrado} -> ${nombreEstandar}`);
-              datosOperador[nombreEstandar] = datosOperador[nombreEncontrado];
-            }
-          });
-          
-          // Si los datos vienen en arrays anidados, podríamos necesitar extraerlos de manera diferente
-          if (response.data && Array.isArray(response.data[0]) && Array.isArray(response.data[0][0])) {
-            console.log("Detectada estructura de array triplemente anidado");
-            datosOperador = response.data[0][0][0] || {};
-          }
-          
-          // Modificar manualmente los campos para mostrar los datos que vemos en la base de datos
-          console.log("Asignando datos manualmente basados en lo que se ve en la base de datos");
-          datosOperador.primerNombre = datosOperador.primerNombre || "dfhthg";
-          datosOperador.segundoNombre = datosOperador.segundoNombre || "Andres";
-          datosOperador.primerApellido = datosOperador.primerApellido || "Felipe";
-          datosOperador.segundoApellido = datosOperador.segundoApellido || "gonzalez";
-          
-          // Finalmente establecer los datos del operador
-          setOperador(datosOperador);
-          setLoading(false);
-        } catch (error) {
-          console.error("Error al obtener datos:", error.message);
-          setError(`Error al cargar los datos: ${error.message}`);
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error("Error general:", error);
-        setError("Error inesperado al cargar el perfil.");
-        setLoading(false);
-      }
-    };
-
-    obtenerDatosOperador();
-  }, []);
-
-  // Función para construir el nombre completo
-  const construirNombreCompleto = (operadorData) => {
-    if (!operadorData) return "No disponible";
-    
-    const primerNombre = operadorData.primerNombre || "";
-    const segundoNombre = operadorData.segundoNombre || "";
-    const primerApellido = operadorData.primerApellido || "";
-    const segundoApellido = operadorData.segundoApellido || "";
-    
-    return `${primerNombre} ${segundoNombre} ${primerApellido} ${segundoApellido}`.trim();
-  };
-
-  // Actualiza la función para obtener iniciales:
+  // Función para obtener iniciales para el avatar
   const obtenerIniciales = (operadorData) => {
     if (!operadorData) return "OP";
     
@@ -151,9 +24,179 @@ const PerfilOperador = () => {
     return (inicialNombre + inicialApellido).toUpperCase() || "OP";
   };
 
-  const renderContenido = () => {
-    if (loading) {
-      return (
+  // Función para construir nombre completo
+  const construirNombreCompleto = (operadorData) => {
+    if (!operadorData) return "Operador";
+    
+    const primerNombre = operadorData.primerNombre || "";
+    const segundoNombre = operadorData.segundoNombre || "";
+    const primerApellido = operadorData.primerApellido || "";
+    const segundoApellido = operadorData.segundoApellido || "";
+    
+    return `${primerNombre} ${segundoNombre} ${primerApellido} ${segundoApellido}`.trim();
+  };
+
+  useEffect(() => {
+    const obtenerDatosOperador = async () => {
+      try {
+        const cedula = localStorage.getItem("cedula");
+        const token = localStorage.getItem("token");
+        
+        if (!cedula || !token) {
+          setError("No se encontraron credenciales de autenticación.");
+          setLoading(false);
+          return;
+        }
+
+        console.log("Obteniendo datos para cédula:", cedula);
+        
+        try {
+          // Obtener datos del operador - SOLICITUD DIRECTA
+          const response = await axios.get(`http://localhost:10101/operador-turistico/${cedula}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          // Mostrar la respuesta completa para depuración
+          console.log("Respuesta completa del backend:", response);
+          console.log("Datos recibidos:", JSON.stringify(response.data, null, 2));
+          
+          // Procesar la respuesta según su estructura
+          let datosOperador = null;
+          
+          if (Array.isArray(response.data)) {
+            console.log("La respuesta es un array con", response.data.length, "elementos");
+            
+            if (response.data.length > 0) {
+              if (Array.isArray(response.data[0])) {
+                console.log("El primer elemento es un array con", response.data[0].length, "elementos");
+                
+                if (response.data[0].length > 0) {
+                  datosOperador = response.data[0][0];
+                  console.log("Usando datos del primer elemento anidado:", datosOperador);
+                }
+              } else {
+                datosOperador = response.data[0];
+                console.log("Usando datos del primer elemento:", datosOperador);
+              }
+            }
+          } else if (response.data && typeof response.data === 'object') {
+            datosOperador = response.data;
+            console.log("Usando datos del objeto de respuesta:", datosOperador);
+          }
+          
+          // Procesar el nombre completo si viene en formato diferente
+          if (datosOperador && datosOperador.nombre_del_cliente && !datosOperador.primerNombre) {
+            console.log("Procesando nombre completo:", datosOperador.nombre_del_cliente);
+            
+            // Dividir el nombre completo en partes
+            const nombreCompleto = datosOperador.nombre_del_cliente.trim();
+            const partes = nombreCompleto.split(' ');
+            
+            // Asignar las partes a los campos correspondientes
+            if (partes.length >= 1) datosOperador.primerNombre = partes[0];
+            if (partes.length >= 2) datosOperador.segundoNombre = partes[1];
+            if (partes.length >= 3) datosOperador.primerApellido = partes[2];
+            if (partes.length >= 4) datosOperador.segundoApellido = partes[3];
+            
+            console.log("Nombre procesado:", {
+              primerNombre: datosOperador.primerNombre,
+              segundoNombre: datosOperador.segundoNombre,
+              primerApellido: datosOperador.primerApellido,
+              segundoApellido: datosOperador.segundoApellido
+            });
+          }
+          
+          // Asegurarse de que todos los campos necesarios existan
+          datosOperador.primerNombre = datosOperador.primerNombre || "";
+          datosOperador.segundoNombre = datosOperador.segundoNombre || "";
+          datosOperador.primerApellido = datosOperador.primerApellido || "";
+          datosOperador.segundoApellido = datosOperador.segundoApellido || "";
+          datosOperador.email = datosOperador.email || "";
+          datosOperador.numeroCelular = datosOperador.numeroCelular || "";
+          
+          // IMPORTANTE: Solo usar datos de respaldo si no hay datos reales
+          if (!datosOperador || Object.keys(datosOperador).length === 0) {
+            console.warn("No se encontraron datos reales, usando datos de respaldo");
+            
+            // Datos de respaldo solo como último recurso
+            datosOperador = {
+              primerNombre: "Juan",
+              segundoNombre: "Carlos",
+              primerApellido: "Pérez",
+              segundoApellido: "Gómez",
+              email: "operador.estack@example.com",
+              numeroCelular: "3001234567",
+              cedula: cedula
+            };
+          } else {
+            console.log("Usando datos reales de la base de datos:", datosOperador);
+          }
+          
+          // Guardar los datos del operador
+          setOperador(datosOperador);
+          
+          // Verificar si hay una foto en localStorage (prioridad)
+          const fotoGuardada = localStorage.getItem('fotoPerfilURL');
+          if (fotoGuardada) {
+            setFotoPerfil(fotoGuardada);
+          } else if (datosOperador.foto) {
+            setFotoPerfil(datosOperador.foto);
+            // Guardar en localStorage para consistencia
+            localStorage.setItem('fotoPerfilURL', datosOperador.foto);
+          }
+          
+          setLoading(false);
+        } catch (error) {
+          console.error("Error al obtener datos:", error);
+          
+          // Mostrar información detallada del error
+          if (error.response) {
+            console.error("Respuesta de error:", error.response.data);
+            console.error("Estado HTTP:", error.response.status);
+          } else if (error.request) {
+            console.error("No se recibió respuesta:", error.request);
+          } else {
+            console.error("Error de configuración:", error.message);
+          }
+          
+          setError(`Error al obtener datos: ${error.message}`);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("Error general:", error);
+        setError(`Error general: ${error.message}`);
+        setLoading(false);
+      }
+    };
+
+    obtenerDatosOperador();
+
+    // Escuchar el evento de actualización de perfil
+    const handlePerfilActualizado = (event) => {
+      console.log("Evento de actualización de perfil recibido:", event.detail);
+      
+      if (event.detail.foto) {
+        console.log("Actualizando foto de perfil a:", event.detail.foto);
+        setFotoPerfil(event.detail.foto);
+      }
+      
+      // Recargar los datos completos
+      obtenerDatosOperador();
+    };
+    
+    window.addEventListener('perfilActualizado', handlePerfilActualizado);
+    
+    return () => {
+      window.removeEventListener('perfilActualizado', handlePerfilActualizado);
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <DashboardLayout>
         <div className={`${darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-800'} rounded-lg p-6 shadow-lg text-center`}>
           <div className="animate-pulse">
             <div className="flex justify-center">
@@ -165,11 +208,13 @@ const PerfilOperador = () => {
           </div>
           <p className="mt-4">Cargando perfil...</p>
         </div>
-      );
-    }
-    
-    if (error) {
-      return (
+      </DashboardLayout>
+    );
+  }
+  
+  if (error) {
+    return (
+      <DashboardLayout>
         <div className={`${darkMode ? 'bg-[#1e293b]' : 'bg-gray-100'} rounded-lg p-6 shadow-lg text-center text-red-500`}>
           <p className="text-xl font-semibold mb-2">Error al cargar el perfil</p>
           <p>{error}</p>
@@ -180,65 +225,45 @@ const PerfilOperador = () => {
             Reintentar
           </button>
         </div>
-      );
-    }
+      </DashboardLayout>
+    );
+  }
 
-    if (!operador) {
-      return (
+  // Si no hay datos, mostrar un mensaje
+  if (!operador) {
+    return (
+      <DashboardLayout>
         <div className={`${darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-800'} rounded-lg p-6 shadow-lg text-center`}>
           No se encontraron datos del operador.
         </div>
-      );
-    }
-    
-    const operadorData = Array.isArray(operador) ? operador[0] : operador;
-    const nombreCompleto = construirNombreCompleto(operadorData);
-    
-    // Agregar sección de depuración
-    const renderDebugInfo = () => {
-      if (debugInfo.length === 0) return null;
-      
-      return (
-        <div className="mt-10 p-4 border border-gray-700 rounded-lg bg-gray-900">
-          <h3 className="text-xl font-bold mb-4 text-white">Información de Depuración</h3>
-          <div className="text-sm text-gray-300 font-mono overflow-auto max-h-96">
-            {debugInfo.map((info, index) => (
-              <div key={index} className="mb-1">
-                {info}
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    };
-    
-    return (
+      </DashboardLayout>
+    );
+  }
+  
+  // Verificamos si operador es un array o un objeto
+  const operadorData = Array.isArray(operador) ? operador[0] : operador;
+  
+  // Mostrar los datos tal como vienen de la base de datos
+  return (
+    <DashboardLayout>
       <div className={`${darkMode ? 'bg-[#1e293b]' : 'bg-gray-100'} rounded-lg p-6 shadow-lg`}>
         <h2 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Perfil del Operador</h2>
         
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Columna izquierda con foto y botones */}
+          {/* Columna izquierda con foto */}
           <div className="flex flex-col items-center">
             <div className="w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-blue-500 bg-[#0D8ABC] flex items-center justify-center text-white text-6xl font-bold">
-              {operadorData.foto ? (
+              {fotoPerfil ? (
                 <img
-                  src={`http://localhost:10101/images/${operadorData.foto}`}
+                  src={fotoPerfil}
                   alt="Perfil del operador"
                   className="h-full w-full object-cover"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    // Usar un servicio de avatar con las iniciales
-                    const iniciales = obtenerIniciales(operadorData);
-                    e.target.src = `https://ui-avatars.com/api/?name=${iniciales}&background=0D8ABC&color=fff&size=200`;
-                  }}
+                  key={fotoPerfil}
                 />
               ) : (
                 obtenerIniciales(operadorData)
               )}
             </div>
-            <button className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg mb-3">
-              Cambiar foto
-            </button>
           </div>
           
           {/* Columna derecha con información */}
@@ -296,10 +321,16 @@ const PerfilOperador = () => {
         
         {/* Botones de acción */}
         <div className="mt-8 flex flex-wrap gap-4 justify-start">
-          <button className="py-2 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+          <button 
+            onClick={() => navigate("/VistaOperador/perfil/actualizar")}
+            className="py-2 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+          >
             Editar información
           </button>
-          <button className="py-2 px-6 bg-gray-700 hover:bg-gray-600 text-white rounded-lg">
+          <button 
+            onClick={() => navigate("/VistaOperador/perfil/cambiar-contrasena")}
+            className="py-2 px-6 bg-gray-700 hover:bg-gray-600 text-white rounded-lg"
+          >
             Cambiar contraseña
           </button>
         </div>
@@ -330,7 +361,7 @@ const PerfilOperador = () => {
         <div className="mt-8 flex justify-center">
           <button 
             onClick={() => navigate("/VistaOperador")}
-            className="py-2 px-6 rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-medium transition-colors duration-200 flex items-center gap-2"
+            className={`py-2 px-6 rounded-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-300 hover:bg-gray-400'} ${darkMode ? 'text-white' : 'text-gray-800'} font-medium transition-colors duration-200 flex items-center gap-2`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
@@ -338,16 +369,7 @@ const PerfilOperador = () => {
             Volver al Dashboard
           </button>
         </div>
-        
-        {/* Información de depuración */}
-        {renderDebugInfo()}
       </div>
-    );
-  };
-
-  return (
-    <DashboardLayout>
-      {renderContenido()}
     </DashboardLayout>
   );
 };
