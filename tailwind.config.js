@@ -30,11 +30,22 @@ export default {
             transform: 'translateY(0)',
             opacity: '1'
           }
+        },
+        'fade-in-down': {
+          '0%': {
+            opacity: '0',
+            transform: 'translateY(-20px)'
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0)'
+          },
         }
       },
       animation: {
         'bounce-in': 'bounce-in 0.8s ease-out',
-        gradient: "gradientBG 6s ease infinite"
+        gradient: "gradientBG 6s ease infinite",
+        'fade-in-down': 'fade-in-down 0.3s ease-out forwards'
       },
       gradientBG: {
         "0%": { backgroundPosition: "0% 50%" },

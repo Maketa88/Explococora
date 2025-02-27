@@ -22,6 +22,8 @@ import {
   Key,
   LogOut
 } from 'lucide-react';
+import SelectorEstado from '../pages/VistaOperador/CambioEstadoOpe/Selector_Estado_Ope';
+import axios from 'axios';
 
 const DashboardLayout = ({ children }) => {
   const location = useLocation();
@@ -32,6 +34,7 @@ const DashboardLayout = ({ children }) => {
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [fotoPerfil, setFotoPerfil] = useState(localStorage.getItem('fotoPerfilURL') || null);
   const [nombreUsuario, setNombreUsuario] = useState("");
+  const [operadorEstado, setOperadorEstado] = useState("disponible");
   
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -73,6 +76,11 @@ const DashboardLayout = ({ children }) => {
       window.removeEventListener('perfilActualizado', handlePerfilActualizado);
     };
   }, []);
+
+
+  const handleCambioEstado = (nuevoEstado) => {
+    setOperadorEstado(nuevoEstado);
+  };
 
   const menuItems = [
     {
@@ -159,12 +167,97 @@ const DashboardLayout = ({ children }) => {
     setSearchTerm('');
   };
 
-  const handleLogout = () => {
-    // Eliminar el token del localStorage
-    localStorage.removeItem('token');
-    // Redirigir a la página de inicio de sesión
-    navigate('/Ingreso');
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const cedula = localStorage.getItem('cedula');
+      
+      // Cambiar estado a inactivo antes de cerrar sesión
+      await axios.patch('http://localhost:10101/usuarios/cambiar-estado', 
+        { 
+          cedula: cedula,
+          nuevoEstado: 'inactivo'
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      // Eliminar el token y otros datos del localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('cedula');
+      // Redirigir a la página de inicio de sesión
+      navigate('/Ingreso');
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+      // Continuar con el cierre de sesión incluso si falla el cambio de estado
+      localStorage.removeItem('token');
+      localStorage.removeItem('cedula');
+      navigate('/Ingreso');
+    }
   };
+
+  // Añadir nuevo useEffect para establecer estado inicial
+  useEffect(() => {
+    const establecerEstadoInicial = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const cedula = localStorage.getItem('cedula');
+        
+        if (!token || !cedula) return;
+
+        // Establecer estado como disponible al iniciar sesión
+        await axios.patch('http://localhost:10101/usuarios/cambiar-estado',
+          {
+            cedula: cedula,
+            nuevoEstado: 'disponible'
+          },
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        );
+        
+        setOperadorEstado('disponible');
+      } catch (error) {
+        console.error("Error al establecer estado inicial:", error);
+      }
+    };
+
+    establecerEstadoInicial();
+  }, []); // Se ejecuta solo al montar el componente
+
+  useEffect(() => {
+    const handleBeforeUnload = async (e) => {
+      try {
+        const token = localStorage.getItem('token');
+        const cedula = localStorage.getItem('cedula');
+        
+        if (!token || !cedula) return;
+
+        // Usar sendBeacon para garantizar que la solicitud se complete
+        const data = new FormData();
+        data.append('cedula', cedula);
+        data.append('nuevoEstado', 'inactivo');
+
+        navigator.sendBeacon(
+          'http://localhost:10101/usuarios/cambiar-estado',
+          data
+        );
+      } catch (error) {
+        console.error("Error al cambiar estado en cierre:", error);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
 
   return (
     <div className={`flex h-screen overflow-hidden ${darkMode ? 'bg-[#0f172a]' : 'bg-white'}`}>
@@ -255,6 +348,15 @@ const DashboardLayout = ({ children }) => {
               </form>
             </div>
             <div className="flex items-center gap-4">
+              <div className="mr-4">
+                <SelectorEstado 
+                  estadoActual={operadorEstado}
+                  onCambioEstado={handleCambioEstado}
+                  cedula={localStorage.getItem('cedula')}
+                  esAdmin={false}
+                  esPropio={true}
+                />
+              </div>
               <button 
                 onClick={() => setDarkMode(!darkMode)}
                 className={`p-2 rounded-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}

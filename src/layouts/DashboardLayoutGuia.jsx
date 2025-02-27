@@ -18,13 +18,14 @@ import {
   Sun
 } from 'lucide-react';
 import axios from 'axios';
+import SelectorEstado from '../pages/VistaGuia/CambioEstado/SelectorEstado';
 
 const DashboardLayoutGuia = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
-  const [estado, setEstado] = useState("Estado 1");
+  const [estado, setEstado] = useState("disponible");
   const [isOpen, setIsOpen] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const dropdownRef = useRef(null);
@@ -59,6 +60,39 @@ const DashboardLayoutGuia = ({ children }) => {
       setShowProfile(false);
     }
   }, [location.pathname]);
+
+
+  // Añadir este efecto para cambiar estado a disponible al iniciar sesión-jhojan
+  useEffect(() => {
+    const cambiarEstadoAlIniciar = async () => {
+      try {
+        const cedula = localStorage.getItem("cedula");
+        const token = localStorage.getItem("token");
+        
+        // Si hay cédula y token, significa que el usuario ha iniciado sesión-jhojan
+        if (cedula && token) {
+          
+          // Llamar a la API para cambiar estado
+          await axios.patch('http://localhost:10101/usuarios/cambiar-estado', 
+            { nuevoEstado: "disponible", cedula }, 
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            }
+          );
+          
+          // Actualizar estado local y localStorage
+          setEstado("disponible");
+          localStorage.setItem("ultimoEstado", "disponible");
+        }
+      } catch (error) {
+        console.error("Error al cambiar estado al iniciar sesión:", error);
+      }
+    };
+    
+    cambiarEstadoAlIniciar();
+  }, []); // Solo se ejecuta al montar el componente-jhojan
 
   // Función para cargar los datos del guía cuando se muestra el perfil
   const loadGuiaData = () => {
@@ -183,19 +217,61 @@ const DashboardLayoutGuia = ({ children }) => {
     setIsOpen(!isOpen);
   };
 
+  // Modificar la función handleOptionClick para cambiar estado al cerrar sesión
   const handleOptionClick = (path, action) => {
     if (path === "/VistaGuia/PerfilGuia") {
       // Mostrar el perfil y cargar los datos
       setShowProfile(true);
       loadGuiaData();
       navigate("/VistaGuia/PerfilGuia"); // Navegar a la ruta principal
+    } else if (path === "/") {
+      // Lógica para cerrar sesión-jhojan
+      const cambiarEstadoAlCerrarSesion = async () => {
+        try {
+          const cedula = localStorage.getItem("cedula");
+          const token = localStorage.getItem("token");
+          
+          if (cedula && token) {
+            
+            // Llamar a la API para cambiar estado antes de cerrar sesión
+            await axios.patch('http://localhost:10101/usuarios/cambiar-estado', 
+              { nuevoEstado: "inactivo", cedula }, 
+              {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
+              }
+            );
+            
+            // Actualizar localStorage por si acaso
+            localStorage.setItem("ultimoEstado", "inactivo");
+          }
+          
+          // Continuar con el cierre de sesión
+          setShowProfile(false);
+          // Borrar datos de sesión
+          localStorage.removeItem("token");
+          localStorage.removeItem("cedula");
+          localStorage.removeItem("rol");
+          navigate("/");
+        } catch (error) {
+          console.error("Error al cambiar estado al cerrar sesión:", error);
+          // Aún así continuar con el cierre de sesión-jhojan
+          setShowProfile(false);
+          localStorage.removeItem("token");
+          localStorage.removeItem("cedula");
+          localStorage.removeItem("rol");
+          navigate("/");
+        }
+      };
+      
+      cambiarEstadoAlCerrarSesion();
     } else if (path) {
       navigate(path);
       setShowProfile(false); // Ocultar el perfil al navegar a otra ruta
     } else if (path === null) {
-      // Lógica para cerrar sesión
+      // Otra lógica si es necesaria
       setShowProfile(false);
-      // Aquí iría tu lógica de cierre de sesión
     }
     setIsOpen(false);
   };
@@ -432,15 +508,15 @@ const DashboardLayoutGuia = ({ children }) => {
               />
             </div>
             <div className="flex items-center gap-4">
-              <select 
-                value={estado} 
-                onChange={(e) => setEstado(e.target.value)} 
-                className={`p-1 rounded-lg ${estado === "Disponible" ? 'bg-green-500 text-white' : estado === "Ocupado" ? 'bg-yellow-500 text-black' : estado === "Inactivo" ? 'bg-red-500 text-white' : darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-900'} hover:bg-gray-300`}
-              >
-                <option value="Disponible" className="bg-green-500 text-white">Disponible</option>
-                <option value="Ocupado" className="bg-yellow-500 text-black">Ocupado</option>
-                <option value="Inactivo" className="bg-red-500 text-white">Inactivo</option>
-              </select>
+              {localStorage.getItem('cedula') && (
+                <SelectorEstado 
+                  estadoActual={estado}
+                  onCambioEstado={setEstado}
+                  cedula={localStorage.getItem('cedula')}
+                  esAdmin={false}
+                  esPropio={true}
+                />
+              )}
               <button 
                 onClick={() => setDarkMode(!darkMode)}
                 className={`p-2 rounded-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
