@@ -10,6 +10,7 @@ import Products from '../../pages/VistaOperador/Products/Products';
 import NewProduct from '../../pages/VistaOperador/Products/NewProduct';
 import Inventory from '../../pages/VistaOperador/Products/Inventory';
 import Settings from '../../pages/VistaOperador/Settings/Settings';
+import PerfilOperador from '../../pages/VistaOperador/Perfil/PerfilOperador';
 
 const RutasOperador = () => {
   return (
@@ -24,6 +25,7 @@ const RutasOperador = () => {
       <Route path="/new-product" element={<NewProduct />} />
       <Route path="/inventory" element={<Inventory />} />
       <Route path="/settings" element={<Settings />} />
+      <Route path="/perfil" element={<PerfilOperador />} />
     </Routes>
   );
 };

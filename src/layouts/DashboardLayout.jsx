@@ -16,7 +16,11 @@ import {
   Settings,
   Moon,
   Sun,
-  Search
+  Search,
+  User,
+  Edit,
+  Key,
+  LogOut
 } from 'lucide-react';
 
 const DashboardLayout = ({ children }) => {
@@ -25,6 +29,7 @@ const DashboardLayout = ({ children }) => {
   const [darkMode, setDarkMode] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -113,6 +118,13 @@ const DashboardLayout = ({ children }) => {
     
     // Limpiar el campo de búsqueda
     setSearchTerm('');
+  };
+
+  const handleLogout = () => {
+    // Eliminar el token del localStorage
+    localStorage.removeItem('token');
+    // Redirigir a la página de inicio de sesión
+    navigate('/Ingreso');
   };
 
   return (
@@ -213,12 +225,45 @@ const DashboardLayout = ({ children }) => {
               <button className={`p-2 rounded-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                 <Bell className="w-5 h-5" />
               </button>
-              <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                <img 
-                  src="https://ui-avatars.com/api/?name=User&background=random" 
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
+              <div className="relative">
+                <button 
+                  onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                  className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden cursor-pointer"
+                >
+                  <img 
+                    src="https://ui-avatars.com/api/?name=User&background=random" 
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+                
+                {/* Menú desplegable de perfil */}
+                {profileMenuOpen && (
+                  <div 
+                    className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 
+                    ${darkMode ? 'bg-gray-800' : 'bg-white'} 
+                    ring-1 ring-black ring-opacity-5 z-50`}
+                  >
+                    <Link 
+                      to="/VistaOperador/perfil" 
+                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} flex items-center gap-2`}
+                      onClick={() => setProfileMenuOpen(false)}
+                    >
+                      <User className="w-4 h-4" />
+                      Ver Perfil
+                    </Link>
+                    <button 
+                      onClick={() => {
+                        setProfileMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className={`block w-full text-left px-4 py-2 text-sm ${darkMode ? 'text-red-400 hover:bg-gray-700' : 'text-red-600 hover:bg-gray-100'} flex items-center gap-2`}
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Cerrar Sesión
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
