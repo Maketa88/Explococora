@@ -5,7 +5,7 @@ import Colombia from "../../../assets/Images/Colombia.png";
 import Usa from "../../../assets/Images/Usa.png";
 import { NavItem } from "./Lista";
 import { Logo } from "./Logo";
-import React from "react";
+
 
 
 export const Header = () => {
