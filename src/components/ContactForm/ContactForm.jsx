@@ -42,7 +42,7 @@ const ContactForm = () => {
 
     emailjs
       .send(
-        "service_ur5nbyc", // Tu Service ID
+        "service_ur5nbyc", // Tu Service iD
         "template_pz6zib4", // Tu Template ID
         {
           nombre: formData.nombre,
