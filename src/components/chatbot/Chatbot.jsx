@@ -163,7 +163,7 @@ export const ChatBot = () => {
   return (
     <div className="fixed bottom-4 right-4 z-50">
       <div className="relative">
-        <dyiv className="fixed bottom-5 right-5 flex items-center justify-center">
+        <div className="fixed bottom-5 right-5 flex items-center justify-center">
           <div className="relative">
             <button
               onClick={toggleChat}
@@ -176,7 +176,7 @@ export const ChatBot = () => {
               />
             </button>
           </div>
-        </dyiv>
+        </div>
 
         {isChatOpen && (
           <div className="fixed bottom-24 right-5 w-[300px] h-[450px] border border-gray-300 rounded-lg shadow-lg bg-white overflow-hidden">
