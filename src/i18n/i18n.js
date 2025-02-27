@@ -149,7 +149,7 @@ i18n
 
           // Título y descripción principal
           tituloValle: "Descubre la Magia del Valle del Cocora",
-          descripcionValle: "El Valle del Cocora es mucho más que un destino turístico; es un lugar donde la historia, la cultura y la naturaleza se entrelazan para crear un escenario único en el corazón de Colombia. Cada rincón de este valle mágico está cargado de leyendas ancestrales, tradiciones vivas y paisajes que quitan el aliento. Aquí, las imponentes palmas de cera tocan el cielo mientras susurran historias del pasado, los pueblos cercanos como Salento invitan a revivir las costumbres cafetaleras, y la biodiversidad florece como un testimonio de la riqueza de nuestra tierra. Prepárate para un recorrido inolvidable que despertará tus sentidos y te conectará con las raíces más profundas de nuestra historia. ¡Adéntrate en el Valle del Cocora y deja que su encanto te envuelva!",
+          descripcionValle: "El Valle del Cocora es un destino donde historia, cultura y naturaleza se fusionan en un paisaje único de Colombia. Sus majestuosas palmas de cera se alzan hacia el cielo, mientras los pueblos cercanos, como Salento, mantienen vivas las tradiciones cafetaleras. Con una biodiversidad impresionante y paisajes de ensueño, este valle te invita a una experiencia inolvidable que despertará tus sentidos. ¡Descúbrelo y déjate cautivar por su magia!",
 
           // Nuestras Rutas
           tituloRutas: "Nuestras Rutas",
@@ -310,7 +310,7 @@ i18n
 
           // Main title and description
           tituloValle: "Discover the Magic of Cocora Valley",
-          descripcionValle: "The Cocora Valley is much more than a tourist destination; it is a place where history, culture, and nature intertwine to create a unique setting in the heart of Colombia. Every corner of this magical valley is filled with ancestral legends, living traditions, and breathtaking landscapes. Here, the majestic wax palms touch the sky while whispering stories of the past, nearby towns like Salento invite you to relive coffee-growing traditions, and biodiversity flourishes as a testament to the richness of our land. Get ready for an unforgettable journey that will awaken your senses and connect you with the deepest roots of our history. Step into the Cocora Valley and let its charm embrace you!",
+          descripcionValle: "The Cocora Valley is a place where history, culture, and nature come together in a unique Colombian landscape. Its towering wax palms reach for the sky, while nearby towns like Salento keep coffee traditions alive. With stunning biodiversity and breathtaking views, this valley offers an unforgettable experience that will awaken your senses. Discover it and let its magic captivate you!",
 
           // Our Routes
           tituloRutas: "Our Routes",
