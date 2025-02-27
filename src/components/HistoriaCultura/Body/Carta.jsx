@@ -2,19 +2,29 @@ import React from "react";
 
 export const Carta = ({ image, title, text }) => {
   return (
-    <div 
-      className="max-w-screen-sm mx-auto bg-white shadow-lg transform transition duration-300 hover:scale-105 cursor-pointer font-nunito p-6"
-      style={{
-        clipPath: "polygon(5% 0, 95% 0, 100% 5%, 100% 95%, 95% 100%, 5% 100%, 0 95%, 0 5%)"
-      }}
-    >
-      <img
-        className="w-full h-96 object-cover transition-transform duration-500 "
-        src={image}
-        alt={title}
-      />
-      <h2 className="text-2xl font-bold text-gray-800 mt-4 text-center">{title}</h2>
-      <p className="text-gray-700 text-base mt-2 text-justify">{text}</p>
+    <div className="flex flex-col items-center p-4 h-full">
+      {/* Contenedor de la imagen con tamaño fijo */}
+      <div className="mb-4 w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 flex items-center justify-center">
+        <img 
+          className="w-full h-full object-contain" 
+          src={image} 
+          alt={title} 
+          loading="lazy"
+        />
+      </div>
+      
+      {/* Contenedor para el texto que ocupa todo el ancho disponible */}
+      <div className="w-full flex flex-col flex-grow">
+        {/* Título centrado con padding consistente y tamaño de texto responsivo */}
+        <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-teal-700 mb-3 text-center w-full">
+          {title}
+        </h3>
+        
+        {/* Párrafo con texto justificado y tamaño de texto responsivo */}
+        <p className="text-gray-800 text-xs sm:text-sm md:text-base text-center w-full flex-grow">
+          {text}
+        </p>
+      </div>
     </div>
   );
 };
