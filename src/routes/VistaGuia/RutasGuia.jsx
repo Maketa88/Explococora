@@ -12,10 +12,9 @@ import Inventory from '../../pages/VistaGuia/Products/Inventory';
 import Settings from '../../pages/VistaGuia/Settings/Settings';
 import PerfilGuia from '../../pages/VistaGuia/PerfilGuia/PerfilGuia';
 import CambioEstado from '../../pages/VistaGuia/CambioEstado/CambioEstado';
+import CambiarContraseña from '../../pages/VistaGuia/PerfilGuia/cambiarContra';
 
-// ... existing code ...
-
-const RutasGuia = () => {
+const  RutasGuia = () => {
   return (
     <Routes>
       <Route path="/" element={<Dashboard />} />
@@ -28,8 +27,9 @@ const RutasGuia = () => {
       <Route path="/inventory" element={<Inventory />} />
       <Route path="/settings" element={<Settings />} />
       <Route path="/VisualizarRutas" element={<VisualizarRutas />} />
-      <Route path="/PerfilGuia" element={<PerfilGuia />} />
       <Route path="/CambioEstado" element={<CambioEstado />} />
+      <Route path="/CambiarContraseña" element={<CambiarContraseña />} />
+      <Route path="/PerfilGuia" element={<PerfilGuia />} />
     </Routes>
   );
 };
