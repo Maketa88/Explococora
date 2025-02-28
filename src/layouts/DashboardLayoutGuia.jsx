@@ -17,7 +17,11 @@ import {
   Moon,
   Sun,
   Search,
-  User
+  User,
+  Edit,
+  Key,
+  LogOut,
+  Trash2
 } from 'lucide-react';
 import axios from 'axios';
 import SelectorEstado from '../pages/VistaGuia/CambioEstado/SelectorEstado';
@@ -40,6 +44,8 @@ const DashboardLayoutGuia = ({ children }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
+  
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -210,17 +216,20 @@ const DashboardLayoutGuia = ({ children }) => {
       icon: <Users className="w-5 h-5" />,
       path: "/VistaGuia/ActualizarGuia",
       section: "ActualizarGuia"
+    },
+    {
+      title: "EliminarCuentaGuia",
+      icon: <Trash2 className="w-5 h-5" />,
+      path: "/VistaGuia/EliminarCuentaGuia",
+      section: "EliminarCuenta"
     }
-
-    
-
   ];
   
   const sections = ["Dashboard", "Customers", "Products"];
 
   const toggleMenu = (e) => {
     e.stopPropagation();
-    setIsOpen(!isOpen);
+    setProfileMenuOpen(!profileMenuOpen);
   };
 
   // Modificar la función handleOptionClick para cambiar estado al cerrar sesión
@@ -279,7 +288,7 @@ const DashboardLayoutGuia = ({ children }) => {
       // Otra lógica si es necesaria
       setShowProfile(false);
     }
-    setIsOpen(false);
+    setProfileMenuOpen(false);
   };
 
   const handleMenuItemClick = (path) => {
@@ -296,9 +305,9 @@ const DashboardLayoutGuia = ({ children }) => {
         loadGuiaData();
       }
     },
-    { label: "Actualizar perfil", path: "/VistaCliente/ActualizarPerfil" },
+    { label: "Actualizar perfil", path: "/VistaGuia/ActualizarGuia" },
     { label: "Cambiar contraseña", path: "/VistaGuia/CambiarContraseña" },
-    { label: "Eliminar cuenta", path: "/VistaCliente/EliminarCuenta" },
+    { label: "Eliminar cuenta", path: "/VistaGuia/EliminarCuentaGuia" },
     { label: "Cerrar sesión", path: "/" },
   ];
 
@@ -681,36 +690,48 @@ const DashboardLayoutGuia = ({ children }) => {
                   />
                 </div>
                 
-                {/* Menú desplegable reposicionado */}
-                {isOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-teal-700 border-2 border-gray-900 rounded-xl shadow-xl py-2 z-50 transform transition-all duration-300 ease-in-out">
-                    {menuOptions.map((option, index) => (
-                      <div
-                        key={index}
-                        onClick={() => handleOptionClick(option.path, option.action)}
-                        role="menuitem"
-                        tabIndex={0}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            handleOptionClick(option.path, option.action);
-                          }
-                        }}
-                        className={`group px-4 py-3 text-white ${
-                          index === menuOptions.length - 1
-                            ? "mt-1 text-red-400 hover:text-white hover:bg-red-600 active:bg-red-700 font-bold"
-                            : "hover:bg-teal-600 active:bg-teal-500"
-                        } flex items-center cursor-pointer transition-all duration-200 text-sm md:text-base relative overflow-hidden`}
-                      >
-                        <span className="relative z-10">{option.label}</span>
-                        <span 
-                          className={`absolute bottom-0 left-0 w-0 h-0.5 ${
-                            index === menuOptions.length - 1
-                              ? "bg-red-400"
-                              : "bg-teal-400"
-                          } group-hover:w-full transition-all duration-300 ease-out`}
-                        ></span>
-                      </div>
-                    ))}
+                {/* Menú desplegable actualizado al estilo del operador */}
+                {profileMenuOpen && (
+                  <div 
+                    className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 
+                    ${darkMode ? 'bg-gray-800' : 'bg-white'} 
+                    ring-1 ring-black ring-opacity-5 z-50`}
+                  >
+                    <div 
+                      onClick={() => handleOptionClick("/VistaGuia/PerfilGuia")}
+                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} flex items-center gap-2 cursor-pointer`}
+                    >
+                      <User className="w-4 h-4" />
+                      Ver Perfil
+                    </div>
+                    <div 
+                      onClick={() => handleOptionClick("/VistaGuia/ActualizarGuia")}
+                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} flex items-center gap-2 cursor-pointer`}
+                    >
+                      <Edit className="w-4 h-4" />
+                      Actualizar Información
+                    </div>
+                    <div 
+                      onClick={() => handleOptionClick("/VistaGuia/CambiarContraseña")}
+                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} flex items-center gap-2 cursor-pointer`}
+                    >
+                      <Key className="w-4 h-4" />
+                      Cambiar Contraseña
+                    </div>
+                    <div 
+                      onClick={() => handleOptionClick("/VistaGuia/EliminarCuentaGuia")}
+                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} flex items-center gap-2 cursor-pointer`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Eliminar Cuenta
+                    </div>
+                    <div 
+                      onClick={() => handleOptionClick("/")}
+                      className={`block w-full text-left px-4 py-2 text-sm ${darkMode ? 'text-red-400 hover:bg-gray-700' : 'text-red-600 hover:bg-gray-100'} flex items-center gap-2 cursor-pointer`}
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Cerrar Sesión
+                    </div>
                   </div>
                 )}
               </div>

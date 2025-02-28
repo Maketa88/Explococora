@@ -1,252 +1,402 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { FaKey, FaLock, FaUserShield } from 'react-icons/fa';
+import { useNavigate } from "react-router-dom";
 import DashboardLayoutGuia from "../../../layouts/DashboardLayoutGuia";
+import { AlertCircle, CheckCircle, X, ArrowLeft, Eye, EyeOff, Lock } from "lucide-react";
 
 const CambiarContraseña = () => {
-  const [cedula, setCedula] = useState('');
-  const [contrasenia, setContrasenia] = useState('');
-  const [confirmarContrasenia, setConfirmarContrasenia] = useState('');
-  const [mensaje, setMensaje] = useState({ texto: '', tipo: '' });
-  const [cargando, setCargando] = useState(false);
-  const [erroresValidacion, setErroresValidacion] = useState([]);
+  const [formData, setFormData] = useState({
+    cedula: '',
+    contrasenaActual: '',
+    nuevaContrasena: '',
+    confirmarContrasena: ''
+  });
+  const [showPassword, setShowPassword] = useState({
+    actual: false,
+    nueva: false,
+    confirmar: false
+  });
+  const [error, setError] = useState(null);
+  const [darkMode, setDarkMode] = useState(true);
+  const [alert, setAlert] = useState({ show: false, message: "", type: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const [cambiosRealizados, setCambiosRealizados] = useState(false);
+  const [requisitosContrasena, setRequisitosContrasena] = useState({
+    longitud: false,
+    mayuscula: false,
+    minuscula: false,
+    numero: false,
+    especial: false
+  });
+  const navigate = useNavigate();
 
-  const validarContrasenia = (password) => {
-    const errores = [];
-    
-    if (!password) {
-      errores.push("La contraseña no puede ser vacía");
-      return errores;
-    }
-
-    if (password.length < 8) {
-      errores.push("La contraseña debe tener al menos 8 caracteres.");
-    }
-
-    if (!/[A-Z]/.test(password)) {
-      errores.push("La contraseña debe incluir al menos una letra mayúscula.");
-    }
-
-    if (!/[a-z]/.test(password)) {
-      errores.push("La contraseña debe incluir al menos una letra minúscula.");
-    }
-
-    if (!/[0-9]/.test(password)) {
-      errores.push("La contraseña debe incluir al menos un número.");
-    }
-
-    if (!/[\W_]/.test(password)) {
-      errores.push("La contraseña debe incluir al menos un carácter especial.");
-    }
-
-    return errores;
+  const verificarRequisitos = (contrasena) => {
+    setRequisitosContrasena({
+      longitud: contrasena.length >= 8,
+      mayuscula: /[A-Z]/.test(contrasena),
+      minuscula: /[a-z]/.test(contrasena),
+      numero: /[0-9]/.test(contrasena),
+      especial: /[\W_]/.test(contrasena)
+    });
   };
 
-  const handleContraseniaChange = (e) => {
-    const nuevaContrasenia = e.target.value;
-    setContrasenia(nuevaContrasenia);
-    setErroresValidacion(validarContrasenia(nuevaContrasenia));
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    
+    let valorValidado = value;
+    
+    if (name === 'cedula') {
+      valorValidado = value.replace(/\D/g, '');
+    } else if (['nuevaContrasena', 'confirmarContrasena'].includes(name)) {
+      if (name === 'nuevaContrasena') {
+        verificarRequisitos(valorValidado);
+      }
+    }
+    
+    setFormData(prev => {
+      const nuevoEstado = {
+        ...prev,
+        [name]: valorValidado
+      };
+      
+      // Verificar si hay cambios en la contraseña
+      const nuevaContrasenaDiferente = 
+        nuevoEstado.nuevaContrasena !== "" && 
+        nuevoEstado.nuevaContrasena !== nuevoEstado.contrasenaActual;
+      
+      const confirmacionCorrecta = 
+        nuevoEstado.confirmarContrasena !== "" && 
+        nuevoEstado.nuevaContrasena === nuevoEstado.confirmarContrasena;
+      
+      const contrasenaActualIngresada = nuevoEstado.contrasenaActual !== "";
+      const cedulaValida = nuevoEstado.cedula !== "";
+      
+      setCambiosRealizados(
+        nuevaContrasenaDiferente && 
+        confirmacionCorrecta && 
+        contrasenaActualIngresada &&
+        cedulaValida
+      );
+      
+      return nuevoEstado;
+    });
+  };
+
+  const togglePasswordVisibility = (field) => {
+    setShowPassword(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }));
+  };
+
+  const validarContrasenaSegura = (contrasena) => {
+    const tieneMinuscula = /[a-z]/.test(contrasena);
+    const tieneMayuscula = /[A-Z]/.test(contrasena);
+    const tieneNumero = /[0-9]/.test(contrasena);
+    const tieneEspecial = /[\W_]/.test(contrasena);
+    
+    return tieneMinuscula && tieneMayuscula && tieneNumero && tieneEspecial;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const errores = validarContrasenia(contrasenia);
-    setErroresValidacion(errores);
-    
-    if (errores.length > 0) {
-      setMensaje({ 
-        texto: 'Por favor, corrige los errores de validación', 
-        tipo: 'error' 
-      });
-      return;
-    }
-    
-    if (contrasenia !== confirmarContrasenia) {
-      setMensaje({ texto: 'Datos Incorrectos', tipo: 'error' });
+    // Validar que la nueva contraseña sea diferente a la actual
+    if (formData.nuevaContrasena === formData.contrasenaActual) {
+      showAlert("La nueva contraseña no puede ser igual a la actual", "error");
       return;
     }
 
+    // Validar contraseña segura
+    if (!validarContrasenaSegura(formData.nuevaContrasena)) {
+      showAlert("La contraseña debe contener al menos una minúscula, una mayúscula, un número y un carácter especial", "error");
+      return;
+    }
+    
+    // Validar que las contraseñas coincidan
+    if (formData.nuevaContrasena !== formData.confirmarContrasena) {
+      showAlert("Las contraseñas no coinciden", "error");
+      return;
+    }
+    
+    setSubmitting(true);
+    
     try {
-      setCargando(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       
       if (!token) {
-        setMensaje({ texto: 'No hay sesión activa', tipo: 'error' });
+        showAlert("No se encontraron credenciales de autenticación", "error");
+        setSubmitting(false);
         return;
       }
 
-      await axios.patch(`http://localhost:10101/guia/cambiar-contrasenia/${cedula}`, 
-        { contrasenia },
-        { 
+      // Ajustar la URL y el cuerpo según la ruta del backend para guía
+      await axios.patch(
+        `http://localhost:10101/guia/cambiar-contrasenia/${formData.cedula}`,
+        {
+          contrasenaActual: formData.contrasenaActual,
+          contrasenia: formData.nuevaContrasena
+        },
+        {
           headers: {
-            'Authorization': `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
           }
         }
       );
       
-      setMensaje({ texto: 'Contraseña cambiada con éxito', tipo: 'exito' });
-      setCedula('');
-      setContrasenia('');
-      setConfirmarContrasenia('');
-      setErroresValidacion([]);
+      showAlert("Contraseña actualizada exitosamente", "success");
+      
+      // Limpiar el formulario
+      setFormData({
+        cedula: "",
+        contrasenaActual: "",
+        nuevaContrasena: "",
+        confirmarContrasena: ""
+      });
+      
+      // Redirigir después de 2 segundos
+      setTimeout(() => {
+        navigate("/VistaGuia/PerfilGuia");
+      }, 2000);
+      
     } catch (error) {
-      if (error.response?.status === 400 || error.response?.status === 404) {
-        setMensaje({ texto: 'Datos incorrectos', tipo: 'error' });
-      } else {
-        setMensaje({ 
-          texto: 'Error al cambiar la contraseña', 
-          tipo: 'error' 
-        });
+      console.error("Error al cambiar contraseña:", error);
+      
+      let errorMessage;
+      
+      switch (error.response?.status) {
+        case 401:
+          errorMessage = "Credenciales inválidas";
+          break;
+        case 403:
+          errorMessage = "No tiene permisos para realizar esta acción";
+          break;
+        case 404:
+          errorMessage = "Usuario no encontrado";
+          break;
+        case 409:
+          errorMessage = "La contraseña actual es incorrecta";
+          break;
+        case 400:
+          errorMessage = "La nueva contraseña no puede ser igual a la actual";
+          break;
+        default:
+          errorMessage = error.response?.data?.message || "Error al cambiar la contraseña";
       }
-    } finally {
-      setCargando(false);
+      
+      showAlert(errorMessage, "error");
+      setSubmitting(false);
     }
   };
 
-  const renderFormulariocontra = () => {
+  const showAlert = (message, type) => {
+    setAlert({ show: true, message, type });
+    
+    if (type === "success") {
+      setTimeout(() => {
+        setAlert({ show: false, message: "", type: "" });
+      }, 3000);
+    }
+  };
+
+  const closeAlert = () => {
+    setAlert({ show: false, message: "", type: "" });
+  };
+
+  // Componente de Alerta
+  const AlertComponent = () => {
+    if (!alert.show) return null;
+    
+    const bgColor = alert.type === "success" ? "bg-green-500" : "bg-red-500";
+    const Icon = alert.type === "success" ? CheckCircle : AlertCircle;
+    
     return (
-      <div className="min-h-screen bg-gradient-to-b from-teal-800/10 to-white py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
-        <div className="max-w-md w-full space-y-8">
-          <div className="text-center">
-            <div className="mx-auto h-16 w-16 bg-teal-800 rounded-full flex items-center justify-center mb-4 shadow-lg">
-              <FaLock className="h-8 w-8 text-white" />
-            </div>
-            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-              Cambiar Contraseña
-            </h2>
-            <p className="mt-2 text-sm text-white">
-              Protege tu cuenta con una contraseña segura
-            </p>
-            <p className="mt-2 text-sm text-gray-600">
-              Asegúrate de que tu nueva contraseña tenga al menos 8 caracteres, incluyendo letras mayúsculas, minúsculas, números y caracteres especiales.
-            </p>
-          </div>
-          
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            <div className="space-y-6">
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaUserShield className="h-5 w-5 text-teal-800" />
-                </div>
-                <input
-                  id="cedula"
-                  name="cedula"
-                  type="text"
-                  required
-                  value={cedula}
-                  onChange={(e) => setCedula(e.target.value)}
-                  className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 bg-gray-50/80 hover:bg-white backdrop-blur-sm"
-                  placeholder="Ingrese su cédula"
-                />
-                <label htmlFor="cedula" className="absolute left-10 -top-2 bg-white px-2 text-xs font-medium text-teal-800">
-                  Cédula
-                </label>
-              </div>
-
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaKey className="h-5 w-5 text-teal-800" />
-                </div>
-                <input
-                  id="contrasenia"
-                  name="contrasenia"
-                  type="password"
-                  required
-                  value={contrasenia}
-                  onChange={handleContraseniaChange}
-                  className={`pl-10 w-full px-4 py-3 border ${
-                    erroresValidacion.length > 0 ? 'border-red-300' : 'border-gray-200'
-                  } rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 bg-gray-50/80 hover:bg-white backdrop-blur-sm`}
-                  placeholder="Ingrese su nueva contraseña"
-                />
-                <label htmlFor="contrasenia" className="absolute left-10 -top-2 bg-white px-2 text-xs font-medium text-teal-800">
-                  Nueva Contraseña
-                </label>
-              </div>
-
-              {erroresValidacion.length > 0 && (
-                <div className="bg-red-50/90 backdrop-blur-sm text-red-700 p-4 rounded-xl border border-red-200">
-                  {erroresValidacion.map((error, index) => (
-                    <p key={index} className="text-sm flex items-center mb-1 last:mb-0">
-                      <span className="mr-2">•</span>
-                      {error}
-                    </p>
-                  ))}
-                </div>
-              )}
-
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaKey className="h-5 w-5 text-teal-800" />
-                </div>
-                <input
-                  id="confirmarContrasenia"
-                  name="confirmarContrasenia"
-                  type="password"
-                  required
-                  value={confirmarContrasenia}
-                  onChange={(e) => setConfirmarContrasenia(e.target.value)}
-                  className={`pl-10 w-full px-4 py-3 border ${
-                    contrasenia !== confirmarContrasenia && confirmarContrasenia 
-                      ? 'border-red-300' 
-                      : 'border-gray-200'
-                  } rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 bg-gray-50/80 hover:bg-white backdrop-blur-sm`}
-                  placeholder="Confirme su nueva contraseña"
-                />
-                <label htmlFor="confirmarContrasenia" className="absolute left-10 -top-2 bg-white px-2 text-xs font-medium text-teal-800">
-                  Confirmar Contraseña
-                </label>
-              </div>
-            </div>
-
-            {mensaje.texto && (
-              <div className={`rounded-xl p-4 ${
-                mensaje.tipo === 'error' 
-                  ? 'bg-red-50/90 text-red-700 border border-red-200' 
-                  : 'bg-teal-50/90 text-teal-700 border border-teal-200'
-              } shadow-sm backdrop-blur-sm`}>
-                {mensaje.texto}
-              </div>
-            )}
-
-            <div>
-              <button
-                type="submit"
-                disabled={cargando || erroresValidacion.length > 0}
-                className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white ${
-                  cargando || erroresValidacion.length > 0
-                    ? 'bg-teal-400 cursor-not-allowed' 
-                    : 'bg-teal-800 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl'
-                }`}
-              >
-                {cargando ? (
-                  <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                    <svg className="animate-spin h-5 w-5 text-teal-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                  </span>
-                ) : null}
-                <span className="flex items-center">
-                  {cargando ? 'Procesando...' : (
-                    <>
-                      <FaLock className="mr-2" />
-                      Cambiar Contraseña
-                    </>
-                  )}
-                </span>
-              </button>
-            </div>
-          </form>
-        </div>
+      <div className={`${bgColor} text-white p-4 rounded-lg mb-4 flex items-start`}>
+        <Icon className="w-5 h-5 mr-2 mt-0.5" />
+        <div className="flex-1">{alert.message}</div>
+        <button onClick={closeAlert} className="text-white">
+          <X className="w-5 h-5" />
+        </button>
       </div>
     );
   };
 
   return (
     <DashboardLayoutGuia>
-      {renderFormulariocontra()}
+      <div className="p-6">
+        <div className={`${darkMode ? 'bg-[#1e293b]' : 'bg-gray-100'} rounded-lg p-8 shadow-lg max-w-5xl mx-auto`}>
+          <div className="flex items-center mb-8">
+            <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center mr-4">
+              <Lock className="w-8 h-8 text-white" />
+            </div>
+            <h2 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+              Cambiar Contraseña
+            </h2>
+          </div>
+          
+          <AlertComponent />
+          
+          <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Cédula
+                </label>
+                <input
+                  type="text"
+                  name="cedula"
+                  value={formData.cedula}
+                  onChange={handleInputChange}
+                  className={`w-full p-3 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Contraseña Actual
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword.actual ? "text" : "password"}
+                    name="contrasenaActual"
+                    value={formData.contrasenaActual}
+                    onChange={handleInputChange}
+                    className={`w-full p-3 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'} pr-10`}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => togglePasswordVisibility('actual')}
+                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
+                  >
+                    {showPassword.actual ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Nueva Contraseña
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword.nueva ? "text" : "password"}
+                    name="nuevaContrasena"
+                    value={formData.nuevaContrasena}
+                    onChange={handleInputChange}
+                    className={`w-full p-3 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'} pr-10`}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => togglePasswordVisibility('nueva')}
+                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
+                  >
+                    {showPassword.nueva ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Confirmar Contraseña
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword.confirmar ? "text" : "password"}
+                    name="confirmarContrasena"
+                    value={formData.confirmarContrasena}
+                    onChange={handleInputChange}
+                    className={`w-full p-3 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'} pr-10`}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => togglePasswordVisibility('confirmar')}
+                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
+                  >
+                    {showPassword.confirmar ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Requisitos de contraseña */}
+            <div className={`mt-8 p-4 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+              <h3 className={`text-sm font-medium mb-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                Requisitos de la contraseña:
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <p className={`flex items-center ${requisitosContrasena.longitud ? 'text-green-500' : 'text-red-500'}`}>
+                  <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.longitud ? 'opacity-100' : 'opacity-50'}`} />
+                  8 caracteres
+                </p>
+                <p className={`flex items-center ${requisitosContrasena.mayuscula ? 'text-green-500' : 'text-red-500'}`}>
+                  <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.mayuscula ? 'opacity-100' : 'opacity-50'}`} />
+                  Al menos una mayúscula
+                </p>
+                <p className={`flex items-center ${requisitosContrasena.minuscula ? 'text-green-500' : 'text-red-500'}`}>
+                  <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.minuscula ? 'opacity-100' : 'opacity-50'}`} />
+                  Al menos una minúscula
+                </p>
+                <p className={`flex items-center ${requisitosContrasena.numero ? 'text-green-500' : 'text-red-500'}`}>
+                  <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.numero ? 'opacity-100' : 'opacity-50'}`} />
+                  Al menos un número
+                </p>
+                <p className={`flex items-center ${requisitosContrasena.especial ? 'text-green-500' : 'text-red-500'}`}>
+                  <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.especial ? 'opacity-100' : 'opacity-50'}`} />
+                  Al menos un carácter especial (!@#$%^&*)
+                </p>
+              </div>
+            </div>
+
+            {/* Botones de acción */}
+            <div className="flex justify-end mt-8 space-x-4">
+              <button
+                type="button"
+                onClick={() => navigate("/VistaGuia/PerfilGuia")}
+                className="py-2 px-6 bg-gray-700 hover:bg-gray-600 text-white rounded-lg flex items-center gap-2"
+              >
+                <ArrowLeft className="w-5 h-5" />
+                Cancelar
+              </button>
+              
+              <button
+                type="submit"
+                disabled={submitting || !cambiosRealizados || !Object.values(requisitosContrasena).every(Boolean)}
+                className={`py-2 px-6 ${
+                  cambiosRealizados && Object.values(requisitosContrasena).every(Boolean)
+                    ? 'bg-blue-600 hover:bg-blue-700'
+                    : 'bg-gray-500'
+                } text-white rounded-lg flex items-center gap-2 ${
+                  (submitting || !cambiosRealizados || !Object.values(requisitosContrasena).every(Boolean))
+                    ? 'opacity-70 cursor-not-allowed'
+                    : ''
+                }`}
+              >
+                {submitting ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Guardando...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-5 h-5" />
+                    Cambiar Contraseña
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </DashboardLayoutGuia>
   );
 };
