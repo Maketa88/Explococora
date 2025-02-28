@@ -15,7 +15,9 @@ import {
   ChevronRight,
   Settings,
   Moon,
-  Sun
+  Sun,
+  Search,
+  User
 } from 'lucide-react';
 import axios from 'axios';
 import SelectorEstado from '../pages/VistaGuia/CambioEstado/SelectorEstado';
@@ -34,6 +36,10 @@ const DashboardLayoutGuia = ({ children }) => {
   const [guia, setGuia] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [showResults, setShowResults] = useState(false);
   
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -426,6 +432,90 @@ const DashboardLayoutGuia = ({ children }) => {
     );
   };
 
+  // Mapa de términos de búsqueda y sus rutas correspondientes
+  const searchMapping = [
+    { terms: ['dashboard', 'inicio', 'principal', 'panel'], path: '/VistaGuia', title: 'Dashboard' },
+    { terms: ['ruta', 'visualizar rutas', 'ver rutas'], path: '/VistaGuia/VisualizarRutas', title: 'Visualizar Rutas' },
+    { terms: ['asignadas', 'rutas asignadas', 'mis rutas'], path: '/VistaGuia/RutasAsignadas', title: 'Rutas Asignadas' },
+    { terms: ['cliente', 'clientes', 'usuarios'], path: '/VistaGuia/customers', title: 'Clientes' },
+    { terms: ['nuevo cliente', 'agregar cliente'], path: '/VistaGuia/new-customer', title: 'Nuevo Cliente' },
+    { terms: ['verificados', 'clientes verificados'], path: '/VistaGuia/verified-customers', title: 'Clientes Verificados' },
+    { terms: ['producto', 'productos'], path: '/VistaGuia/products', title: 'Productos' },
+    { terms: ['nuevo producto', 'agregar producto'], path: '/VistaGuia/new-product', title: 'Nuevo Producto' },
+    { terms: ['inventario', 'stock'], path: '/VistaGuia/inventory', title: 'Inventario' },
+    { terms: ['contraseña', 'cambiar contraseña', 'password'], path: '/VistaGuia/CambiarContraseña', title: 'Cambiar Contraseña' },
+    { terms: ['perfil', 'mi perfil', 'datos personales'], path: '/VistaGuia/PerfilGuia', title: 'Perfil Guía' },
+    { terms: ['actualizar', 'actualizar guia', 'editar perfil'], path: '/VistaGuia/ActualizarGuia', title: 'Actualizar Guía' }
+  ];
+
+  // Función para buscar coincidencias mientras el usuario escribe
+  const handleSearchChange = (e) => {
+    const term = e.target.value.toLowerCase();
+    setSearchTerm(term);
+    
+    if (term.length < 2) {
+      setShowResults(false);
+      return;
+    }
+    
+    // Filtrar resultados basados en el término de búsqueda
+    const results = searchMapping
+      .filter(item => {
+        return item.terms.some(t => t.includes(term)) || 
+               item.title.toLowerCase().includes(term);
+      })
+      .slice(0, 5); // Limitar a 5 resultados
+    
+    setSearchResults(results);
+    setShowResults(results.length > 0);
+  };
+
+  // Función para navegar al resultado seleccionado
+  const handleResultClick = (path) => {
+    navigate(path);
+    setSearchTerm('');
+    setShowResults(false);
+    setShowProfile(false); // Ocultar el perfil al navegar
+  };
+
+  // Función para manejar el envío del formulario
+  const handleSearch = (e) => {
+    e.preventDefault();
+    
+    if (searchTerm.length < 2) return;
+    
+    // Buscar la mejor coincidencia
+    for (const item of searchMapping) {
+      if (item.terms.some(t => t.includes(searchTerm.toLowerCase())) || 
+          item.title.toLowerCase().includes(searchTerm.toLowerCase())) {
+        navigate(item.path);
+        setSearchTerm('');
+        setShowResults(false);
+        setShowProfile(false); // Ocultar el perfil al navegar
+        return;
+      }
+    }
+    
+    // Si no hay coincidencias
+    alert('No se encontraron resultados para: ' + searchTerm);
+    setSearchTerm('');
+    setShowResults(false);
+  };
+
+  // Función para cerrar los resultados si se hace clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.search-container')) {
+        setShowResults(false);
+      }
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className={`flex h-screen overflow-hidden ${darkMode ? 'bg-[#0f172a]' : 'bg-white'}`}>
       {/* Sidebar */}
@@ -498,14 +588,65 @@ const DashboardLayoutGuia = ({ children }) => {
         {/* Top Navigation */}
         <div className={`${darkMode ? 'bg-[#0f172a]' : 'bg-white'} sticky top-0 z-10`}>
           <div className="flex items-center justify-between p-4">
-            <div className="flex-1 max-w-xl">
-              <input
-                type="search"
-                placeholder="Buscar..."
-                className={`w-full px-4 py-2 rounded-lg ${
-                  darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-900'
-                }`}
-              />
+            <div className="flex-1 max-w-xl relative search-container">
+              <form onSubmit={handleSearch} className="flex items-center">
+                <input
+                  type="text"
+                  placeholder="Buscar..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (searchResults.length > 0) setShowResults(true);
+                  }}
+                  className={`w-full px-4 py-2 rounded-lg ${
+                    darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-900'
+                  }`}
+                />
+                <button 
+                  type="submit"
+                  className={`p-2 rounded-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
+                >
+                  <Search className="w-5 h-5" />
+                </button>
+              </form>
+              
+              {/* Resultados de búsqueda */}
+              {showResults && (
+                <div 
+                  className={`absolute top-full left-0 w-full mt-1 rounded-lg shadow-lg z-50 ${
+                    darkMode ? 'bg-[#1e293b] text-white' : 'bg-white text-gray-900'
+                  }`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {searchResults.map((result, index) => (
+                    <div
+                      key={index}
+                      onClick={() => handleResultClick(result.path)}
+                      className={`p-3 cursor-pointer flex items-center gap-2 ${
+                        darkMode 
+                          ? 'hover:bg-gray-700 border-b border-gray-700' 
+                          : 'hover:bg-gray-100 border-b border-gray-200'
+                      } ${index === searchResults.length - 1 ? 'border-b-0 rounded-b-lg' : ''}`}
+                    >
+                      {/* Icono basado en el título */}
+                      {result.title === 'Dashboard' && <LayoutDashboard className="w-4 h-4" />}
+                      {result.title === 'Visualizar Rutas' && <BarChart2 className="w-4 h-4" />}
+                      {result.title === 'Rutas Asignadas' && <FileText className="w-4 h-4" />}
+                      {result.title === 'Clientes' && <Users className="w-4 h-4" />}
+                      {result.title === 'Nuevo Cliente' && <UserPlus className="w-4 h-4" />}
+                      {result.title === 'Clientes Verificados' && <UserCheck className="w-4 h-4" />}
+                      {result.title === 'Productos' && <Package className="w-4 h-4" />}
+                      {result.title === 'Nuevo Producto' && <PackagePlus className="w-4 h-4" />}
+                      {result.title === 'Inventario' && <PackageSearch className="w-4 h-4" />}
+                      {result.title === 'Cambiar Contraseña' && <Settings className="w-4 h-4" />}
+                      {result.title === 'Perfil Guía' && <User className="w-4 h-4" />}
+                      {result.title === 'Actualizar Guía' && <UserPlus className="w-4 h-4" />}
+                      <span>{result.title}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-4">
               {localStorage.getItem('cedula') && (
