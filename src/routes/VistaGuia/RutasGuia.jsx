@@ -14,7 +14,7 @@ import PerfilGuia from '../../pages/VistaGuia/PerfilGuia/PerfilGuia';
 import CambioEstado from '../../pages/VistaGuia/CambioEstado/CambioEstado';
 import CambiarContraseña from '../../pages/VistaGuia/PerfilGuia/cambiarContra';
 import ActualizarGuia from '../../pages/VistaGuia/PerfilGuia/ActualizarGuia';
-
+import EliminarCuentaGuia from '../../pages/VistaGuia/PerfilGuia/EliminarCuentaGuia';
 const  RutasGuia = () => {
   return (
     <Routes>
@@ -32,6 +32,7 @@ const  RutasGuia = () => {
       <Route path="/CambiarContraseña" element={<CambiarContraseña />} />
       <Route path="/PerfilGuia" element={<PerfilGuia />} />
       <Route path="/ActualizarGuia" element={<ActualizarGuia />} />
+      <Route path="/EliminarCuentaGuia" element={<EliminarCuentaGuia />} />
     </Routes>
   );
 };

@@ -15,7 +15,13 @@ import {
   ChevronRight,
   Settings,
   Moon,
-  Sun
+  Sun,
+  Search,
+  User,
+  Edit,
+  Key,
+  LogOut,
+  Trash2
 } from 'lucide-react';
 import axios from 'axios';
 import SelectorEstado from '../pages/VistaGuia/CambioEstado/SelectorEstado';
@@ -34,6 +40,12 @@ const DashboardLayoutGuia = ({ children }) => {
   const [guia, setGuia] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+  
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -204,17 +216,20 @@ const DashboardLayoutGuia = ({ children }) => {
       icon: <Users className="w-5 h-5" />,
       path: "/VistaGuia/ActualizarGuia",
       section: "ActualizarGuia"
+    },
+    {
+      title: "EliminarCuentaGuia",
+      icon: <Trash2 className="w-5 h-5" />,
+      path: "/VistaGuia/EliminarCuentaGuia",
+      section: "EliminarCuenta"
     }
-
-    
-
   ];
   
   const sections = ["Dashboard", "Customers", "Products"];
 
   const toggleMenu = (e) => {
     e.stopPropagation();
-    setIsOpen(!isOpen);
+    setProfileMenuOpen(!profileMenuOpen);
   };
 
   // Modificar la función handleOptionClick para cambiar estado al cerrar sesión
@@ -273,7 +288,7 @@ const DashboardLayoutGuia = ({ children }) => {
       // Otra lógica si es necesaria
       setShowProfile(false);
     }
-    setIsOpen(false);
+    setProfileMenuOpen(false);
   };
 
   const handleMenuItemClick = (path) => {
@@ -290,9 +305,9 @@ const DashboardLayoutGuia = ({ children }) => {
         loadGuiaData();
       }
     },
-    { label: "Actualizar perfil", path: "/VistaCliente/ActualizarPerfil" },
+    { label: "Actualizar perfil", path: "/VistaGuia/ActualizarGuia" },
     { label: "Cambiar contraseña", path: "/VistaGuia/CambiarContraseña" },
-    { label: "Eliminar cuenta", path: "/VistaCliente/EliminarCuenta" },
+    { label: "Eliminar cuenta", path: "/VistaGuia/EliminarCuentaGuia" },
     { label: "Cerrar sesión", path: "/" },
   ];
 
@@ -426,6 +441,90 @@ const DashboardLayoutGuia = ({ children }) => {
     );
   };
 
+  // Mapa de términos de búsqueda y sus rutas correspondientes
+  const searchMapping = [
+    { terms: ['dashboard', 'inicio', 'principal', 'panel'], path: '/VistaGuia', title: 'Dashboard' },
+    { terms: ['ruta', 'visualizar rutas', 'ver rutas'], path: '/VistaGuia/VisualizarRutas', title: 'Visualizar Rutas' },
+    { terms: ['asignadas', 'rutas asignadas', 'mis rutas'], path: '/VistaGuia/RutasAsignadas', title: 'Rutas Asignadas' },
+    { terms: ['cliente', 'clientes', 'usuarios'], path: '/VistaGuia/customers', title: 'Clientes' },
+    { terms: ['nuevo cliente', 'agregar cliente'], path: '/VistaGuia/new-customer', title: 'Nuevo Cliente' },
+    { terms: ['verificados', 'clientes verificados'], path: '/VistaGuia/verified-customers', title: 'Clientes Verificados' },
+    { terms: ['producto', 'productos'], path: '/VistaGuia/products', title: 'Productos' },
+    { terms: ['nuevo producto', 'agregar producto'], path: '/VistaGuia/new-product', title: 'Nuevo Producto' },
+    { terms: ['inventario', 'stock'], path: '/VistaGuia/inventory', title: 'Inventario' },
+    { terms: ['contraseña', 'cambiar contraseña', 'password'], path: '/VistaGuia/CambiarContraseña', title: 'Cambiar Contraseña' },
+    { terms: ['perfil', 'mi perfil', 'datos personales'], path: '/VistaGuia/PerfilGuia', title: 'Perfil Guía' },
+    { terms: ['actualizar', 'actualizar guia', 'editar perfil'], path: '/VistaGuia/ActualizarGuia', title: 'Actualizar Guía' }
+  ];
+
+  // Función para buscar coincidencias mientras el usuario escribe
+  const handleSearchChange = (e) => {
+    const term = e.target.value.toLowerCase();
+    setSearchTerm(term);
+    
+    if (term.length < 2) {
+      setShowResults(false);
+      return;
+    }
+    
+    // Filtrar resultados basados en el término de búsqueda
+    const results = searchMapping
+      .filter(item => {
+        return item.terms.some(t => t.includes(term)) || 
+               item.title.toLowerCase().includes(term);
+      })
+      .slice(0, 5); // Limitar a 5 resultados
+    
+    setSearchResults(results);
+    setShowResults(results.length > 0);
+  };
+
+  // Función para navegar al resultado seleccionado
+  const handleResultClick = (path) => {
+    navigate(path);
+    setSearchTerm('');
+    setShowResults(false);
+    setShowProfile(false); // Ocultar el perfil al navegar
+  };
+
+  // Función para manejar el envío del formulario
+  const handleSearch = (e) => {
+    e.preventDefault();
+    
+    if (searchTerm.length < 2) return;
+    
+    // Buscar la mejor coincidencia
+    for (const item of searchMapping) {
+      if (item.terms.some(t => t.includes(searchTerm.toLowerCase())) || 
+          item.title.toLowerCase().includes(searchTerm.toLowerCase())) {
+        navigate(item.path);
+        setSearchTerm('');
+        setShowResults(false);
+        setShowProfile(false); // Ocultar el perfil al navegar
+        return;
+      }
+    }
+    
+    // Si no hay coincidencias
+    alert('No se encontraron resultados para: ' + searchTerm);
+    setSearchTerm('');
+    setShowResults(false);
+  };
+
+  // Función para cerrar los resultados si se hace clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.search-container')) {
+        setShowResults(false);
+      }
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className={`flex h-screen overflow-hidden ${darkMode ? 'bg-[#0f172a]' : 'bg-white'}`}>
       {/* Sidebar */}
@@ -498,14 +597,65 @@ const DashboardLayoutGuia = ({ children }) => {
         {/* Top Navigation */}
         <div className={`${darkMode ? 'bg-[#0f172a]' : 'bg-white'} sticky top-0 z-10`}>
           <div className="flex items-center justify-between p-4">
-            <div className="flex-1 max-w-xl">
-              <input
-                type="search"
-                placeholder="Buscar..."
-                className={`w-full px-4 py-2 rounded-lg ${
-                  darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-900'
-                }`}
-              />
+            <div className="flex-1 max-w-xl relative search-container">
+              <form onSubmit={handleSearch} className="flex items-center">
+                <input
+                  type="text"
+                  placeholder="Buscar..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (searchResults.length > 0) setShowResults(true);
+                  }}
+                  className={`w-full px-4 py-2 rounded-lg ${
+                    darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-900'
+                  }`}
+                />
+                <button 
+                  type="submit"
+                  className={`p-2 rounded-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
+                >
+                  <Search className="w-5 h-5" />
+                </button>
+              </form>
+              
+              {/* Resultados de búsqueda */}
+              {showResults && (
+                <div 
+                  className={`absolute top-full left-0 w-full mt-1 rounded-lg shadow-lg z-50 ${
+                    darkMode ? 'bg-[#1e293b] text-white' : 'bg-white text-gray-900'
+                  }`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {searchResults.map((result, index) => (
+                    <div
+                      key={index}
+                      onClick={() => handleResultClick(result.path)}
+                      className={`p-3 cursor-pointer flex items-center gap-2 ${
+                        darkMode 
+                          ? 'hover:bg-gray-700 border-b border-gray-700' 
+                          : 'hover:bg-gray-100 border-b border-gray-200'
+                      } ${index === searchResults.length - 1 ? 'border-b-0 rounded-b-lg' : ''}`}
+                    >
+                      {/* Icono basado en el título */}
+                      {result.title === 'Dashboard' && <LayoutDashboard className="w-4 h-4" />}
+                      {result.title === 'Visualizar Rutas' && <BarChart2 className="w-4 h-4" />}
+                      {result.title === 'Rutas Asignadas' && <FileText className="w-4 h-4" />}
+                      {result.title === 'Clientes' && <Users className="w-4 h-4" />}
+                      {result.title === 'Nuevo Cliente' && <UserPlus className="w-4 h-4" />}
+                      {result.title === 'Clientes Verificados' && <UserCheck className="w-4 h-4" />}
+                      {result.title === 'Productos' && <Package className="w-4 h-4" />}
+                      {result.title === 'Nuevo Producto' && <PackagePlus className="w-4 h-4" />}
+                      {result.title === 'Inventario' && <PackageSearch className="w-4 h-4" />}
+                      {result.title === 'Cambiar Contraseña' && <Settings className="w-4 h-4" />}
+                      {result.title === 'Perfil Guía' && <User className="w-4 h-4" />}
+                      {result.title === 'Actualizar Guía' && <UserPlus className="w-4 h-4" />}
+                      <span>{result.title}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-4">
               {localStorage.getItem('cedula') && (
@@ -540,36 +690,48 @@ const DashboardLayoutGuia = ({ children }) => {
                   />
                 </div>
                 
-                {/* Menú desplegable reposicionado */}
-                {isOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-teal-700 border-2 border-gray-900 rounded-xl shadow-xl py-2 z-50 transform transition-all duration-300 ease-in-out">
-                    {menuOptions.map((option, index) => (
-                      <div
-                        key={index}
-                        onClick={() => handleOptionClick(option.path, option.action)}
-                        role="menuitem"
-                        tabIndex={0}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            handleOptionClick(option.path, option.action);
-                          }
-                        }}
-                        className={`group px-4 py-3 text-white ${
-                          index === menuOptions.length - 1
-                            ? "mt-1 text-red-400 hover:text-white hover:bg-red-600 active:bg-red-700 font-bold"
-                            : "hover:bg-teal-600 active:bg-teal-500"
-                        } flex items-center cursor-pointer transition-all duration-200 text-sm md:text-base relative overflow-hidden`}
-                      >
-                        <span className="relative z-10">{option.label}</span>
-                        <span 
-                          className={`absolute bottom-0 left-0 w-0 h-0.5 ${
-                            index === menuOptions.length - 1
-                              ? "bg-red-400"
-                              : "bg-teal-400"
-                          } group-hover:w-full transition-all duration-300 ease-out`}
-                        ></span>
-                      </div>
-                    ))}
+                {/* Menú desplegable actualizado al estilo del operador */}
+                {profileMenuOpen && (
+                  <div 
+                    className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 
+                    ${darkMode ? 'bg-gray-800' : 'bg-white'} 
+                    ring-1 ring-black ring-opacity-5 z-50`}
+                  >
+                    <div 
+                      onClick={() => handleOptionClick("/VistaGuia/PerfilGuia")}
+                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} flex items-center gap-2 cursor-pointer`}
+                    >
+                      <User className="w-4 h-4" />
+                      Ver Perfil
+                    </div>
+                    <div 
+                      onClick={() => handleOptionClick("/VistaGuia/ActualizarGuia")}
+                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} flex items-center gap-2 cursor-pointer`}
+                    >
+                      <Edit className="w-4 h-4" />
+                      Actualizar Información
+                    </div>
+                    <div 
+                      onClick={() => handleOptionClick("/VistaGuia/CambiarContraseña")}
+                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} flex items-center gap-2 cursor-pointer`}
+                    >
+                      <Key className="w-4 h-4" />
+                      Cambiar Contraseña
+                    </div>
+                    <div 
+                      onClick={() => handleOptionClick("/VistaGuia/EliminarCuentaGuia")}
+                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} flex items-center gap-2 cursor-pointer`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Eliminar Cuenta
+                    </div>
+                    <div 
+                      onClick={() => handleOptionClick("/")}
+                      className={`block w-full text-left px-4 py-2 text-sm ${darkMode ? 'text-red-400 hover:bg-gray-700' : 'text-red-600 hover:bg-gray-100'} flex items-center gap-2 cursor-pointer`}
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Cerrar Sesión
+                    </div>
                   </div>
                 )}
               </div>
