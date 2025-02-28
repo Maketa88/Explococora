@@ -1,17 +1,18 @@
-// src/components/Seccion/Indicadores.jsx
 import React from "react";
 import PropTypes from "prop-types";
 
-export const Indicadores = ({ images, currentImage }) => {
+export const Indicadores = ({ images, currentImage, goToImage }) => {
   return (
     <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
       {images.map((_, index) => (
-        <span
+        <button
           key={index}
-          className={`block w-3 h-3 rounded-full ${
-            index === currentImage ? "bg-gray-950" : "bg-white bg-opacity-50"
+          onClick={() => goToImage(index)}
+          className={`block w-3 h-3 rounded-full transition-all duration-300 ${
+            index === currentImage ? "bg-gray-950" : "bg-white bg-opacity-50 hover:bg-opacity-70"
           }`}
-        ></span>
+          aria-label={`Ir a imagen ${index + 1}`}
+        ></button>
       ))}
     </div>
   );
@@ -20,4 +21,5 @@ export const Indicadores = ({ images, currentImage }) => {
 Indicadores.propTypes = {
   images: PropTypes.array.isRequired,
   currentImage: PropTypes.number.isRequired,
+  goToImage: PropTypes.func.isRequired,
 };
