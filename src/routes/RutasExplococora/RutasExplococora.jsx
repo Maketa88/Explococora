@@ -1,4 +1,3 @@
-import React from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { PaginaInicio } from "../../pages/PaginaInicio/PaginaInicio";
 import { HistoriaCultura } from "../../components/HistoriaCultura/Body/HistoriaCultura";

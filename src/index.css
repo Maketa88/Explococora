@@ -22,3 +22,29 @@ input[type="password"]::-moz-password {
     clip-path: polygon(0 40%, 100% 0, 100% 100%, 0 60%);
   }
 }
+
+/* Animaciones personalizadas */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.1);
+    filter: brightness(1.2) drop-shadow(0 0 5px rgba(255, 215, 0, 0.7));
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+/* Animación de brillo para las estrellas */
+@keyframes starTwinkle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
