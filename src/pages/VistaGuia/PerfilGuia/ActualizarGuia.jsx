@@ -145,13 +145,46 @@ const ActualizarDatosGuia = () => {
     }
 
     try {
+      let fotoActualizada = false;
+      
       // Si hay una foto nueva, procesarla primero
       if (foto) {
-        // Aquí normalmente subirías la foto a un servidor
-        // Por ahora, guardamos la vista previa en localStorage
-        localStorage.setItem("foto_perfil", previewFoto);
+        try {
+          // Crear un FormData para enviar la foto
+          const formDataFoto = new FormData();
+          formDataFoto.append('foto', foto);
+          
+          // Llamar al endpoint para subir la foto
+          const fotoResponse = await axios.post(
+            `http://localhost:10101/guia/subir-Foto`,
+            formDataFoto,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data'
+              },
+            }
+          );
+          
+          // Si la foto se subió correctamente, guardar también en localStorage para vista previa
+          if (fotoResponse.data && fotoResponse.data.path) {
+            localStorage.setItem("foto_perfil", previewFoto);
+            fotoActualizada = true;
+            console.log("Foto actualizada exitosamente:", fotoResponse.data);
+          }
+        } catch (fotoError) {
+          console.error("Error al subir la foto:", fotoError);
+          // Mostrar error específico de la foto pero continuar con la actualización de los demás datos
+          Swal.fire({
+            icon: "warning",
+            title: "Advertencia",
+            text: `No se pudo actualizar la foto: ${fotoError.response?.data?.message || fotoError.message}. Se continuará con la actualización de los demás datos.`,
+            confirmButtonColor: "#3085d6"
+          });
+        }
       }
       
+      // Continuar con la actualización de los demás datos
       const response = await axios.patch(
         `http://localhost:10101/guia/actualizar/${cedula}`,
         {
@@ -181,10 +214,18 @@ const ActualizarDatosGuia = () => {
           foto_perfil: previewFoto
         });
 
+        // Mensaje personalizado según si se actualizó la foto o no
+        let mensajeExito = "Tu información ha sido actualizada correctamente.";
+        if (foto && !fotoActualizada) {
+          mensajeExito += " Sin embargo, hubo un problema al actualizar la foto.";
+        } else if (foto && fotoActualizada) {
+          mensajeExito += " La foto de perfil también se actualizó correctamente.";
+        }
+
         Swal.fire({
           icon: "success",
           title: "¡Datos actualizados!",
-          text: "Tu información ha sido actualizada correctamente.",
+          text: mensajeExito,
           confirmButtonColor: "#3085d6"
         });
 
