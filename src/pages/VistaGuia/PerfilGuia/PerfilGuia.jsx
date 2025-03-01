@@ -21,12 +21,6 @@ const PerfilGuia = () => {
     const cedula = localStorage.getItem("cedula");
     const token = localStorage.getItem("token");
 
-    // Recuperar la foto del localStorage si existe
-    const storedFoto = localStorage.getItem("foto_perfil");
-    if (storedFoto) {
-      setPreviewFoto(storedFoto);
-    }
-
     if (!cedula) {
       setError("No se encontró la cédula del guia.");
       setLoading(false);
@@ -48,6 +42,42 @@ const PerfilGuia = () => {
         console.log("Datos del guia recibidos:", response.data);
         // Guardar los datos del guía
         setGuia(response.data);
+        
+        // Verificar si hay una foto en la respuesta del servidor
+        const guiaData = Array.isArray(response.data) ? response.data[0] : response.data;
+        
+        if (guiaData.foto_perfil) {
+          console.log("Foto perfil encontrada:", guiaData.foto_perfil);
+          
+          // Si la foto comienza con http, es una URL completa
+          if (guiaData.foto_perfil.startsWith('http')) {
+            setPreviewFoto(guiaData.foto_perfil);
+            localStorage.setItem("foto_perfil", guiaData.foto_perfil);
+          } 
+          // Si la foto no comienza con http, construir la URL completa
+          else {
+            // Verificar si la ruta ya incluye /uploads/images
+            let fotoUrl;
+            if (guiaData.foto_perfil.includes('/uploads/images/')) {
+              fotoUrl = `http://localhost:10101${guiaData.foto_perfil}`;
+            } else {
+              fotoUrl = `http://localhost:10101/uploads/images/${guiaData.foto_perfil}`;
+            }
+            
+            console.log("URL de foto construida:", fotoUrl);
+            setPreviewFoto(fotoUrl);
+            localStorage.setItem("foto_perfil", fotoUrl);
+          }
+        } 
+        // Si no hay foto en la respuesta, intentar recuperarla del localStorage
+        else {
+          const storedFoto = localStorage.getItem("foto_perfil");
+          if (storedFoto) {
+            console.log("Usando foto desde localStorage");
+            setPreviewFoto(storedFoto);
+          }
+        }
+        
         setLoading(false);
       })
       .catch((error) => {
@@ -130,6 +160,11 @@ const PerfilGuia = () => {
                   src={previewFoto}
                   alt="Foto de perfil"
                   className="h-full w-full object-cover"
+                  onError={(e) => {
+                    console.error("Error al cargar la imagen:", e);
+                    e.target.onerror = null;
+                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto)}&size=200&background=0D8ABC&color=fff`;
+                  }}
                 />
               ) : (
                 <img
