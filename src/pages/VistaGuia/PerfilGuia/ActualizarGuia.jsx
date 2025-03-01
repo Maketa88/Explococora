@@ -22,7 +22,8 @@ const ActualizarDatosGuia = () => {
     segundoApellido: "",
     email: "",
     telefono: "",
-    especialidad: ""
+    especialidad: "",
+    descripcion: ""
   });
 
   // Función para separar nombre completo
@@ -83,7 +84,8 @@ const ActualizarDatosGuia = () => {
           segundoApellido: segundoApellido || "",
           email: guiaData.email || "",
           telefono: guiaData.telefono || "",
-          especialidad: guiaData.especialidad || ""
+          especialidad: guiaData.especialidad || "",
+          descripcion: guiaData.descripcion || ""
         });
       }
     } catch (error) {
@@ -193,8 +195,9 @@ const ActualizarDatosGuia = () => {
           primerApellido: formData.primerApellido,
           segundoApellido: formData.segundoApellido,
           email: formData.email,
-          numeroCelular: formData.telefono, // Mapear telefono a numeroCelular para el backend
-          especialidad: formData.especialidad
+          numeroCelular: formData.telefono,
+          especialidad: formData.especialidad,
+          descripcion: formData.descripcion
         },
         {
           headers: {
@@ -211,6 +214,7 @@ const ActualizarDatosGuia = () => {
           email: formData.email,
           telefono: formData.telefono,
           especialidad: formData.especialidad,
+          descripcion: formData.descripcion,
           foto_perfil: previewFoto
         });
 
@@ -424,6 +428,20 @@ const ActualizarDatosGuia = () => {
                 onChange={handleChange}
                 className={`w-full px-4 py-2 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
               />
+            </div>
+            
+            <div className="md:col-span-2">
+              <label className={`block mb-2 text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                Descripción
+              </label>
+              <textarea
+                name="descripcion"
+                value={formData.descripcion}
+                onChange={handleChange}
+                rows="4"
+                className={`w-full px-4 py-2 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                placeholder="Escribe una breve descripción sobre ti, tu experiencia y habilidades como guía..."
+              ></textarea>
             </div>
           </div>
           
