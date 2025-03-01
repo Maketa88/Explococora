@@ -47,31 +47,50 @@ const ActualizarDatosGuia = () => {
   const cargarDatosGuia = useCallback(async () => {
     const cedula = localStorage.getItem("cedula");
     const token = localStorage.getItem("token");
-
+  
     if (!cedula || !token) {
       setError("No se encontraron credenciales necesarias.");
       setLoading(false);
       return;
     }
-
+  
     try {
       const response = await axios.get(`http://localhost:10101/guia/${cedula}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
+  
       if (response.data) {
         const guiaData = Array.isArray(response.data) ? response.data[0] : response.data;
-        // Recuperar la foto del localStorage si existe
-        const storedFoto = localStorage.getItem("foto_perfil");
-        if (storedFoto) {
-          guiaData.foto_perfil = storedFoto;
-          setPreviewFoto(storedFoto);
+        
+        // Verificar si hay una foto en la respuesta del servidor
+        if (guiaData.foto_perfil) {
+          // Si la foto comienza con http, es una URL completa
+          if (guiaData.foto_perfil.startsWith('http')) {
+            setPreviewFoto(guiaData.foto_perfil);
+          } 
+          // Si la foto no comienza con http, construir la URL completa
+          else {
+            // Verificar si la ruta ya incluye /uploads/images
+            if (guiaData.foto_perfil.includes('/uploads/images/')) {
+              setPreviewFoto(`http://localhost:10101${guiaData.foto_perfil}`);
+            } else {
+              setPreviewFoto(`http://localhost:10101/uploads/images/${guiaData.foto_perfil}`);
+            }
+          }
+        } 
+        // Si no hay foto en la respuesta, intentar recuperarla del localStorage
+        else {
+          const storedFoto = localStorage.getItem("foto_perfil");
+          if (storedFoto) {
+            setPreviewFoto(storedFoto);
+          }
         }
+        
         setGuia(guiaData);
         localStorage.setItem("guia", JSON.stringify(guiaData));
-
+  
         // Separar el nombre completo
         const nombreDelGuia = guiaData.nombre || guiaData.nombre_completo || guiaData.nombre_del_guia;
         const { primerNombre, segundoNombre, primerApellido, segundoApellido } = separarNombre(nombreDelGuia);
