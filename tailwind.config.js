@@ -5,10 +5,11 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    fontFamily: {
+      sans: ['Nunito', 'sans-serif'],
+      nunito: ["Nunito", "sans-serif"],
+    },
     extend: {
-      fontFamily: {
-        nunito: ["Nunito", "sans-serif"],
-      },
       colors: {
         primary: "#4361ee",
         secondary: "#4f46e5",

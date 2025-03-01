@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Aplicar Nunito a todo el documento */
+@layer base {
+  html, body, #root {
+    font-family: 'Nunito', sans-serif;
+  }
+  
+  * {
+    font-family: 'Nunito', sans-serif;
+  }
+}
+
 /* Para eliminar el icono de ojo en Edge y Chrome */
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {

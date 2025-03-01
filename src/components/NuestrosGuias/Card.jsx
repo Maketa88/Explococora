@@ -1,50 +1,19 @@
 import PropTypes from 'prop-types';
 
 const CardGuia = ({ guia }) => {
-  // Datos de ejemplo para cuando no se proporciona un guía
-  const guiaEjemplo = {
-    primerNombre: 'Juan',
-    segundoNombre: 'Carlos',
-    primerApellido: 'Rodríguez',
-    cedula: '1234567890',
-    email: 'ejemplo@vallecocora.com',
-    estado: 'disponible',
-    foto: '/default-avatar.png'
-  };
-
-  // Usar los datos proporcionados o los de ejemplo
-  const guiaData = guia || guiaEjemplo;
-
-  // Determinar el color del estado
-  const estadoColor = (() => {
-    const estadoLowerCase = guiaData.estado?.toLowerCase() || '';
-    
-    // Lógica actualizada para manejar los tres estados
-    if (estadoLowerCase === 'disponible') {
-      return 'bg-green-500 text-white';
-    } else if (estadoLowerCase === 'ocupado') {
-      return 'bg-orange-500 text-white';
-    } else if (estadoLowerCase === 'inactivo') {
-      return 'bg-red-500 text-white';
-    } else {
-      // Para cualquier otro estado desconocido
-      return 'bg-yellow-500 text-white';
-    }
-  })();
-
   // Obtener nombres y apellidos de forma más eficiente
   const { nombres, apellidos } = (() => {
     // Si tenemos los campos separados, usarlos
-    if (guiaData.primerNombre || guiaData.segundoNombre || guiaData.primerApellido) {
+    if (guia.primerNombre || guia.segundoNombre || guia.primerApellido) {
       return {
-        nombres: `${guiaData.primerNombre || ''} ${guiaData.segundoNombre || ''}`.trim(),
-        apellidos: guiaData.primerApellido || ''
+        nombres: `${guia.primerNombre || ''} ${guia.segundoNombre || ''}`.trim(),
+        apellidos: guia.primerApellido || ''
       };
     }
     
     // Si tenemos el nombre completo, dividirlo
-    if (guiaData.nombreCompleto) {
-      const partes = guiaData.nombreCompleto.split(' ');
+    if (guia.nombreCompleto) {
+      const partes = guia.nombreCompleto.split(' ');
       
       // Si hay al menos 3 partes, asumimos que las dos primeras son nombres
       if (partes.length >= 3) {
@@ -81,7 +50,7 @@ const CardGuia = ({ guia }) => {
       {/* Imagen de fondo con efecto parallax */}
       <div className="absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-110">
         <img 
-          src={guiaData.foto || '/default-avatar.png'} 
+          src={guia.foto || '/default-avatar.png'} 
           alt={`Foto de ${nombres}`} 
           className="w-full h-full object-cover"
         />
@@ -135,11 +104,11 @@ const CardGuia = ({ guia }) => {
               </div>
               <div className="flex flex-col">
                 <span className="text-xs font-semibold text-black">Cédula:</span>
-                <span className="text-gray-700">{guiaData.cedula || 'No disponible'}</span>
+                <span className="text-gray-700">{guia.cedula || 'No disponible'}</span>
               </div>
             </div>
             
-            {guiaData.email && (
+            {guia.email && (
               <div className="flex items-start sm:items-center text-sm flex-wrap">
                 {/* Icono para el email */}
                 <div className="flex items-center justify-center w-7 h-7 rounded-full bg-green-500 mr-3 shadow-md shrink-0">
@@ -149,7 +118,7 @@ const CardGuia = ({ guia }) => {
                 </div>
                 <div className="flex flex-col max-w-[calc(100%-40px)]">
                   <span className="text-xs font-semibold text-black">Email:</span>
-                  <span className="truncate text-gray-700">{guiaData.email}</span>
+                  <span className="truncate text-gray-700">{guia.email}</span>
                 </div>
               </div>
             )}
@@ -178,9 +147,6 @@ const CardGuia = ({ guia }) => {
               </div>
             </div>
           </div>
-          
-          {/* Etiqueta de estado - Ahora debajo de las estrellas y centrada */}
-          
         </div>
       </div>
     </div>
@@ -197,9 +163,8 @@ CardGuia.propTypes = {
     foto: PropTypes.string,
     tipo: PropTypes.string,
     email: PropTypes.string,
-    estado: PropTypes.string,
     nombreCompleto: PropTypes.string
-  })
+  }).isRequired
 };
 
 export { CardGuia };
