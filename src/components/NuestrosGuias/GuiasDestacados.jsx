@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { CardGuia } from "./Card";
 
 // URL del backend (mejor moverla a un archivo de configuración)
@@ -48,6 +49,7 @@ const GuiasDestacados = () => {
   const [guias, setGuias] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { t } = useTranslation();
 
   // Función para cargar los guías desde el backend
   const cargarGuias = async () => {
@@ -82,7 +84,7 @@ const GuiasDestacados = () => {
   }, []);
 
   return (
-    <div className="p-8">
+    <div className="p-16">
       <div className="relative py-12 px-4 overflow-hidden">
         {/* Fondo decorativo inspirado en el Valle del Cocora */}
         <div className="absolute inset-0 -z-10 overflow-hidden border-2 border-teal-500 rounded-2xl">
@@ -122,8 +124,16 @@ const GuiasDestacados = () => {
             </svg>
           </div>
         </div>
+        <div className="flex justify-center mb-8">
+            <div className="text-center">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 text-emerald-900 relative">
+                {t("tituloGuias")}
+                <span className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-emerald-500 rounded-full"></span>
+              </h1>
+            </div>
+        </div>
 
-        <div className="max-w-7xl mx-auto relative">
+        <div className="max-w-7xl mx-auto relative flex flex-col items-center">
           {loading && (
             <div className="flex justify-center items-center py-16">
               <div className="relative">
@@ -187,22 +197,19 @@ const GuiasDestacados = () => {
           )}
 
           {!loading && !error && guias.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center w-full">
               {/* Mostrar todos los guías */}
               {guias.map((guia) => (
                 <CardGuia key={guia.id || guia.cedula} guia={guia} />
               ))}
             </div>
           )}
-
-          <div className="text-center mt-10">
-            <a
-              href="/VistaCliente/NuestrosGuias"
-              className="inline-block px-5 py-2 bg-teal-600 text-white font-bold font-nunito text-lg rounded-lg hover:bg-teal-800 transition-colors duration-300 shadow-md"
-            >
-              Ver todos nuestros guías
-            </a>
-          </div>
+          
+          {!loading && !error && guias.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-lg text-emerald-700">No hay guías disponibles en este momento.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -210,3 +217,4 @@ const GuiasDestacados = () => {
 };
 
 export { GuiasDestacados };
+
