@@ -81,8 +81,51 @@ const GuiasDestacados = () => {
   }, []);
 
   return (
-    <div className="py-12 px-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="p-10">
+    <div className="relative py-12 px-4 overflow-hidden">
+      {/* Fondo decorativo inspirado en el Valle del Cocora */}
+      <div className="absolute inset-0 -z-10 overflow-hidden border-2 border-teal-500 rounded-2xl">
+
+        <div className="absolute inset-0 bg-gradient-to-b from-emerald-50 to-white"></div>
+
+        {/* Siluetas de palmeras de cera */}
+        <div className="absolute top-0 left-0 w-full h-full opacity-10">
+          <svg
+            viewBox="0 0 1200 600"
+            className="w-full h-full"
+            preserveAspectRatio="xMidYMid slice"
+          >
+            <path
+              d="M100,600 C100,400 150,300 200,100 C220,300 240,400 260,600"
+              fill="none"
+              stroke="#047857"
+              strokeWidth="8"
+            />
+            <path
+              d="M400,600 C400,350 450,250 500,50 C520,250 540,350 560,600"
+              fill="none"
+              stroke="#047857"
+              strokeWidth="8"
+            />
+            <path
+              d="M700,600 C700,400 750,300 800,100 C820,300 840,400 860,600"
+              fill="none"
+              stroke="#047857"
+              strokeWidth="8"
+            />
+            <path
+              d="M1000,600 C1000,350 1050,250 1100,50 C1120,250 1140,350 1160,600"
+              fill="none"
+              stroke="#047857"
+              strokeWidth="8"
+            />
+          </svg>
+        </div>
+      </div>
+      
+      <div className="max-w-7xl mx-auto relative">
+        
+        
         <h2 className="text-3xl font-bold text-emerald-800 mb-2 text-center">Conoce a nuestros guías</h2>
         <p className="text-gray-600 text-center mb-10 max-w-2xl mx-auto">Nuestros guías expertos te acompañarán en tu aventura por el Valle del Cocora, brindándote una experiencia inolvidable.</p>
         
@@ -131,11 +174,12 @@ const GuiasDestacados = () => {
         )}
         
         <div className="text-center mt-10">
-          <a href="/NuestrosGuias" className="inline-block px-6 py-3 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors duration-300 shadow-md">
+          <a href="/NuestrosGuias" className="inline-block px-5 py-2 bg-teal-600 text-white font-bold font-nunito text-lg rounded-lg hover:bg-teal-800 transition-colors duration-300 shadow-md">
             Ver todos nuestros guías
           </a>
         </div>
       </div>
+    </div>
     </div>
   );
 };

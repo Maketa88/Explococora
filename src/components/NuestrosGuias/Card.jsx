@@ -180,11 +180,7 @@ const CardGuia = ({ guia }) => {
           </div>
           
           {/* Etiqueta de estado - Ahora debajo de las estrellas y centrada */}
-          <div className="flex justify-center mt-3">
-            <span className={`px-4 py-1 rounded-full text-sm font-bold ${estadoColor} shadow-lg`}>
-              {guiaData.estado}
-            </span>
-          </div>
+          
         </div>
       </div>
     </div>
