@@ -1,5 +1,4 @@
 // src/components/Seccion/BotonNav.jsx
-import React from "react";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import PropTypes from "prop-types";
 

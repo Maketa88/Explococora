@@ -3,8 +3,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CardGuia } from "./Card";
 
-
-
 // URL del backend (mejor moverla a un archivo de configuración)
 const API_URL = "http://localhost:10101";
 
@@ -38,10 +36,6 @@ const mapearCamposGuia = (datosGuia) => {
     primerApellido: datosGuia.primer_apellido || primerApellido,
     email: datosGuia.email || "",
     foto: datosGuia.foto || "",
-    // Normalizar el estado para que siempre sea en minúscula y coincida con los filtros
-    estado: (datosGuia.estado || "").toLowerCase(),
-    // Manejar correctamente el tipo
-    tipo: datosGuia.tipo || "",
     nombreCompleto: datosGuia.nombre_del_guia || "",
   };
 };
@@ -53,8 +47,6 @@ const NuestrosGuias = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [busqueda, setBusqueda] = useState("");
-  // Nuevo estado para el filtro por tipo de guía
-  const [filtroTipo, setFiltroTipo] = useState("todos");
 
   // Función para cargar los guías desde el backend
   const cargarGuias = useCallback(async () => {
@@ -89,11 +81,11 @@ const NuestrosGuias = () => {
     cargarGuias();
   }, [cargarGuias]);
 
-  // Aplicar todos los filtros cuando cambie cualquier criterio de filtrado
+  // Aplicar filtro de búsqueda cuando cambie
   useEffect(() => {
     // Comenzamos con todos los guías
     let resultado = [...guias];
-    
+
     // Aplicar filtro de búsqueda textual
     if (busqueda.trim()) {
       const terminoBusqueda = busqueda.toLowerCase();
@@ -107,26 +99,14 @@ const NuestrosGuias = () => {
             guia.primerApellido.toLowerCase().includes(terminoBusqueda)) ||
           (guia.nombreCompleto &&
             guia.nombreCompleto.toLowerCase().includes(terminoBusqueda)) ||
-          (guia.cedula && guia.cedula.toLowerCase().includes(terminoBusqueda)) ||
+          (guia.cedula &&
+            guia.cedula.toLowerCase().includes(terminoBusqueda)) ||
           (guia.email && guia.email.toLowerCase().includes(terminoBusqueda))
       );
     }
-    
-    // Ya no aplicamos filtro de estado porque siempre es "todos"
-    
-    // Aplicar filtro de tipo
-    if (filtroTipo !== "todos") {
-      resultado = resultado.filter(guia => {
-        const tipoGuia = (guia.tipo || "").toLowerCase();
-        return tipoGuia === filtroTipo.toLowerCase();
-      });
-    }
-    
-    setGuiasFiltrados(resultado);
-  }, [busqueda, filtroTipo, guias]);
 
-  // Extraer los tipos de guía únicos para construir los filtros
-  const tiposDeGuia = [...new Set(guias.map(guia => guia.tipo).filter(Boolean))];
+    setGuiasFiltrados(resultado);
+  }, [busqueda, guias]);
 
   const handleBusquedaChange = (e) => {
     setBusqueda(e.target.value);
@@ -234,65 +214,6 @@ const NuestrosGuias = () => {
           </div>
         </div>
 
-        {/* Filtros por estado - Movido desde CardList al componente principal */}
-        <div className="flex justify-center mb-10 max-w-6xl mx-auto px-4">
-          <div className="relative flex-1 max-w-md min-h-[100px] px-6 py-5 rounded-xl bg-teal-800 text-white shadow-xl z-10">
-            {/* Efecto de fondo */}
-            <span className="absolute inset-0 overflow-hidden">
-              <span className="absolute -inset-[10px] bg-teal-700 rounded-full blur-xl opacity-50"></span>
-            </span>
-            
-            {/* Contenedor principal */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full">
-              {/* Círculo decorativo para el icono */}
-              <div className="flex items-center justify-center w-12 h-12 rounded-full shrink-0 bg-white text-teal-800">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </div>
-              
-              {/* Texto del botón */}
-              <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
-                <span className="font-bold text-lg text-white drop-shadow-sm">Todos los Guías</span>
-                <span className="text-xs text-white font-medium drop-shadow-sm brightness-150">
-                  Ver todos los guías registrados
-                </span>
-              </div>
-            </div>
-            
-            {/* Indicador de selección */}
-            <span className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-white rounded-full"></span>
-          </div>
-        </div>
-
-        {/* Filtro por tipo de guía - Si hay varios tipos en los datos */}
-        {tiposDeGuia.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
-            <button
-              onClick={() => setFiltroTipo("todos")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 
-                ${filtroTipo === "todos" 
-                  ? "bg-emerald-600 text-white shadow-md" 
-                  : "bg-white text-emerald-700 border border-emerald-300 hover:bg-emerald-50"}`}
-            >
-              Todos los tipos
-            </button>
-            
-            {tiposDeGuia.map(tipo => (
-              <button
-                key={tipo}
-                onClick={() => setFiltroTipo(tipo)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 
-                  ${filtroTipo === tipo 
-                    ? "bg-emerald-600 text-white shadow-md" 
-                    : "bg-white text-emerald-700 border border-emerald-300 hover:bg-emerald-50"}`}
-              >
-                {tipo}
-              </button>
-            ))}
-          </div>
-        )}
-
         {loading && (
           <div className="flex justify-center items-center py-16">
             <div className="relative">
@@ -357,7 +278,7 @@ const NuestrosGuias = () => {
 
         {!loading && !error && (
           <>
-            {guiasFiltrados.length === 0 && (busqueda || filtroTipo !== "todos") && (
+            {guiasFiltrados.length === 0 && busqueda && (
               <div className="text-center py-12 px-4">
                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-8 max-w-lg mx-auto shadow-lg">
                   <svg
@@ -378,31 +299,18 @@ const NuestrosGuias = () => {
                     No se encontraron resultados
                   </h3>
                   <p className="text-amber-700 mb-4">
-                    No hay guías que coincidan con los filtros seleccionados.
+                    No hay guías que coincidan con tu búsqueda.
                   </p>
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {busqueda && (
-                      <button
-                        onClick={() => setBusqueda("")}
-                        className="px-4 py-2 bg-amber-200 hover:bg-amber-300 text-amber-800 rounded-md transition-colors duration-300"
-                      >
-                        Limpiar búsqueda
-                      </button>
-                    )}
-                    {filtroTipo !== "todos" && (
-                      <button
-                        onClick={() => setFiltroTipo("todos")}
-                        className="px-4 py-2 bg-amber-200 hover:bg-amber-300 text-amber-800 rounded-md transition-colors duration-300"
-                      >
-                        Mostrar todos los tipos
-                      </button>
-                    )}
-                  </div>
+                  <button
+                    onClick={() => setBusqueda("")}
+                    className="px-4 py-2 bg-amber-200 hover:bg-amber-300 text-amber-800 rounded-md transition-colors duration-300"
+                  >
+                    Limpiar búsqueda
+                  </button>
                 </div>
               </div>
             )}
-            
-            {/* Aquí pasamos directamente los guías filtrados al CardList, sin la prop de filtro */}
+
             {guiasFiltrados.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-4">
                 {guiasFiltrados.map((guia, index) => (
@@ -418,4 +326,3 @@ const NuestrosGuias = () => {
 };
 
 export { NuestrosGuias };
-

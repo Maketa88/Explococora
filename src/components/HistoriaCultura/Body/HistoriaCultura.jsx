@@ -1,29 +1,28 @@
-import React from "react";
-import { Carta } from "./Carta";
-import Carta1 from "../../../assets/Images/indigena.png";
-import Carta2 from "../../../assets/Images/palma-de-cera.png";
-import Carta3 from "../../../assets/Images/madre-tierra.png";
-import Carta4 from "../../../assets/Images/trucha-arcoiris.png";
-import Carta5 from "../../../assets/Images/casa.png";
-import Carta6 from "../../../assets/Images/caballito.png";
-import Carta7 from "../../../assets/Images/loro.png";
-import Carta8 from "../../../assets/Images/plantando.png";
-import { TituloExplo } from "./TituloExplo";
 import { useTranslation } from "react-i18next";
+import Carta6 from "../../../assets/Images/caballito.png";
+import Carta5 from "../../../assets/Images/casa.png";
+import Carta1 from "../../../assets/Images/indigena.png";
+import Carta7 from "../../../assets/Images/loro.png";
+import Carta3 from "../../../assets/Images/madre-tierra.png";
+import Carta2 from "../../../assets/Images/palma-de-cera.png";
+import Carta8 from "../../../assets/Images/plantando.png";
+import Carta4 from "../../../assets/Images/trucha-arcoiris.png";
+import { Carta } from "./Carta";
+import { TituloExplo } from "./TituloExplo";
 
 export const HistoriaCultura = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen ">
-      <div className="py-8">
+    <div className="min-h-screen w-full">
+      <div className="py-4 md:py-8">
         <TituloExplo />
       </div>
 
       {/* Contenedor principal con posición relativa para las olas */}
-      <div className="relative container mx-auto px-12 pb-16">
+      <div className="relative container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 pb-12 md:pb-16">
         {/* Ola superior */}
-        <div className="absolute top-0 left-0 w-full h-8 overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-6 md:h-8 overflow-hidden">
           <div className="w-full h-full bg-gradient-to-r from-teal-600 via-teal-700 to-teal-800 opacity-70">
             <svg
               preserveAspectRatio="none"
@@ -40,7 +39,7 @@ export const HistoriaCultura = () => {
         </div>
 
         {/* Grid de cartas con padding superior para dejar espacio a la ola */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-20 pb-30">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6 pt-12 sm:pt-16 md:pt-20 pb-12 sm:pb-20 md:pb-30">
           <Carta
             image={Carta1}
             title={t("card1Title")}
@@ -61,6 +60,16 @@ export const HistoriaCultura = () => {
             title={t("card4Title")}
             text={t("card4Text")}
           />
+          
+          {/* Línea divisoria después de las primeras 4 cartas */}
+          <div className="col-span-1 sm:col-span-2 lg:col-span-4 my-2 md:my-4">
+            <div className="flex items-center justify-center px-4 sm:px-8 md:px-16">
+              <div className="border-t-2 border-gray-950 flex-grow"></div>
+              <div className="w-2 h-2 md:w-3 md:h-3 bg-gray-950 rounded-full mx-2"></div>
+              <div className="border-t-2 border-gray-950 flex-grow"></div>
+            </div>
+          </div>
+          
           <Carta
             image={Carta5}
             title={t("card5Title")}
@@ -84,7 +93,7 @@ export const HistoriaCultura = () => {
         </div>
 
         {/* Ola inferior */}
-        <div className="absolute bottom-0 left-0 w-full h-8 overflow-hidden transform rotate-180">
+        <div className="absolute bottom-0 left-0 w-full h-6 md:h-8 overflow-hidden transform rotate-180">
           <div className="w-full h-full bg-gradient-to-r from-teal-600 via-teal-700 to-teal-800 opacity-70">
             <svg
               preserveAspectRatio="none"

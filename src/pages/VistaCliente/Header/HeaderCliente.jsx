@@ -45,7 +45,7 @@ export const HeaderCliente = () => {
           <NavItem
             tipo="enlace"
             contenido={t("nuestrosGuias")}
-            to="/NuestrosGuias"
+            to="/VistaCliente/NuestrosGuias"
           />
           <NavItem
             tipo="enlace"

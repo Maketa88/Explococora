@@ -1,5 +1,3 @@
-import React from "react";
-
 export const Carta = ({ image, title, text }) => {
   return (
     <div className="flex flex-col items-center p-4 h-full">

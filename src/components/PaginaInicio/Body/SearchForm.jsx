@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Clock, Calendar } from 'lucide-react';
 
 export const SearchForm = ({ onSearch }) => {

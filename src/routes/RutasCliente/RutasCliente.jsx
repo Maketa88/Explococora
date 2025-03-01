@@ -9,7 +9,7 @@ import ContactForm from "../../components/ContactForm/ContactForm";
 import ActualizarDatosCliente from "../../pages/VistaCliente/ActualizarCliente";
 import CambiarContraseña from "../../pages/VistaCliente/CambiarContraseña";
 import {BorrarCuenta} from "../../pages/VistaCliente/BorrarCuenta";
-
+import {NuestrosGuias} from "../../components/NuestrosGuias/NuestrosGuias";
 // ... existing code ...
 
 const RutasCliente = () => {
@@ -24,6 +24,7 @@ const RutasCliente = () => {
         <Route path="/ActualizarPerfil" element={<ActualizarDatosCliente />} />
         <Route path="/ActualizarContrasenia" element={<CambiarContraseña />} />
         <Route path="/EliminarCuenta" element={<BorrarCuenta />} />
+        <Route path="/NuestrosGuias" element={<NuestrosGuias />} />
       </Routes>
       <Footer />
       <ChatBot />
