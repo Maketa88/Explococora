@@ -47,6 +47,8 @@ const DashboardLayoutGuia = ({ children }) => {
   
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   
+  const [previewFoto, setPreviewFoto] = useState(null);
+  
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
@@ -72,7 +74,6 @@ const DashboardLayoutGuia = ({ children }) => {
       setShowProfile(false);
     }
   }, [location.pathname]);
-
 
   // Añadir este efecto para cambiar estado a disponible al iniciar sesión-jhojan
   useEffect(() => {
@@ -106,6 +107,34 @@ const DashboardLayoutGuia = ({ children }) => {
     cambiarEstadoAlIniciar();
   }, []); // Solo se ejecuta al montar el componente-jhojan
 
+  // Añade este efecto para cargar la foto de perfil al iniciar
+  useEffect(() => {
+    // Intentar obtener la foto del localStorage
+    const storedFoto = localStorage.getItem("foto_perfil");
+    if (storedFoto) {
+      setPreviewFoto(storedFoto);
+    }
+    
+    // Add event listener for profile photo updates
+    const handleFotoUpdate = (event) => {
+      if (event.detail && event.detail.fotoUrl) {
+        setPreviewFoto(event.detail.fotoUrl);
+      } else {
+        const updatedFoto = localStorage.getItem("foto_perfil");
+        if (updatedFoto) {
+          setPreviewFoto(updatedFoto);
+        }
+      }
+    };
+    
+    window.addEventListener('fotoPerfilActualizada', handleFotoUpdate);
+    
+    // Clean up event listener when component unmounts
+    return () => {
+      window.removeEventListener('fotoPerfilActualizada', handleFotoUpdate);
+    };
+  }, []);
+
   // Función para cargar los datos del guía cuando se muestra el perfil
   const loadGuiaData = () => {
     setLoading(true);
@@ -124,7 +153,7 @@ const DashboardLayoutGuia = ({ children }) => {
       return;
     }
 
-    axios.get(`http://localhost:10101/guia/${cedula}`, {
+    axios.get(`http://localhost:10101/guia/perfil-completo/${cedula}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -133,6 +162,44 @@ const DashboardLayoutGuia = ({ children }) => {
         console.log("Datos del guia recibidos:", response.data);
         // Guardar los datos del guía
         setGuia(response.data);
+        
+        // Verificar si hay una foto en la respuesta del servidor
+        const guiaData = Array.isArray(response.data) ? response.data[0] : response.data;
+        
+        if (guiaData.foto_perfil) {
+          // Si la foto comienza con http, es una URL completa
+          if (guiaData.foto_perfil.startsWith('http')) {
+            setPreviewFoto(guiaData.foto_perfil);
+            localStorage.setItem("foto_perfil", guiaData.foto_perfil);
+          } 
+          // Si la foto no comienza con http, construir la URL completa
+          else {
+            let fotoUrl;
+            if (guiaData.foto_perfil.includes('/uploads/images/')) {
+              fotoUrl = `http://localhost:10101${guiaData.foto_perfil}`;
+            } else {
+              fotoUrl = `http://localhost:10101/uploads/images/${guiaData.foto_perfil}`;
+            }
+            
+            setPreviewFoto(fotoUrl);
+            localStorage.setItem("foto_perfil", fotoUrl);
+          }
+        } 
+        // Verificar si hay foto en otros campos posibles
+        else if (guiaData.foto) {
+          let fotoUrl;
+          if (guiaData.foto.startsWith('http')) {
+            fotoUrl = guiaData.foto;
+          } else if (guiaData.foto.includes('/uploads/images/')) {
+            fotoUrl = `http://localhost:10101${guiaData.foto}`;
+          } else {
+            fotoUrl = `http://localhost:10101/uploads/images/${guiaData.foto}`;
+          }
+          
+          setPreviewFoto(fotoUrl);
+          localStorage.setItem("foto_perfil", fotoUrl);
+        }
+        
         setLoading(false);
       })
       .catch((error) => {
@@ -324,20 +391,20 @@ const DashboardLayoutGuia = ({ children }) => {
   // Componente del perfil del guía con datos dinámicos
   const PerfilGuiaComponent = () => {
     if (loading) return (
-      <div className={`${darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-800'} rounded-lg p-6 shadow-lg text-center`}>
+      <div className={`${darkMode ? 'bg-teal-900 text-white' : 'bg-teal-50'} rounded-lg p-6 shadow-lg text-center`}>
         Cargando perfil...
       </div>
     );
     
     if (error) return (
-      <div className={`${darkMode ? 'bg-[#1e293b]' : 'bg-gray-100'} rounded-lg p-6 shadow-lg text-center text-red-500`}>
+      <div className={`${darkMode ? 'bg-teal-900' : 'bg-teal-50'} rounded-lg p-6 shadow-lg text-center text-red-500`}>
         {error}
       </div>
     );
     
     // Si no hay datos, mostrar un mensaje
     if (!guia) return (
-      <div className={`${darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-800'} rounded-lg p-6 shadow-lg text-center`}>
+      <div className={`${darkMode ? 'bg-teal-900 text-white' : 'bg-teal-50'} rounded-lg p-6 shadow-lg text-center`}>
         No se encontraron datos del guía.
       </div>
     );
@@ -350,65 +417,77 @@ const DashboardLayoutGuia = ({ children }) => {
     const { nombres, apellidos } = separarNombre(nombreCompleto);
     
     return (
-      <div className={`${darkMode ? 'bg-[#1e293b]' : 'bg-gray-100'} rounded-lg p-6 shadow-lg`}>
-        <h2 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Perfil del Guía</h2>
+      <div className={`${darkMode ? 'bg-teal-900' : 'bg-teal-50'} rounded-lg p-6 shadow-lg`}>
+        <h2 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-teal-800'}`}>Perfil del Guía</h2>
         
         <div className="flex flex-col md:flex-row gap-6">
           {/* Imagen de perfil */}
           <div className="flex flex-col items-center">
-            <div className="w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-blue-500">
-              <img
-                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto)}&size=200&background=0D8ABC&color=fff`}
-                alt="Perfil del guía"
-                className="h-full w-full object-cover"
-              />
+            <div className="w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-teal-500">
+              {previewFoto ? (
+                <img
+                  src={previewFoto}
+                  alt="Perfil del guía"
+                  className="h-full w-full object-cover"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto)}&size=200&background=0D9488&color=fff`;
+                  }}
+                />
+              ) : (
+                <img
+                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto)}&size=200&background=0D9488&color=fff`}
+                  alt="Perfil del guía"
+                  className="h-full w-full object-cover"
+                />
+              )}
             </div>
-            <button className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white font-medium transition-colors duration-200`}>
+            <button className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-teal-600 hover:bg-teal-700' : 'bg-teal-500 hover:bg-teal-600'} text-white font-medium transition-colors duration-200`}>
               Cambiar foto
             </button>
           </div>
           
           {/* Información personal */}
           <div className="flex-1">
-            <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${darkMode ? 'text-teal-300' : 'text-teal-700'}`}>
               <div>
-                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Nombre</h3>
+                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-teal-400' : 'text-teal-500'}`}>Nombre</h3>
                 <p className="font-medium text-lg">{nombres}</p>
               </div>
               
               <div>
-                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Apellidos</h3>
+                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-teal-400' : 'text-teal-500'}`}>Apellidos</h3>
                 <p className="font-medium text-lg">{apellidos}</p>
               </div>
               
               <div>
-                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Cédula</h3>
+                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-teal-400' : 'text-teal-500'}`}>Cédula</h3>
                 <p className="font-medium text-lg">{guiaData.cedula || "No disponible"}</p>
               </div>
               
               <div>
-                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Correo electrónico</h3>
+                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-teal-400' : 'text-teal-500'}`}>Correo electrónico</h3>
                 <p className="font-medium text-lg">{guiaData.email || "No disponible"}</p>
               </div>
               
               <div>
-                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Teléfono</h3>
+                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-teal-400' : 'text-teal-500'}`}>Teléfono</h3>
                 <p className="font-medium text-lg">{guiaData.telefono || "No disponible"}</p>
               </div>
               
               <div>
-                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Especialidad</h3>
+                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-teal-400' : 'text-teal-500'}`}>Especialidad</h3>
                 <p className="font-medium text-lg">{guiaData.especialidad || "No disponible"}</p>
               </div>
             </div>
             
             <div className="mt-6 flex gap-3">
-              <button className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white font-medium transition-colors duration-200`}>
+              <button className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-teal-600 hover:bg-teal-700' : 'bg-teal-500 hover:bg-teal-600'} text-white font-medium transition-colors duration-200`}>
                 Editar información
               </button>
               <button 
                 onClick={() => navigate("/VistaGuia/CambiarContraseña")}
-                className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-300 hover:bg-gray-400'} ${darkMode ? 'text-white' : 'text-gray-800'} font-medium transition-colors duration-200`}
+                className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-teal-700 hover:bg-teal-600' : 'bg-teal-300 hover:bg-teal-400'} ${darkMode ? 'text-white' : 'text-teal-800'} font-medium transition-colors duration-200`}
               >
                 Cambiar contraseña
               </button>
@@ -418,22 +497,22 @@ const DashboardLayoutGuia = ({ children }) => {
         
         {/* Sección de estadísticas - Valores estáticos por ahora */}
         <div className="mt-8">
-          <h3 className={`text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Estadísticas</h3>
+          <h3 className={`text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-teal-800'}`}>Estadísticas</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className={`p-4 rounded-lg ${darkMode ? 'bg-blue-900/50' : 'bg-blue-100'}`}>
-              <h4 className={`text-sm uppercase mb-1 ${darkMode ? 'text-blue-300' : 'text-blue-600'}`}>Rutas completadas</h4>
-              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-blue-700'}`}>127</p>
+            <div className={`p-4 rounded-lg ${darkMode ? 'bg-teal-900/50' : 'bg-teal-100'}`}>
+              <h4 className={`text-sm uppercase mb-1 ${darkMode ? 'text-teal-300' : 'text-teal-600'}`}>Rutas completadas</h4>
+              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-teal-700'}`}>127</p>
             </div>
             
-            <div className={`p-4 rounded-lg ${darkMode ? 'bg-green-900/50' : 'bg-green-100'}`}>
-              <h4 className={`text-sm uppercase mb-1 ${darkMode ? 'text-green-300' : 'text-green-600'}`}>Valoración media</h4>
-              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-green-700'}`}>4.8/5.0</p>
+            <div className={`p-4 rounded-lg ${darkMode ? 'bg-teal-900/50' : 'bg-teal-100'}`}>
+              <h4 className={`text-sm uppercase mb-1 ${darkMode ? 'text-teal-300' : 'text-teal-600'}`}>Valoración media</h4>
+              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-teal-700'}`}>4.8/5.0</p>
             </div>
             
-            <div className={`p-4 rounded-lg ${darkMode ? 'bg-purple-900/50' : 'bg-purple-100'}`}>
-              <h4 className={`text-sm uppercase mb-1 ${darkMode ? 'text-purple-300' : 'text-purple-600'}`}>Clientes atendidos</h4>
-              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-purple-700'}`}>350+</p>
+            <div className={`p-4 rounded-lg ${darkMode ? 'bg-teal-900/50' : 'bg-teal-100'}`}>
+              <h4 className={`text-sm uppercase mb-1 ${darkMode ? 'text-teal-300' : 'text-teal-600'}`}>Clientes atendidos</h4>
+              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-teal-700'}`}>350+</p>
             </div>
           </div>
         </div>
@@ -526,34 +605,33 @@ const DashboardLayoutGuia = ({ children }) => {
   }, []);
 
   return (
-    <div className={`flex h-screen overflow-hidden ${darkMode ? 'bg-[#0f172a]' : 'bg-white'}`}>
+    <div className={`flex h-screen overflow-hidden ${darkMode ? 'bg-teal-950' : 'bg-white'}`}>
       {/* Sidebar */}
       <div className={` 
         ${collapsed ? 'w-20' : 'w-64'} 
-        ${darkMode ? 'bg-[#0f172a]' : 'bg-white'} 
+        ${darkMode ? 'bg-teal-900' : 'bg-teal-50'} 
         p-4 transition-all duration-300 flex flex-col
-        ${darkMode ? 'text-gray-400' : 'text-gray-600'}
-        border-r ${darkMode ? 'border-gray-800' : 'border-gray-200'}
+        ${darkMode ? 'text-teal-300' : 'text-teal-700'}
+        border-r ${darkMode ? 'border-teal-800' : 'border-teal-200'}
         h-screen sticky top-0
       `}>
         <div className="mb-8 flex flex-col items-start">
           <div className="flex items-center">
-            {!collapsed && <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>Explococora</h1>} 
+            {!collapsed && <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-teal-800'}`}>Explococora</h1>} 
             <button 
               onClick={() => setCollapsed(!collapsed)}
-              className="p-1.5 rounded-lg bg-blue-600 text-white ml-2"
+              className="p-1.5 rounded-lg bg-teal-600 text-white ml-2 hover:bg-teal-700"
             >
-              
               {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
             </button>
           </div>
-          {!collapsed && <h1 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-black'} mt-1 text-center w-40`}>Guia</h1>}
+          {!collapsed && <h1 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-teal-800'} mt-1 text-center w-40`}>Guia</h1>}
         </div>
 
-        <nav className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
+        <nav className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-teal-700 scrollbar-track-transparent">
           {sections.map((section) => (
             <div key={section} className="mb-4">
-              {!collapsed && <h2 className="text-gray-400 text-sm mb-2">{section}</h2>}
+              {!collapsed && <h2 className={`${darkMode ? 'text-teal-400' : 'text-teal-600'} text-sm mb-2`}>{section}</h2>}
               {menuItems
                 .filter((item) => item.section === section)
                 .map((item) => (
@@ -563,8 +641,8 @@ const DashboardLayoutGuia = ({ children }) => {
                     onClick={() => handleMenuItemClick(item.path)}
                     className={`flex items-center gap-2 p-2 rounded-lg mb-1 ${
                       location.pathname === item.path
-                        ? "bg-blue-600 text-white"
-                        : `text-gray-400 ${!darkMode && 'hover:bg-gray-100'}`
+                        ? "bg-teal-700 text-white"
+                        : `${darkMode ? 'text-teal-300 hover:bg-teal-800' : 'text-teal-700 hover:bg-teal-100'}`
                     }`}
                     title={collapsed ? item.title : ""}
                   >
@@ -576,14 +654,14 @@ const DashboardLayoutGuia = ({ children }) => {
           ))} 
         </nav>
 
-        <div className={`border-t ${darkMode ? 'border-gray-800' : 'border-gray-200'} pt-4 mt-4`}>
+        <div className={`border-t ${darkMode ? 'border-teal-800' : 'border-teal-200'} pt-4 mt-4`}>
           <Link
             to="/VistaGuia/settings"
             onClick={() => setShowProfile(false)}
             className={`flex items-center gap-2 w-full p-2 mb-2 rounded-lg ${
               location.pathname === '/VistaGuia/settings'
-                ? "bg-blue-600 text-white"
-                : "text-gray-400"
+                ? "bg-teal-700 text-white"
+                : `${darkMode ? 'text-teal-300 hover:bg-teal-800' : 'text-teal-700 hover:bg-teal-100'}`
             }`}
           >
             <Settings className="w-5 h-5" />
@@ -593,9 +671,9 @@ const DashboardLayoutGuia = ({ children }) => {
       </div>
 
       {/* Main Content */}
-      <div className={`flex-1 flex flex-col overflow-hidden ${darkMode ? 'bg-[#0f172a]' : 'bg-white'}`}>
+      <div className={`flex-1 flex flex-col overflow-hidden ${darkMode ? 'bg-teal-950' : 'bg-white'}`}>
         {/* Top Navigation */}
-        <div className={`${darkMode ? 'bg-[#0f172a]' : 'bg-white'} sticky top-0 z-10`}>
+        <div className={`${darkMode ? 'bg-teal-900' : 'bg-teal-50'} sticky top-0 z-10`}>
           <div className="flex items-center justify-between p-4">
             <div className="flex-1 max-w-xl relative search-container">
               <form onSubmit={handleSearch} className="flex items-center">
@@ -609,12 +687,12 @@ const DashboardLayoutGuia = ({ children }) => {
                     if (searchResults.length > 0) setShowResults(true);
                   }}
                   className={`w-full px-4 py-2 rounded-lg ${
-                    darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-900'
-                  }`}
+                    darkMode ? 'bg-teal-800 text-white placeholder-teal-300' : 'bg-white text-teal-900 placeholder-teal-500'
+                  } border ${darkMode ? 'border-teal-700' : 'border-teal-300'}`}
                 />
                 <button 
                   type="submit"
-                  className={`p-2 rounded-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
+                  className={`p-2 rounded-lg ${darkMode ? 'text-teal-300 hover:text-white' : 'text-teal-700 hover:text-teal-900'}`}
                 >
                   <Search className="w-5 h-5" />
                 </button>
@@ -624,7 +702,7 @@ const DashboardLayoutGuia = ({ children }) => {
               {showResults && (
                 <div 
                   className={`absolute top-full left-0 w-full mt-1 rounded-lg shadow-lg z-50 ${
-                    darkMode ? 'bg-[#1e293b] text-white' : 'bg-white text-gray-900'
+                    darkMode ? 'bg-teal-800 text-white' : 'bg-white text-teal-900'
                   }`}
                   onClick={(e) => e.stopPropagation()}
                 >
@@ -634,8 +712,8 @@ const DashboardLayoutGuia = ({ children }) => {
                       onClick={() => handleResultClick(result.path)}
                       className={`p-3 cursor-pointer flex items-center gap-2 ${
                         darkMode 
-                          ? 'hover:bg-gray-700 border-b border-gray-700' 
-                          : 'hover:bg-gray-100 border-b border-gray-200'
+                          ? 'hover:bg-teal-700 border-b border-teal-700' 
+                          : 'hover:bg-teal-50 border-b border-teal-100'
                       } ${index === searchResults.length - 1 ? 'border-b-0 rounded-b-lg' : ''}`}
                     >
                       {/* Icono basado en el título */}
@@ -669,65 +747,79 @@ const DashboardLayoutGuia = ({ children }) => {
               )}
               <button 
                 onClick={() => setDarkMode(!darkMode)}
-                className={`p-2 rounded-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
+                className={`p-2 rounded-lg ${darkMode ? 'text-teal-300 hover:text-white' : 'text-teal-700 hover:text-teal-900'}`}
               >
                 {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
               </button>
-              <button className={`p-2 rounded-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              <button className={`p-2 rounded-lg ${darkMode ? 'text-teal-300 hover:text-white' : 'text-teal-700 hover:text-teal-900'}`}>
                 <Bell className="w-5 h-5" />
               </button>
               
               {/* Avatar con menú desplegable */}
               <div className="relative" ref={dropdownRef}>
                 <div 
-                  className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden cursor-pointer"
+                  className="w-10 h-10 rounded-full bg-teal-200 overflow-hidden cursor-pointer"
                   onClick={toggleMenu}
                 >
-                  <img
-                    src="https://ui-avatars.com/api/?name=User&background=random"
-                    alt="Perfil de usuario"
-                    className="h-full w-full object-cover transform transition hover:scale-110 active:scale-95"
-                  />
+                  {previewFoto ? (
+                    <img
+                      src={previewFoto}
+                      alt="Perfil de usuario"
+                      className="h-full w-full object-cover transform transition hover:scale-110 active:scale-95"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        // Intentar obtener el nombre para el avatar de respaldo
+                        const nombreGuia = guia ? (Array.isArray(guia) ? guia[0].nombre_del_guia : guia.nombre_del_guia) : "User";
+                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nombreGuia || "User")}&background=0D9488&color=fff`;
+                      }}
+                    />
+                  ) : (
+                    <img
+                      src="https://ui-avatars.com/api/?name=User&background=0D9488&color=fff"
+                      alt="Perfil de usuario"
+                      className="h-full w-full object-cover transform transition hover:scale-110 active:scale-95"
+                    />
+                  )}
                 </div>
                 
                 {/* Menú desplegable actualizado al estilo del operador */}
                 {profileMenuOpen && (
                   <div 
                     className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 
-                    ${darkMode ? 'bg-gray-800' : 'bg-white'} 
+                    ${darkMode ? 'bg-teal-800' : 'bg-white'} 
                     ring-1 ring-black ring-opacity-5 z-50`}
                   >
                     <div 
                       onClick={() => handleOptionClick("/VistaGuia/PerfilGuia")}
-                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} flex items-center gap-2 cursor-pointer`}
+                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-teal-200 hover:bg-teal-700' : 'text-teal-700 hover:bg-teal-50'} flex items-center gap-2 cursor-pointer`}
                     >
                       <User className="w-4 h-4" />
                       Ver Perfil
                     </div>
                     <div 
                       onClick={() => handleOptionClick("/VistaGuia/ActualizarGuia")}
-                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} flex items-center gap-2 cursor-pointer`}
+                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-teal-200 hover:bg-teal-700' : 'text-teal-700 hover:bg-teal-50'} flex items-center gap-2 cursor-pointer`}
                     >
                       <Edit className="w-4 h-4" />
                       Actualizar Información
                     </div>
                     <div 
                       onClick={() => handleOptionClick("/VistaGuia/CambiarContraseña")}
-                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} flex items-center gap-2 cursor-pointer`}
+                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-teal-200 hover:bg-teal-700' : 'text-teal-700 hover:bg-teal-50'} flex items-center gap-2 cursor-pointer`}
                     >
                       <Key className="w-4 h-4" />
                       Cambiar Contraseña
                     </div>
                     <div 
                       onClick={() => handleOptionClick("/VistaGuia/EliminarCuentaGuia")}
-                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} flex items-center gap-2 cursor-pointer`}
+                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-teal-200 hover:bg-teal-700' : 'text-teal-700 hover:bg-teal-50'} flex items-center gap-2 cursor-pointer`}
                     >
                       <Trash2 className="w-4 h-4" />
                       Eliminar Cuenta
                     </div>
                     <div 
                       onClick={() => handleOptionClick("/")}
-                      className={`block w-full text-left px-4 py-2 text-sm ${darkMode ? 'text-red-400 hover:bg-gray-700' : 'text-red-600 hover:bg-gray-100'} flex items-center gap-2 cursor-pointer`}
+                      className={`block w-full text-left px-4 py-2 text-sm ${darkMode ? 'text-red-400 hover:bg-teal-700' : 'text-red-600 hover:bg-teal-50'} flex items-center gap-2 cursor-pointer`}
                     >
                       <LogOut className="w-4 h-4" />
                       Cerrar Sesión
@@ -740,19 +832,31 @@ const DashboardLayoutGuia = ({ children }) => {
         </div>
 
         {/* Content and Footer Container */}
-        <div className={`flex-1 flex flex-col overflow-auto ${darkMode ? 'bg-[#0f172a]' : 'bg-white'}`}>
+        <div className={`flex-1 flex flex-col overflow-auto ${darkMode ? 'bg-teal-950' : 'bg-white'}`}>
           {/* Page Content */}
           <div className="flex-1 p-4">
-            {showProfile && location.pathname === "/VistaGuia" ? <PerfilGuiaComponent /> : children}
+            {showProfile && location.pathname === "/VistaGuia" ? (
+              <div className={`${darkMode ? 'bg-teal-900 text-white' : 'bg-teal-50 text-teal-800'} rounded-lg p-6 shadow-lg`}>
+                {loading ? (
+                  <div className="text-center">Cargando perfil...</div>
+                ) : error ? (
+                  <div className="text-center text-red-500">{error}</div>
+                ) : !guia ? (
+                  <div className="text-center">No se encontraron datos del guía.</div>
+                ) : (
+                  <PerfilGuiaComponent />
+                )}
+              </div>
+            ) : children}
           </div>
 
           {/* Footer */}
-          <div className={`p-4 ${darkMode ? 'bg-[#0f172a] text-gray-400' : 'bg-white text-gray-600'} sticky bottom-0`}>
+          <div className={`p-4 ${darkMode ? 'bg-teal-900 text-teal-300' : 'bg-teal-50 text-teal-700'} sticky bottom-0`}>
             <div className="flex justify-between items-center text-sm">
               <span>© 2025 ExploCocora. Todos los derechos reservados.</span>
               <div className="flex gap-6">
-                <a href="#" className="hover:text-blue-600">Privacy Policy</a>
-                <a href="#" className="hover:text-blue-600">Terms of Service</a>
+                <a href="#" className={`${darkMode ? 'hover:text-white' : 'hover:text-teal-800'}`}>Privacy Policy</a>
+                <a href="#" className={`${darkMode ? 'hover:text-white' : 'hover:text-teal-800'}`}>Terms of Service</a>
               </div>
             </div>
           </div>

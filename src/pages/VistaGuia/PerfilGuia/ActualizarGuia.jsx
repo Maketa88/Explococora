@@ -192,6 +192,10 @@ const ActualizarDatosGuia = () => {
             localStorage.setItem("foto_perfil", previewFoto);
             fotoActualizada = true;
             console.log("Foto actualizada exitosamente:", fotoResponse.data);
+            
+            // Dispatch custom event to notify other components that the photo was updated
+            const event = new CustomEvent('fotoPerfilActualizada', { detail: { fotoUrl: previewFoto } });
+            window.dispatchEvent(event);
           }
         } catch (fotoError) {
           console.error("Error al subir la foto:", fotoError);

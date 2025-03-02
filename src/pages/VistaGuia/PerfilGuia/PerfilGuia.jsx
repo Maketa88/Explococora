@@ -33,7 +33,7 @@ const PerfilGuia = () => {
       return;
     }
 
-    axios.get(`http://localhost:10101/guia/${cedula}`, {
+    axios.get(`http://localhost:10101/guia/perfil-completo/${cedula}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -69,6 +69,23 @@ const PerfilGuia = () => {
             localStorage.setItem("foto_perfil", fotoUrl);
           }
         } 
+        // Verificar si hay foto en otros campos posibles
+        else if (guiaData.foto) {
+          console.log("Foto encontrada en campo 'foto':", guiaData.foto);
+          
+          let fotoUrl;
+          if (guiaData.foto.startsWith('http')) {
+            fotoUrl = guiaData.foto;
+          } else if (guiaData.foto.includes('/uploads/images/')) {
+            fotoUrl = `http://localhost:10101${guiaData.foto}`;
+          } else {
+            fotoUrl = `http://localhost:10101/uploads/images/${guiaData.foto}`;
+          }
+          
+          console.log("URL de foto construida:", fotoUrl);
+          setPreviewFoto(fotoUrl);
+          localStorage.setItem("foto_perfil", fotoUrl);
+        }
         // Si no hay foto en la respuesta, intentar recuperarla del localStorage
         else {
           const storedFoto = localStorage.getItem("foto_perfil");
@@ -154,7 +171,7 @@ const PerfilGuia = () => {
         <div className="flex flex-col md:flex-row gap-6">
           {/* Imagen de perfil */}
           <div className="flex flex-col items-center">
-            <div className="w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-blue-500">
+            <div className="w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-teal-500">
               {previewFoto ? (
                 <img
                   src={previewFoto}
@@ -163,12 +180,19 @@ const PerfilGuia = () => {
                   onError={(e) => {
                     console.error("Error al cargar la imagen:", e);
                     e.target.onerror = null;
-                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto)}&size=200&background=0D8ABC&color=fff`;
+                    // Intentar cargar desde localStorage como respaldo
+                    const storedFoto = localStorage.getItem("foto_perfil");
+                    if (storedFoto && storedFoto !== previewFoto) {
+                      e.target.src = storedFoto;
+                    } else {
+                      // Fallback a avatar generado
+                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto)}&size=200&background=0D9488&color=fff`;
+                    }
                   }}
                 />
               ) : (
                 <img
-                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto)}&size=200&background=0D8ABC&color=fff`}
+                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto)}&size=200&background=0D9488&color=fff`}
                   alt="Perfil del guía"
                   className="h-full w-full object-cover"
                 />
@@ -176,7 +200,7 @@ const PerfilGuia = () => {
             </div>
             <button 
               onClick={() => navigate("/VistaGuia/ActualizarGuia")}
-              className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white font-medium transition-colors duration-200`}>
+              className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-teal-600 hover:bg-teal-700' : 'bg-teal-500 hover:bg-teal-600'} text-white font-medium transition-colors duration-200`}>
               Cambiar foto
             </button>
           </div>
@@ -218,7 +242,7 @@ const PerfilGuia = () => {
             <div className="mt-6 flex flex-wrap gap-3">
               <button 
                 onClick={() => navigate("/VistaGuia/ActualizarGuia")}
-                className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white font-medium transition-colors duration-200`}>
+                className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-teal-600 hover:bg-teal-700' : 'bg-teal-500 hover:bg-teal-600'} text-white font-medium transition-colors duration-200`}>
                 Actualizar información
               </button>
               <button 
