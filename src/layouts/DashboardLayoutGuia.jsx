@@ -267,7 +267,7 @@ const DashboardLayoutGuia = ({ children }) => {
     {
       title: "Dashboard",
       icon: <LayoutDashboard className="w-5 h-5" />,
-      path: "/VistaGuia",
+      path: "/VistaGuia/Dashboard",
       section: "Dashboard"
     },
     {
@@ -567,6 +567,19 @@ const DashboardLayoutGuia = ({ children }) => {
               <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-teal-700'}`}>350+</p>
             </div>
           </div>
+        </div>
+
+        {/* Botón para ir al Dashboard */}
+        <div className="mt-8 flex justify-center">
+          <button 
+            onClick={() => navigate("/VistaGuia/Dashboard")}
+            className={`py-2 px-6 rounded-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-300 hover:bg-gray-400'} ${darkMode ? 'text-white' : 'text-gray-800'} font-medium transition-colors duration-200 flex items-center gap-2`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+            Ir al Dashboard
+          </button>
         </div>
       </div>
     );
