@@ -23,7 +23,7 @@ const PerfilCliente = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:10101/cliente/${cedula}`,
+        `http://localhost:10101/cliente/perfil-completo/${cedula}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -31,24 +31,95 @@ const PerfilCliente = () => {
         }
       );
 
-      if (response.data && response.data.length > 0) {
-        const clienteData = response.data[0];
+      console.log("Respuesta del servidor:", response.data);
+
+      if (response.data) {
+        // Manejar tanto si la respuesta es un objeto directo o está dentro de un array
+        const clienteData = Array.isArray(response.data) ? response.data[0] : response.data;
         
-        // La foto de perfil ya debería ser una URL completa de Azure Blob Storage
+        // Verificar si hay una foto en la respuesta del servidor
         if (clienteData.foto_perfil) {
-          // Guardar en localStorage
-          localStorage.setItem("foto_perfil", clienteData.foto_perfil);
-        } else {
-          // Recuperar la foto del localStorage si existe
-          const storedFoto = localStorage.getItem("foto_perfil");
-          if (storedFoto) {
-            clienteData.foto_perfil = storedFoto;
+          console.log("Foto perfil encontrada:", clienteData.foto_perfil);
+          
+          // Si la foto comienza con http, es una URL completa
+          if (clienteData.foto_perfil.startsWith('http')) {
+            // Verificar si la foto ha cambiado antes de emitir el evento
+            const currentStoredFoto = localStorage.getItem("foto_perfil_cliente");
+            if (clienteData.foto_perfil !== currentStoredFoto) {
+              localStorage.setItem("foto_perfil_cliente", clienteData.foto_perfil);
+              
+              // Solo emitimos el evento si la foto ha cambiado y no viene de una recarga por evento
+              if (!fotoActualizada) {
+                const event = new CustomEvent('fotoPerfilClienteActualizada', { 
+                  detail: { fotoUrl: clienteData.foto_perfil } 
+                });
+                window.dispatchEvent(event);
+              }
+            }
+          } 
+          // Si la foto no comienza con http, construir la URL completa
+          else {
+            // Verificar si la ruta ya incluye /uploads/images
+            let fotoUrl;
+            if (clienteData.foto_perfil.includes('/uploads/images/')) {
+              fotoUrl = `http://localhost:10101${clienteData.foto_perfil}`;
+            } else {
+              fotoUrl = `http://localhost:10101/uploads/images/${clienteData.foto_perfil}`;
+            }
+            
+            console.log("URL de foto construida:", fotoUrl);
+            
+            // Verificar si la foto ha cambiado antes de emitir el evento
+            const currentStoredFoto = localStorage.getItem("foto_perfil_cliente");
+            if (fotoUrl !== currentStoredFoto) {
+              localStorage.setItem("foto_perfil_cliente", fotoUrl);
+              
+              // Solo emitimos el evento si la foto ha cambiado y no viene de una recarga por evento
+              if (!fotoActualizada) {
+                const event = new CustomEvent('fotoPerfilClienteActualizada', { 
+                  detail: { fotoUrl } 
+                });
+                window.dispatchEvent(event);
+              }
+            }
+          }
+        } 
+        // Verificar si hay foto en otros campos posibles
+        else if (clienteData.foto) {
+          console.log("Foto encontrada en campo 'foto':", clienteData.foto);
+          
+          let fotoUrl;
+          if (clienteData.foto.startsWith('http')) {
+            fotoUrl = clienteData.foto;
+          } else if (clienteData.foto.includes('/uploads/images/')) {
+            fotoUrl = `http://localhost:10101${clienteData.foto}`;
+          } else {
+            fotoUrl = `http://localhost:10101/uploads/images/${clienteData.foto}`;
           }
           
-          // Verificar si hay una foto actualizada en localStorage con la clave correcta
-          const fotoPerfilCliente = localStorage.getItem("foto_perfil_cliente");
-          if (fotoPerfilCliente) {
-            clienteData.foto_perfil = fotoPerfilCliente;
+          console.log("URL de foto construida:", fotoUrl);
+          
+          // Verificar si la foto ha cambiado antes de emitir el evento
+          const currentStoredFoto = localStorage.getItem("foto_perfil_cliente");
+          if (fotoUrl !== currentStoredFoto) {
+            localStorage.setItem("foto_perfil_cliente", fotoUrl);
+            
+            // Solo emitimos el evento si la foto ha cambiado y no viene de una recarga por evento
+            if (!fotoActualizada) {
+              const event = new CustomEvent('fotoPerfilClienteActualizada', { 
+                detail: { fotoUrl } 
+              });
+              window.dispatchEvent(event);
+            }
+          }
+        }
+        // Si no hay foto en la respuesta, intentar recuperarla del localStorage
+        else {
+          const storedFoto = localStorage.getItem("foto_perfil_cliente");
+          if (storedFoto) {
+            console.log("Usando foto desde localStorage");
+            clienteData.foto_perfil = storedFoto;
+            // No emitimos evento aquí para evitar bucles infinitos
           }
         }
         
@@ -69,7 +140,14 @@ const PerfilCliente = () => {
     // Agregar event listener para actualizar la foto cuando cambie
     const handleFotoActualizada = (event) => {
       console.log("Evento de foto actualizada recibido:", event.detail);
-      setFotoActualizada(true);
+      
+      // Verificar si la foto es diferente a la que ya tenemos en localStorage
+      const currentStoredFoto = localStorage.getItem("foto_perfil_cliente");
+      if (event.detail.fotoUrl && event.detail.fotoUrl !== currentStoredFoto) {
+        // Solo actualizar si la foto es diferente
+        localStorage.setItem("foto_perfil_cliente", event.detail.fotoUrl);
+        setFotoActualizada(true);
+      }
     };
     
     window.addEventListener('fotoPerfilClienteActualizada', handleFotoActualizada);
@@ -170,6 +248,18 @@ const PerfilCliente = () => {
                   alt="Foto de perfil"
                   className="h-32 w-32 rounded-full object-cover shadow-xl ring-4 ring-teal-500/30"
                   onClick={abrirModal}
+                  onError={(e) => {
+                    console.error("Error al cargar la imagen:", e);
+                    e.target.onerror = null;
+                    // Intentar cargar desde localStorage como respaldo
+                    const storedFoto = localStorage.getItem("foto_perfil_cliente");
+                    if (storedFoto && storedFoto !== fotoUrl) {
+                      e.target.src = storedFoto;
+                    } else {
+                      // Fallback a avatar por defecto
+                      e.target.src = Avatar;
+                    }
+                  }}
                 />
                 <button 
                   onClick={abrirModal}
@@ -275,6 +365,18 @@ const PerfilCliente = () => {
               alt="Foto de perfil ampliada"
               className="max-h-[85vh] rounded-2xl shadow-2xl"
               onClick={(e) => e.stopPropagation()}
+              onError={(e) => {
+                console.error("Error al cargar la imagen en modal:", e);
+                e.target.onerror = null;
+                // Intentar cargar desde localStorage como respaldo
+                const storedFoto = localStorage.getItem("foto_perfil_cliente");
+                if (storedFoto && storedFoto !== fotoUrl) {
+                  e.target.src = storedFoto;
+                } else {
+                  // Fallback a avatar por defecto
+                  e.target.src = Avatar;
+                }
+              }}
             />
           </div>
         </div>
