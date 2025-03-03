@@ -23,6 +23,7 @@ const ActualizarDatosCliente = () => {
   const [foto, setFoto] = useState(null);
   const [subiendoFoto, setSubiendoFoto] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [fotoError, setFotoError] = useState(null);
 
   const cargarDatosCliente = useCallback(async () => {
     const cedula = localStorage.getItem("cedula");
@@ -43,11 +44,19 @@ const ActualizarDatosCliente = () => {
 
       if (response.data && response.data.length > 0) {
         const clienteData = response.data[0];
-        // Recuperar la foto del localStorage si existe
-        const storedFoto = localStorage.getItem("foto_perfil");
-        if (storedFoto) {
-          clienteData.foto_perfil = storedFoto;
+        
+        // La foto de perfil ya debería ser una URL completa de Azure Blob Storage
+        if (clienteData.foto_perfil) {
+          // Guardar en localStorage
+          localStorage.setItem("foto_perfil", clienteData.foto_perfil);
+        } else {
+          // Recuperar la foto del localStorage si existe
+          const storedFoto = localStorage.getItem("foto_perfil");
+          if (storedFoto) {
+            clienteData.foto_perfil = storedFoto;
+          }
         }
+        
         setCliente(clienteData);
         localStorage.setItem("cliente", JSON.stringify(clienteData));
 
@@ -99,6 +108,23 @@ const ActualizarDatosCliente = () => {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
+      // Validar tipo de archivo
+      const filetypes = /jpeg|jpg|png|webp/;
+      const mimetype = filetypes.test(selectedFile.type);
+      const extname = filetypes.test(selectedFile.name.toLowerCase().split('.').pop());
+      
+      if (!mimetype || !extname) {
+        setFotoError("Solo se permiten imágenes (jpeg, jpg, png, webp)");
+        return;
+      }
+      
+      // Validar tamaño (5MB máximo)
+      if (selectedFile.size > 5 * 1024 * 1024) {
+        setFotoError("La imagen no debe superar los 5MB");
+        return;
+      }
+      
+      setFotoError(null);
       setFoto(selectedFile);
       
       // Crear URL de vista previa
@@ -138,19 +164,20 @@ const ActualizarDatosCliente = () => {
         }
       );
       
-      if (response.data && response.data.path) {
-        const fotoPath = response.data.path;
+      if (response.data) {
+        // Obtener la URL de la foto desde la respuesta
+        const imageUrl = response.data.url;
         
         // Actualizar el estado del cliente
         const clienteActualizado = {
           ...cliente,
-          foto_perfil: fotoPath
+          foto_perfil: imageUrl
         };
         
         // Actualizar estado y localStorage
         setCliente(clienteActualizado);
         localStorage.setItem("cliente", JSON.stringify(clienteActualizado));
-        localStorage.setItem("foto_perfil", fotoPath);
+        localStorage.setItem("foto_perfil", imageUrl);
 
         Swal.fire({
           html: `
@@ -426,6 +453,12 @@ const ActualizarDatosCliente = () => {
           </div>
         )}
 
+        {fotoError && (
+          <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 shadow-sm">
+            {fotoError}
+          </div>
+        )}
+
         {/* Sección de foto de perfil */}
         <div className="flex justify-center mt-8">
           <div className="relative">
@@ -433,11 +466,14 @@ const ActualizarDatosCliente = () => {
               <img
                 key={cliente.foto_perfil}
                 src={
-                  previewUrl ||
-                  (cliente.foto_perfil ? `http://localhost:10101/images/${cliente.foto_perfil}` : Avatar)
+                  previewUrl || (cliente.foto_perfil ? cliente.foto_perfil : Avatar)
                 }
                 alt="Foto de perfil"
                 className="w-32 h-32 rounded-full object-cover cursor-pointer hover:opacity-90 transition-all duration-300 transform hover:scale-105 border-4 border-teal-50"
+                onError={(e) => {
+                  console.error("Error al cargar la imagen");
+                  e.target.src = Avatar;
+                }}
               />
               <label
                 htmlFor="upload-photo"
@@ -450,7 +486,7 @@ const ActualizarDatosCliente = () => {
                 id="upload-photo"
                 onChange={handleFileChange}
                 className="hidden"
-                accept="image/*"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
               />
             </div>
           </div>

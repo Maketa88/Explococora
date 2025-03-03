@@ -1,3 +1,4 @@
+
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { FaCamera, FaEnvelope, FaIdCard, FaUser, FaUserEdit } from 'react-icons/fa';
@@ -32,11 +33,19 @@ const PerfilCliente = () => {
 
       if (response.data && response.data.length > 0) {
         const clienteData = response.data[0];
-        // Recuperar la foto del localStorage si existe
-        const storedFoto = localStorage.getItem("foto_perfil");
-        if (storedFoto) {
-          clienteData.foto_perfil = storedFoto;
+        
+        // La foto de perfil ya debería ser una URL completa de Azure Blob Storage
+        if (clienteData.foto_perfil) {
+          // Guardar en localStorage
+          localStorage.setItem("foto_perfil", clienteData.foto_perfil);
+        } else {
+          // Recuperar la foto del localStorage si existe
+          const storedFoto = localStorage.getItem("foto_perfil");
+          if (storedFoto) {
+            clienteData.foto_perfil = storedFoto;
+          }
         }
+        
         setCliente(clienteData);
         localStorage.setItem("cliente", JSON.stringify(clienteData));
       }
@@ -117,7 +126,8 @@ const PerfilCliente = () => {
     );
 
   const { nombres, apellidos } = separarNombreCompleto(cliente.nombre_del_cliente);
-  const fotoUrl = cliente.foto_perfil ? `http://localhost:10101/images/${cliente.foto_perfil}` : Avatar;
+  // Usar directamente la URL de Azure Blob Storage
+  const fotoUrl = cliente.foto_perfil || Avatar;
 
   return (
     <>
