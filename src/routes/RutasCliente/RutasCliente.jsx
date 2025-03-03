@@ -10,7 +10,7 @@ import ActualizarDatosCliente from "../../pages/VistaCliente/ActualizarCliente";
 import CambiarContraseña from "../../pages/VistaCliente/CambiarContraseña";
 import {BorrarCuenta} from "../../pages/VistaCliente/BorrarCuenta";
 import {NuestrosGuias} from "../../components/NuestrosGuias/NuestrosGuias";
-// ... existing code ...
+import NuestrasRutas from "../../components/NuestrasRutas/NuestrasRutas";
 
 const RutasCliente = () => {
   return (
@@ -25,6 +25,7 @@ const RutasCliente = () => {
         <Route path="/ActualizarContrasenia" element={<CambiarContraseña />} />
         <Route path="/EliminarCuenta" element={<BorrarCuenta />} />
         <Route path="/NuestrosGuias" element={<NuestrosGuias />} />
+        <Route path="/NuestrasRutas" element={<NuestrasRutas />} />
       </Routes>
       <Footer />
       <ChatBot />

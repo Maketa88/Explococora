@@ -332,35 +332,43 @@ const ContactForm = () => {
   return (
     <div className={`min-h-[80vh] bg-gradient-to-br ${backgroundColors[currentStep]} flex flex-col items-center justify-center p-3 md:p-6 transition-all duration-1000 ease-in-out relative overflow-hidden`}>
       {/* Patrón SVG de fondo */}
-      <div className="absolute top-0 left-0 w-full h-full opacity-30">
+      <div className="absolute top-0 left-0 w-full h-full opacity-40">
         <svg
           viewBox="0 0 1200 600"
           className="w-full h-full"
           preserveAspectRatio="xMidYMid slice"
         >
+          {/* Título Explococora como marca de agua en el fondo */}
+          <text
+            x="600"
+            y="300"
+            textAnchor="middle"
+            className="text-5xl font-bold"
+            fill="#047857"
+            fontSize="120"
+            fontWeight="bold"
+            fontFamily="Arial, sans-serif"
+            opacity="0.15"
+            letterSpacing="40"
+          >
+            EXPLOCOCORA
+          </text>
+          
+          {/* Montañas en diferentes capas */}
           <path
-            d="M100,600 C100,400 150,300 200,100 C220,300 240,400 260,600"
-            fill="none"
-            stroke="#047857"
-            strokeWidth="8"
+            d="M0,600 L100,450 L200,500 L300,380 L400,450 L500,300 L600,420 L700,350 L800,480 L900,400 L1000,320 L1100,450 L1200,380 L1200,600 Z"
+            fill="#047857"
+            fillOpacity="0.2"
           />
           <path
-            d="M400,600 C400,350 450,250 500,50 C520,250 540,350 560,600"
-            fill="none"
-            stroke="#047857"
-            strokeWidth="8"
+            d="M0,600 L150,500 L250,550 L350,450 L450,520 L550,400 L650,480 L750,420 L850,500 L950,450 L1050,500 L1200,420 L1200,600 Z"
+            fill="#047857"
+            fillOpacity="0.15"
           />
           <path
-            d="M700,600 C700,400 750,300 800,100 C820,300 840,400 860,600"
-            fill="none"
-            stroke="#047857"
-            strokeWidth="8"
-          />
-          <path
-            d="M1000,600 C1000,350 1050,250 1100,50 C1120,250 1140,350 1160,600"
-            fill="none"
-            stroke="#047857"
-            strokeWidth="8"
+            d="M0,600 L200,550 L300,520 L400,540 L500,480 L600,520 L700,500 L800,550 L900,530 L1000,560 L1100,530 L1200,550 L1200,600 Z"
+            fill="#047857"
+            fillOpacity="0.1"
           />
         </svg>
       </div>

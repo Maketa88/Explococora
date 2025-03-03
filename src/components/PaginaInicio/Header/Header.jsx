@@ -36,7 +36,7 @@ export const Header = () => {
           <NavItem
             tipo="enlace"
             contenido={t("nuestrasRutas")}
-            enlace="#routes"
+            enlace="/NuestrasRutas"
           />
           <NavItem
             tipo="enlace"

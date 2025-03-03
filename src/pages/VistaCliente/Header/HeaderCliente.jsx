@@ -39,8 +39,8 @@ export const HeaderCliente = () => {
           />
           <NavItem
             tipo="enlace"
-            contenido={t("nuestrasRutas")}
-            enlace="#routes"
+            contenido={t("NuestrasRutas")}
+            to="/VistaCliente/NuestrasRutas"
           />
           <NavItem
             tipo="enlace"
@@ -52,7 +52,6 @@ export const HeaderCliente = () => {
             contenido={t("contactanos")}
             to="/VistaCliente/Contacto"
           />
-
           {/* Botones */}
 
           {/* Banderas */}
