@@ -1,172 +1,109 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaCamera, FaEnvelope, FaIdCard, FaUser, FaUserEdit } from 'react-icons/fa';
 import Avatar from "../../assets/Images/avatar.png";
 
 const PerfilCliente = () => {
   const [cliente, setCliente] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [modalAbierto, setModalAbierto] = useState(false);
-  const [fotoActualizada, setFotoActualizada] = useState(false);
-
+  
   // Función para cargar los datos del cliente
-  const cargarDatosCliente = async () => {
-    const cedula = localStorage.getItem("cedula");
-    const token = localStorage.getItem("token");
-
-    if (!cedula || !token) {
-      setError("No se encontraron credenciales necesarias.");
-      setLoading(false);
-      return;
-    }
-
+  const cargarDatosCliente = useCallback(async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:10101/cliente/perfil-completo/${cedula}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      setLoading(true);
+      
+      // Obtener datos básicos del localStorage
+      const cedula = localStorage.getItem("cedula");
+      const token = localStorage.getItem("token");
+      
+      if (!cedula || !token) {
+        setLoading(false);
+        return;
+      }
 
-      console.log("Respuesta del servidor:", response.data);
+      try {
+        const response = await axios.get(
+          `http://localhost:10101/cliente/perfil-completo/${cedula}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            }
+          }
+        );
 
-      if (response.data) {
-        // Manejar tanto si la respuesta es un objeto directo o está dentro de un array
-        const clienteData = Array.isArray(response.data) ? response.data[0] : response.data;
-        
-        // Verificar si hay una foto en la respuesta del servidor
-        if (clienteData.foto_perfil) {
-          console.log("Foto perfil encontrada:", clienteData.foto_perfil);
+        // Procesar datos recibidos del servidor
+        if (response.data) {
+          const clienteData = Array.isArray(response.data) ? response.data[0] : response.data;
           
-          // Si la foto comienza con http, es una URL completa
-          if (clienteData.foto_perfil.startsWith('http')) {
-            // Verificar si la foto ha cambiado antes de emitir el evento
-            const currentStoredFoto = localStorage.getItem("foto_perfil_cliente");
-            if (clienteData.foto_perfil !== currentStoredFoto) {
-              localStorage.setItem("foto_perfil_cliente", clienteData.foto_perfil);
-              
-              // Solo emitimos el evento si la foto ha cambiado y no viene de una recarga por evento
-              if (!fotoActualizada) {
-                const event = new CustomEvent('fotoPerfilClienteActualizada', { 
-                  detail: { fotoUrl: clienteData.foto_perfil } 
-                });
-                window.dispatchEvent(event);
-              }
-            }
-          } 
-          // Si la foto no comienza con http, construir la URL completa
-          else {
-            // Verificar si la ruta ya incluye /uploads/images
-            let fotoUrl;
-            if (clienteData.foto_perfil.includes('/uploads/images/')) {
-              fotoUrl = `http://localhost:10101${clienteData.foto_perfil}`;
-            } else {
-              fotoUrl = `http://localhost:10101/uploads/images/${clienteData.foto_perfil}`;
-            }
-            
-            console.log("URL de foto construida:", fotoUrl);
-            
-            // Verificar si la foto ha cambiado antes de emitir el evento
-            const currentStoredFoto = localStorage.getItem("foto_perfil_cliente");
-            if (fotoUrl !== currentStoredFoto) {
-              localStorage.setItem("foto_perfil_cliente", fotoUrl);
-              
-              // Solo emitimos el evento si la foto ha cambiado y no viene de una recarga por evento
-              if (!fotoActualizada) {
-                const event = new CustomEvent('fotoPerfilClienteActualizada', { 
-                  detail: { fotoUrl } 
-                });
-                window.dispatchEvent(event);
-              }
-            }
-          }
-        } 
-        // Verificar si hay foto en otros campos posibles
-        else if (clienteData.foto) {
-          console.log("Foto encontrada en campo 'foto':", clienteData.foto);
+          // Formatear los datos del cliente para mostrar correctamente
+          const clienteFormateado = {
+            cedula: cedula,
+            email: clienteData.email || localStorage.getItem("email"),
+            // Construir nombre_del_cliente a partir de los componentes si están disponibles
+            nombre_del_cliente: clienteData.nombre_completo || 
+              `${clienteData.primerNombre || ""} ${clienteData.segundoNombre || ""} ${clienteData.primerApellido || ""} ${clienteData.segundoApellido || ""}`.trim(),
+            // Extraer otros datos si están disponibles
+            primerNombre: clienteData.primerNombre,
+            segundoNombre: clienteData.segundoNombre,
+            primerApellido: clienteData.primerApellido,
+            segundoApellido: clienteData.segundoApellido,
+            foto_perfil: clienteData.foto_perfil || clienteData.foto
+          };
           
-          let fotoUrl;
-          if (clienteData.foto.startsWith('http')) {
-            fotoUrl = clienteData.foto;
-          } else if (clienteData.foto.includes('/uploads/images/')) {
-            fotoUrl = `http://localhost:10101${clienteData.foto}`;
-          } else {
-            fotoUrl = `http://localhost:10101/uploads/images/${clienteData.foto}`;
-          }
           
-          console.log("URL de foto construida:", fotoUrl);
+          setCliente(clienteFormateado);
+          localStorage.setItem("cliente", JSON.stringify(clienteFormateado));
           
-          // Verificar si la foto ha cambiado antes de emitir el evento
-          const currentStoredFoto = localStorage.getItem("foto_perfil_cliente");
-          if (fotoUrl !== currentStoredFoto) {
-            localStorage.setItem("foto_perfil_cliente", fotoUrl);
-            
-            // Solo emitimos el evento si la foto ha cambiado y no viene de una recarga por evento
-            if (!fotoActualizada) {
-              const event = new CustomEvent('fotoPerfilClienteActualizada', { 
-                detail: { fotoUrl } 
-              });
-              window.dispatchEvent(event);
-            }
+          // Procesar la foto de perfil
+          if (clienteFormateado.foto_perfil) {
+            procesarFotoPerfil(clienteFormateado);
           }
         }
-        // Si no hay foto en la respuesta, intentar recuperarla del localStorage
-        else {
-          const storedFoto = localStorage.getItem("foto_perfil_cliente");
-          if (storedFoto) {
-            console.log("Usando foto desde localStorage");
-            clienteData.foto_perfil = storedFoto;
-            // No emitimos evento aquí para evitar bucles infinitos
-          }
-        }
-        
-        setCliente(clienteData);
-        localStorage.setItem("cliente", JSON.stringify(clienteData));
+      } catch (error) {
+        console.error("Error al obtener datos del servidor:", error);
       }
     } catch (error) {
-      console.error("Error al cargar datos:", error);
-      setError(`Error: ${error.response?.data?.message || error.message}`);
+      console.error("Error general:", error);
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  // Función para procesar la foto de perfil
+  const procesarFotoPerfil = (clienteData) => {
+    if (clienteData.foto_perfil) {
+      let fotoUrl = clienteData.foto_perfil;
+      
+      if (!fotoUrl.startsWith('http')) {
+        if (fotoUrl.includes('/uploads/images/')) {
+          fotoUrl = `http://localhost:10101${fotoUrl}`;
+        } else {
+          fotoUrl = `http://localhost:10101/uploads/images/${fotoUrl}`;
+        }
+      }
+      
+      localStorage.setItem("foto_perfil_cliente", fotoUrl);
+    } else if (clienteData.foto) {
+      let fotoUrl = clienteData.foto;
+      
+      if (!fotoUrl.startsWith('http')) {
+        if (fotoUrl.includes('/uploads/images/')) {
+          fotoUrl = `http://localhost:10101${fotoUrl}`;
+        } else {
+          fotoUrl = `http://localhost:10101/uploads/images/${fotoUrl}`;
+        }
+      }
+      
+      localStorage.setItem("foto_perfil_cliente", fotoUrl);
+    }
   };
 
+  // Cargar datos al montar el componente
   useEffect(() => {
     cargarDatosCliente();
-    
-    // Agregar event listener para actualizar la foto cuando cambie
-    const handleFotoActualizada = (event) => {
-      console.log("Evento de foto actualizada recibido:", event.detail);
-      
-      // Verificar si la foto es diferente a la que ya tenemos en localStorage
-      const currentStoredFoto = localStorage.getItem("foto_perfil_cliente");
-      if (event.detail.fotoUrl && event.detail.fotoUrl !== currentStoredFoto) {
-        // Solo actualizar si la foto es diferente
-        localStorage.setItem("foto_perfil_cliente", event.detail.fotoUrl);
-        setFotoActualizada(true);
-      }
-    };
-    
-    window.addEventListener('fotoPerfilClienteActualizada', handleFotoActualizada);
-    
-    // Limpiar el event listener cuando el componente se desmonte
-    return () => {
-      window.removeEventListener('fotoPerfilClienteActualizada', handleFotoActualizada);
-    };
-  }, []);
-  
-  // Efecto para recargar los datos cuando la foto se actualiza
-  useEffect(() => {
-    if (fotoActualizada) {
-      cargarDatosCliente();
-      setFotoActualizada(false);
-    }
-  }, [fotoActualizada]);
+  }, [cargarDatosCliente]);
 
-  // Función mejorada para separar nombres y apellidos
   const separarNombreCompleto = (nombreCompleto) => {
     if (!nombreCompleto) return { nombres: "", apellidos: "" };
 
@@ -212,15 +149,6 @@ const PerfilCliente = () => {
       </div>
     );
 
-  if (error)
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-teal-800/10 to-white flex items-center justify-center">
-        <div className="text-red-600 text-xl font-semibold bg-red-50 p-4 rounded-xl shadow-lg border border-red-200">
-          {error}
-        </div>
-      </div>
-    );
-
   if (!cliente)
     return (
       <div className="min-h-screen bg-gradient-to-b from-teal-800/10 to-white flex items-center justify-center">
@@ -230,11 +158,15 @@ const PerfilCliente = () => {
       </div>
     );
 
-  const { nombres, apellidos } = separarNombreCompleto(cliente.nombre_del_cliente);
+  const { nombres, apellidos } = cliente.primerNombre ? 
+    { 
+      nombres: `${cliente.primerNombre || ""} ${cliente.segundoNombre || ""}`.trim(), 
+      apellidos: `${cliente.primerApellido || ""} ${cliente.segundoApellido || ""}`.trim() 
+    } : 
+    separarNombreCompleto(cliente.nombre_del_cliente);
   
-  // Usar la foto actualizada del localStorage si existe, o la del cliente, o la imagen por defecto
-  const fotoPerfilCliente = localStorage.getItem("foto_perfil_cliente");
-  const fotoUrl = fotoPerfilCliente || cliente.foto_perfil || Avatar;
+  // Usar la foto de la base de datos con prioridad sobre cualquier otra fuente
+  const fotoUrl = cliente.foto_perfil || localStorage.getItem("foto_perfil_cliente") || Avatar;
 
   return (
     <>
@@ -256,8 +188,8 @@ const PerfilCliente = () => {
                     if (storedFoto && storedFoto !== fotoUrl) {
                       e.target.src = storedFoto;
                     } else {
-                      // Fallback a avatar por defecto
-                      e.target.src = Avatar;
+                      // Fallback a avatar generado con iniciales
+                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(cliente.nombre_del_cliente || "Usuario")}&size=200&background=0D8ABC&color=fff`;
                     }
                   }}
                 />
