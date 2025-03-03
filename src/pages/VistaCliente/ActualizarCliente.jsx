@@ -133,19 +133,6 @@ const ActualizarDatosCliente = () => {
     cargarDatosCliente();
   }, [cargarDatosCliente]);
 
-  const separarNombre = (nombreCompleto) => {
-    if (!nombreCompleto) return { primerNombre: "", segundoNombre: "", primerApellido: "", segundoApellido: "" };
-
-    const partes = nombreCompleto.split(" ");
-    
-    const primerNombre = partes[0] || "";
-    const segundoNombre = partes[1] || "";
-    const primerApellido = partes[2] || "";
-    const segundoApellido = partes[3] || "";
-
-    return { primerNombre, segundoNombre, primerApellido, segundoApellido };
-  };
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -190,12 +177,19 @@ const ActualizarDatosCliente = () => {
     setUpdating(true);
     setError(null);
 
+    // Emitir evento para ocultar el footer
+    const ocultarFooterEvent = new CustomEvent('ocultarFooter', { detail: { ocultar: true } });
+    window.dispatchEvent(ocultarFooterEvent);
+
     const cedula = localStorage.getItem("cedula");
     const token = localStorage.getItem("token");
 
     if (!cedula || !token) {
       setError("Faltan credenciales para actualizar");
       setUpdating(false);
+      // Restaurar footer
+      const mostrarFooterEvent = new CustomEvent('ocultarFooter', { detail: { ocultar: false } });
+      window.dispatchEvent(mostrarFooterEvent);
       return;
     }
 
@@ -364,7 +358,15 @@ const ActualizarDatosCliente = () => {
           didOpen: () => {
             document.getElementById("cerrarAlerta").addEventListener("click", () => {
               Swal.close();
+              // Restaurar footer cuando se cierra la alerta
+              const mostrarFooterEvent = new CustomEvent('ocultarFooter', { detail: { ocultar: false } });
+              window.dispatchEvent(mostrarFooterEvent);
             });
+          },
+          willClose: () => {
+            // Asegurarse de que el footer se restaure cuando se cierre la alerta
+            const mostrarFooterEvent = new CustomEvent('ocultarFooter', { detail: { ocultar: false } });
+            window.dispatchEvent(mostrarFooterEvent);
           }
         });
 
@@ -377,6 +379,9 @@ const ActualizarDatosCliente = () => {
     } catch (error) {
       console.error("Error al actualizar:", error);
       setError(`Error al actualizar: ${error.response?.data?.message || error.message}`);
+      // Restaurar footer en caso de error
+      const mostrarFooterEvent = new CustomEvent('ocultarFooter', { detail: { ocultar: false } });
+      window.dispatchEvent(mostrarFooterEvent);
     } finally {
       setUpdating(false);
     }
