@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { PaginaInicio } from "../../pages/PaginaInicio/PaginaInicio";
 import { HistoriaCultura } from "../../components/HistoriaCultura/Body/HistoriaCultura";
 import { InicioSesion } from "../../components/InicioSesion/InicioSesion";
@@ -32,6 +32,7 @@ export const RutasExplococora = () => {
   if (isGuiaRoute) {
     return (
       <Routes>
+        <Route path="/VistaGuia" element={<Navigate to="/VistaGuia/PerfilGuia" replace />} />
         <Route path="/VistaGuia/*" element={<VistaGuia />} />
       </Routes>
     );

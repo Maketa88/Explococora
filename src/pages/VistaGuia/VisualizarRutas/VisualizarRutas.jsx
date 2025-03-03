@@ -102,22 +102,22 @@ const VisualizarRutas = () => {
           <h1 className="text-2xl font-bold text-white">Visualizar Rutas</h1>
           <button
             onClick={() => setMostrarFiltros(!mostrarFiltros)}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+            className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg"
           >
             {mostrarFiltros ? 'Ocultar Filtros' : 'Mostrar Filtros'}
           </button>
         </div>
         
         {mostrarFiltros && (
-          <div className="bg-gray-800 p-4 rounded-lg mb-4">
+          <div className="bg-teal-900 p-4 rounded-lg mb-4">
             <h2 className="text-xl font-semibold text-white mb-3">Filtrar Rutas</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <label className="block text-gray-400 mb-1">Dificultad</label>
+                <label className="block text-teal-300 mb-1">Dificultad</label>
                 <select
                   value={filtros.dificultad}
                   onChange={(e) => setFiltros({...filtros, dificultad: e.target.value})}
-                  className="w-full p-2 rounded bg-gray-700 text-white"
+                  className="w-full p-2 rounded bg-teal-800 text-white"
                 >
                   <option value="">Todas</option>
                   <option value="Facil">Fácil</option>
@@ -127,11 +127,11 @@ const VisualizarRutas = () => {
               </div>
               
               <div>
-                <label className="block text-gray-400 mb-1">Duración</label>
+                <label className="block text-teal-300 mb-1">Duración</label>
                 <select
                   value={filtros.duracion}
                   onChange={(e) => setFiltros({...filtros, duracion: e.target.value})}
-                  className="w-full p-2 rounded bg-gray-700 text-white"
+                  className="w-full p-2 rounded bg-teal-800 text-white"
                 >
                   <option value="">Todas</option>
                   <option value="corta">Corta (menos de 1 hora)</option>
@@ -141,11 +141,11 @@ const VisualizarRutas = () => {
               </div>
               
               <div>
-                <label className="block text-gray-400 mb-1">Estado</label>
+                <label className="block text-teal-300 mb-1">Estado</label>
                 <select
                   value={filtros.estado}
                   onChange={(e) => setFiltros({...filtros, estado: e.target.value})}
-                  className="w-full p-2 rounded bg-gray-700 text-white"
+                  className="w-full p-2 rounded bg-teal-800 text-white"
                 >
                   <option value="">Todos</option>
                   <option value="Activa">Activa</option>
@@ -154,11 +154,11 @@ const VisualizarRutas = () => {
               </div>
               
               <div>
-                <label className="block text-gray-400 mb-1">Tipo</label>
+                <label className="block text-teal-300 mb-1">Tipo</label>
                 <select
                   value={filtros.tipo}
                   onChange={(e) => setFiltros({...filtros, tipo: e.target.value})}
-                  className="w-full p-2 rounded bg-gray-700 text-white"
+                  className="w-full p-2 rounded bg-teal-800 text-white"
                 >
                   <option value="">Todos</option>
                   <option value="Cabalgata">Cabalgata</option>
@@ -171,13 +171,13 @@ const VisualizarRutas = () => {
             <div className="flex justify-end mt-4 gap-2">
               <button
                 onClick={limpiarFiltros}
-                className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+                className="bg-teal-700 text-white px-4 py-2 rounded hover:bg-teal-600"
               >
                 Limpiar
               </button>
               <button
                 onClick={aplicarFiltros}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                className="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600"
               >
                 Aplicar Filtros
               </button>
@@ -191,20 +191,20 @@ const VisualizarRutas = () => {
         {Array.isArray(rutasFiltradas) && rutasFiltradas.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {rutasFiltradas.map((ruta) => (
-              <div key={`${ruta.id}-${ruta.nombreRuta}`} className="bg-gray-800 p-4 rounded-lg">
+              <div key={`${ruta.id}-${ruta.nombreRuta}`} className="bg-teal-800 p-4 rounded-lg">
                 <h2 className="text-xl font-semibold text-white">{ruta.nombreRuta}</h2>
-                <p className="text-gray-400">Duración: {ruta.duracion} horas</p>
-                <p className="text-gray-400">Descripción: {ruta.descripcion}</p>
-                <p className="text-gray-400">Dificultad: {ruta.dificultad}</p>
-                <p className="text-gray-400">Capacidad Máxima: {ruta.capacidadMaxima}</p>
-                <p className="text-gray-400">Distancia: {ruta.distancia} km</p>
-                <p className="text-gray-400">Tipo: {ruta.tipo}</p>
-                <p className="text-gray-400">Estado: {ruta.estado}</p>
+                <p className="text-teal-300">Duración: {ruta.duracion} horas</p>
+                <p className="text-teal-300">Descripción: {ruta.descripcion}</p>
+                <p className="text-teal-300">Dificultad: {ruta.dificultad}</p>
+                <p className="text-teal-300">Capacidad Máxima: {ruta.capacidadMaxima}</p>
+                <p className="text-teal-300">Distancia: {ruta.distancia} km</p>
+                <p className="text-teal-300">Tipo: {ruta.tipo}</p>
+                <p className="text-teal-300">Estado: {ruta.estado}</p>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-gray-400">No hay rutas disponibles con los filtros seleccionados.</p>
+          <p className="text-teal-300">No hay rutas disponibles con los filtros seleccionados.</p>
         )}
         {/* Contenido específico de Analytics */}
       </div>

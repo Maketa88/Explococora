@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import DashboardLayoutGuia from '../../../layouts/DashboardLayoutGuia';
-import { AlertTriangle, X, ArrowLeft, Trash2, Lock, CheckCircle } from 'lucide-react';
+import { AlertTriangle, X, ArrowLeft, Trash2, Lock, CheckCircle, Eye, EyeOff } from 'lucide-react';
 
 const EliminarCuentaGuia = () => {
   const [formData, setFormData] = useState({
@@ -75,10 +75,6 @@ const EliminarCuentaGuia = () => {
     if (name === 'confirmacion') {
       setConfirmacionValida(value.toLowerCase() === 'eliminar mi cuenta');
     }
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
   };
 
   const handleSubmit = async (e) => {
@@ -177,37 +173,33 @@ const EliminarCuentaGuia = () => {
   return (
     <DashboardLayoutGuia>
       <div className="p-6">
-        <div className={`${darkMode ? 'bg-[#1e293b]' : 'bg-gray-100'} rounded-lg p-8 shadow-lg max-w-3xl mx-auto`}>
+        <div className="bg-teal-900 rounded-lg p-8 shadow-lg max-w-3xl mx-auto">
           <div className="flex items-center mb-8">
             <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center mr-4">
               <Trash2 className="w-8 h-8 text-white" />
             </div>
-            <h2 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+            <h2 className="text-3xl font-bold text-white">
               Eliminar Cuenta
             </h2>
           </div>
           
           <AlertComponent />
           
-          <div className={`mb-8 p-4 rounded-lg ${darkMode ? 'bg-red-900/30' : 'bg-red-100'} border ${darkMode ? 'border-red-800' : 'border-red-200'}`}>
-            <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-red-400' : 'text-red-700'}`}>
-              ¡Advertencia! Esta acción no se puede deshacer
-            </h3>
-            <p className={`${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-              Al eliminar su cuenta:
+          <div className="mb-6 text-white">
+            <p className="text-lg">
+              Esta acción eliminará permanentemente su cuenta y todos los datos asociados.
             </p>
-            <ul className={`list-disc pl-5 mt-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-              <li>Perderá acceso a todos sus datos y configuraciones</li>
-              <li>No podrá recuperar su historial de rutas y actividades</li>
-              <li>Su perfil será eliminado permanentemente del sistema</li>
-              <li>Todas sus reservas pendientes serán canceladas</li>
+            <ul className="list-disc pl-5 mt-2 text-white opacity-90">
+              <li>Perderá acceso a todos sus datos y configuraciones personales</li>
+              <li>No podrá recuperar su cuenta después de eliminarla</li>
+              <li>Las rutas asignadas deberán ser reasignadas a otro guía</li>
             </ul>
           </div>
           
           <form onSubmit={handleSubmit}>
             <div className="space-y-6">
               <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label className="block text-sm font-medium mb-2 text-white">
                   Cédula
                 </label>
                 <input
@@ -215,13 +207,13 @@ const EliminarCuentaGuia = () => {
                   name="cedula"
                   value={formData.cedula}
                   onChange={handleInputChange}
-                  className={`w-full p-3 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
+                  className="w-full p-3 rounded-lg bg-teal-800 text-white border border-teal-600"
                   required
                 />
               </div>
               
               <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label className="block text-sm font-medium mb-2 text-white">
                   Contraseña
                 </label>
                 <div className="relative">
@@ -230,35 +222,32 @@ const EliminarCuentaGuia = () => {
                     name="contrasena"
                     value={formData.contrasena}
                     onChange={handleInputChange}
-                    className={`w-full p-3 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'} pr-10`}
+                    className="w-full p-3 rounded-lg bg-teal-800 text-white border border-teal-600"
                     required
                   />
                   <button
                     type="button"
-                    onClick={togglePasswordVisibility}
-                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-teal-300 hover:text-white"
                   >
-                    <Lock className="w-5 h-5" />
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
               </div>
               
               <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Para confirmar, escriba "eliminar mi cuenta"
+                <label className="block text-sm font-medium mb-2 text-white">
+                  Confirmar eliminación
                 </label>
+                <p className="text-sm mb-2 text-white opacity-80">
+                  Para confirmar, escriba "eliminar mi cuenta" en el campo a continuación
+                </p>
                 <input
                   type="text"
                   name="confirmacion"
                   value={formData.confirmacion}
                   onChange={handleInputChange}
-                  className={`w-full p-3 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${
-                    formData.confirmacion 
-                      ? (confirmacionValida 
-                          ? (darkMode ? 'border-green-500' : 'border-green-500') 
-                          : (darkMode ? 'border-red-500' : 'border-red-500'))
-                      : (darkMode ? 'border-gray-600' : 'border-gray-300')
-                  }`}
+                  className="w-full p-3 rounded-lg bg-teal-800 text-white border border-teal-600"
                   required
                   placeholder="eliminar mi cuenta"
                 />
@@ -270,7 +259,7 @@ const EliminarCuentaGuia = () => {
               <button
                 type="button"
                 onClick={() => navigate("/VistaGuia/PerfilGuia")}
-                className="py-2 px-6 bg-gray-700 hover:bg-gray-600 text-white rounded-lg flex items-center gap-2"
+                className="py-2 px-6 bg-teal-700 hover:bg-teal-600 text-white rounded-lg flex items-center gap-2"
               >
                 <ArrowLeft className="w-5 h-5" />
                 Cancelar
@@ -282,7 +271,7 @@ const EliminarCuentaGuia = () => {
                 className={`py-2 px-6 ${
                   confirmacionValida && formData.contrasena && formData.cedula
                     ? 'bg-red-600 hover:bg-red-700'
-                    : 'bg-gray-500'
+                    : 'bg-teal-500'
                 } text-white rounded-lg flex items-center gap-2 ${
                   (submitting || !confirmacionValida || !formData.contrasena || !formData.cedula)
                     ? 'opacity-70 cursor-not-allowed'
@@ -307,7 +296,7 @@ const EliminarCuentaGuia = () => {
             </div>
             
             {countdown !== null && (
-              <div className={`mt-4 text-center ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <div className="mt-4 text-center text-white">
                 Redirigiendo en {countdown} segundos...
               </div>
             )}

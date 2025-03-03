@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from '../../pages/VistaGuia/Dashboard/Dashboard';
 import VisualizarRutas from '../../pages/VistaGuia/VisualizarRutas/VisualizarRutas';
 import RutasAsignadas from '../../pages/VistaGuia/RutasAsignadas/RutasAsignadas';
@@ -15,10 +15,12 @@ import CambioEstado from '../../pages/VistaGuia/CambioEstado/CambioEstado';
 import CambiarContraseña from '../../pages/VistaGuia/PerfilGuia/cambiarContra';
 import ActualizarGuia from '../../pages/VistaGuia/PerfilGuia/ActualizarGuia';
 import EliminarCuentaGuia from '../../pages/VistaGuia/PerfilGuia/EliminarCuentaGuia';
-const  RutasGuia = () => {
+
+const RutasGuia = () => {
   return (
     <Routes>
-      <Route path="/" element={<Dashboard />} />
+      <Route path="/" element={<Navigate to="/VistaGuia/PerfilGuia" replace />} />
+      <Route path="/Dashboard" element={<Dashboard />} />
       <Route path="/RutasAsignadas" element={<RutasAsignadas />} />
       <Route path="/customers" element={<Customers />} />
       <Route path="/new-customer" element={<NewCustomer />} />

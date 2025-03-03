@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import DashboardLayoutGuia from "../../../layouts/DashboardLayoutGuia";
+import { Edit, User } from "lucide-react";
 
 const ActualizarDatosGuia = () => {
   const [cliente, setGuia] = useState(null);
@@ -275,11 +276,11 @@ const ActualizarDatosGuia = () => {
   const renderContenido = () => {
     if (loading) {
       return (
-        <div className={`${darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-800'} rounded-lg p-6 shadow-lg text-center`}>
+        <div className={`${darkMode ? 'bg-teal-900 text-white' : 'bg-teal-50 text-teal-800'} rounded-lg p-6 shadow-lg text-center`}>
           <div className="animate-pulse">
-            <div className="h-4 bg-gray-700 rounded w-3/4 mx-auto mb-2"></div>
-            <div className="h-4 bg-gray-700 rounded w-1/2 mx-auto mb-2"></div>
-            <div className="h-4 bg-gray-700 rounded w-2/3 mx-auto"></div>
+            <div className="h-4 bg-teal-700 rounded w-3/4 mx-auto mb-2"></div>
+            <div className="h-4 bg-teal-700 rounded w-1/2 mx-auto mb-2"></div>
+            <div className="h-4 bg-teal-700 rounded w-2/3 mx-auto"></div>
           </div>
           <p className="mt-4">Cargando información...</p>
         </div>
@@ -288,12 +289,12 @@ const ActualizarDatosGuia = () => {
     
     if (error && !formData.primerNombre) {
       return (
-        <div className={`${darkMode ? 'bg-[#1e293b]' : 'bg-gray-100'} rounded-lg p-6 shadow-lg text-center text-red-500`}>
+        <div className={`${darkMode ? 'bg-teal-900' : 'bg-teal-50'} rounded-lg p-6 shadow-lg text-center text-red-500`}>
           <p className="text-xl font-semibold mb-2">Error al cargar los datos</p>
           <p>{error}</p>
           <button 
             onClick={() => cargarDatosGuia()} 
-            className="mt-4 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            className="mt-4 py-2 px-4 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors"
           >
             Reintentar
           </button>
@@ -305,8 +306,8 @@ const ActualizarDatosGuia = () => {
     const nombreCompleto = `${formData.primerNombre} ${formData.segundoNombre} ${formData.primerApellido} ${formData.segundoApellido}`.trim();
 
     return (
-      <div className={`${darkMode ? 'bg-[#1e293b]' : 'bg-gray-100'} rounded-lg p-6 shadow-lg`}>
-        <h2 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Actualizar Información Personal</h2>
+      <div className="bg-teal-900 rounded-lg p-6 shadow-lg">
+        <h2 className="text-2xl font-bold mb-6 text-white">Actualizar Información Personal</h2>
         
         {error && (
           <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
@@ -318,30 +319,30 @@ const ActualizarDatosGuia = () => {
           {/* Sección para foto de perfil */}
           <div className="flex flex-col items-center mb-8">
             <div className="relative">
-              <div className="w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-blue-500">
+              <div className="w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-teal-500">
                 {previewFoto ? (
                   <img
                     src={previewFoto}
-                    alt="Vista previa"
-                    className="h-full w-full object-cover"
+                    alt="Foto de perfil"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://ui-avatars.com/api/?name=User&background=0D9488&color=fff';
+                    }}
                   />
                 ) : (
-                  <img
-                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto || "Usuario")}&size=200&background=0D8ABC&color=fff`}
-                    alt="Foto de perfil"
-                    className="h-full w-full object-cover"
-                  />
+                  <div className="w-full h-full flex items-center justify-center bg-teal-700 text-white">
+                    <User size={64} />
+                  </div>
                 )}
               </div>
               
               <button
                 type="button"
                 onClick={handleSelectFoto}
-                className={`absolute bottom-2 right-0 p-2 rounded-full ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white shadow-lg`}
+                className="absolute bottom-2 right-0 p-2 rounded-full bg-teal-600 hover:bg-teal-700 text-white shadow-lg"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                </svg>
+                <Edit size={20} />
               </button>
             </div>
             
@@ -353,14 +354,14 @@ const ActualizarDatosGuia = () => {
               className="hidden"
             />
             
-            <p className={`text-sm mt-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            <p className="text-sm mt-2 text-white">
               Haz clic en el icono para cambiar tu foto
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className={`block mb-2 text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className="block mb-2 text-sm font-medium text-white">
                 Primer Nombre *
               </label>
               <input
@@ -369,12 +370,12 @@ const ActualizarDatosGuia = () => {
                 value={formData.primerNombre}
                 onChange={handleChange}
                 required
-                className={`w-full px-4 py-2 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                className="w-full px-4 py-2 rounded-lg border bg-teal-800 border-teal-600 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
             
             <div>
-              <label className={`block mb-2 text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className="block mb-2 text-sm font-medium text-white">
                 Segundo Nombre
               </label>
               <input
@@ -382,12 +383,12 @@ const ActualizarDatosGuia = () => {
                 name="segundoNombre"
                 value={formData.segundoNombre}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                className="w-full px-4 py-2 rounded-lg border bg-teal-800 border-teal-600 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
             
             <div>
-              <label className={`block mb-2 text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className="block mb-2 text-sm font-medium text-white">
                 Primer Apellido *
               </label>
               <input
@@ -396,12 +397,12 @@ const ActualizarDatosGuia = () => {
                 value={formData.primerApellido}
                 onChange={handleChange}
                 required
-                className={`w-full px-4 py-2 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                className="w-full px-4 py-2 rounded-lg border bg-teal-800 border-teal-600 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
             
             <div>
-              <label className={`block mb-2 text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className="block mb-2 text-sm font-medium text-white">
                 Segundo Apellido
               </label>
               <input
@@ -409,12 +410,12 @@ const ActualizarDatosGuia = () => {
                 name="segundoApellido"
                 value={formData.segundoApellido}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                className="w-full px-4 py-2 rounded-lg border bg-teal-800 border-teal-600 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
             
             <div>
-              <label className={`block mb-2 text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className="block mb-2 text-sm font-medium text-white">
                 Correo Electrónico *
               </label>
               <input
@@ -423,25 +424,26 @@ const ActualizarDatosGuia = () => {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className={`w-full px-4 py-2 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                className="w-full px-4 py-2 rounded-lg border bg-teal-800 border-teal-600 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
             
             <div>
-              <label className={`block mb-2 text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Teléfono
+              <label className="block mb-2 text-sm font-medium text-white">
+                Teléfono *
               </label>
               <input
                 type="tel"
                 name="telefono"
                 value={formData.telefono}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                required
+                className="w-full px-4 py-2 rounded-lg border bg-teal-800 border-teal-600 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
             
             <div>
-              <label className={`block mb-2 text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className="block mb-2 text-sm font-medium text-white">
                 Especialidad
               </label>
               <input
@@ -449,12 +451,12 @@ const ActualizarDatosGuia = () => {
                 name="especialidad"
                 value={formData.especialidad}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                className="w-full px-4 py-2 rounded-lg border bg-teal-800 border-teal-600 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
             
             <div className="md:col-span-2">
-              <label className={`block mb-2 text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <label className="block mb-2 text-sm font-medium text-white">
                 Descripción
               </label>
               <textarea
@@ -462,7 +464,7 @@ const ActualizarDatosGuia = () => {
                 value={formData.descripcion}
                 onChange={handleChange}
                 rows="4"
-                className={`w-full px-4 py-2 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                className="w-full px-4 py-2 rounded-lg border bg-teal-800 border-teal-600 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                 placeholder="Escribe una breve descripción sobre ti, tu experiencia y habilidades como guía..."
               ></textarea>
             </div>
@@ -472,7 +474,7 @@ const ActualizarDatosGuia = () => {
             <button
               type="submit"
               disabled={updating}
-              className={`py-2 px-6 rounded-lg ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white font-medium transition-colors duration-200 flex items-center gap-2 ${updating ? 'opacity-70 cursor-not-allowed' : ''}`}
+              className={`py-2 px-6 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-medium transition-colors duration-200 flex items-center gap-2 ${updating ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
               {updating ? (
                 <>
@@ -489,8 +491,8 @@ const ActualizarDatosGuia = () => {
             
             <button
               type="button"
-              onClick={() => navigate("/VistaGuia/Perfil")}
-              className={`py-2 px-6 rounded-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-300 hover:bg-gray-400'} ${darkMode ? 'text-white' : 'text-gray-800'} font-medium transition-colors duration-200`}
+              onClick={() => navigate("/VistaGuia/PerfilGuia")}
+              className="py-2 px-6 rounded-lg bg-teal-700 hover:bg-teal-600 text-white font-medium transition-colors duration-200"
             >
               Cancelar
             </button>

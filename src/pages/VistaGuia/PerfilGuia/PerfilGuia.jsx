@@ -10,6 +10,7 @@ const PerfilGuia = () => {
   const [darkMode, setDarkMode] = useState(true); // Por defecto modo oscuro como en el dashboard
   const [previewFoto, setPreviewFoto] = useState(null);
   const navigate = useNavigate();
+  
 
   useEffect(() => {
     // Detectar el modo actual del dashboard
@@ -53,6 +54,12 @@ const PerfilGuia = () => {
           if (guiaData.foto_perfil.startsWith('http')) {
             setPreviewFoto(guiaData.foto_perfil);
             localStorage.setItem("foto_perfil", guiaData.foto_perfil);
+            
+            // Emitir evento con la URL completa
+            const event = new CustomEvent('fotoPerfilActualizada', { 
+              detail: { fotoUrl: guiaData.foto_perfil } 
+            });
+            window.dispatchEvent(event);
           } 
           // Si la foto no comienza con http, construir la URL completa
           else {
@@ -67,6 +74,10 @@ const PerfilGuia = () => {
             console.log("URL de foto construida:", fotoUrl);
             setPreviewFoto(fotoUrl);
             localStorage.setItem("foto_perfil", fotoUrl);
+            
+            // Notificar a otros componentes que la foto se ha actualizado
+            const event = new CustomEvent('fotoPerfilActualizada', { detail: { fotoUrl } });
+            window.dispatchEvent(event);
           }
         } 
         // Verificar si hay foto en otros campos posibles
@@ -85,6 +96,10 @@ const PerfilGuia = () => {
           console.log("URL de foto construida:", fotoUrl);
           setPreviewFoto(fotoUrl);
           localStorage.setItem("foto_perfil", fotoUrl);
+          
+          // Notificar a otros componentes que la foto se ha actualizado
+          const event = new CustomEvent('fotoPerfilActualizada', { detail: { fotoUrl } });
+          window.dispatchEvent(event);
         }
         // Si no hay foto en la respuesta, intentar recuperarla del localStorage
         else {
@@ -92,6 +107,10 @@ const PerfilGuia = () => {
           if (storedFoto) {
             console.log("Usando foto desde localStorage");
             setPreviewFoto(storedFoto);
+            
+            // También notificamos para mantener consistencia
+            const event = new CustomEvent('fotoPerfilActualizada', { detail: { fotoUrl: storedFoto } });
+            window.dispatchEvent(event);
           }
         }
         
@@ -119,7 +138,7 @@ const PerfilGuia = () => {
   const renderContenido = () => {
     if (loading) {
       return (
-        <div className={`${darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-800'} rounded-lg p-6 shadow-lg text-center`}>
+        <div className={`${darkMode ? 'bg-teal-900' : 'bg-teal-50'} rounded-lg p-6 shadow-lg text-center`}>
           <div className="animate-pulse">
             <div className="flex justify-center">
               <div className="rounded-full bg-gray-700 h-32 w-32 mb-4"></div>
@@ -135,12 +154,12 @@ const PerfilGuia = () => {
     
     if (error) {
       return (
-        <div className={`${darkMode ? 'bg-[#1e293b]' : 'bg-gray-100'} rounded-lg p-6 shadow-lg text-center text-red-500`}>
+        <div className={`${darkMode ? 'bg-teal-900' : 'bg-teal-50'} rounded-lg p-6 shadow-lg text-center text-red-500`}>
           <p className="text-xl font-semibold mb-2">Error al cargar el perfil</p>
           <p>{error}</p>
           <button 
             onClick={() => window.location.reload()} 
-            className="mt-4 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            className="mt-4 py-2 px-4 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors"
           >
             Reintentar
           </button>
@@ -151,7 +170,7 @@ const PerfilGuia = () => {
     // Si no hay datos, mostrar un mensaje
     if (!guia) {
       return (
-        <div className={`${darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-800'} rounded-lg p-6 shadow-lg text-center`}>
+        <div className={`${darkMode ? 'bg-teal-900' : 'bg-teal-50'} rounded-lg p-6 shadow-lg text-center`}>
           No se encontraron datos del guía.
         </div>
       );
@@ -165,8 +184,8 @@ const PerfilGuia = () => {
     const { nombres, apellidos } = separarNombre(nombreCompleto);
     
     return (
-      <div className={`${darkMode ? 'bg-[#1e293b]' : 'bg-gray-100'} rounded-lg p-6 shadow-lg`}>
-        <h2 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Perfil del Guía</h2>
+      <div className={`${darkMode ? 'bg-teal-900' : 'bg-teal-50'} rounded-lg p-6 shadow-lg`}>
+        <h2 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-teal-800'}`}>Perfil del Guía</h2>
         
         <div className="flex flex-col md:flex-row gap-6">
           {/* Imagen de perfil */}
@@ -207,35 +226,35 @@ const PerfilGuia = () => {
           
           {/* Información personal */}
           <div className="flex-1">
-            <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-              <div>
-                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Nombre</h3>
-                <p className="font-medium text-lg">{nombres}</p>
+            <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${darkMode ? 'text-teal-300' : 'text-teal-700'}`}>
+              <div className="bg-teal-800/70 p-3 rounded-lg shadow-md">
+                <h3 className={`text-sm uppercase mb-1 font-weight.bold ${darkMode ? 'text-white' : 'text-white'}`}>Nombre</h3>
+                <p className="text-lg text-white">{nombres}</p>
               </div>
               
-              <div>
-                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Apellidos</h3>
-                <p className="font-medium text-lg">{apellidos}</p>
+              <div className="bg-teal-800/70 p-3 rounded-lg shadow-md">
+                <h3 className={`text-sm uppercase mb-1 font-weight.bold ${darkMode ? 'text-white' : 'text-white'}`}>Apellidos</h3>
+                <p className=" text-lg text-white">{apellidos}</p>
               </div>
               
-              <div>
-                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Cédula</h3>
-                <p className="font-medium text-lg">{guiaData.cedula || "No disponible"}</p>
+              <div className="bg-teal-800/70 p-3 rounded-lg shadow-md">
+                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-white' : 'text-white'}`}>Cédula</h3>
+                <p className=" text-lg text-white">{guiaData.cedula || "No disponible"}</p>
               </div>
               
-              <div>
-                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Correo electrónico</h3>
-                <p className="font-medium text-lg">{guiaData.email || "No disponible"}</p>
+              <div className="bg-teal-800/70 p-3 rounded-lg shadow-md">
+                <h3 className={`text-sm bold uppercase mb-1 ${darkMode ? 'text-white' : 'text-white'}`}>Correo electrónico</h3>
+                <p className=" text-lg text-white">{guiaData.email || "No disponible"}</p>
               </div>
               
-              <div>
-                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Teléfono</h3>
-                <p className="font-medium text-lg">{guiaData.telefono || "No disponible"}</p>
+              <div className="bg-teal-800/70 p-3 rounded-lg shadow-md">
+                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-white' : 'text-white'}`}>Teléfono</h3>
+                <p className=" text-lg text-white">{guiaData.telefono || "No disponible"}</p>
               </div>
               
-              <div>
-                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Especialidad</h3>
-                <p className="font-medium text-lg">{guiaData.especialidad || "No disponible"}</p>
+              <div className="bg-teal-800/70 p-3 rounded-lg shadow-md">
+                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-white' : 'text-white'}`}>Especialidad</h3>
+                <p className=" text-lg text-white">{guiaData.especialidad || "No disponible"}</p>
               </div>
             </div>
             
@@ -247,7 +266,7 @@ const PerfilGuia = () => {
               </button>
               <button 
                 onClick={() => navigate("/VistaGuia/CambiarContraseña")}
-                className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-300 hover:bg-gray-400'} ${darkMode ? 'text-white' : 'text-gray-800'} font-medium transition-colors duration-200`}
+                className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-teal-700 hover:bg-teal-600' : 'bg-teal-300 hover:bg-teal-400'} ${darkMode ? 'text-white' : 'text-teal-800'} font-medium transition-colors duration-200`}
               >
                 Cambiar contraseña
               </button>
@@ -257,36 +276,36 @@ const PerfilGuia = () => {
         
         {/* Sección de estadísticas */}
         <div className="mt-8">
-          <h3 className={`text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Estadísticas</h3>
+          <h3 className={`text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-teal-800'}`}>Estadísticas</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className={`p-4 rounded-lg ${darkMode ? 'bg-blue-900/50' : 'bg-blue-100'}`}>
-              <h4 className={`text-sm uppercase mb-1 ${darkMode ? 'text-blue-300' : 'text-blue-600'}`}>Rutas completadas</h4>
-              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-blue-700'}`}>127</p>
+            <div className="p-4 rounded-lg shadow-md bg-blue-900">
+              <h4 className="text-sm uppercase mb-1 text-blue-300">Rutas completadas</h4>
+              <p className="text-2xl font-bold text-white">127</p>
             </div>
             
-            <div className={`p-4 rounded-lg ${darkMode ? 'bg-green-900/50' : 'bg-green-100'}`}>
-              <h4 className={`text-sm uppercase mb-1 ${darkMode ? 'text-green-300' : 'text-green-600'}`}>Valoración media</h4>
-              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-green-700'}`}>4.8/5.0</p>
+            <div className="p-4 rounded-lg shadow-md bg-green-900">
+              <h4 className="text-sm uppercase mb-1 text-green-300">Valoración media</h4>
+              <p className="text-2xl font-bold text-white">4.8/5.0</p>
             </div>
             
-            <div className={`p-4 rounded-lg ${darkMode ? 'bg-purple-900/50' : 'bg-purple-100'}`}>
-              <h4 className={`text-sm uppercase mb-1 ${darkMode ? 'text-purple-300' : 'text-purple-600'}`}>Clientes atendidos</h4>
-              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-purple-700'}`}>350+</p>
+            <div className="p-4 rounded-lg shadow-md bg-purple-900">
+              <h4 className="text-sm uppercase mb-1 text-purple-300">Clientes atendidos</h4>
+              <p className="text-2xl font-bold text-white">350+</p>
             </div>
           </div>
         </div>
         
-        {/* Botón para volver al Dashboard */}
+        {/* Botón para ir al Dashboard en lugar de "Volver" */}
         <div className="mt-8 flex justify-center">
           <button 
-            onClick={() => navigate("/VistaGuia")}
-            className={`py-2 px-6 rounded-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-300 hover:bg-gray-400'} ${darkMode ? 'text-white' : 'text-gray-800'} font-medium transition-colors duration-200 flex items-center gap-2`}
+            onClick={() => navigate("/VistaGuia/Dashboard")}
+            className={`py-2 px-6 rounded-lg ${darkMode ? 'bg-teal-700 hover:bg-teal-600' : 'bg-teal-300 hover:bg-teal-400'} ${darkMode ? 'text-white' : 'text-teal-800'} font-medium transition-colors duration-200 flex items-center gap-2`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
+              <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
-            Volver al Dashboard
+            Ir al Dashboard
           </button>
         </div>
       </div>

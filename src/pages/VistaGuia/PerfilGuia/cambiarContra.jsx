@@ -225,12 +225,12 @@ const CambiarContraseña = () => {
   return (
     <DashboardLayoutGuia>
       <div className="p-6">
-        <div className={`${darkMode ? 'bg-[#1e293b]' : 'bg-gray-100'} rounded-lg p-8 shadow-lg max-w-5xl mx-auto`}>
+        <div className="bg-teal-900 rounded-lg p-8 shadow-lg max-w-5xl mx-auto">
           <div className="flex items-center mb-8">
-            <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center mr-4">
+            <div className="w-16 h-16 rounded-full bg-teal-600 flex items-center justify-center mr-4">
               <Lock className="w-8 h-8 text-white" />
             </div>
-            <h2 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+            <h2 className="text-3xl font-bold text-white">
               Cambiar Contraseña
             </h2>
           </div>
@@ -240,7 +240,7 @@ const CambiarContraseña = () => {
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label className="block text-sm font-medium mb-2 text-white">
                   Cédula
                 </label>
                 <input
@@ -248,13 +248,13 @@ const CambiarContraseña = () => {
                   name="cedula"
                   value={formData.cedula}
                   onChange={handleInputChange}
-                  className={`w-full p-3 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
+                  className="w-full p-3 rounded-lg bg-teal-800 text-white border border-teal-600"
                   required
                 />
               </div>
               
               <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label className="block text-sm font-medium mb-2 text-white">
                   Contraseña Actual
                 </label>
                 <div className="relative">
@@ -263,23 +263,21 @@ const CambiarContraseña = () => {
                     name="contrasenaActual"
                     value={formData.contrasenaActual}
                     onChange={handleInputChange}
-                    className={`w-full p-3 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'} pr-10`}
+                    className="w-full p-3 rounded-lg bg-teal-800 text-white border border-teal-600"
                     required
                   />
                   <button
                     type="button"
-                    onClick={() => togglePasswordVisibility('actual')}
-                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
+                    onClick={() => togglePassword("actual")}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-teal-300 hover:text-white"
                   >
-                    {showPassword.actual ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                    {showPassword.actual ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+              
               <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label className="block text-sm font-medium mb-2 text-white">
                   Nueva Contraseña
                 </label>
                 <div className="relative">
@@ -288,22 +286,22 @@ const CambiarContraseña = () => {
                     name="nuevaContrasena"
                     value={formData.nuevaContrasena}
                     onChange={handleInputChange}
-                    className={`w-full p-3 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'} pr-10`}
+                    className="w-full p-3 rounded-lg bg-teal-800 text-white border border-teal-600"
                     required
                   />
                   <button
                     type="button"
-                    onClick={() => togglePasswordVisibility('nueva')}
-                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
+                    onClick={() => togglePassword("nueva")}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-teal-300 hover:text-white"
                   >
-                    {showPassword.nueva ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                    {showPassword.nueva ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
               </div>
-
+              
               <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Confirmar Contraseña
+                <label className="block text-sm font-medium mb-2 text-white">
+                  Confirmar Nueva Contraseña
                 </label>
                 <div className="relative">
                   <input
@@ -311,43 +309,49 @@ const CambiarContraseña = () => {
                     name="confirmarContrasena"
                     value={formData.confirmarContrasena}
                     onChange={handleInputChange}
-                    className={`w-full p-3 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'} pr-10`}
+                    className={`w-full p-3 rounded-lg bg-teal-800 text-white border ${
+                      formData.nuevaContrasena && formData.confirmarContrasena && 
+                      formData.nuevaContrasena !== formData.confirmarContrasena 
+                        ? 'border-red-500'
+                        : 'border-teal-600'
+                    }`}
                     required
                   />
                   <button
                     type="button"
-                    onClick={() => togglePasswordVisibility('confirmar')}
-                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
+                    onClick={() => togglePassword("confirmar")}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-teal-300 hover:text-white"
                   >
-                    {showPassword.confirmar ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                    {showPassword.confirmar ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
+                {formData.nuevaContrasena && formData.confirmarContrasena && 
+                  formData.nuevaContrasena !== formData.confirmarContrasena && (
+                  <p className="text-red-400 text-sm mt-1">Las contraseñas no coinciden</p>
+                )}
               </div>
             </div>
-
-            {/* Requisitos de contraseña */}
-            <div className={`mt-8 p-4 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-              <h3 className={`text-sm font-medium mb-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Requisitos de la contraseña:
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <p className={`flex items-center ${requisitosContrasena.longitud ? 'text-green-500' : 'text-red-500'}`}>
+            
+            <div className="mt-8 p-4 rounded-lg bg-teal-800 border border-teal-700">
+              <h3 className="text-white text-lg font-medium mb-2">Requisitos de la contraseña</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                <p className={`flex items-center ${requisitosContrasena.longitud ? 'text-green-500' : 'text-white'}`}>
                   <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.longitud ? 'opacity-100' : 'opacity-50'}`} />
-                  8 caracteres
+                  Mínimo 8 caracteres
                 </p>
-                <p className={`flex items-center ${requisitosContrasena.mayuscula ? 'text-green-500' : 'text-red-500'}`}>
+                <p className={`flex items-center ${requisitosContrasena.mayuscula ? 'text-green-500' : 'text-white'}`}>
                   <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.mayuscula ? 'opacity-100' : 'opacity-50'}`} />
                   Al menos una mayúscula
                 </p>
-                <p className={`flex items-center ${requisitosContrasena.minuscula ? 'text-green-500' : 'text-red-500'}`}>
+                <p className={`flex items-center ${requisitosContrasena.minuscula ? 'text-green-500' : 'text-white'}`}>
                   <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.minuscula ? 'opacity-100' : 'opacity-50'}`} />
                   Al menos una minúscula
                 </p>
-                <p className={`flex items-center ${requisitosContrasena.numero ? 'text-green-500' : 'text-red-500'}`}>
+                <p className={`flex items-center ${requisitosContrasena.numero ? 'text-green-500' : 'text-white'}`}>
                   <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.numero ? 'opacity-100' : 'opacity-50'}`} />
                   Al menos un número
                 </p>
-                <p className={`flex items-center ${requisitosContrasena.especial ? 'text-green-500' : 'text-red-500'}`}>
+                <p className={`flex items-center ${requisitosContrasena.especial ? 'text-green-500' : 'text-white'}`}>
                   <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.especial ? 'opacity-100' : 'opacity-50'}`} />
                   Al menos un carácter especial (!@#$%^&*)
                 </p>
@@ -359,7 +363,7 @@ const CambiarContraseña = () => {
               <button
                 type="button"
                 onClick={() => navigate("/VistaGuia/PerfilGuia")}
-                className="py-2 px-6 bg-gray-700 hover:bg-gray-600 text-white rounded-lg flex items-center gap-2"
+                className="py-2 px-6 bg-teal-700 hover:bg-teal-600 text-white rounded-lg flex items-center gap-2"
               >
                 <ArrowLeft className="w-5 h-5" />
                 Cancelar
@@ -370,7 +374,7 @@ const CambiarContraseña = () => {
                 disabled={submitting || !cambiosRealizados || !Object.values(requisitosContrasena).every(Boolean)}
                 className={`py-2 px-6 ${
                   cambiosRealizados && Object.values(requisitosContrasena).every(Boolean)
-                    ? 'bg-blue-600 hover:bg-blue-700'
+                    ? 'bg-teal-600 hover:bg-teal-700'
                     : 'bg-gray-500'
                 } text-white rounded-lg flex items-center gap-2 ${
                   (submitting || !cambiosRealizados || !Object.values(requisitosContrasena).every(Boolean))

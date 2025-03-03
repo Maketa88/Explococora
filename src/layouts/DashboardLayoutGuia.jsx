@@ -107,12 +107,17 @@ const DashboardLayoutGuia = ({ children }) => {
     cambiarEstadoAlIniciar();
   }, []); // Solo se ejecuta al montar el componente-jhojan
 
-  // Añade este efecto para cargar la foto de perfil al iniciar
+  // Modificar el useEffect para cargar inmediatamente los datos del perfil
   useEffect(() => {
-    // Intentar obtener la foto del localStorage
+    // Intentar obtener la foto del localStorage para mostrarla rápidamente
     const storedFoto = localStorage.getItem("foto_perfil");
     if (storedFoto) {
       setPreviewFoto(storedFoto);
+    }
+    
+    // Si estamos en la ruta principal o en la ruta de perfil, cargar los datos
+    if (location.pathname === "/VistaGuia" || location.pathname === "/VistaGuia/PerfilGuia") {
+      loadGuiaData(); // Cargar los datos del perfil automáticamente
     }
     
     // Add event listener for profile photo updates
@@ -133,7 +138,54 @@ const DashboardLayoutGuia = ({ children }) => {
     return () => {
       window.removeEventListener('fotoPerfilActualizada', handleFotoUpdate);
     };
-  }, []);
+  }, [location.pathname]);
+
+  // Add or update this useEffect to refresh the photo when the route changes
+  useEffect(() => {
+    // Check if we're navigating to the dashboard
+    if (location.pathname === "/VistaGuia") {
+      // Try to get the latest photo from localStorage
+      const storedFoto = localStorage.getItem("foto_perfil");
+      if (storedFoto) {
+        setPreviewFoto(storedFoto);
+      }
+      
+      // If we have a cedula and token, we could also fetch the latest data
+      const cedula = localStorage.getItem("cedula");
+      const token = localStorage.getItem("token");
+      
+      if (cedula && token) {
+        // Optional: fetch the latest photo data from the server
+        axios.get(`http://localhost:10101/guia/perfil-completo/${cedula}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then(response => {
+          if (response.data) {
+            const guiaData = Array.isArray(response.data) ? response.data[0] : response.data;
+            
+            if (guiaData.foto_perfil) {
+              let fotoUrl;
+              if (guiaData.foto_perfil.startsWith('http')) {
+                fotoUrl = guiaData.foto_perfil;
+              } else if (guiaData.foto_perfil.includes('/uploads/images/')) {
+                fotoUrl = `http://localhost:10101${guiaData.foto_perfil}`;
+              } else {
+                fotoUrl = `http://localhost:10101/uploads/images/${guiaData.foto_perfil}`;
+              }
+              
+              setPreviewFoto(fotoUrl);
+              localStorage.setItem("foto_perfil", fotoUrl);
+            }
+          }
+        })
+        .catch(error => {
+          console.error("Error fetching profile photo:", error);
+        });
+      }
+    }
+  }, [location.pathname]); // This effect runs whenever the route changes
 
   // Función para cargar los datos del guía cuando se muestra el perfil
   const loadGuiaData = () => {
