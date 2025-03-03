@@ -5,8 +5,48 @@ import Swal from "sweetalert2";
 
 const ProfileDropdown = ({ imgSrc, alt }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [profileImage, setProfileImage] = useState(imgSrc);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+
+  // Cargar la imagen de perfil del localStorage
+  useEffect(() => {
+    const fotoPerfil = localStorage.getItem("foto_perfil_cliente");
+    if (fotoPerfil) {
+      setProfileImage(fotoPerfil);
+    }
+
+    // Función para escuchar cambios en localStorage
+    const handleStorageChange = () => {
+      const nuevaFotoPerfil = localStorage.getItem("foto_perfil_cliente");
+      if (nuevaFotoPerfil && nuevaFotoPerfil !== profileImage) {
+        setProfileImage(nuevaFotoPerfil);
+      }
+    };
+
+    // Función para escuchar el evento personalizado de actualización de foto
+    const handleFotoPerfilActualizada = (event) => {
+      if (event.detail && event.detail.fotoUrl) {
+        setProfileImage(event.detail.fotoUrl);
+      } else {
+        // Si no hay URL en el evento, intentar obtenerla del localStorage
+        const nuevaFotoPerfil = localStorage.getItem("foto_perfil_cliente");
+        if (nuevaFotoPerfil) {
+          setProfileImage(nuevaFotoPerfil);
+        }
+      }
+    };
+
+    // Agregar event listeners
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('fotoPerfilClienteActualizada', handleFotoPerfilActualizada);
+
+    // Limpiar event listeners
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('fotoPerfilClienteActualizada', handleFotoPerfilActualizada);
+    };
+  }, [profileImage]);
 
   const cerrarSesion = () => {
     Swal.fire({
@@ -197,9 +237,9 @@ const ProfileDropdown = ({ imgSrc, alt }) => {
       }}
     >
       <img
-        src={imgSrc}
+        src={profileImage}
         alt={alt}
-        className="h-11 w-11 rounded-full object-cover  transform transition hover:scale-110 active:scale-95"
+        className="h-11 w-11 rounded-full object-cover transform transition hover:scale-110 active:scale-95"
       />
   
       {isOpen && (

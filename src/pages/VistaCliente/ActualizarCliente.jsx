@@ -185,10 +185,6 @@ const ActualizarDatosCliente = () => {
     }
   };
 
-  const handleSelectFoto = () => {
-    fileInputRef.current.click();
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setUpdating(true);
@@ -441,7 +437,6 @@ const ActualizarDatosCliente = () => {
                 <label
                   htmlFor="upload-photo"
                   className="absolute -bottom-3 -right-3 bg-teal-600 text-white p-2.5 rounded-full shadow-lg transform hover:rotate-12 hover:scale-110 transition-transform duration-300 cursor-pointer"
-                  onClick={handleSelectFoto}
                 >
                   <FaCamera className="h-5 w-5" />
                 </label>
