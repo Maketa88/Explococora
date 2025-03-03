@@ -26,6 +26,7 @@ const ActualizarDatosCliente = () => {
   const fileInputRef = useRef(null);
 
   const cargarDatosCliente = useCallback(async () => {
+    setLoading(true);
     const cedula = localStorage.getItem("cedula");
     const token = localStorage.getItem("token");
 
@@ -36,56 +37,92 @@ const ActualizarDatosCliente = () => {
     }
 
     try {
-      const response = await axios.get(`http://localhost:10101/cliente/${cedula}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // Hacemos la petición al endpoint correcto de clientes
+      const response = await axios.get(
+        `http://localhost:10101/cliente/perfil-completo/${cedula}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      if (response.data && response.data.length > 0) {
-        const clienteData = response.data[0];
+      console.log("Datos del cliente recibidos:", response.data);
+      
+      // Procesamos los datos según el formato de respuesta (array u objeto)
+      const clienteData = Array.isArray(response.data) ? response.data[0] : response.data;
+      
+      // Guardar los datos básicos del cliente
+      setCliente({
+        cedula: clienteData.cedula || cedula,
+        nombre_del_cliente: clienteData.nombre_completo || 
+          `${clienteData.primerNombre || ""} ${clienteData.segundoNombre || ""} ${clienteData.primerApellido || ""} ${clienteData.segundoApellido || ""}`.trim(),
+        email: clienteData.email || ""
+      });
+      
+      // Establecer los datos del formulario
+      setFormData({
+        primerNombre: clienteData.primerNombre || "",
+        segundoNombre: clienteData.segundoNombre || "",
+        primerApellido: clienteData.primerApellido || "",
+        segundoApellido: clienteData.segundoApellido || "",
+        email: clienteData.email || ""
+      });
+      
+      // Procesar la foto de perfil
+      if (clienteData.foto_perfil) {
+        console.log("Foto perfil encontrada:", clienteData.foto_perfil);
         
-        // Verificar si hay una foto en la respuesta del servidor
-        if (clienteData.foto_perfil) {
-          // Si la foto comienza con http, es una URL completa
-          if (clienteData.foto_perfil.startsWith('http')) {
-            setPreviewFoto(clienteData.foto_perfil);
-          } 
-          // Si la foto no comienza con http, construir la URL completa
-          else {
-            // Verificar si la ruta ya incluye /uploads/images
-            if (clienteData.foto_perfil.includes('/uploads/images/')) {
-              setPreviewFoto(`http://localhost:10101${clienteData.foto_perfil}`);
-            } else {
-              setPreviewFoto(`http://localhost:10101/uploads/images/${clienteData.foto_perfil}`);
-            }
-          }
+        // Si la foto comienza con http, es una URL completa
+        if (clienteData.foto_perfil.startsWith('http')) {
+          setPreviewFoto(clienteData.foto_perfil);
+          localStorage.setItem("foto_perfil_cliente", clienteData.foto_perfil);
         } 
-        // Si no hay foto en la respuesta, intentar recuperarla del localStorage
+        // Si la foto no comienza con http, construir la URL completa
         else {
-          const storedFoto = localStorage.getItem("foto_perfil_cliente");
-          if (storedFoto) {
-            setPreviewFoto(storedFoto);
+          // Verificar si la ruta ya incluye /uploads/images
+          let fotoUrl;
+          if (clienteData.foto_perfil.includes('/uploads/images/')) {
+            fotoUrl = `http://localhost:10101${clienteData.foto_perfil}`;
+          } else {
+            fotoUrl = `http://localhost:10101/uploads/images/${clienteData.foto_perfil}`;
           }
+          
+          console.log("URL de foto construida:", fotoUrl);
+          setPreviewFoto(fotoUrl);
+          localStorage.setItem("foto_perfil_cliente", fotoUrl);
+        }
+      } 
+      // Verificar si hay foto en otros campos posibles
+      else if (clienteData.foto) {
+        console.log("Foto encontrada en campo 'foto':", clienteData.foto);
+        
+        let fotoUrl;
+        if (clienteData.foto.startsWith('http')) {
+          fotoUrl = clienteData.foto;
+        } else if (clienteData.foto.includes('/uploads/images/')) {
+          fotoUrl = `http://localhost:10101${clienteData.foto}`;
+        } else {
+          fotoUrl = `http://localhost:10101/uploads/images/${clienteData.foto}`;
         }
         
-        setCliente(clienteData);
-        localStorage.setItem("cliente", JSON.stringify(clienteData));
-
-        // Separar el nombre completo
-        const { primerNombre, segundoNombre, primerApellido, segundoApellido } = separarNombre(clienteData.nombre_del_cliente);
-        
-        // Establecer los datos en el formulario
-        setFormData({
-          primerNombre: primerNombre,
-          segundoNombre: segundoNombre,
-          primerApellido: primerApellido,
-          segundoApellido: segundoApellido,
-          email: clienteData.email || ""
-        });
+        console.log("URL de foto construida:", fotoUrl);
+        setPreviewFoto(fotoUrl);
+        localStorage.setItem("foto_perfil_cliente", fotoUrl);
       }
+      // Si no hay foto en la respuesta, intentar recuperarla del localStorage
+      else {
+        const storedFoto = localStorage.getItem("foto_perfil_cliente");
+        if (storedFoto) {
+          console.log("Usando foto desde localStorage");
+          setPreviewFoto(storedFoto);
+        }
+      }
+      
     } catch (error) {
-      console.error("Error al cargar datos:", error);
+      console.error("Error completo:", error);
+      console.error("Status:", error.response?.status);
+      console.error("Respuesta del servidor:", error.response?.data);
       setError(`Error: ${error.response?.data?.message || error.message}`);
     } finally {
       setLoading(false);
