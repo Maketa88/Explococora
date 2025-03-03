@@ -1,4 +1,3 @@
-
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { FaCamera, FaEnvelope, FaIdCard, FaUser, FaUserEdit } from 'react-icons/fa';
@@ -9,6 +8,7 @@ const PerfilCliente = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [modalAbierto, setModalAbierto] = useState(false);
+  const [fotoActualizada, setFotoActualizada] = useState(false);
 
   // Función para cargar los datos del cliente
   const cargarDatosCliente = async () => {
@@ -44,6 +44,12 @@ const PerfilCliente = () => {
           if (storedFoto) {
             clienteData.foto_perfil = storedFoto;
           }
+          
+          // Verificar si hay una foto actualizada en localStorage con la clave correcta
+          const fotoPerfilCliente = localStorage.getItem("foto_perfil_cliente");
+          if (fotoPerfilCliente) {
+            clienteData.foto_perfil = fotoPerfilCliente;
+          }
         }
         
         setCliente(clienteData);
@@ -59,7 +65,28 @@ const PerfilCliente = () => {
 
   useEffect(() => {
     cargarDatosCliente();
+    
+    // Agregar event listener para actualizar la foto cuando cambie
+    const handleFotoActualizada = (event) => {
+      console.log("Evento de foto actualizada recibido:", event.detail);
+      setFotoActualizada(true);
+    };
+    
+    window.addEventListener('fotoPerfilClienteActualizada', handleFotoActualizada);
+    
+    // Limpiar el event listener cuando el componente se desmonte
+    return () => {
+      window.removeEventListener('fotoPerfilClienteActualizada', handleFotoActualizada);
+    };
   }, []);
+  
+  // Efecto para recargar los datos cuando la foto se actualiza
+  useEffect(() => {
+    if (fotoActualizada) {
+      cargarDatosCliente();
+      setFotoActualizada(false);
+    }
+  }, [fotoActualizada]);
 
   // Función mejorada para separar nombres y apellidos
   const separarNombreCompleto = (nombreCompleto) => {
@@ -126,8 +153,10 @@ const PerfilCliente = () => {
     );
 
   const { nombres, apellidos } = separarNombreCompleto(cliente.nombre_del_cliente);
-  // Usar directamente la URL de Azure Blob Storage
-  const fotoUrl = cliente.foto_perfil || Avatar;
+  
+  // Usar la foto actualizada del localStorage si existe, o la del cliente, o la imagen por defecto
+  const fotoPerfilCliente = localStorage.getItem("foto_perfil_cliente");
+  const fotoUrl = fotoPerfilCliente || cliente.foto_perfil || Avatar;
 
   return (
     <>

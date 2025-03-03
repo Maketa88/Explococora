@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FaCamera, FaEnvelope, FaIdCard, FaSave, FaUser } from 'react-icons/fa';
 import Swal from "sweetalert2";
 import Avatar from "../../assets/Images/avatar.png";
@@ -21,9 +21,9 @@ const ActualizarDatosCliente = () => {
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState(null);
   const [foto, setFoto] = useState(null);
-  const [subiendoFoto, setSubiendoFoto] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState(null);
+  const [previewFoto, setPreviewFoto] = useState(null);
   const [fotoError, setFotoError] = useState(null);
+  const fileInputRef = useRef(null);
 
   const cargarDatosCliente = useCallback(async () => {
     const cedula = localStorage.getItem("cedula");
@@ -45,15 +45,27 @@ const ActualizarDatosCliente = () => {
       if (response.data && response.data.length > 0) {
         const clienteData = response.data[0];
         
-        // La foto de perfil ya debería ser una URL completa de Azure Blob Storage
+        // Verificar si hay una foto en la respuesta del servidor
         if (clienteData.foto_perfil) {
-          // Guardar en localStorage
-          localStorage.setItem("foto_perfil", clienteData.foto_perfil);
-        } else {
-          // Recuperar la foto del localStorage si existe
-          const storedFoto = localStorage.getItem("foto_perfil");
+          // Si la foto comienza con http, es una URL completa
+          if (clienteData.foto_perfil.startsWith('http')) {
+            setPreviewFoto(clienteData.foto_perfil);
+          } 
+          // Si la foto no comienza con http, construir la URL completa
+          else {
+            // Verificar si la ruta ya incluye /uploads/images
+            if (clienteData.foto_perfil.includes('/uploads/images/')) {
+              setPreviewFoto(`http://localhost:10101${clienteData.foto_perfil}`);
+            } else {
+              setPreviewFoto(`http://localhost:10101/uploads/images/${clienteData.foto_perfil}`);
+            }
+          }
+        } 
+        // Si no hay foto en la respuesta, intentar recuperarla del localStorage
+        else {
+          const storedFoto = localStorage.getItem("foto_perfil_cliente");
           if (storedFoto) {
-            clienteData.foto_perfil = storedFoto;
+            setPreviewFoto(storedFoto);
           }
         }
         
@@ -130,158 +142,14 @@ const ActualizarDatosCliente = () => {
       // Crear URL de vista previa
       const fileReader = new FileReader();
       fileReader.onload = () => {
-        setPreviewUrl(fileReader.result);
+        setPreviewFoto(fileReader.result);
       };
       fileReader.readAsDataURL(selectedFile);
     }
   };
 
-  const handleSubmitFoto = async (e) => {
-    e.preventDefault();
-    if (!foto) return;
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("No se encontró el token de autenticación.");
-      return;
-    }
-
-    setSubiendoFoto(true);
-    setError(null);
-    
-    const formData = new FormData();
-    formData.append("foto", foto);
-
-    try {
-      const response = await axios.post(
-        "http://localhost:10101/cliente/subir-foto",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      
-      if (response.data) {
-        // Obtener la URL de la foto desde la respuesta
-        const imageUrl = response.data.url;
-        
-        // Actualizar el estado del cliente
-        const clienteActualizado = {
-          ...cliente,
-          foto_perfil: imageUrl
-        };
-        
-        // Actualizar estado y localStorage
-        setCliente(clienteActualizado);
-        localStorage.setItem("cliente", JSON.stringify(clienteActualizado));
-        localStorage.setItem("foto_perfil", imageUrl);
-
-        Swal.fire({
-          html: `
-            <div style="
-              display: flex; 
-              flex-direction: column; 
-              align-items: center;
-              border: 4px solid #004d40;
-              border-radius: 12px;
-              padding: clamp(10px, 3vw, 20px);
-              background-color: #ffffff;
-              box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-              width: 100%;
-              max-width: 500px;
-              margin: auto;
-            ">
-              <div style="
-                display: flex; 
-                flex-direction: column; 
-                align-items: center;
-                border-radius: 8px;
-                padding: clamp(5px, 2vw, 10px);
-                width: 100%;
-              ">
-                <img src="https://i.gifer.com/7efs.gif" 
-                    alt="Actualización exitosa" 
-                    style="
-                      width: clamp(100px, 30vw, 150px);
-                      margin-bottom: clamp(5px, 2vw, 10px);
-                      border-radius: 8px;
-                    ">
-                <img src="https://i.pinimg.com/736x/10/3e/44/103e4418d4a3675326fbc9273f9af62a.jpg" 
-                    alt="Logo ExploCocora" 
-                    style="
-                      width: clamp(80px, 25vw, 120px);
-                      border-radius: 8px;
-                    ">
-              </div>
-              <h2 style="
-                font-size: clamp(20px, 5vw, 28px);
-                font-weight: bold; 
-                font-family: Arial, Helvetica, sans-serif; 
-                color: #004d40; 
-                margin-top: clamp(10px, 3vw, 15px);
-                text-align: center;
-                white-space: normal;
-                width: 100%;
-                padding: 0 10px;
-              ">
-                ¡Foto Actualizada!
-              </h2>
-              <p style="
-                font-size: clamp(14px, 4vw, 18px);
-                font-family: Arial, Helvetica, sans-serif; 
-                color: #004d40; 
-                text-align: center; 
-                margin-top: clamp(5px, 2vw, 10px);
-                padding: 0 10px;
-                width: 100%;
-              ">
-                Tu foto de perfil ha sido actualizada correctamente
-              </p>
-              <button id="cerrarAlerta" style="
-                margin-top: clamp(10px, 3vw, 15px);
-                padding: clamp(8px, 2vw, 10px) clamp(15px, 4vw, 20px);
-                background-color: #38a169;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                font-size: clamp(14px, 3vw, 16px);
-                font-weight: bold;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-                width: auto;
-                min-width: 100px;
-              ">
-                OK
-              </button>
-            </div>
-          `,
-          showConfirmButton: false,
-          customClass: {
-            popup: 'swal2-popup-custom',
-            container: 'swal2-container-custom'
-          },
-          didOpen: () => {
-            document.getElementById("cerrarAlerta").addEventListener("click", () => {
-              Swal.close();
-            });
-          }
-        });
-        
-        setFoto(null);
-        setPreviewUrl(null);
-        
-        // Forzar una recarga de los datos del cliente
-        await cargarDatosCliente();
-      }
-    } catch (error) {
-      console.error("Error al subir foto:", error);
-      setError(`Error al subir foto: ${error.response?.data?.message || error.message}`);
-    } finally {
-      setSubiendoFoto(false);
-    }
+  const handleSelectFoto = () => {
+    fileInputRef.current.click();
   };
 
   const handleSubmit = async (e) => {
@@ -299,6 +167,50 @@ const ActualizarDatosCliente = () => {
     }
 
     try {
+      let fotoActualizada = false;
+      
+      // Si hay una foto nueva, procesarla primero
+      if (foto) {
+        try {
+          // Crear un FormData para enviar la foto
+          const formDataFoto = new FormData();
+          formDataFoto.append('foto', foto);
+          
+          // Llamar al endpoint para subir la foto
+          const fotoResponse = await axios.post(
+            `http://localhost:10101/cliente/subir-foto`,
+            formDataFoto,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data'
+              },
+            }
+          );
+          
+          // Si la foto se subió correctamente, guardar también en localStorage para vista previa
+          if (fotoResponse.data && fotoResponse.data.url) {
+            localStorage.setItem("foto_perfil_cliente", previewFoto);
+            fotoActualizada = true;
+            console.log("Foto actualizada exitosamente:", fotoResponse.data);
+            
+            // Dispatch custom event to notify other components that the photo was updated
+            const event = new CustomEvent('fotoPerfilClienteActualizada', { detail: { fotoUrl: previewFoto } });
+            window.dispatchEvent(event);
+          }
+        } catch (fotoError) {
+          console.error("Error al subir la foto:", fotoError);
+          // Mostrar error específico de la foto pero continuar con la actualización de los demás datos
+          Swal.fire({
+            icon: "warning",
+            title: "Advertencia",
+            text: `No se pudo actualizar la foto: ${fotoError.response?.data?.message || fotoError.message}. Se continuará con la actualización de los demás datos.`,
+            confirmButtonColor: "#3085d6"
+          });
+        }
+      }
+
+      // Continuar con la actualización de los demás datos
       const response = await axios.patch(
         `http://localhost:10101/cliente/${cedula}`,
         {
@@ -321,7 +233,16 @@ const ActualizarDatosCliente = () => {
           ...cliente,
           nombre_del_cliente: nombreCompleto,
           email: formData.email,
+          foto_perfil: previewFoto
         });
+
+        // Mensaje personalizado según si se actualizó la foto o no
+        let mensajeExito = "Tu información ha sido actualizada correctamente.";
+        if (foto && !fotoActualizada) {
+          mensajeExito += " Sin embargo, hubo un problema al actualizar la foto.";
+        } else if (foto && fotoActualizada) {
+          mensajeExito += " La foto de perfil también se actualizó correctamente.";
+        }
 
         Swal.fire({
           html: `
@@ -382,7 +303,7 @@ const ActualizarDatosCliente = () => {
                 padding: 0 10px;
                 width: 100%;
               ">
-                Tus datos han sido actualizados correctamente
+                ${mensajeExito}
               </p>
               <button id="cerrarAlerta" style="
                 margin-top: clamp(10px, 3vw, 15px);
@@ -414,6 +335,10 @@ const ActualizarDatosCliente = () => {
           }
         });
 
+        // Resetear el estado de la foto después de la actualización
+        setFoto(null);
+        
+        // Forzar una recarga de los datos del cliente
         await cargarDatosCliente();
       }
     } catch (error) {
@@ -459,54 +384,42 @@ const ActualizarDatosCliente = () => {
           </div>
         )}
 
-        {/* Sección de foto de perfil */}
-        <div className="flex justify-center mt-8">
-          <div className="relative">
-            <div className="p-3 bg-white rounded-full shadow-lg ring-4 ring-teal-100">
-              <img
-                key={cliente.foto_perfil}
-                src={
-                  previewUrl || (cliente.foto_perfil ? cliente.foto_perfil : Avatar)
-                }
-                alt="Foto de perfil"
-                className="w-32 h-32 rounded-full object-cover cursor-pointer hover:opacity-90 transition-all duration-300 transform hover:scale-105 border-4 border-teal-50"
-                onError={(e) => {
-                  console.error("Error al cargar la imagen");
-                  e.target.src = Avatar;
-                }}
-              />
-              <label
-                htmlFor="upload-photo"
-                className="absolute -bottom-3 -right-3 bg-teal-600 text-white p-2.5 rounded-full shadow-lg transform hover:rotate-12 hover:scale-110 transition-transform duration-300 cursor-pointer"
-              >
-                <FaCamera className="h-5 w-5" />
-              </label>
-              <input
-                type="file"
-                id="upload-photo"
-                onChange={handleFileChange}
-                className="hidden"
-                accept="image/jpeg,image/jpg,image/png,image/webp"
-              />
-            </div>
-          </div>
-        </div>
-
-        {foto && (
-          <div className="flex justify-center">
-            <button 
-              onClick={handleSubmitFoto}
-              className="px-6 py-2 bg-teal-700 text-white rounded-xl flex items-center hover:bg-teal-800 transition-all duration-300 shadow-md transform hover:scale-[1.02]"
-              disabled={subiendoFoto}
-            >
-              <FaSave className="h-5 w-5 mr-2" />
-              {subiendoFoto ? 'Subiendo...' : 'Guardar foto'}
-            </button>
-          </div>
-        )}
-
         {/* Formulario de datos personales */}
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          {/* Sección de foto de perfil */}
+          <div className="flex justify-center mt-8">
+            <div className="relative">
+              <div className="p-3 bg-white rounded-full shadow-lg ring-4 ring-teal-100">
+                <img
+                  src={
+                    previewFoto || (cliente.foto_perfil ? cliente.foto_perfil : Avatar)
+                  }
+                  alt="Foto de perfil"
+                  className="w-32 h-32 rounded-full object-cover cursor-pointer hover:opacity-90 transition-all duration-300 transform hover:scale-105 border-4 border-teal-50"
+                  onError={(e) => {
+                    console.error("Error al cargar la imagen");
+                    e.target.src = Avatar;
+                  }}
+                />
+                <label
+                  htmlFor="upload-photo"
+                  className="absolute -bottom-3 -right-3 bg-teal-600 text-white p-2.5 rounded-full shadow-lg transform hover:rotate-12 hover:scale-110 transition-transform duration-300 cursor-pointer"
+                  onClick={handleSelectFoto}
+                >
+                  <FaCamera className="h-5 w-5" />
+                </label>
+                <input
+                  type="file"
+                  id="upload-photo"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  className="hidden"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="space-y-6">
             <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
