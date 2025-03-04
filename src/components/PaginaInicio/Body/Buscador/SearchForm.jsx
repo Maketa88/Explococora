@@ -306,7 +306,7 @@ export const SearchForm = ({ onSearch }) => {
       }
       
       // No ejecutamos filterRoutes() para no mostrar resultados fuera del recuadro de IA
-    }, 2000);
+    }, 8000);
   };
   
   // Actualizar resultados mientras el usuario escribe - Desactivamos la búsqueda automática y las sugerencias
@@ -386,14 +386,16 @@ export const SearchForm = ({ onSearch }) => {
               <div className="flex flex-col items-center">
                 {generatingRoute ? (
                   <>
-                    <div className="w-full max-w-lg mb-8">
+                    <div className="w-full max-w-2xl mb-8">
                       <div className="relative aspect-video rounded-xl overflow-hidden shadow-lg">
-                        <img 
-                          src="https://cdn.pixabay.com/photo/2023/05/12/14/48/ai-generated-7989213_1280.jpg" 
-                          alt="IA generando ruta" 
+                        <video
+                          src="/videos/ia_generando.mp4"
+                          autoPlay
+                          loop
+                          muted
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70 flex flex-col justify-end p-6">
+                        <div className="absolute inset-0  flex flex-col justify-end p-6">
                           <h3 className="text-white text-2xl font-bold">Inteligencia Artificial</h3>
                           <p className="text-white/90">Creando tu ruta personalizada...</p>
                         </div>

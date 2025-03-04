@@ -19,7 +19,7 @@ export const Carta = ({ image, title, text }) => {
         </h3>
         
         {/* Párrafo con texto justificado y tamaño de texto responsivo */}
-        <p className="text-gray-800 text-xs sm:text-sm md:text-base text-center w-full flex-grow">
+        <p className="text-gray-800 text-xs sm:text-sm md:text-base text-justify w-full flex-grow">
           {text}
         </p>
       </div>

@@ -127,7 +127,7 @@ i18n
           card1Text: "El Valle del Cocora debe su nombre a una princesa Quimbaya, símbolo de pureza y riqueza natural. Según la leyenda, su espíritu sigue vivo en este mágico destino de Colombia, donde cada rincón cuenta una historia y refleja el respeto ancestral por la tierra y la cultura indígena.",
 
           card2Title: "Palma de Cera: La Gigante que Toca el Cielo",
-          card2Text: "La palma de cera del Quindío, árbol nacional de Colombia, simboliza resistencia y majestuosidad. Con más de 60 metros de altura, ha sido testigo de siglos de historia. Protegida desde 1985, su conservación es clave para el hábitat del loro orejiamarillo y representa el orgullo colombiano.",
+          card2Text: "La palma de cera, árbol nacional de Colombia, simboliza resistencia y majestuosidad. Con más de 60 metros de altura, ha sido testigo de siglos de historia. Protegida desde 1985, su conservación es clave para el hábitat del loro orejiamarillo y representa el orgullo colombiano.",
 
           card3Title: "Los Quimbayas: Maestros del Oro y la Naturaleza",
           card3Text: "Mucho antes de la colonia, el Valle del Cocora era hogar de los Quimbayas, maestros del oro. Para ellos, no era un hogar, sino un templo sagrado donde montañas y ríos eran dioses. Su legado inspira sostenibilidad y respeto por la naturaleza, valores presentes en el valle.",
