@@ -23,7 +23,6 @@ const ActualizarDatosGuia = () => {
     segundoApellido: "",
     email: "",
     telefono: "",
-    especialidad: "",
     descripcion: ""
   });
 
@@ -56,14 +55,65 @@ const ActualizarDatosGuia = () => {
     }
   
     try {
-      const response = await axios.get(`http://localhost:10101/guia/${cedula}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      console.log("Solicitando datos actualizados del guía...");
+      
+      // Primero, obtenemos los datos básicos del guía
+      const response = await axios.get(
+        `http://localhost:10101/guia/perfil-completo/${cedula}`, 
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: {
+            _t: new Date().getTime()
+          }
+        }
+      );
   
       if (response.data) {
         const guiaData = Array.isArray(response.data) ? response.data[0] : response.data;
+        console.log("DATOS COMPLETOS DEL GUÍA:", JSON.stringify(guiaData, null, 2));
+        
+        // Ahora, hacemos una solicitud específica para obtener el teléfono más reciente
+        try {
+          console.log("Solicitando datos de teléfono actualizados...");
+          const telefonoResponse = await axios.get(
+            `http://localhost:10101/guia/telefono/${cedula}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              params: {
+                _t: new Date().getTime()
+              }
+            }
+          );
+          
+          console.log("RESPUESTA DE TELÉFONO:", JSON.stringify(telefonoResponse.data, null, 2));
+          
+          // Si recibimos datos de teléfono, los utilizamos
+          if (telefonoResponse.data && telefonoResponse.data.numeroCelular) {
+            console.log("TELÉFONO ENCONTRADO EN TABLA TELEFONO:", telefonoResponse.data.numeroCelular);
+            // Actualizar el objeto guiaData con el teléfono más reciente
+            guiaData.numeroCelular = telefonoResponse.data.numeroCelular;
+          }
+        } catch (telefonoError) {
+          console.error("Error al obtener teléfono específico:", telefonoError);
+          // Continuamos con los datos del guía que ya tenemos, sin interrumpir el flujo
+        }
+        
+        // Verificar todos los campos posibles donde podría estar el teléfono
+        const posiblesCamposTelefono = [
+          'telefono', 'numeroCelular', 'numero_celular', 'celular'
+        ];
+        
+        console.log("ANÁLISIS DE CAMPOS DE TELÉFONO:");
+        posiblesCamposTelefono.forEach(campo => {
+          console.log(`Campo ${campo}: ${guiaData[campo] || 'No encontrado'}`);
+        });
+        
+        const telefonoEncontrado = guiaData.numeroCelular || guiaData.telefono || "";
+        console.log("TELÉFONO FINAL A UTILIZAR:", telefonoEncontrado);
         
         // Verificar si hay una foto en la respuesta del servidor
         if (guiaData.foto_perfil) {
@@ -96,15 +146,14 @@ const ActualizarDatosGuia = () => {
         const nombreDelGuia = guiaData.nombre || guiaData.nombre_completo || guiaData.nombre_del_guia;
         const { primerNombre, segundoNombre, primerApellido, segundoApellido } = separarNombre(nombreDelGuia);
         
-        // Establecer los datos en el formulario
+        // Establecer los datos en el formulario con el teléfono actualizado
         setFormData({
           primerNombre: primerNombre,
           segundoNombre: segundoNombre || "",
           primerApellido: primerApellido || "",
           segundoApellido: segundoApellido || "",
           email: guiaData.email || "",
-          telefono: guiaData.telefono || "",
-          especialidad: guiaData.especialidad || "",
+          telefono: telefonoEncontrado,
           descripcion: guiaData.descripcion || ""
         });
       }
@@ -210,25 +259,31 @@ const ActualizarDatosGuia = () => {
         }
       }
       
-      // Continuar con la actualización de los demás datos
+      // Preparar datos para actualizar
+      const datosActualizar = {
+        primerNombre: formData.primerNombre,
+        segundoNombre: formData.segundoNombre,
+        primerApellido: formData.primerApellido,
+        segundoApellido: formData.segundoApellido,
+        email: formData.email,
+        numeroCelular: formData.telefono,
+        telefono: formData.telefono, // Enviar en ambos campos para asegurarnos
+        descripcion: formData.descripcion
+      };
+      
+      console.log("DATOS QUE SE ENVIARÁN PARA ACTUALIZAR:", JSON.stringify(datosActualizar, null, 2));
+      
       const response = await axios.patch(
         `http://localhost:10101/guia/actualizar/${cedula}`,
-        {
-          primerNombre: formData.primerNombre,
-          segundoNombre: formData.segundoNombre,
-          primerApellido: formData.primerApellido,
-          segundoApellido: formData.segundoApellido,
-          email: formData.email,
-          numeroCelular: formData.telefono,
-          especialidad: formData.especialidad,
-          descripcion: formData.descripcion
-        },
+        datosActualizar,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
+
+      console.log("RESPUESTA COMPLETA DEL SERVIDOR:", JSON.stringify(response.data, null, 2));
 
       if (response.data) {
         const nombreCompleto = `${formData.primerNombre} ${formData.segundoNombre} ${formData.primerApellido} ${formData.segundoApellido}`;
@@ -237,7 +292,6 @@ const ActualizarDatosGuia = () => {
           nombre_del_guia: nombreCompleto,
           email: formData.email,
           telefono: formData.telefono,
-          especialidad: formData.especialidad,
           descripcion: formData.descripcion,
           foto_perfil: previewFoto
         });
@@ -257,7 +311,13 @@ const ActualizarDatosGuia = () => {
           confirmButtonColor: "#3085d6"
         });
 
-        await cargarDatosGuia();
+        // Forzar una recarga completa con un pequeño retraso para dar tiempo a que la DB se actualice
+        localStorage.removeItem("guia"); // Eliminar datos antiguos almacenados
+        
+        setTimeout(async () => {
+          await cargarDatosGuia(); // Recargar datos frescos
+          console.log("Datos recargados después de la actualización");
+        }, 1000);
       }
     } catch (error) {
       console.error("Error al actualizar:", error);
@@ -438,19 +498,6 @@ const ActualizarDatosGuia = () => {
                 value={formData.telefono}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg border bg-teal-800 border-teal-600 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-              />
-            </div>
-            
-            <div>
-              <label className="block mb-2 text-sm font-medium text-white">
-                Especialidad
-              </label>
-              <input
-                type="text"
-                name="especialidad"
-                value={formData.especialidad}
-                onChange={handleChange}
                 className="w-full px-4 py-2 rounded-lg border bg-teal-800 border-teal-600 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
