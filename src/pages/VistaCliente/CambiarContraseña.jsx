@@ -60,6 +60,7 @@ const CambiarContraseña = () => {
           padding: 20px;
           background-color: #ffffff;
           box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+          max-width: 100%;
         ">
           <div style="
             display: flex; 
@@ -67,33 +68,35 @@ const CambiarContraseña = () => {
             align-items: center;
             border-radius: 8px;
             padding: 10px;
+            width: 100%;
           ">
             <img src="https://i.pinimg.com/originals/bf/fc/c2/bffcc2de14a013a2e7a795668846cae5.gif" 
                 alt="Caballo corriendo" 
                 width="150" 
-                style="margin-bottom: 10px; border-radius: 8px;">
+                style="margin-bottom: 10px; border-radius: 8px; max-width: 100%;">
             <img src="https://i.pinimg.com/736x/10/3e/44/103e4418d4a3675326fbc9273f9af62a.jpg" 
                 alt="Logo ExploCocora" 
                 width="120" 
-                style="border-radius: 8px;">
+                style="border-radius: 8px; max-width: 100%;">
           </div>
           <h2 style="
-            font-size: 28px; 
+            font-size: clamp(20px, 5vw, 28px); 
             font-weight: bold; 
             font-family: Arial, Helvetica, sans-serif; 
             color: #004d40; 
             margin-top: 15px;
             text-align: center;
-            white-space: nowrap;
+            width: 100%;
           ">
             ¡Contraseña Actualizada!
           </h2>
           <p style="
-            font-size: 18px; 
+            font-size: clamp(14px, 4vw, 18px); 
             font-family: Arial, Helvetica, sans-serif; 
             color: #004d40; 
             text-align: center; 
             margin-top: 10px;
+            width: 100%;
           ">
             Tu contraseña ha sido cambiada exitosamente
           </p>
@@ -104,7 +107,7 @@ const CambiarContraseña = () => {
             color: white;
             border: none;
             border-radius: 6px;
-            font-size: 16px;
+            font-size: clamp(14px, 4vw, 16px);
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.3s ease;
@@ -114,6 +117,7 @@ const CambiarContraseña = () => {
         </div>
       `,
       showConfirmButton: false,
+      width: 'auto',
       didOpen: () => {
         document.getElementById("cerrarAlerta").addEventListener("click", () => {
           Swal.close();
@@ -181,27 +185,29 @@ const CambiarContraseña = () => {
   };
 
   return (
-    <div className="bg-teal-900">
-      <div className="container mx-auto px-4 py-6 sm:py-8 md:py-10">
-        <div className="bg-teal-800/70 rounded-xl shadow-xl p-4 sm:p-5 md:p-6">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6 ml-2 sm:ml-4">Cambiar Contraseña</h2>
+    <div className="min-h-screen bg-teal-900 flex items-center justify-center w-full py-6 px-4">
+      <div className="w-full max-w-4xl mx-auto">
+        <div className="bg-teal-800/70 rounded-xl shadow-xl p-4 sm:p-6 md:p-8 backdrop-blur-sm">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 text-center sm:text-left">
+            Cambiar Contraseña
+          </h2>
           
-          <div className="flex flex-col md:flex-row gap-6">
+          <div className="flex flex-col lg:flex-row gap-6">
             {/* Columna izquierda - Icono */}
-            <div className="w-full md:w-1/4 flex flex-col items-center mb-6 md:mb-0">
-              <div className="relative mb-3">
-                <div className="h-32 w-32 sm:h-36 sm:w-36 md:h-40 md:w-40 rounded-full bg-teal-700 flex items-center justify-center shadow-xl ring-4 ring-teal-500/30">
-                  <FaLock className="h-16 w-16 sm:h-20 sm:w-20 text-white opacity-80" />
+            <div className="w-full lg:w-1/3 flex flex-col items-center mb-6 lg:mb-0">
+              <div className="relative mb-4">
+                <div className="h-28 w-28 sm:h-36 sm:w-36 md:h-40 md:w-40 rounded-full bg-teal-700 flex items-center justify-center shadow-xl ring-4 ring-teal-500/30 mx-auto transform transition-transform hover:scale-105 duration-300">
+                  <FaLock className="h-14 w-14 sm:h-16 sm:w-16 md:h-20 md:w-20 text-white opacity-80" />
                 </div>
               </div>
               <p className="text-white text-center font-medium text-base sm:text-lg">Seguridad de Cuenta</p>
             </div>
             
             {/* Columna derecha - Formulario */}
-            <div className="w-full md:w-3/4">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div className="bg-teal-700/0 p-0 sm:p-0 col-span-1 sm:col-span-2">
+            <div className="w-full lg:w-2/3">
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="space-y-4">
+                  <div className="bg-teal-700/0 p-0">
                     <h3 className="text-xs sm:text-sm uppercase mb-2 text-teal-300 flex items-center">
                       <FaUserShield className="mr-2" />
                       CÉDULA
@@ -218,7 +224,7 @@ const CambiarContraseña = () => {
                     />
                   </div>
                   
-                  <div className="bg-teal-700/0 p-0 sm:p-0 col-span-1 sm:col-span-2 mt-4">
+                  <div className="bg-teal-700/0 p-0 mt-4">
                     <h3 className="text-xs sm:text-sm uppercase mb-2 text-teal-300 flex items-center">
                       <FaKey className="mr-2" />
                       NUEVA CONTRASEÑA
@@ -238,18 +244,19 @@ const CambiarContraseña = () => {
                   </div>
                   
                   {erroresValidacion.length > 0 && (
-                    <div className="bg-red-100 text-red-700 p-4 rounded-lg border border-red-300 col-span-1 sm:col-span-2">
+                    <div className="bg-red-100 text-red-700 p-4 rounded-lg border border-red-300 shadow-md">
                       <h3 className="font-medium text-red-800 mb-2">Requisitos de contraseña:</h3>
-                      {erroresValidacion.map((error, index) => (
-                        <p key={index} className="text-sm flex items-center mb-1 last:mb-0">
-                          <span className="mr-2">•</span>
-                          {error}
-                        </p>
-                      ))}
+                      <ul className="list-disc pl-5 space-y-1">
+                        {erroresValidacion.map((error, index) => (
+                          <li key={index} className="text-sm">
+                            {error}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   )}
                   
-                  <div className="bg-teal-700/0 p-0 sm:p-0 col-span-1 sm:col-span-2 mt-4">
+                  <div className="bg-teal-700/0 p-0 mt-4">
                     <h3 className="text-xs sm:text-sm uppercase mb-2 text-teal-300 flex items-center">
                       <FaKey className="mr-2" />
                       CONFIRMAR CONTRASEÑA
@@ -276,7 +283,7 @@ const CambiarContraseña = () => {
                     mensaje.tipo === 'error' 
                       ? 'bg-red-100 text-red-700 border border-red-300' 
                       : 'bg-teal-100 text-teal-700 border border-teal-300'
-                  } shadow-md`}>
+                  } shadow-md mt-4 animate-fadeIn`}>
                     {mensaje.texto}
                   </div>
                 )}
@@ -285,11 +292,11 @@ const CambiarContraseña = () => {
                   <button
                     type="submit"
                     disabled={cargando || erroresValidacion.length > 0}
-                    className={`py-2 px-4 sm:px-6 rounded-lg ${
+                    className={`py-3 px-6 rounded-lg ${
                       cargando || erroresValidacion.length > 0
-                        ? 'bg-teal-500 cursor-not-allowed' 
-                        : 'bg-teal-600 hover:bg-teal-500'
-                    } text-white font-medium transition-colors duration-200 shadow-lg flex items-center`}
+                        ? 'bg-teal-500 cursor-not-allowed opacity-70' 
+                        : 'bg-teal-600 hover:bg-teal-500 hover:shadow-lg active:bg-teal-700'
+                    } text-white font-medium transition-all duration-200 shadow-lg flex items-center justify-center w-full sm:w-auto min-w-[180px]`}
                   >
                     {cargando ? (
                       <>
