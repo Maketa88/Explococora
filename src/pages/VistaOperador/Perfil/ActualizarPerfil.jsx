@@ -245,6 +245,19 @@ const ActualizarPerfil = () => {
     const selectedFile = e.target.files[0];
     
     if (selectedFile) {
+      // Validar tipo de archivo
+      const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      if (!validTypes.includes(selectedFile.type)) {
+        showAlert("Por favor seleccione una imagen válida (JPEG, PNG, GIF, WEBP)", "error");
+        return;
+      }
+      
+      // Validar tamaño (máximo 5MB)
+      if (selectedFile.size > 5 * 1024 * 1024) {
+        showAlert("La imagen es demasiado grande. El tamaño máximo es 5MB", "error");
+        return;
+      }
+      
       setFoto(selectedFile);
       
       // Crear URL para previsualización
@@ -255,7 +268,7 @@ const ActualizarPerfil = () => {
       const eventoActualizacion = new CustomEvent('perfilActualizado', { 
         detail: { 
           foto: previewURL,
-          temporal: true
+          temporal: true // Marcar como temporal hasta que se guarde
         } 
       });
       window.dispatchEvent(eventoActualizacion);
@@ -297,14 +310,56 @@ const ActualizarPerfil = () => {
       formData.append("segundoApellido", operador.segundoApellido || "");
       formData.append("email", operador.email);
       
-      // Solo añadir el número de celular si existe
+      // Asegurarse de enviar el número de teléfono con el nombre correcto
       if (operador.numeroCelular && operador.numeroCelular.trim() !== "") {
         formData.append("numeroCelular", operador.numeroCelular);
+        formData.append("telefono", operador.numeroCelular); // Añadir también como "telefono"
       }
       
-      // Si hay una nueva foto, añadirla
+      // Si hay una foto nueva, subirla primero
       if (foto) {
-        formData.append("foto", foto);
+        try {
+          console.log("Subiendo foto de perfil...");
+          
+          const fotoFormData = new FormData();
+          fotoFormData.append('foto', foto);
+          
+          const fotoResponse = await axios.post(
+            `http://localhost:10101/operador-turistico/subir-foto`,
+            fotoFormData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data'
+              },
+            }
+          );
+          
+          console.log("Respuesta de subida de foto:", fotoResponse.data);
+          
+          if (fotoResponse.data && fotoResponse.data.url) {
+            // Guardar la URL devuelta por el servidor
+            const nuevaFotoURL = fotoResponse.data.url;
+            localStorage.setItem("fotoPerfilURL", nuevaFotoURL);
+            
+            // Actualizar el estado
+            setFotoActual(nuevaFotoURL);
+            
+            // Notificar a otros componentes
+            const eventoActualizacion = new CustomEvent('perfilActualizado', { 
+              detail: { 
+                foto: nuevaFotoURL,
+                nombre: `${operador.primerNombre} ${operador.primerApellido}`,
+                email: operador.email,
+                temporal: false
+              } 
+            });
+            window.dispatchEvent(eventoActualizacion);
+          }
+        } catch (fotoError) {
+          console.error("Error al subir la foto:", fotoError);
+          showAlert("No se pudo actualizar la foto: " + (fotoError.response?.data?.message || fotoError.message), "error");
+        }
       }
       
       // URL correcta según el controlador

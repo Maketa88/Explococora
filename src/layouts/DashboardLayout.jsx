@@ -77,6 +77,96 @@ const DashboardLayout = ({ children }) => {
     };
   }, []);
 
+  // Añadir este useEffect para manejar la actualización de fotos
+  useEffect(() => {
+    // Cargar foto inicial desde localStorage
+    const fotoGuardada = localStorage.getItem('fotoPerfilURL');
+    if (fotoGuardada) {
+      setFotoPerfil(fotoGuardada);
+    }
+    
+    // Escuchar eventos de actualización de foto de perfil
+    const handleFotoUpdate = (event) => {
+      if (event.detail && event.detail.foto) {
+        console.log("Actualizando foto de perfil desde evento:", event.detail.foto);
+        setFotoPerfil(event.detail.foto);
+        
+        // Si la foto no es temporal, guardarla en localStorage
+        if (!event.detail.temporal) {
+          localStorage.setItem("fotoPerfilURL", event.detail.foto);
+        }
+      }
+    };
+    
+    window.addEventListener('perfilActualizado', handleFotoUpdate);
+    
+    // Limpiar el listener al desmontar
+    return () => {
+      window.removeEventListener('perfilActualizado', handleFotoUpdate);
+    };
+  }, []);
+
+  // Añadir esta función para cargar la foto desde el backend
+  const cargarFotoPerfil = async () => {
+    try {
+      const cedula = localStorage.getItem("cedula");
+      const token = localStorage.getItem("token");
+      
+      if (!cedula || !token) return;
+      
+      console.log("Solicitando datos del operador para obtener foto...");
+      
+      const response = await axios.get(`http://localhost:10101/operador-turistico/${cedula}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          _t: new Date().getTime() // Evitar caché
+        }
+      });
+      
+      console.log("Respuesta completa del servidor:", response.data);
+      
+      if (response.data) {
+        const operadorData = Array.isArray(response.data) ? response.data[0] : response.data;
+        
+        console.log("Datos del operador:", operadorData);
+        console.log("URL de foto en datos:", operadorData.foto);
+        
+        if (operadorData.foto) {
+          let fotoUrl;
+          if (operadorData.foto.startsWith('http')) {
+            fotoUrl = operadorData.foto;
+          } else if (operadorData.foto.includes('/uploads/images/')) {
+            fotoUrl = `http://localhost:10101${operadorData.foto}`;
+          } else {
+            fotoUrl = `http://localhost:10101/uploads/images/${operadorData.foto}`;
+          }
+          
+          console.log("URL final de la foto:", fotoUrl);
+          
+          setFotoPerfil(fotoUrl);
+          localStorage.setItem("fotoPerfilURL", fotoUrl);
+          
+          // Notificar a otros componentes
+          const event = new CustomEvent('perfilActualizado', { 
+            detail: { 
+              foto: fotoUrl,
+              temporal: false
+            } 
+          });
+          window.dispatchEvent(event);
+        }
+      }
+    } catch (error) {
+      console.error("Error al cargar foto de perfil:", error);
+    }
+  };
+
+  // Llamar a esta función en el useEffect inicial y cuando cambia la ruta
+  useEffect(() => {
+    cargarFotoPerfil();
+  }, [location.pathname]);
 
   const handleCambioEstado = (nuevoEstado) => {
     setOperadorEstado(nuevoEstado);
