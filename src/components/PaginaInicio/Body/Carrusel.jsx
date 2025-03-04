@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { HooksCarrusel } from "../../../hooks/HookCarrusel";
 import { BotonCarrusel } from "./BotonCarrusel";
 import { Indicadores } from "./Indicadores";
-import { SearchForm } from "./SearchForm";
+import { SearchForm } from "./Buscador/SearchForm";
 
 export const Carrusel = () => {
   const { t } = useTranslation();
