@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ArrowRight, Clock, Map, MapPin, TrendingUp } from 'lucide-react';
+import { ArrowRight, Clock, MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export const SearchForm = ({ onSearch }) => {
@@ -9,12 +9,6 @@ export const SearchForm = ({ onSearch }) => {
   const [allRoutes, setAllRoutes] = useState([]);
   const [error, setError] = useState(null);
   const [searchHistory, setSearchHistory] = useState([]);
-  const [suggestions, setSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [activeFilters, setActiveFilters] = useState({
-    difficulty: null // facil, moderada, desafiante
-  });
-  // Nuevo estado para controlar la visualización del recuadro de IA
   const [showAIRouteGenerator, setShowAIRouteGenerator] = useState(false);
   const [generatingRoute, setGeneratingRoute] = useState(false);
   const [generatedRoute, setGeneratedRoute] = useState(null);
@@ -229,174 +223,21 @@ export const SearchForm = ({ onSearch }) => {
            query.match(/(una|un|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s+(hora|horas|minuto|minutos)/i);
   };
 
-  // Detecta si la búsqueda es relacionada con dificultad
-  const isDifficultySearch = (query) => {
-    const difficultyTerms = [
-      'fácil', 'facil', 'moderada', 'difícil', 'dificil', 'extrema',
-      'sencilla', 'simple', 'complicada', 'dura', 'exigente', 'principiante', 
-      'intermedia', 'avanzada', 'experto'
-    ];
-    
-    const normalizedQuery = query.toLowerCase();
-    return difficultyTerms.some(term => normalizedQuery.includes(term)) ||
-           normalizedQuery.includes('dificultad') ||
-           normalizedQuery.includes('nivel');
-  };
-  
-  // Generar sugerencias de búsqueda basadas en la entrada actual
-  const generateSuggestions = (input) => {
-    if (!input || input.length < 2) {
-      setShowSuggestions(false);
-      return;
-    }
-    
-    const normalizedInput = input.toLowerCase().trim();
-    const potentialSuggestions = [];
-    
-    // Sugerencias basadas en nombres de rutas
-    allRoutes.forEach(route => {
-      if (route.nombreRuta && route.nombreRuta.toLowerCase().includes(normalizedInput)) {
-        potentialSuggestions.push({
-          text: route.nombreRuta,
-          type: 'name',
-          icon: <Map className="w-4 h-4 text-blue-500" />
-        });
-      }
-    });
-    
-    // Sugerencias basadas en dificultad
-    if (isDifficultySearch(normalizedInput)) {
-      ['Fácil', 'Moderada', 'Difícil', 'Extrema'].forEach(difficulty => {
-        if (difficulty.toLowerCase().includes(normalizedInput)) {
-          potentialSuggestions.push({
-            text: `Rutas de dificultad ${difficulty}`,
-            type: 'difficulty',
-            icon: <TrendingUp className="w-4 h-4 text-orange-500" />
-          });
-        }
-      });
-    }
-    
-    // Sugerencias basadas en tiempo
-    if (normalizedInput.match(/\d/)) {
-      const timePatterns = ['minutos', 'horas', 'hora'];
-      timePatterns.forEach(pattern => {
-        potentialSuggestions.push({
-          text: `${normalizedInput} ${pattern}`,
-          type: 'time',
-          icon: <Clock className="w-4 h-4 text-green-500" />
-        });
-      });
-    }
-    
-    // Filtrar duplicados y limitar a 5 sugerencias
-    const uniqueSuggestions = [];
-    const seenTexts = new Set();
-    
-    for (const suggestion of potentialSuggestions) {
-      if (!seenTexts.has(suggestion.text)) {
-        seenTexts.add(suggestion.text);
-        uniqueSuggestions.push(suggestion);
-        if (uniqueSuggestions.length >= 5) break;
-      }
-    }
-    
-    setSuggestions(uniqueSuggestions);
-    setShowSuggestions(uniqueSuggestions.length > 0);
-  };
-
-  // Aplicar un filtro de dificultad específico
-  const applyDifficultyFilter = (difficulty) => {
-    // Mapeo de términos de dificultad para búsqueda más flexible
-    const difficultyMap = {
-      'facil': ['fácil', 'facil', 'sencilla', 'sencillo', 'principiante', 'básica', 'basica', 'simple'],
-      'moderada': ['moderada', 'moderado', 'intermedia', 'intermedio', 'media', 'medio'],
-      'desafiante': ['difícil', 'dificil', 'desafiante', 'extrema', 'extremo', 'avanzada', 'avanzado', 'dura', 'duro']
-    };
-    
-    const terms = difficultyMap[difficulty] || [difficulty];
-    
-    return allRoutes.filter(route => 
-      route.dificultad && 
-      terms.some(term => route.dificultad.toLowerCase().includes(term))
-    );
-  };
-
-  // Función para filtrar rutas según término de búsqueda con algoritmo mejorado
-  const filterRoutes = () => {
-    setIsSearching(true);
-    
-    setTimeout(() => {
-      if (!searchQuery.trim() && !activeFilters.difficulty) {
-        setRoutes([]);
-        setIsSearching(false);
-        return;
-      }
-      
-      const query = searchQuery.toLowerCase().trim();
-      
-      // Guardar búsqueda en historial si hay texto
-      if (query.length > 2 && !searchHistory.includes(query)) {
-        const newHistory = [query, ...searchHistory].slice(0, 5);
-        setSearchHistory(newHistory);
-        localStorage.setItem('searchHistory', JSON.stringify(newHistory));
-      }
-      
-      // Si no hay rutas, no podemos buscar
-      if (!allRoutes.length) {
-        setIsSearching(false);
-        return;
-      }
-      
-      // Base filtrada inicial
-      let filteredRoutes = allRoutes;
-      
-      // Aplicar filtro de dificultad si está activo
-      if (activeFilters.difficulty) {
-        filteredRoutes = applyDifficultyFilter(activeFilters.difficulty);
-      }
-      
-      // Si hay una búsqueda de texto, aplicar filtrado adicional
-      if (query) {
-        // Calcular puntuación de relevancia para cada ruta
-        const scoredRoutes = filteredRoutes.map(route => ({
-          ...route,
-          relevanceScore: calculateRelevanceScore(route, query)
-        }));
-        
-        // Filtrar rutas con alguna coincidencia
-        const matchingRoutes = scoredRoutes.filter(route => route.relevanceScore > 0);
-        
-        // Ordenar por puntuación de relevancia
-        matchingRoutes.sort((a, b) => b.relevanceScore - a.relevanceScore);
-        
-        // Limitar a las 10 más relevantes y eliminar la propiedad auxiliar
-        const finalRoutes = matchingRoutes
-          .slice(0, 10)
-          .map(route => {
-            // Crear un nuevo objeto sin la propiedad relevanceScore
-            const { nombreRuta, dificultad, duracion, descripcion, ubicacion, distancia, id, puntos } = route;
-            return { nombreRuta, dificultad, duracion, descripcion, ubicacion, distancia, id, puntos };
-          });
-        
-        setRoutes(finalRoutes);
-      } else {
-        // Si solo hay filtros activos sin búsqueda de texto, mostrar todas las rutas filtradas
-        setRoutes(filteredRoutes.slice(0, 10));
-      }
-      
-      setIsSearching(false);
-    }, 300);
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSearch && onSearch({ difficulty: activeFilters.difficulty });
+    onSearch && onSearch({ query: searchQuery });
     
-    // Verificar si se ha seleccionado una dificultad
-    if (!activeFilters.difficulty) {
-      alert('Por favor, selecciona una dificultad para generar una ruta');
+    // Verificar si hay texto de búsqueda
+    if (!searchQuery.trim()) {
+      alert('Por favor, ingresa un término de búsqueda para generar una ruta');
       return;
+    }
+    
+    // Guardar búsqueda en historial si hay texto
+    if (searchQuery.trim().length > 2 && !searchHistory.includes(searchQuery.trim())) {
+      const newHistory = [searchQuery.trim(), ...searchHistory].slice(0, 5);
+      setSearchHistory(newHistory);
+      localStorage.setItem('searchHistory', JSON.stringify(newHistory));
     }
     
     // Mostrar el recuadro de IA generando rutas
@@ -409,22 +250,35 @@ export const SearchForm = ({ onSearch }) => {
     setTimeout(() => {
       setGeneratingRoute(false);
       
-      // Filtrar rutas según la dificultad seleccionada
+      // Base filtrada inicial
       let rutasFiltradas = allRoutes;
       
-      // Aplicar filtro de dificultad
-      rutasFiltradas = applyDifficultyFilter(activeFilters.difficulty);
+      // Aplicar filtro de búsqueda si hay texto
+      if (searchQuery.trim()) {
+        // Calcular puntuación de relevancia para cada ruta
+        const scoredRoutes = rutasFiltradas.map(route => ({
+          ...route,
+          relevanceScore: calculateRelevanceScore(route, searchQuery)
+        }));
+        
+        // Filtrar rutas con alguna coincidencia
+        const matchingRoutes = scoredRoutes.filter(route => route.relevanceScore > 0);
+        
+        // Ordenar por puntuación de relevancia
+        matchingRoutes.sort((a, b) => b.relevanceScore - a.relevanceScore);
+        
+        // Limitar a las más relevantes
+        rutasFiltradas = matchingRoutes.slice(0, 5);
+      }
       
       // Si no hay rutas filtradas, mostrar mensaje
       if (rutasFiltradas.length === 0) {
-        // Crear una ruta genérica
+        // Crear una ruta genérica basada en la búsqueda
         const aiGeneratedRoute = {
-          nombreRuta: `Ruta ${activeFilters.difficulty === 'facil' ? 'Fácil' : 
-                        activeFilters.difficulty === 'moderada' ? 'Moderada' : 'Desafiante'}`,
-          dificultad: activeFilters.difficulty,
+          nombreRuta: `Ruta personalizada: ${searchQuery}`,
+          dificultad: 'moderada',
           duracion: '2-3 horas',
-          descripcion: `Una ruta personalizada de dificultad ${activeFilters.difficulty === 'facil' ? 'fácil' : 
-                        activeFilters.difficulty === 'moderada' ? 'moderada' : 'desafiante'} generada por nuestra IA.`,
+          descripcion: `Una ruta personalizada basada en tu búsqueda "${searchQuery}" generada por nuestra IA.`,
           puntos: [
             'Punto de partida',
             'Mirador panorámico',
@@ -455,170 +309,64 @@ export const SearchForm = ({ onSearch }) => {
     }, 2000);
   };
   
-  const handleSuggestionClick = (suggestion) => {
-    setSearchQuery(suggestion.text);
-    setShowSuggestions(false);
-    
-    // Ejecutar búsqueda automáticamente
-    setTimeout(() => filterRoutes(), 100);
-  };
-  
-  // Actualizar resultados mientras el usuario escribe - Desactivamos la búsqueda automática
+  // Actualizar resultados mientras el usuario escribe - Desactivamos la búsqueda automática y las sugerencias
   useEffect(() => {
+    // Ya no generamos sugerencias mientras se escribe
     const delaySearch = setTimeout(() => {
-      generateSuggestions(searchQuery);
-      // No ejecutamos filterRoutes() automáticamente
+      // Eliminamos la generación de sugerencias
       if (!searchQuery.trim()) {
         setRoutes([]);
-        setShowSuggestions(false);
       }
     }, 300);
     
     return () => clearTimeout(delaySearch);
-  }, [searchQuery, activeFilters]);
-
-  // Observar clicks para cerrar sugerencias al hacer clic fuera
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!e.target.closest('.search-container')) {
-        setShowSuggestions(false);
-      }
-    };
-    
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [searchQuery]);
 
   return (
     <div className="w-full flex flex-col items-center">
       {/* Título */}
-      <h1 className="text-3xl font-bold text-blue-700 mb-6 mt-6 text-center">
+      <h1 className="text-2xl font-bold text-white mb-4 mt-4 text-center">
         Encuentra Tu Ruta Perfecta
       </h1>
       
-      <div className="w-full max-w-4xl px-4 search-container relative">
+      <div className="w-full max-w-3xl px-4 search-container relative">
         <form 
           onSubmit={handleSubmit}
-          className="w-full bg-white/80 backdrop-blur-md rounded-xl shadow-lg overflow-hidden border border-white/20 hover:bg-white/90 transition-all duration-300"
+          className="w-full rounded-3xl overflow-hidden transition-all duration-300"
         >
-          <div className="flex flex-col items-center py-6 px-4">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Selecciona la dificultad de tu ruta</h2>
-            
-            {/* Selector de dificultad grande */}
-            <div className="w-full max-w-md mb-6">
-              <div className="flex justify-center gap-4">
+          <div className="flex flex-col items-center py-8 px-3">
+            {/* Campo de búsqueda inteligente con botón integrado */}
+            <div className="w-full max-w-2xl">
+              <div className="relative">
+                {/* Eliminamos los efectos decorativos de fondo */}
+                
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="¿Qué tipo de aventura buscas hoy?"
+                  className="w-full px-10 py-6 pr-44 rounded-full border border-gray-200 bg-white backdrop-blur-md focus:border-gray-200 focus:ring-0 transition-all duration-300 text-black placeholder-teal-400 outline-none focus:outline-none"
+                />
                 <button
-                  type="button"
-                  onClick={() => setActiveFilters({...activeFilters, difficulty: 'facil'})}
-                  className={`flex-1 py-4 px-6 rounded-xl flex flex-col items-center justify-center transition-all duration-300 ${
-                    activeFilters.difficulty === 'facil' 
-                      ? 'bg-green-100 border-2 border-green-500 shadow-md' 
-                      : 'bg-white border border-gray-200 hover:bg-green-50'
-                  }`}
+                  type="submit"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 px-7 py-3.5 bg-teal-700 hover:bg-teal-800 text-white font-medium rounded-full transition-all duration-300 text-sm uppercase tracking-wide flex items-center shadow-lg hover:shadow-teal-500/30 group focus:outline-none active:outline-none focus:ring-0 focus:ring-offset-0 outline-none border-0 focus:border-0 active:border-0"
                 >
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${
-                    activeFilters.difficulty === 'facil' ? 'bg-green-500 text-white' : 'bg-green-100 text-green-600'
-                  }`}>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </div>
-                  <span className="font-medium text-gray-800">Fácil</span>
-                  <span className="text-xs text-gray-500 mt-1">Para principiantes</span>
+                  <span>Buscar Aventura</span>
+                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                 </button>
                 
-                <button
-                  type="button"
-                  onClick={() => setActiveFilters({...activeFilters, difficulty: 'moderada'})}
-                  className={`flex-1 py-4 px-6 rounded-xl flex flex-col items-center justify-center transition-all duration-300 ${
-                    activeFilters.difficulty === 'moderada' 
-                      ? 'bg-blue-100 border-2 border-blue-500 shadow-md' 
-                      : 'bg-white border border-gray-200 hover:bg-blue-50'
-                  }`}
-                >
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${
-                    activeFilters.difficulty === 'moderada' ? 'bg-blue-500 text-white' : 'bg-blue-100 text-blue-600'
-                  }`}>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                    </svg>
-                  </div>
-                  <span className="font-medium text-gray-800">Moderada</span>
-                  <span className="text-xs text-gray-500 mt-1">Nivel intermedio</span>
-                </button>
+                {/* Efecto decorativo */}
+                <div className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
                 
-                <button
-                  type="button"
-                  onClick={() => setActiveFilters({...activeFilters, difficulty: 'desafiante'})}
-                  className={`flex-1 py-4 px-6 rounded-xl flex flex-col items-center justify-center transition-all duration-300 ${
-                    activeFilters.difficulty === 'desafiante' 
-                      ? 'bg-red-100 border-2 border-red-500 shadow-md' 
-                      : 'bg-white border border-gray-200 hover:bg-red-50'
-                  }`}
-                >
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${
-                    activeFilters.difficulty === 'desafiante' ? 'bg-red-500 text-white' : 'bg-red-100 text-red-600'
-                  }`}>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                    </svg>
-                  </div>
-                  <span className="font-medium text-gray-800">Desafiante</span>
-                  <span className="text-xs text-gray-500 mt-1">Para expertos</span>
-                </button>
+                {/* Eliminamos las partículas decorativas */}
               </div>
             </div>
-
-            {/* Search Button */}
-            <button
-              type="submit"
-              className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-300 text-base uppercase tracking-wide flex items-center"
-            >
-              <span>Generar Ruta</span>
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </button>
           </div>
         </form>
-
-        {/* Sugerencias de búsqueda */}
-        {showSuggestions && (
-          <div className="absolute left-0 right-0 mt-2 z-10 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden max-h-60">
-            <div className="p-2">
-              {suggestions.length > 0 ? (
-                <div>
-                  {suggestions.map((suggestion, index) => (
-                    <div
-                      key={index}
-                      onClick={() => handleSuggestionClick(suggestion)}
-                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-blue-50 cursor-pointer rounded-lg group"
-                    >
-                      {suggestion.icon}
-                      <span className="text-gray-800 group-hover:text-blue-700">{suggestion.text}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : searchHistory.length > 0 ? (
-                <div>
-                  <div className="px-4 py-1 text-xs font-semibold text-gray-500 uppercase">Búsquedas recientes</div>
-                  {searchHistory.map((query, index) => (
-                    <div
-                      key={index}
-                      onClick={() => {
-                        setSearchQuery(query);
-                        setShowSuggestions(false);
-                        setTimeout(() => filterRoutes(), 100);
-                      }}
-                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-blue-50 cursor-pointer rounded-lg"
-                    >
-                      <Clock className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-700">{query}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-          </div>
-        )}
 
         {/* Recuadro de IA generando rutas */}
         {showAIRouteGenerator && (
@@ -653,17 +401,17 @@ export const SearchForm = ({ onSearch }) => {
                         {/* Efectos de IA trabajando */}
                         <div className="absolute inset-0 flex items-center justify-center">
                           <div className="relative w-32 h-32">
-                            <div className="absolute inset-0 border-4 border-blue-500 rounded-full opacity-30 animate-ping"></div>
-                            <div className="absolute inset-2 border-4 border-blue-400 rounded-full opacity-50 animate-ping" style={{ animationDelay: '0.3s' }}></div>
-                            <div className="absolute inset-4 border-4 border-blue-300 rounded-full opacity-70 animate-ping" style={{ animationDelay: '0.6s' }}></div>
-                            <div className="absolute inset-6 border-4 border-blue-200 rounded-full opacity-90 animate-ping" style={{ animationDelay: '0.9s' }}></div>
+                            <div className="absolute inset-0 border-4 border-teal-500 rounded-full opacity-30 animate-ping"></div>
+                            <div className="absolute inset-2 border-4 border-teal-400 rounded-full opacity-50 animate-ping" style={{ animationDelay: '0.3s' }}></div>
+                            <div className="absolute inset-4 border-4 border-teal-300 rounded-full opacity-70 animate-ping" style={{ animationDelay: '0.6s' }}></div>
+                            <div className="absolute inset-6 border-4 border-teal-200 rounded-full opacity-90 animate-ping" style={{ animationDelay: '0.9s' }}></div>
                           </div>
                         </div>
                       </div>
                     </div>
                     
                     <div className="flex flex-col items-center">
-                      <div className="w-16 h-16 border-t-4 border-blue-600 border-solid rounded-full animate-spin mb-4"></div>
+                      <div className="w-16 h-16 border-t-4 border-teal-600 border-solid rounded-full animate-spin mb-4"></div>
                       <h2 className="text-2xl font-bold text-gray-800 mb-2">Generando tu ruta perfecta</h2>
                       <p className="text-gray-600 text-center max-w-md">
                         Nuestra IA está analizando tus preferencias y creando una ruta personalizada con los mejores puntos de interés.
@@ -676,11 +424,11 @@ export const SearchForm = ({ onSearch }) => {
                           <p className="text-sm text-gray-700">Analizando preferencias de búsqueda...</p>
                         </div>
                         <div className="flex items-center space-x-2 mb-2">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                          <div className="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></div>
                           <p className="text-sm text-gray-700">Identificando puntos de interés...</p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                          <div className="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></div>
                           <p className="text-sm text-gray-700">Optimizando ruta para mejor experiencia...</p>
                         </div>
                       </div>
@@ -698,7 +446,7 @@ export const SearchForm = ({ onSearch }) => {
                         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70 flex flex-col justify-end p-6">
                           <h3 className="text-white text-2xl font-bold">{generatedRoute.nombreRuta}</h3>
                           <div className="flex items-center mt-2">
-                            <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm mr-3">
+                            <span className="bg-teal-500 text-white px-3 py-1 rounded-full text-sm mr-3">
                               {generatedRoute.dificultad}
                             </span>
                             <span className="text-white/90 flex items-center">
@@ -732,19 +480,19 @@ export const SearchForm = ({ onSearch }) => {
                           
                           {/* Puntos en el mapa */}
                           <div className="absolute top-[20%] left-[15%]">
-                            <div className="h-6 w-6 bg-blue-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-bold">1</div>
+                            <div className="h-6 w-6 bg-teal-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-bold">1</div>
                           </div>
                           <div className="absolute top-[35%] left-[30%]">
-                            <div className="h-6 w-6 bg-blue-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-bold">2</div>
+                            <div className="h-6 w-6 bg-teal-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-bold">2</div>
                           </div>
                           <div className="absolute top-[45%] left-[50%]">
-                            <div className="h-6 w-6 bg-blue-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-bold">3</div>
+                            <div className="h-6 w-6 bg-teal-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-bold">3</div>
                           </div>
                           <div className="absolute top-[60%] left-[65%]">
-                            <div className="h-6 w-6 bg-blue-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-bold">4</div>
+                            <div className="h-6 w-6 bg-teal-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-bold">4</div>
                           </div>
                           <div className="absolute top-[75%] left-[80%]">
-                            <div className="h-6 w-6 bg-blue-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-bold">5</div>
+                            <div className="h-6 w-6 bg-teal-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-bold">5</div>
                           </div>
                           
                           {/* Línea de ruta */}
@@ -752,7 +500,7 @@ export const SearchForm = ({ onSearch }) => {
                             <path 
                               d="M15%,20% Q25%,25% 30%,35% T50%,45% T65%,60% T80%,75%" 
                               fill="none" 
-                              stroke="#3b82f6" 
+                              stroke="#0d9488" 
                               strokeWidth="3" 
                               strokeLinecap="round" 
                               strokeDasharray="6,6"
@@ -782,17 +530,17 @@ export const SearchForm = ({ onSearch }) => {
                         </div>
                       </div>
                       
-                      <div className="bg-blue-50 rounded-xl p-6 mb-6">
-                        <h3 className="text-lg font-semibold text-blue-800 mb-4">Puntos de interés</h3>
+                      <div className="bg-teal-50 rounded-xl p-6 mb-6">
+                        <h3 className="text-lg font-semibold text-teal-800 mb-4">Puntos de interés</h3>
                         <div className="space-y-0">
                           {generatedRoute.puntos.map((punto, index) => (
                             <div key={index} className="flex items-start">
                               <div className="relative">
-                                <div className="h-8 w-8 flex items-center justify-center rounded-full bg-blue-100 border-2 border-blue-500 z-10 relative">
-                                  <span className="text-blue-600 font-bold text-xs">{index + 1}</span>
+                                <div className="h-8 w-8 flex items-center justify-center rounded-full bg-teal-100 border-2 border-teal-500 z-10 relative">
+                                  <span className="text-teal-600 font-bold text-xs">{index + 1}</span>
                                 </div>
                                 {index < generatedRoute.puntos.length - 1 && (
-                                  <div className="absolute top-8 left-1/2 w-0.5 h-16 -translate-x-1/2 bg-blue-300" />
+                                  <div className="absolute top-8 left-1/2 w-0.5 h-16 -translate-x-1/2 bg-teal-300" />
                                 )}
                               </div>
                               <div className="ml-4 mb-12">
@@ -815,13 +563,13 @@ export const SearchForm = ({ onSearch }) => {
                       <div className="flex flex-wrap justify-center gap-3 mt-6">
                         <button 
                           onClick={() => setShowAIRouteGenerator(false)}
-                          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-300 text-sm"
+                          className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-300 text-sm"
                         >
                           Cerrar
                         </button>
                         
                         <button 
-                          className="px-5 py-2.5 bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-300 flex items-center text-sm"
+                          className="px-5 py-2.5 bg-white border border-teal-600 text-teal-600 hover:bg-teal-50 font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-300 flex items-center text-sm"
                           onClick={() => {
                             // Simular compartir la ruta
                             alert('Compartiendo ruta: ' + generatedRoute.nombreRuta);
@@ -879,8 +627,8 @@ export const SearchForm = ({ onSearch }) => {
       {isSearching && !showAIRouteGenerator && (
         <div className="mt-8 w-full max-w-4xl mx-auto">
           <div className="flex justify-center items-center gap-3">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></div>
-            <span className="text-blue-600 font-medium">Buscando rutas...</span>
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-600"></div>
+            <span className="text-teal-600 font-medium">Buscando rutas...</span>
           </div>
         </div>
       )}
@@ -895,13 +643,13 @@ export const SearchForm = ({ onSearch }) => {
                 key={route.id} 
                 className="bg-white/90 backdrop-blur-md rounded-lg p-5 shadow-md hover:shadow-lg transition-all border border-gray-100 h-full flex flex-col"
               >
-                <h3 className="text-lg font-bold text-blue-700">{route.nombreRuta}</h3>
+                <h3 className="text-lg font-bold text-teal-700">{route.nombreRuta}</h3>
                 <div className="flex justify-between items-center mt-2">
                   <div className="flex items-center text-gray-600">
                     <Clock className="h-4 w-4 mr-1" />
                     <p>{route.duracion}</p>
                   </div>
-                  <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                  <span className="inline-block bg-teal-100 text-teal-800 text-xs px-2 py-1 rounded-full">
                     {route.dificultad}
                   </span>
                 </div>
@@ -914,11 +662,11 @@ export const SearchForm = ({ onSearch }) => {
                     {generateRoutePoints(route).map((point, i, arr) => (
                       <div key={i} className="flex items-start mb-4">
                         <div className="relative">
-                          <div className="h-8 w-8 flex items-center justify-center rounded-full bg-blue-100 border-2 border-blue-500 z-10 relative">
-                            <MapPin className="h-4 w-4 text-blue-600" />
+                          <div className="h-8 w-8 flex items-center justify-center rounded-full bg-teal-100 border-2 border-teal-500 z-10 relative">
+                            <MapPin className="h-4 w-4 text-teal-600" />
                           </div>
                           {i < arr.length - 1 && (
-                            <div className="absolute top-8 left-1/2 w-0.5 h-full -translate-x-1/2 bg-blue-300" />
+                            <div className="absolute top-8 left-1/2 w-0.5 h-full -translate-x-1/2 bg-teal-300" />
                           )}
                         </div>
                         <div className="ml-3 mt-1.5">
@@ -929,27 +677,6 @@ export const SearchForm = ({ onSearch }) => {
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-      
-      {routes.length === 0 && !isSearching && searchQuery && (
-        <div className="mt-8 w-full max-w-4xl p-6 bg-blue-50 rounded-lg text-center mx-auto">
-          <p className="text-blue-800 text-lg">No se encontraron rutas que coincidan con tu búsqueda.</p>
-          <p className="text-blue-600 mt-2">Intenta con otros términos o ajusta los filtros de búsqueda.</p>
-          <div className="mt-4 flex flex-wrap justify-center gap-2">
-            {['cascada', 'fácil', '2 horas', 'bosque', 'mirador'].map((suggestion, i) => (
-              <button 
-                key={i}
-                onClick={() => {
-                  setSearchQuery(suggestion);
-                  setTimeout(() => filterRoutes(), 100);
-                }}
-                className="px-3 py-1.5 bg-white text-blue-700 rounded-full text-sm hover:bg-blue-100 transition-colors"
-              >
-                {suggestion}
-              </button>
             ))}
           </div>
         </div>
