@@ -253,8 +253,8 @@ const PerfilGuia = () => {
               </div>
               
               <div className="bg-teal-800/70 p-3 rounded-lg shadow-md">
-                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-white' : 'text-white'}`}>Especialidad</h3>
-                <p className=" text-lg text-white">{guiaData.especialidad || "No disponible"}</p>
+                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-white' : 'text-white'}`}>Descripción</h3>
+                <p className="text-lg text-white">{guiaData.descripcion || "No hay descripción disponible."}</p>
               </div>
             </div>
             
@@ -274,8 +274,7 @@ const PerfilGuia = () => {
           </div>
         </div>
         
-        {/* Sección de estadísticas */}
-        <div className="mt-8">
+        <div className="mt-6">
           <h3 className={`text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-teal-800'}`}>Estadísticas</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

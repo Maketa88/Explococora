@@ -14,6 +14,7 @@ import VistaGuia from "../../pages/VistaGuia/VistaGuia";
 import ChatBot from "../../components/Chatbot/Chatbot";
 import QuienesSomos from "../../components/QuienesSomos/QuienesSomos";
 import VistaCliente from "../../pages/VistaCliente/VistaCliente";
+import NuestrasRutas from "../../components/NuestrasRutas/NuestrasRutas";
 
 export const RutasExplococora = () => {
   const location = useLocation();
@@ -53,6 +54,7 @@ export const RutasExplococora = () => {
         <Route path="/" element={<PaginaInicio />} />
         <Route path="/Historia" element={<HistoriaCultura />} />
         <Route path="/NuestrosGuias" element={<NuestrosGuias />} />
+        <Route path="/NuestrasRutas" element={<NuestrasRutas />} />
         <Route path="/Ingreso" element={<InicioSesion />} />
         <Route path="/Registro" element={<Registro />} />
         <Route path="/ContactForm" element={<ContactForm />} />
