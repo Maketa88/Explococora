@@ -396,44 +396,42 @@ const ActualizarDatosCliente = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-teal-800/10 to-white py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
-      <div className="max-w-md w-full space-y-8 bg-white rounded-2xl shadow-2xl p-8 transform hover:scale-[1.02] transition-transform duration-300">
+    <div className="min-h-screen bg-teal-900 py-6 sm:py-8 md:py-12 px-3 sm:px-4 md:px-6 lg:px-8 flex items-center justify-center">
+      <div className="max-w-5xl w-full space-y-4 sm:space-y-6 bg-teal-800/70 rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl p-4 sm:p-6 md:p-8">
         <div className="text-center">
-          <div className="mx-auto h-16 w-16 bg-teal-800 rounded-full flex items-center justify-center mb-4 shadow-lg">
-            <FaUser className="h-8 w-8 text-white" />
+          <div className="mx-auto h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 bg-teal-600 rounded-full flex items-center justify-center mb-3 sm:mb-4 shadow-lg">
+            <FaUser className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-white" />
           </div>
-          <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+          <h2 className="text-2xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight">
             Actualizar Perfil
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-teal-300">
             Mantén tu información personal actualizada
           </p>
         </div>
 
         {error && (
-          <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 shadow-sm">
+          <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-red-100 text-red-700 text-sm rounded-lg border border-red-400 shadow-sm">
             {error}
           </div>
         )}
 
         {fotoError && (
-          <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 shadow-sm">
+          <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-red-100 text-red-700 text-sm rounded-lg border border-red-400 shadow-sm">
             {fotoError}
           </div>
         )}
 
-        {/* Formulario de datos personales */}
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-          {/* Sección de foto de perfil */}
-          <div className="flex justify-center mt-8">
+        <form onSubmit={handleSubmit} className="mt-4 sm:mt-6 space-y-4 sm:space-y-6">
+          <div className="flex justify-center mb-4 sm:mb-6 md:mb-8">
             <div className="relative">
-              <div className="p-3 bg-white rounded-full shadow-lg ring-4 ring-teal-100">
+              <div className="p-2 sm:p-3 bg-white rounded-full shadow-lg ring-2 sm:ring-4 ring-teal-100">
                 <img
                   src={
                     previewFoto || (cliente.foto_perfil ? cliente.foto_perfil : Avatar)
                   }
                   alt="Foto de perfil"
-                  className="w-32 h-32 rounded-full object-cover cursor-pointer hover:opacity-90 transition-all duration-300 transform hover:scale-105 border-4 border-teal-50"
+                  className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full object-cover cursor-pointer hover:opacity-90 transition-all duration-300 transform hover:scale-105 border-2 sm:border-4 border-teal-50"
                   onError={(e) => {
                     console.error("Error al cargar la imagen");
                     e.target.src = Avatar;
@@ -441,9 +439,9 @@ const ActualizarDatosCliente = () => {
                 />
                 <label
                   htmlFor="upload-photo"
-                  className="absolute -bottom-3 -right-3 bg-teal-600 text-white p-2.5 rounded-full shadow-lg transform hover:rotate-12 hover:scale-110 transition-transform duration-300 cursor-pointer"
+                  className="absolute -bottom-2 -right-2 sm:-bottom-3 sm:-right-3 bg-teal-600 text-white p-1.5 sm:p-2.5 rounded-full shadow-lg transform hover:rotate-12 hover:scale-110 transition-transform duration-300 cursor-pointer"
                 >
-                  <FaCamera className="h-5 w-5" />
+                  <FaCamera className="h-4 w-4 sm:h-5 sm:w-5" />
                 </label>
                 <input
                   type="file"
@@ -457,120 +455,134 @@ const ActualizarDatosCliente = () => {
             </div>
           </div>
 
-          <div className="space-y-6">
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaIdCard className="h-5 w-5 text-teal-800" />
+          <div className="bg-teal-700/50 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 shadow-inner">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
+              <div className="relative group">
+                <label className="block text-teal-300 text-xs sm:text-sm font-medium mb-1">
+                  Cédula
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+                    <FaIdCard className="h-4 w-4 sm:h-5 sm:w-5 text-teal-300" />
+                  </div>
+                  <input
+                    type="text"
+                    value={cliente.cedula || ""}
+                    disabled
+                    className="pl-8 sm:pl-10 w-full px-3 sm:px-4 py-2 sm:py-3 border border-teal-600 rounded-lg sm:rounded-xl text-white bg-teal-800 text-sm sm:text-base"
+                  />
+                </div>
               </div>
-              <input
-                type="text"
-                value={cliente.cedula || ""}
-                disabled
-                className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 bg-gray-50"
-              />
-              <label className="absolute left-10 -top-2 bg-white px-2 text-xs font-medium text-teal-800">
-                Cédula
-              </label>
-            </div>
 
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaUser className="h-5 w-5 text-teal-800" />
+              <div className="relative group">
+                <label className="block text-teal-300 text-xs sm:text-sm font-medium mb-1">
+                  Primer Nombre
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+                    <FaUser className="h-4 w-4 sm:h-5 sm:w-5 text-teal-300" />
+                  </div>
+                  <input
+                    type="text"
+                    name="primerNombre"
+                    value={formData.primerNombre}
+                    onChange={handleInputChange}
+                    className="pl-8 sm:pl-10 w-full px-3 sm:px-4 py-2 sm:py-3 border border-teal-600 rounded-lg sm:rounded-xl text-white bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm sm:text-base"
+                    required
+                  />
+                </div>
               </div>
-              <input
-                type="text"
-                name="primerNombre"
-                value={formData.primerNombre}
-                onChange={handleInputChange}
-                className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
-                required
-              />
-              <label className="absolute left-10 -top-2 bg-white px-2 text-xs font-medium text-teal-800">
-                Primer Nombre
-              </label>
-            </div>
 
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaUser className="h-5 w-5 text-teal-800" />
+              <div className="relative group">
+                <label className="block text-teal-300 text-xs sm:text-sm font-medium mb-1">
+                  Segundo Nombre
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+                    <FaUser className="h-4 w-4 sm:h-5 sm:w-5 text-teal-300" />
+                  </div>
+                  <input
+                    type="text"
+                    name="segundoNombre"
+                    value={formData.segundoNombre}
+                    onChange={handleInputChange}
+                    className="pl-8 sm:pl-10 w-full px-3 sm:px-4 py-2 sm:py-3 border border-teal-600 rounded-lg sm:rounded-xl text-white bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm sm:text-base"
+                  />
+                </div>
               </div>
-              <input
-                type="text"
-                name="segundoNombre"
-                value={formData.segundoNombre}
-                onChange={handleInputChange}
-                className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
-              />
-              <label className="absolute left-10 -top-2 bg-white px-2 text-xs font-medium text-teal-800">
-                Segundo Nombre
-              </label>
-            </div>
 
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaUser className="h-5 w-5 text-teal-800" />
+              <div className="relative group">
+                <label className="block text-teal-300 text-xs sm:text-sm font-medium mb-1">
+                  Primer Apellido
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+                    <FaUser className="h-4 w-4 sm:h-5 sm:w-5 text-teal-300" />
+                  </div>
+                  <input
+                    type="text"
+                    name="primerApellido"
+                    value={formData.primerApellido}
+                    onChange={handleInputChange}
+                    className="pl-8 sm:pl-10 w-full px-3 sm:px-4 py-2 sm:py-3 border border-teal-600 rounded-lg sm:rounded-xl text-white bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm sm:text-base"
+                    required
+                  />
+                </div>
               </div>
-              <input
-                type="text"
-                name="primerApellido"
-                value={formData.primerApellido}
-                onChange={handleInputChange}
-                className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
-                required
-              />
-              <label className="absolute left-10 -top-2 bg-white px-2 text-xs font-medium text-teal-800">
-                Primer Apellido
-              </label>
-            </div>
 
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaUser className="h-5 w-5 text-teal-800" />
+              <div className="relative group">
+                <label className="block text-teal-300 text-xs sm:text-sm font-medium mb-1">
+                  Segundo Apellido
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+                    <FaUser className="h-4 w-4 sm:h-5 sm:w-5 text-teal-300" />
+                  </div>
+                  <input
+                    type="text"
+                    name="segundoApellido"
+                    value={formData.segundoApellido}
+                    onChange={handleInputChange}
+                    className="pl-8 sm:pl-10 w-full px-3 sm:px-4 py-2 sm:py-3 border border-teal-600 rounded-lg sm:rounded-xl text-white bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm sm:text-base"
+                  />
+                </div>
               </div>
-              <input
-                type="text"
-                name="segundoApellido"
-                value={formData.segundoApellido}
-                onChange={handleInputChange}
-                className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
-              />
-              <label className="absolute left-10 -top-2 bg-white px-2 text-xs font-medium text-teal-800">
-                Segundo Apellido
-              </label>
-            </div>
 
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaEnvelope className="h-5 w-5 text-teal-800" />
+              <div className="relative group">
+                <label className="block text-teal-300 text-xs sm:text-sm font-medium mb-1">
+                  Email
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+                    <FaEnvelope className="h-4 w-4 sm:h-5 sm:w-5 text-teal-300" />
+                  </div>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="pl-8 sm:pl-10 w-full px-3 sm:px-4 py-2 sm:py-3 border border-teal-600 rounded-lg sm:rounded-xl text-white bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm sm:text-base"
+                    required
+                  />
+                </div>
               </div>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
-                required
-              />
-              <label className="absolute left-10 -top-2 bg-white px-2 text-xs font-medium text-teal-800">
-                Email
-              </label>
             </div>
           </div>
 
-          <div className="pt-6">
+          <div className="pt-4 sm:pt-6 flex justify-center">
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-teal-800 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="py-2 sm:py-3 px-6 sm:px-8 border border-transparent text-xs sm:text-sm font-medium rounded-lg sm:rounded-xl text-white bg-teal-600 hover:bg-teal-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transform hover:scale-[1.02] transition-all duration-300 shadow-md sm:shadow-lg hover:shadow-xl"
               disabled={updating}
             >
               <span className="flex items-center">
                 {updating ? (
-                  <svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                 ) : (
-                  <FaSave className="h-5 w-5 mr-2" />
+                  <FaSave className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
                 )}
                 {updating ? "Actualizando..." : "Guardar Cambios"}
               </span>

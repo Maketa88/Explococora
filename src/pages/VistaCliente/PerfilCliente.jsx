@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
-import { FaCamera, FaEnvelope, FaIdCard, FaUser, FaUserEdit } from 'react-icons/fa';
+import { FaCamera, FaUserEdit } from 'react-icons/fa';
 import Avatar from "../../assets/Images/avatar.png";
 
 const PerfilCliente = () => {
@@ -170,142 +170,105 @@ const PerfilCliente = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-b from-teal-800/10 to-white py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
-        <div className="max-w-md w-full space-y-8 bg-white rounded-2xl shadow-2xl p-8 transform hover:scale-[1.02] transition-transform duration-300">
-          <div className="text-center">
-            <div className="relative mx-auto">
-              <div className="mx-auto h-32 w-32 relative">
-                <img
-                  src={fotoUrl}
-                  alt="Foto de perfil"
-                  className="h-32 w-32 rounded-full object-cover shadow-xl ring-4 ring-teal-500/30"
-                  onClick={abrirModal}
-                  onError={(e) => {
-                    console.error("Error al cargar la imagen:", e);
-                    e.target.onerror = null;
-                    // Intentar cargar desde localStorage como respaldo
-                    const storedFoto = localStorage.getItem("foto_perfil_cliente");
-                    if (storedFoto && storedFoto !== fotoUrl) {
-                      e.target.src = storedFoto;
-                    } else {
-                      // Fallback a avatar generado con iniciales
-                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(cliente.nombre_del_cliente || "Usuario")}&size=200&background=0D8ABC&color=fff`;
-                    }
-                  }}
-                />
+      <div className="bg-teal-900">
+        <div className="container mx-auto px-4 py-6 sm:py-8 md:py-10">
+          <div className="bg-teal-800/70 rounded-xl shadow-xl p-4 sm:p-5 md:p-6">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6 ml-2 sm:ml-4">Perfil del Cliente</h2>
+            
+            <div className="flex flex-col md:flex-row gap-6">
+              {/* Columna izquierda - Foto */}
+              <div className="w-full md:w-1/4 flex flex-col items-center mb-6 md:mb-0">
+                <div className="relative mb-3">
+                  <img
+                    src={fotoUrl}
+                    alt="Foto de perfil"
+                    className="h-32 w-32 sm:h-36 sm:w-36 md:h-40 md:w-40 rounded-full object-cover shadow-xl ring-4 ring-teal-500/30"
+                    onClick={abrirModal}
+                    onError={(e) => {
+                      console.error("Error al cargar la imagen:", e);
+                      e.target.onerror = null;
+                      const storedFoto = localStorage.getItem("foto_perfil_cliente");
+                      if (storedFoto && storedFoto !== fotoUrl) {
+                        e.target.src = storedFoto;
+                      } else {
+                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(cliente.nombre_del_cliente || "Usuario")}&size=200&background=0D8ABC&color=fff`;
+                      }
+                    }}
+                  />
+                </div>
+                <p className="text-white text-center font-medium text-base sm:text-lg">{nombres} {apellidos}</p>
                 <button 
                   onClick={abrirModal}
-                  className="absolute bottom-0 right-0 bg-teal-800 text-white p-2.5 rounded-full shadow-lg transform hover:scale-110 transition-all duration-300 hover:bg-teal-700"
+                  className="mt-2 bg-teal-600 text-white p-2 rounded-full shadow-lg transform hover:scale-110 transition-all duration-300 hover:bg-teal-500"
+                  aria-label="Cambiar foto de perfil"
                 >
-                  <FaCamera className="h-5 w-5" />
+                  <FaCamera className="h-4 w-4 sm:h-5 sm:w-5" />
                 </button>
               </div>
-            </div>
-            <h2 className="mt-8 text-3xl font-extrabold text-gray-900 tracking-tight">
-              Perfil del Cliente
-            </h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Información personal de tu cuenta
-            </p>
-          </div>
-
-          <div className="mt-8 space-y-6">
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaIdCard className="h-5 w-5 text-teal-800" />
-              </div>
-              <div className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50">
-                <label className="block text-xs font-medium text-teal-800 mb-1">
-                  Cédula
-                </label>
-                <p className="text-gray-900 font-medium">
-                  {cliente.cedula || "No disponible"}
-                </p>
-              </div>
-            </div>
-
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaUser className="h-5 w-5 text-teal-800" />
-              </div>
-              <div className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50">
-                <label className="block text-xs font-medium text-teal-800 mb-1">
-                  Nombres
-                </label>
-                <p className="text-gray-900 font-medium">
-                  {nombres || "No disponible"}
-                </p>
-              </div>
-            </div>
-
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaUser className="h-5 w-5 text-teal-800" />
-              </div>
-              <div className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50">
-                <label className="block text-xs font-medium text-teal-800 mb-1">
-                  Apellidos
-                </label>
-                <p className="text-gray-900 font-medium">
-                  {apellidos || "No disponible"}
-                </p>
+              
+              {/* Columna derecha - Información */}
+              <div className="w-full md:w-3/4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="bg-teal-700 p-3 sm:p-4 rounded-lg shadow-md">
+                    <h3 className="text-xs sm:text-sm uppercase mb-1 text-teal-300">CÉDULA</h3>
+                    <p className="text-base sm:text-lg text-white font-medium truncate">{cliente.cedula || "No disponible"}</p>
+                  </div>
+                  
+                  <div className="bg-teal-700 p-3 sm:p-4 rounded-lg shadow-md">
+                    <h3 className="text-xs sm:text-sm uppercase mb-1 text-teal-300">NOMBRES</h3>
+                    <p className="text-base sm:text-lg text-white font-medium truncate">{nombres || "No disponible"}</p>
+                  </div>
+                  
+                  <div className="bg-teal-700 p-3 sm:p-4 rounded-lg shadow-md">
+                    <h3 className="text-xs sm:text-sm uppercase mb-1 text-teal-300">APELLIDOS</h3>
+                    <p className="text-base sm:text-lg text-white font-medium truncate">{apellidos || "No disponible"}</p>
+                  </div>
+                  
+                  <div className="bg-teal-700 p-3 sm:p-4 rounded-lg shadow-md">
+                    <h3 className="text-xs sm:text-sm uppercase mb-1 text-teal-300">EMAIL</h3>
+                    <p className="text-base sm:text-lg text-white font-medium truncate">{cliente.email || "No disponible"}</p>
+                  </div>
+                </div>
+                
+                <div className="flex justify-center sm:justify-end mt-6">
+                  <a
+                    href="/VistaCliente/ActualizarPerfil"
+                    className="py-2 px-4 sm:px-6 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-medium transition-colors duration-200 shadow-lg flex items-center"
+                  >
+                    <FaUserEdit className="mr-2" />
+                    Editar Perfil
+                  </a>
+                </div>
               </div>
             </div>
-
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaEnvelope className="h-5 w-5 text-teal-800" />
-              </div>
-              <div className="pl-10 w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50">
-                <label className="block text-xs font-medium text-teal-800 mb-1">
-                  Email
-                </label>
-                <p className="text-gray-900 font-medium">
-                  {cliente.email || "No disponible"}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <a
-              href="/VistaCliente/ActualizarPerfil"
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-teal-800 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl"
-            >
-              <span className="flex items-center">
-                <FaUserEdit className="mr-2" />
-                Editar Perfil
-              </span>
-            </a>
           </div>
         </div>
       </div>
 
       {modalAbierto && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 backdrop-blur-sm" onClick={cerrarModal}>
-          <div className="relative max-w-4xl max-h-[90vh] p-2">
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 backdrop-blur-sm p-4" onClick={cerrarModal}>
+          <div className="relative max-w-full sm:max-w-4xl max-h-[90vh] p-2">
             <button
-              className="absolute -top-12 right-0 text-white bg-teal-800 rounded-full p-2 hover:bg-teal-700 transition-colors duration-300 shadow-lg"
+              className="absolute -top-10 sm:-top-12 right-0 text-white bg-teal-800 rounded-full p-2 hover:bg-teal-700 transition-colors duration-300 shadow-lg"
               onClick={cerrarModal}
+              aria-label="Cerrar"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
             <img
               src={fotoUrl}
               alt="Foto de perfil ampliada"
-              className="max-h-[85vh] rounded-2xl shadow-2xl"
+              className="max-h-[80vh] w-auto max-w-full rounded-2xl shadow-2xl"
               onClick={(e) => e.stopPropagation()}
               onError={(e) => {
                 console.error("Error al cargar la imagen en modal:", e);
                 e.target.onerror = null;
-                // Intentar cargar desde localStorage como respaldo
                 const storedFoto = localStorage.getItem("foto_perfil_cliente");
                 if (storedFoto && storedFoto !== fotoUrl) {
                   e.target.src = storedFoto;
                 } else {
-                  // Fallback a avatar por defecto
                   e.target.src = Avatar;
                 }
               }}
