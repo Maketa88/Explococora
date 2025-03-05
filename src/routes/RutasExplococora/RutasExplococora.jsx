@@ -21,6 +21,8 @@ export const RutasExplococora = () => {
   const isOperadorRoute = location.pathname.includes("/VistaOperador");
   const isGuiaRoute = location.pathname.includes("/VistaGuia");
   const isClienteRoute = location.pathname.includes("/VistaCliente");
+  const isAdminRoute = location.pathname.includes("/VistaAdmin");
+
 
   if (isOperadorRoute) {
     return (
@@ -46,6 +48,13 @@ export const RutasExplococora = () => {
       </Routes>
     );
   }
+  if (isAdminRoute) {
+    return (
+      <Routes>
+        <Route path="/VistaAdmin/*" element={<VistaAdmin />} />
+      </Routes>
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -59,8 +68,6 @@ export const RutasExplococora = () => {
         <Route path="/Registro" element={<Registro />} />
         <Route path="/ContactForm" element={<ContactForm />} />
         <Route path="/QuienesSomos" element={<QuienesSomos />} />
-        <Route path="/VistaAdmin" element={<VistaAdmin />} />
-        <Route path="/VistaGuia" element={<VistaGuia />} />
         <Route path="/*" element={<PaginaNoEncontrada />} />
       </Routes>
       <Footer />
