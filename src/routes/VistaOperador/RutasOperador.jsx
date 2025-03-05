@@ -3,9 +3,10 @@ import { Routes, Route } from 'react-router-dom';
 import Dashboard from '../../pages/VistaOperador/Dashboard/Dashboard';
 import Rutas from '../../pages/VistaOperador/Rutas/Rutas';
 import Reports from '../../pages/VistaOperador/Reports/Reports';
-import Customers from '../../pages/VistaOperador/Customers/Customers';
-import NewCustomer from '../../pages/VistaOperador/Customers/NewCustomer';
-import VerifiedCustomers from '../../pages/VistaOperador/Customers/VerifiedCustomers';
+import Guias from '../../pages/VistaOperador/Guias/Guias';
+import NuevoGuia from '../../pages/VistaOperador/Guias/NuevoGuia';
+// Comentamos esta importación hasta crear el archivo
+// import GuiasVerificados from '../../pages/VistaOperador/Guias/GuiasVerificados';
 import Products from '../../pages/VistaOperador/Products/Products';
 import NewProduct from '../../pages/VistaOperador/Products/NewProduct';
 import Inventory from '../../pages/VistaOperador/Products/Inventory';
@@ -18,11 +19,12 @@ const RutasOperador = () => {
   return (
     <Routes>
       <Route path="/" element={<Dashboard />} />
-      <Route path="/rutas" element={<Rutas />} />
+      <Route path="/Rutas" element={<Rutas />} />
       <Route path="/reports" element={<Reports />} />
-      <Route path="/customers" element={<Customers />} />
-      <Route path="/new-customer" element={<NewCustomer />} />
-      <Route path="/verified-customers" element={<VerifiedCustomers />} />
+      <Route path="/guias" element={<Guias />} />
+      <Route path="/nuevo-guia" element={<NuevoGuia />} />
+      {/* Comentamos esta ruta hasta tener el componente */}
+      {/* <Route path="/guias-verificados" element={<GuiasVerificados />} /> */}
       <Route path="/products" element={<Products />} />
       <Route path="/new-product" element={<NewProduct />} />
       <Route path="/inventory" element={<Inventory />} />

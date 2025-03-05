@@ -240,22 +240,22 @@ const DashboardLayout = ({ children }) => {
       section: "Dashboard"
     },
     {
-      title: "Customers",
+      title: "Gestionar Guías",
       icon: <Users className="w-5 h-5" />,
-      path: "/VistaOperador/customers",
-      section: "Customers"
+      path: "/VistaOperador/guias",
+      section: "Guías"
     },
     {
-      title: "New Customer",
+      title: "Nuevo Guía",
       icon: <UserPlus className="w-5 h-5" />,
-      path: "/VistaOperador/new-customer",
-      section: "Customers"
+      path: "/VistaOperador/nuevo-guia",
+      section: "Guías"
     },
     {
-      title: "Verified Customers",
+      title: "Guías Verificados",
       icon: <UserCheck className="w-5 h-5" />,
-      path: "/VistaOperador/verified-customers",
-      section: "Customers"
+      path: "/VistaOperador/guias-verificados",
+      section: "Guías"
     },
     {
       title: "Products",
@@ -277,7 +277,7 @@ const DashboardLayout = ({ children }) => {
     }
   ];
 
-  const sections = ["Dashboard", "Customers", "Products"];
+  const sections = ["Dashboard", "Guías", "Products"];
 
   const handleSearch = (e) => {
     e.preventDefault();
