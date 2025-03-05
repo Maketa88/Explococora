@@ -170,7 +170,46 @@ const PerfilCliente = () => {
 
   return (
     <>
-      <div className="bg-teal-900">
+    <section className="relative py-16 px-4 overflow-hidden">
+        {/* Fondo decorativo inspirado en el Valle del Cocora */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-emerald-50 to-white"></div>
+
+          {/* Siluetas de palmeras de cera */}
+          <div className="absolute top-0 left-0 w-full h-full opacity-10">
+            <svg
+              viewBox="0 0 1200 600"
+              className="w-full h-full"
+              preserveAspectRatio="xMidYMid slice"
+            >
+              <path
+                d="M100,600 C100,400 150,300 200,100 C220,300 240,400 260,600"
+                fill="none"
+                stroke="#047857"
+                strokeWidth="8"
+              />
+              <path
+                d="M400,600 C400,350 450,250 500,50 C520,250 540,350 560,600"
+                fill="none"
+                stroke="#047857"
+                strokeWidth="8"
+              />
+              <path
+                d="M700,600 C700,400 750,300 800,100 C820,300 840,400 860,600"
+                fill="none"
+                stroke="#047857"
+                strokeWidth="8"
+              />
+              <path
+                d="M1000,600 C1000,350 1050,250 1100,50 C1120,250 1140,350 1160,600"
+                fill="none"
+                stroke="#047857"
+                strokeWidth="8"
+              />
+            </svg>
+          </div>
+        </div>
+      
         <div className="container mx-auto px-4 py-6 sm:py-8 md:py-10">
           <div className="bg-teal-800/70 rounded-xl shadow-xl p-4 sm:p-5 md:p-6">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6 ml-2 sm:ml-4">Perfil del Cliente</h2>
@@ -243,7 +282,8 @@ const PerfilCliente = () => {
             </div>
           </div>
         </div>
-      </div>
+      
+      </section>
 
       {modalAbierto && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 backdrop-blur-sm p-4" onClick={cerrarModal}>

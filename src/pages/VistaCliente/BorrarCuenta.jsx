@@ -210,7 +210,50 @@ export const BorrarCuenta = () => {
   }
 
   return (
-    <div className="min-h-screen bg-teal-900 py-4 sm:py-8 md:py-12 px-2 sm:px-4 md:px-6 lg:px-8 flex items-center justify-center">
+    <section className="relative py-16 px-4 overflow-hidden">
+        {/* Fondo decorativo inspirado en el Valle del Cocora */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-emerald-50 to-white"></div>
+
+          {/* Siluetas de elementos naturales */}
+          <div className="absolute top-0 left-0 w-full h-full opacity-10">
+            <svg
+              viewBox="0 0 1200 600"
+              className="w-full h-full"
+              preserveAspectRatio="xMidYMid slice"
+            >
+              {/* Árbol */}
+              <path
+                d="M180,600 L180,300 L100,300 L180,200 L120,200 L180,100 L240,200 L180,200 L260,300 L180,300 Z"
+                fill="none"
+                stroke="#047857"
+                strokeWidth="8"
+              />
+              {/* Montaña */}
+              <path
+                d="M400,600 L500,200 L600,600 L400,600 Z M450,600 L500,350 L550,600 Z"
+                fill="none"
+                stroke="#047857"
+                strokeWidth="8"
+              />
+              {/* Helecho */}
+              <path
+                d="M750,600 L750,300 C700,300 700,250 750,250 C800,250 800,300 750,300 M750,250 L750,200 C720,200 720,170 750,170 C780,170 780,200 750,200 M750,170 L750,140 C730,140 730,120 750,120 C770,120 770,140 750,140 M750,300 C800,300 800,350 750,350 C700,350 700,300 750,300 M750,350 C800,350 800,400 750,400 C700,400 700,350 750,350"
+                fill="none"
+                stroke="#047857"
+                strokeWidth="8"
+              />
+              {/* Flor */}
+              <path
+                d="M1050,300 C1050,250 1100,250 1100,300 C1100,350 1050,350 1050,300 Z M1100,300 C1100,250 1150,250 1150,300 C1150,350 1100,350 1100,300 Z M1050,300 C1050,350 1000,350 1000,300 C1000,250 1050,250 1050,300 Z M1050,300 C1050,250 1000,250 1000,200 C1000,150 1050,150 1050,200 C1050,250 1050,250 1050,300 Z M1050,300 L1050,400"
+                fill="none"
+                stroke="#047857"
+                strokeWidth="8"
+              />
+            </svg>
+          </div>
+        </div>
+    <div className="min-h-screen  py-4 sm:py-8 md:py-12 px-2 sm:px-4 md:px-6 lg:px-8 flex items-center justify-center">
       <div className="w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-3xl space-y-3 sm:space-y-6 bg-teal-800/70 rounded-lg sm:rounded-xl md:rounded-2xl shadow-lg sm:shadow-xl md:shadow-2xl p-3 sm:p-5 md:p-8">
         <div className="text-center">
           <div className="mx-auto h-10 w-10 sm:h-14 sm:w-14 md:h-16 md:w-16 bg-teal-600 rounded-full flex items-center justify-center mb-2 sm:mb-3 md:mb-4 shadow-lg">
@@ -271,14 +314,14 @@ export const BorrarCuenta = () => {
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="w-full sm:flex-1 inline-flex justify-center items-center px-3 sm:px-4 py-1.5 sm:py-2 border border-teal-500 shadow-sm text-xs sm:text-sm md:text-base font-medium rounded-lg text-white bg-transparent hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-colors duration-200"
+                className="w-full sm:flex-1 inline-flex justify-center items-center px-3 sm:px-4 py-1.5 sm:py-2 border border-teal-500 shadow-sm text-xs sm:text-sm md:text-base font-medium rounded-lg text-white bg-teal-700 hover:bg-teal-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-colors duration-200"
               >
                 Cancelar
               </button>
               <button
                 type="button"
                 onClick={handleEliminarCuenta}
-                className="w-full sm:flex-1 inline-flex justify-center items-center px-3 sm:px-4 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm md:text-base font-medium rounded-lg shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-colors duration-200"
+                className="w-full sm:flex-1 inline-flex justify-center items-center px-3 sm:px-4 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm md:text-base font-medium rounded-lg shadow-sm text-white bg-teal-700 hover:bg-teal-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-colors duration-200"
                 disabled={isLoading || !cedulaVerificacion}
               >
                 {isLoading ? 'Procesando...' : 'Eliminar Cuenta'}
@@ -331,5 +374,6 @@ export const BorrarCuenta = () => {
         </div>
       )}
     </div>
+    </section>
   );
 };
