@@ -2,92 +2,92 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import DashboardLayout from '../../../layouts/DashboardLayout';
+import { ArrowLeft, CheckCircle, Pencil, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import Swal from 'sweetalert2';
+import { RegistroCliente } from "../../../services/RegistroCliente";
 
 const NuevoGuia = () => {
   const navigate = useNavigate();
-  const [darkMode, setDarkMode] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
+  const [darkMode] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   
   const [formData, setFormData] = useState({
-    nombre: '',
-    apellido: '',
+    primerNombre: '',
+    segundoNombre: '',
+    primerApellido: '',
+    segundoApellido: '',
     email: '',
-    telefono: '',
-    cedula: '',
-    especialidad: '',
-    idiomas: '',
-    experiencia: '',
-    foto: null
+    contrasenia: '',
+    cedula: ''
   });
   
-  const [previewUrl, setPreviewUrl] = useState(null);
-  
-  const handleChange = (e) => {
+  const [alert, setAlert] = useState({ show: false, message: '', type: '' });
+  const [passwordVisible, setPasswordVisible] = useState(false);
+
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       [name]: value
-    });
+    }));
   };
-  
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData({
-        ...formData,
-        foto: file
-      });
-      
-      // Crear URL para previsualización
-      const fileReader = new FileReader();
-      fileReader.onload = () => {
-        setPreviewUrl(fileReader.result);
-      };
-      fileReader.readAsDataURL(file);
-    }
-  };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
+    setSubmitting(true);
+    setAlert({ show: false, message: '', type: '' });
     
     try {
-      const token = localStorage.getItem('token');
+      const guiaData = {
+        cedula: formData.cedula,
+        primerNombre: formData.primerNombre,
+        segundoNombre: formData.segundoNombre || '',
+        primerApellido: formData.primerApellido,
+        segundoApellido: formData.segundoApellido || '',
+        email: formData.email,
+        contrasenia: formData.contrasenia
+      };
       
-      // Crear FormData para enviar archivos
-      const data = new FormData();
-      for (const key in formData) {
-        if (formData[key] !== null) {
-          data.append(key, formData[key]);
-        }
-      }
+      const response = await RegistroCliente(guiaData);
       
-      // Enviar datos al servidor
-      await axios.post('http://localhost:10101/guias/registrar', data, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
+      Swal.fire({
+        icon: 'success',
+        title: '¡Éxito!',
+        text: 'Guía registrado exitosamente',
+      }).then(() => {
+        navigate('/VistaOperador/guias');
+      });
+    } catch (error) {
+      console.error('Error al registrar guía:', error);
+      setAlert({
+        show: true,
+        message: error.message || 'Error al registrar el guía. Por favor, intente nuevamente.',
+        type: 'error'
       });
       
-      setSuccess(true);
-      
-      // Redireccionar después de 2 segundos
-      setTimeout(() => {
-        navigate('/VistaOperador/guias');
-      }, 2000);
-      
-    } catch (err) {
-      console.error("Error al registrar guía:", err);
-      setError(err.response?.data?.message || "Error al registrar el guía. Por favor, intente de nuevo.");
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
-  
+
+  const AlertComponent = () => {
+    if (!alert.show) return null;
+    
+    return (
+      <div className={`p-4 rounded-lg mb-6 flex items-center ${
+        alert.type === 'error' ? 'bg-red-100 text-red-700 border border-red-300' : 'bg-green-100 text-green-700 border border-green-300'
+      }`}>
+        {alert.type === 'error' ? (
+          <AlertCircle className="w-5 h-5 mr-2" />
+        ) : (
+          <CheckCircle className="w-5 h-5 mr-2" />
+        )}
+        {alert.message}
+      </div>
+    );
+  };
+
   return (
     <DashboardLayout>
       <div className={`${darkMode ? 'bg-[#1e293b]' : 'bg-gray-100'} rounded-lg p-6 shadow-lg`}>
@@ -95,50 +95,69 @@ const NuevoGuia = () => {
           Registrar Nuevo Guía
         </h2>
         
-        {success && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <strong className="font-bold">¡Éxito! </strong>
-            <span className="block sm:inline">El guía ha sido registrado correctamente.</span>
-          </div>
-        )}
-        
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <strong className="font-bold">Error: </strong>
-            <span className="block sm:inline">{error}</span>
-          </div>
-        )}
+        <AlertComponent />
         
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Campos de información personal */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Nombre *
+                Primer Nombre *
               </label>
               <input
                 type="text"
-                name="nombre"
-                value={formData.nombre}
-                onChange={handleChange}
+                name="primerNombre"
+                value={formData.primerNombre}
+                onChange={handleInputChange}
+                className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
                 required
-                className={`w-full px-3 py-2 border rounded-md ${darkMode ? 'bg-[#0f172a] border-gray-700 text-white' : 'bg-white border-gray-300'}`}
+                placeholder="Ingrese el primer nombre"
               />
             </div>
             
             <div>
               <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Apellido *
+                Segundo Nombre
               </label>
               <input
                 type="text"
-                name="apellido"
-                value={formData.apellido}
-                onChange={handleChange}
-                required
-                className={`w-full px-3 py-2 border rounded-md ${darkMode ? 'bg-[#0f172a] border-gray-700 text-white' : 'bg-white border-gray-300'}`}
+                name="segundoNombre"
+                value={formData.segundoNombre}
+                onChange={handleInputChange}
+                className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
+                placeholder="Ingrese el segundo nombre (opcional)"
               />
             </div>
             
+            <div>
+              <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                Primer Apellido *
+              </label>
+              <input
+                type="text"
+                name="primerApellido"
+                value={formData.primerApellido}
+                onChange={handleInputChange}
+                className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
+                required
+                placeholder="Ingrese el primer apellido"
+              />
+            </div>
+            
+            <div>
+              <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                Segundo Apellido
+              </label>
+              <input
+                type="text"
+                name="segundoApellido"
+                value={formData.segundoApellido}
+                onChange={handleInputChange}
+                className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
+                placeholder="Ingrese el segundo apellido (opcional)"
+              />
+            </div>
+
             <div>
               <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 Cédula *
@@ -147,114 +166,89 @@ const NuevoGuia = () => {
                 type="text"
                 name="cedula"
                 value={formData.cedula}
-                onChange={handleChange}
+                onChange={handleInputChange}
+                className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
                 required
-                className={`w-full px-3 py-2 border rounded-md ${darkMode ? 'bg-[#0f172a] border-gray-700 text-white' : 'bg-white border-gray-300'}`}
+                placeholder="Ingrese el número de cédula"
               />
             </div>
             
             <div>
               <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Email *
+                Email * (debe contener "guia")
               </label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
-                onChange={handleChange}
+                onChange={handleInputChange}
+                className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
                 required
-                className={`w-full px-3 py-2 border rounded-md ${darkMode ? 'bg-[#0f172a] border-gray-700 text-white' : 'bg-white border-gray-300'}`}
+                placeholder="ejemplo.guia@explococora.com"
               />
             </div>
-            
+
             <div>
               <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Teléfono
+                Contraseña *
               </label>
-              <input
-                type="tel"
-                name="telefono"
-                value={formData.telefono}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md ${darkMode ? 'bg-[#0f172a] border-gray-700 text-white' : 'bg-white border-gray-300'}`}
-              />
-            </div>
-            
-            <div>
-              <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Especialidad
-              </label>
-              <input
-                type="text"
-                name="especialidad"
-                value={formData.especialidad}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md ${darkMode ? 'bg-[#0f172a] border-gray-700 text-white' : 'bg-white border-gray-300'}`}
-              />
-            </div>
-            
-            <div>
-              <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Idiomas (separados por coma)
-              </label>
-              <input
-                type="text"
-                name="idiomas"
-                value={formData.idiomas}
-                onChange={handleChange}
-                placeholder="Español, Inglés, Francés..."
-                className={`w-full px-3 py-2 border rounded-md ${darkMode ? 'bg-[#0f172a] border-gray-700 text-white' : 'bg-white border-gray-300'}`}
-              />
-            </div>
-            
-            <div>
-              <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Años de experiencia
-              </label>
-              <input
-                type="number"
-                name="experiencia"
-                value={formData.experiencia}
-                onChange={handleChange}
-                min="0"
-                className={`w-full px-3 py-2 border rounded-md ${darkMode ? 'bg-[#0f172a] border-gray-700 text-white' : 'bg-white border-gray-300'}`}
-              />
-            </div>
-            
-            <div className="md:col-span-2">
-              <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Foto de perfil
-              </label>
-              <div className="flex items-center space-x-4">
+              <div className="relative">
                 <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className={`w-full px-3 py-2 border rounded-md ${darkMode ? 'bg-[#0f172a] border-gray-700 text-white' : 'bg-white border-gray-300'}`}
+                  type={passwordVisible ? "text" : "password"}
+                  name="contrasenia"
+                  value={formData.contrasenia}
+                  onChange={handleInputChange}
+                  className={`w-full p-2 pr-10 rounded-lg ${
+                    darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'
+                  } border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
+                  required
+                  placeholder="Ingrese la contraseña"
                 />
-                {previewUrl && (
-                  <div className="w-16 h-16 rounded-full overflow-hidden">
-                    <img src={previewUrl} alt="Vista previa" className="w-full h-full object-cover" />
-                  </div>
-                )}
+                <button
+                  type="button"
+                  onClick={() => setPasswordVisible(!passwordVisible)}
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-600/20`}
+                >
+                  {passwordVisible ? (
+                    <Eye className="w-5 h-5 text-gray-400" />
+                  ) : (
+                    <EyeOff className="w-5 h-5 text-gray-400" />
+                  )}
+                </button>
               </div>
             </div>
           </div>
           
-          <div className="flex justify-end space-x-4">
+          {/* Botones de acción */}
+          <div className="flex justify-between mt-8">
             <button
               type="button"
-              onClick={() => navigate('/VistaOperador/guias')}
-              className={`px-4 py-2 rounded-md ${darkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
+              onClick={() => navigate("/VistaOperador/guias")}
+              className="py-2 px-6 bg-gray-700 hover:bg-gray-600 text-white rounded-lg flex items-center gap-2"
             >
+              <ArrowLeft className="w-5 h-5" />
               Cancelar
             </button>
+            
             <button
               type="submit"
-              disabled={loading}
-              className={`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+              disabled={submitting}
+              className={`py-2 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2 ${submitting ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
-              {loading ? 'Registrando...' : 'Registrar Guía'}
+              {submitting ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Registrando...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="w-5 h-5" />
+                  Registrar Guía
+                </>
+              )}
             </button>
           </div>
         </form>
