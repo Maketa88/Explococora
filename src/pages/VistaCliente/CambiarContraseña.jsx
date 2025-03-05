@@ -190,7 +190,7 @@ const CambiarContraseña = () => {
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-emerald-50 to-white"></div>
 
-          {/* Siluetas de palmeras de cera - Estilo espectacular */}
+          {/* Siluetas de palmeras de cera - Valle del Cocora */}
           <div className="absolute top-0 left-0 w-full h-full opacity-15">
             <svg
               viewBox="0 0 1200 600"
@@ -205,34 +205,41 @@ const CambiarContraseña = () => {
                 stroke="none"
               />
               
-              {/* Grupo de palmas principales */}
+              {/* Palmera grande central */}
               <g>
-                {/* Palma central majestuosa */}
+                {/* Tronco de la palmera */}
                 <path
-                  d="M600,600 C600,500 590,400 580,300 C570,200 560,100 550,50 C600,30 650,100 660,200 C670,300 680,400 680,600"
+                  d="M600,600 L600,300 C600,280 605,260 610,240"
                   fill="none"
                   stroke="#047857"
                   strokeWidth="10"
                   strokeLinecap="round"
                 />
                 
-                {/* Hojas de la palma central */}
+                {/* Hojas de la palmera */}
                 <path
-                  d="M550,100 C520,80 490,90 470,110 M550,100 C580,80 610,90 630,110"
+                  d="M610,240 C650,220 680,230 700,250 M610,240 C570,220 540,230 520,250"
                   fill="none"
                   stroke="#047857"
                   strokeWidth="6"
                   strokeLinecap="round"
                 />
                 <path
-                  d="M560,150 C530,120 500,130 480,160 M560,150 C590,120 620,130 640,160"
+                  d="M610,240 C640,210 670,200 700,210 M610,240 C580,210 550,200 520,210"
                   fill="none"
                   stroke="#047857"
                   strokeWidth="6"
                   strokeLinecap="round"
                 />
                 <path
-                  d="M570,200 C540,170 510,180 490,210 M570,200 C600,170 630,180 650,210"
+                  d="M610,240 C630,200 650,180 670,170 M610,240 C590,200 570,180 550,170"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M610,240 C620,190 625,160 630,140 M610,240 C600,190 595,160 590,140"
                   fill="none"
                   stroke="#047857"
                   strokeWidth="6"
@@ -240,27 +247,34 @@ const CambiarContraseña = () => {
                 />
               </g>
               
-              {/* Grupo de palmas izquierda */}
+              {/* Palmera izquierda */}
               <g>
-                {/* Palma izquierda estilizada */}
+                {/* Tronco de la palmera */}
                 <path
-                  d="M200,600 C200,450 210,350 220,250 C230,150 240,80 250,40 C260,80 270,150 280,250 C290,350 300,450 300,600"
+                  d="M300,600 L300,350 C295,330 290,310 285,290"
                   fill="none"
                   stroke="#047857"
                   strokeWidth="8"
                   strokeLinecap="round"
                 />
                 
-                {/* Hojas de la palma izquierda */}
+                {/* Hojas de la palmera */}
                 <path
-                  d="M250,80 C230,60 210,65 190,85 M250,80 C270,60 290,65 310,85"
+                  d="M285,290 C320,270 350,280 370,300 M285,290 C250,270 220,280 200,300"
                   fill="none"
                   stroke="#047857"
                   strokeWidth="5"
                   strokeLinecap="round"
                 />
                 <path
-                  d="M250,130 C230,110 210,115 190,135 M250,130 C270,110 290,115 310,135"
+                  d="M285,290 C310,260 335,250 360,260 M285,290 C260,260 235,250 210,260"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M285,290 C300,250 315,230 330,220 M285,290 C270,250 255,230 240,220"
                   fill="none"
                   stroke="#047857"
                   strokeWidth="5"
@@ -268,27 +282,34 @@ const CambiarContraseña = () => {
                 />
               </g>
               
-              {/* Grupo de palmas derecha */}
+              {/* Palmera derecha */}
               <g>
-                {/* Palma derecha estilizada */}
+                {/* Tronco de la palmera */}
                 <path
-                  d="M900,600 C900,450 910,350 920,250 C930,150 940,80 950,40 C960,80 970,150 980,250 C990,350 1000,450 1000,600"
+                  d="M900,600 L900,350 C905,330 910,310 915,290"
                   fill="none"
                   stroke="#047857"
                   strokeWidth="8"
                   strokeLinecap="round"
                 />
                 
-                {/* Hojas de la palma derecha */}
+                {/* Hojas de la palmera */}
                 <path
-                  d="M950,80 C930,60 910,65 890,85 M950,80 C970,60 990,65 1010,85"
+                  d="M915,290 C880,270 850,280 830,300 M915,290 C950,270 980,280 1000,300"
                   fill="none"
                   stroke="#047857"
                   strokeWidth="5"
                   strokeLinecap="round"
                 />
                 <path
-                  d="M950,130 C930,110 910,115 890,135 M950,130 C970,110 990,115 1010,135"
+                  d="M915,290 C890,260 865,250 840,260 M915,290 C940,260 965,250 990,260"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M915,290 C900,250 885,230 870,220 M915,290 C930,250 945,230 960,220"
                   fill="none"
                   stroke="#047857"
                   strokeWidth="5"
@@ -296,46 +317,102 @@ const CambiarContraseña = () => {
                 />
               </g>
               
-              {/* Palmas pequeñas adicionales */}
+              {/* Palmeras pequeñas */}
               <g>
-                {/* Palma pequeña 1 */}
+                {/* Palmera pequeña 1 */}
                 <path
-                  d="M100,600 C100,500 110,450 120,400 C125,350 130,320 135,300 C140,320 145,350 150,400 C160,450 170,500 170,600"
+                  d="M150,600 L150,450 C150,440 152,430 155,420"
                   fill="none"
                   stroke="#047857"
                   strokeWidth="6"
                   strokeLinecap="round"
                 />
-                
-                {/* Palma pequeña 2 */}
                 <path
-                  d="M400,600 C400,500 410,450 420,400 C425,350 430,320 435,300 C440,320 445,350 450,400 C460,450 470,500 470,600"
+                  d="M155,420 C175,410 190,415 200,425 M155,420 C135,410 120,415 110,425"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M155,420 C165,400 170,390 175,380 M155,420 C145,400 140,390 135,380"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                />
+                
+                {/* Palmera pequeña 2 */}
+                <path
+                  d="M450,600 L450,450 C450,440 452,430 455,420"
                   fill="none"
                   stroke="#047857"
                   strokeWidth="6"
                   strokeLinecap="round"
                 />
-                
-                {/* Palma pequeña 3 */}
                 <path
-                  d="M730,600 C730,500 740,450 750,400 C755,350 760,320 765,300 C770,320 775,350 780,400 C790,450 800,500 800,600"
+                  d="M455,420 C475,410 490,415 500,425 M455,420 C435,410 420,415 410,425"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M455,420 C465,400 470,390 475,380 M455,420 C445,400 440,390 435,380"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                />
+                
+                {/* Palmera pequeña 3 */}
+                <path
+                  d="M750,600 L750,450 C750,440 752,430 755,420"
                   fill="none"
                   stroke="#047857"
                   strokeWidth="6"
                   strokeLinecap="round"
                 />
-                
-                {/* Palma pequeña 4 */}
                 <path
-                  d="M1030,600 C1030,500 1040,450 1050,400 C1055,350 1060,320 1065,300 C1070,320 1075,350 1080,400 C1090,450 1100,500 1100,600"
+                  d="M755,420 C775,410 790,415 800,425 M755,420 C735,410 720,415 710,425"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M755,420 C765,400 770,390 775,380 M755,420 C745,400 740,390 735,380"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                />
+                
+                {/* Palmera pequeña 4 */}
+                <path
+                  d="M1050,600 L1050,450 C1050,440 1052,430 1055,420"
                   fill="none"
                   stroke="#047857"
                   strokeWidth="6"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M1055,420 C1075,410 1090,415 1100,425 M1055,420 C1035,410 1020,415 1010,425"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M1055,420 C1065,400 1070,390 1075,380 M1055,420 C1045,400 1040,390 1035,380"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="4"
                   strokeLinecap="round"
                 />
               </g>
               
-              {/* Elementos decorativos */}
+              {/* Elementos adicionales */}
               <g>
                 {/* Nubes estilizadas */}
                 <path
@@ -354,27 +431,6 @@ const CambiarContraseña = () => {
                   stroke="#047857"
                   strokeWidth="2"
                   strokeOpacity="0.2"
-                />
-                
-                {/* Sol estilizado */}
-                <circle
-                  cx="600"
-                  cy="100"
-                  r="40"
-                  fill="#047857"
-                  fillOpacity="0.1"
-                  stroke="#047857"
-                  strokeWidth="3"
-                  strokeOpacity="0.2"
-                />
-                
-                {/* Rayos de sol */}
-                <path
-                  d="M600,40 L600,10 M560,60 L540,40 M640,60 L660,40 M560,140 L540,160 M640,140 L660,160 M540,100 L510,100 M660,100 L690,100"
-                  stroke="#047857"
-                  strokeWidth="3"
-                  strokeOpacity="0.2"
-                  strokeLinecap="round"
                 />
               </g>
             </svg>
