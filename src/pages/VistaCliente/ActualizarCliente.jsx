@@ -15,7 +15,8 @@ const ActualizarDatosCliente = () => {
     segundoNombre: "",
     primerApellido: "",
     segundoApellido: "",
-    email: ""
+    email: "",
+    numeroCelular: ""
   });
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
@@ -66,7 +67,8 @@ const ActualizarDatosCliente = () => {
         segundoNombre: clienteData.segundoNombre || "",
         primerApellido: clienteData.primerApellido || "",
         segundoApellido: clienteData.segundoApellido || "",
-        email: clienteData.email || ""
+        email: clienteData.email || "",
+        numeroCelular: clienteData.numeroCelular || ""
       });
       
       // Procesar la foto de perfil
@@ -246,6 +248,7 @@ const ActualizarDatosCliente = () => {
           primerApellido: formData.primerApellido,
           segundoApellido: formData.segundoApellido,
           email: formData.email,
+          numeroCelular: formData.numeroCelular
         },
         {
           headers: {
@@ -609,6 +612,27 @@ const ActualizarDatosCliente = () => {
                     onChange={handleInputChange}
                     className="pl-8 sm:pl-10 w-full px-3 sm:px-4 py-2 sm:py-3 border border-teal-600 rounded-lg sm:rounded-xl text-white bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm sm:text-base"
                     required
+                  />
+                </div>
+              </div>
+
+              <div className="relative group">
+                <label className="block text-white text-xs sm:text-sm font-medium mb-1">
+                  Teléfono Celular
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 text-teal-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="tel"
+                    name="numeroCelular"
+                    value={formData.numeroCelular || ""}
+                    onChange={handleInputChange}
+                    placeholder="Ej: 3001234567"
+                    className="pl-8 sm:pl-10 w-full px-3 sm:px-4 py-2 sm:py-3 border border-teal-600 rounded-lg sm:rounded-xl text-white bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm sm:text-base"
                   />
                 </div>
               </div>
