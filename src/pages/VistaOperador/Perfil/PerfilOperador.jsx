@@ -51,15 +51,14 @@ const PerfilOperador = () => {
         console.log("Obteniendo datos para cédula:", cedula);
         
         try {
-          // Obtener datos del operador - SOLICITUD DIRECTA
-          const response = await axios.get(`http://localhost:10101/operador-turistico/${cedula}`, {
+          // Usar el endpoint de perfil completo para obtener todos los datos, incluyendo el teléfono
+          const response = await axios.get(`http://localhost:10101/operador-turistico/perfil-completo/${cedula}`, {
             headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json'
             }
           });
           
-          // Mostrar la respuesta completa para depuración
           console.log("Respuesta completa del backend:", response);
           console.log("Datos recibidos:", JSON.stringify(response.data, null, 2));
           
@@ -87,65 +86,32 @@ const PerfilOperador = () => {
             console.log("Usando datos del objeto de respuesta:", datosOperador);
           }
           
-          // Procesar el nombre completo si viene en formato diferente
-          if (datosOperador && datosOperador.nombre_del_cliente && !datosOperador.primerNombre) {
-            console.log("Procesando nombre completo:", datosOperador.nombre_del_cliente);
-            
-            // Dividir el nombre completo en partes
-            const nombreCompleto = datosOperador.nombre_del_cliente.trim();
-            const partes = nombreCompleto.split(' ');
-            
-            // Asignar las partes a los campos correspondientes
-            if (partes.length >= 1) datosOperador.primerNombre = partes[0];
-            if (partes.length >= 2) datosOperador.segundoNombre = partes[1];
-            if (partes.length >= 3) datosOperador.primerApellido = partes[2];
-            if (partes.length >= 4) datosOperador.segundoApellido = partes[3];
-            
-            console.log("Nombre procesado:", {
-              primerNombre: datosOperador.primerNombre,
-              segundoNombre: datosOperador.segundoNombre,
-              primerApellido: datosOperador.primerApellido,
-              segundoApellido: datosOperador.segundoApellido
-            });
-          }
-          
           // Asegurarse de que todos los campos necesarios existan
-          datosOperador.primerNombre = datosOperador.primerNombre || "";
-          datosOperador.segundoNombre = datosOperador.segundoNombre || "";
-          datosOperador.primerApellido = datosOperador.primerApellido || "";
-          datosOperador.segundoApellido = datosOperador.segundoApellido || "";
-          datosOperador.email = datosOperador.email || "";
-          datosOperador.numeroCelular = datosOperador.numeroCelular || "";
-          
-          // IMPORTANTE: Solo usar datos de respaldo si no hay datos reales
-          if (!datosOperador || Object.keys(datosOperador).length === 0) {
-            console.warn("No se encontraron datos reales, usando datos de respaldo");
+          if (datosOperador) {
+            datosOperador.primerNombre = datosOperador.primerNombre || datosOperador.primer_nombre || "";
+            datosOperador.segundoNombre = datosOperador.segundoNombre || datosOperador.segundo_nombre || "";
+            datosOperador.primerApellido = datosOperador.primerApellido || datosOperador.primer_apellido || "";
+            datosOperador.segundoApellido = datosOperador.segundoApellido || datosOperador.segundo_apellido || "";
+            datosOperador.email = datosOperador.email || "";
+            datosOperador.numeroCelular = datosOperador.numeroCelular || datosOperador.numero_celular || "";
             
-            // Datos de respaldo solo como último recurso
-            datosOperador = {
-              primerNombre: "Juan",
-              segundoNombre: "Carlos",
-              primerApellido: "Pérez",
-              segundoApellido: "Gómez",
-              email: "operador.estack@example.com",
-              numeroCelular: "3001234567",
-              cedula: cedula
-            };
-          } else {
-            console.log("Usando datos reales de la base de datos:", datosOperador);
-          }
-          
-          // Guardar los datos del operador
-          setOperador(datosOperador);
-          
-          // Verificar si hay una foto en localStorage (prioridad)
-          const fotoGuardada = localStorage.getItem('fotoPerfilURL');
-          if (fotoGuardada) {
-            setFotoPerfil(fotoGuardada);
-          } else if (datosOperador.foto) {
-            setFotoPerfil(datosOperador.foto);
-            // Guardar en localStorage para consistencia
-            localStorage.setItem('fotoPerfilURL', datosOperador.foto);
+            // Guardar los datos del operador
+            setOperador(datosOperador);
+            
+            // Verificar si hay una foto
+            if (datosOperador.foto) {
+              let fotoUrl;
+              if (datosOperador.foto.startsWith('http')) {
+                fotoUrl = datosOperador.foto;
+              } else if (datosOperador.foto.includes('/uploads/images/')) {
+                fotoUrl = `http://localhost:10101${datosOperador.foto}`;
+              } else {
+                fotoUrl = `http://localhost:10101/uploads/images/${datosOperador.foto}`;
+              }
+              
+              setFotoPerfil(fotoUrl);
+              localStorage.setItem('fotoPerfilURL', fotoUrl);
+            }
           }
           
           setLoading(false);
@@ -192,6 +158,74 @@ const PerfilOperador = () => {
     return () => {
       window.removeEventListener('perfilActualizado', handlePerfilActualizado);
     };
+  }, []);
+
+  // Añadir este useEffect para manejar la actualización de fotos
+  useEffect(() => {
+    // Cargar foto inicial desde localStorage
+    const fotoGuardada = localStorage.getItem('fotoPerfilURL');
+    if (fotoGuardada) {
+      setFotoPerfil(fotoGuardada);
+    }
+    
+    // Escuchar eventos de actualización de foto de perfil
+    const handleFotoUpdate = (event) => {
+      if (event.detail && event.detail.foto) {
+        console.log("Actualizando foto de perfil desde evento:", event.detail.foto);
+        setFotoPerfil(event.detail.foto);
+      }
+    };
+    
+    window.addEventListener('perfilActualizado', handleFotoUpdate);
+    
+    // Limpiar el listener al desmontar
+    return () => {
+      window.removeEventListener('perfilActualizado', handleFotoUpdate);
+    };
+  }, []);
+
+  // Añadir esta función para cargar la foto desde el backend
+  const cargarFotoPerfil = async () => {
+    try {
+      const cedula = localStorage.getItem("cedula");
+      const token = localStorage.getItem("token");
+      
+      if (!cedula || !token) return;
+      
+      const response = await axios.get(`http://localhost:10101/operador-turistico/${cedula}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          _t: new Date().getTime() // Evitar caché
+        }
+      });
+      
+      if (response.data) {
+        const operadorData = Array.isArray(response.data) ? response.data[0] : response.data;
+        
+        if (operadorData.foto) {
+          let fotoUrl;
+          if (operadorData.foto.startsWith('http')) {
+            fotoUrl = operadorData.foto;
+          } else if (operadorData.foto.includes('/uploads/images/')) {
+            fotoUrl = `http://localhost:10101${operadorData.foto}`;
+          } else {
+            fotoUrl = `http://localhost:10101/uploads/images/${operadorData.foto}`;
+          }
+          
+          setFotoPerfil(fotoUrl);
+          localStorage.setItem("fotoPerfilURL", fotoUrl);
+        }
+      }
+    } catch (error) {
+      console.error("Error al cargar foto de perfil:", error);
+    }
+  };
+
+  // Llamar a esta función en el useEffect inicial
+  useEffect(() => {
+    cargarFotoPerfil();
   }, []);
 
   if (loading) {
@@ -243,12 +277,16 @@ const PerfilOperador = () => {
   // Verificamos si operador es un array o un objeto
   const operadorData = Array.isArray(operador) ? operador[0] : operador;
   
+  console.log("Datos del operador para renderizar:", operadorData);
+  console.log("Número de teléfono:", operadorData.numeroCelular);
+  
   // Mostrar los datos tal como vienen de la base de datos
   return (
     <DashboardLayout>
       <div className={`${darkMode ? 'bg-[#1e293b]' : 'bg-gray-100'} rounded-lg p-6 shadow-lg`}>
         <h2 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Perfil del Operador</h2>
         
+    
         <div className="flex flex-col md:flex-row gap-8">
           {/* Columna izquierda con foto */}
           <div className="flex flex-col items-center">
@@ -313,7 +351,7 @@ const PerfilOperador = () => {
             <div>
               <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>TELÉFONO</h3>
               <p className={`font-medium text-lg ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                {operadorData.numeroCelular || "No disponible"}
+                {operadorData.numeroCelular || operadorData.numero_celular || operadorData.telefono || "No disponible"}
               </p>
             </div>
           </div>
