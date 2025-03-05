@@ -396,7 +396,53 @@ const ActualizarDatosCliente = () => {
   }
 
   return (
-    <div className="min-h-screen bg-teal-900 py-6 sm:py-8 md:py-12 px-3 sm:px-4 md:px-6 lg:px-8 flex items-center justify-center">
+    <section className="relative py-16 px-4 overflow-hidden">
+        {/* Fondo decorativo inspirado en el Valle del Cocora */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-emerald-50 to-white"></div>
+
+          {/* Paisaje montañoso estilizado */}
+          <div className="absolute top-0 left-0 w-full h-full opacity-10">
+            <svg
+              viewBox="0 0 1200 600"
+              className="w-full h-full"
+              preserveAspectRatio="xMidYMid slice"
+            >
+              {/* Montañas en el horizonte */}
+              <path
+                d="M0,600 L0,350 L100,300 L200,350 L300,280 L400,350 L500,250 L600,320 L700,280 L800,350 L900,300 L1000,350 L1100,280 L1200,320 L1200,600 Z"
+                fill="none"
+                stroke="#047857"
+                strokeWidth="8"
+              />
+              
+              {/* Nubes estilizadas */}
+              <path
+                d="M100,200 C130,180 160,190 180,170 C200,150 230,160 250,180 C270,200 300,190 320,170"
+                fill="none"
+                stroke="#047857"
+                strokeWidth="8"
+              />
+              
+              {/* Más nubes */}
+              <path
+                d="M500,150 C530,130 560,140 580,120 C600,100 630,110 650,130 C670,150 700,140 720,120"
+                fill="none"
+                stroke="#047857"
+                strokeWidth="8"
+              />
+              
+              {/* Río serpenteante */}
+              <path
+                d="M0,450 C100,470 200,430 300,450 C400,470 500,430 600,450 C700,470 800,430 900,450 C1000,470 1100,430 1200,450"
+                fill="none"
+                stroke="#047857"
+                strokeWidth="8"
+              />
+            </svg>
+          </div>
+        </div>
+    <div className="min-h-screen py-6 sm:py-8 md:py-12 px-3 sm:px-4 md:px-6 lg:px-8 flex items-center justify-center">
       <div className="max-w-5xl w-full space-y-4 sm:space-y-6 bg-teal-800/70 rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl p-4 sm:p-6 md:p-8">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 bg-teal-600 rounded-full flex items-center justify-center mb-3 sm:mb-4 shadow-lg">
@@ -405,7 +451,7 @@ const ActualizarDatosCliente = () => {
           <h2 className="text-2xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight">
             Actualizar Perfil
           </h2>
-          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-teal-300">
+          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-white">
             Mantén tu información personal actualizada
           </p>
         </div>
@@ -458,7 +504,7 @@ const ActualizarDatosCliente = () => {
           <div className="bg-teal-700/50 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 shadow-inner">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
               <div className="relative group">
-                <label className="block text-teal-300 text-xs sm:text-sm font-medium mb-1">
+                <label className="block text-white text-xs sm:text-sm font-medium mb-1">
                   Cédula
                 </label>
                 <div className="relative">
@@ -475,7 +521,7 @@ const ActualizarDatosCliente = () => {
               </div>
 
               <div className="relative group">
-                <label className="block text-teal-300 text-xs sm:text-sm font-medium mb-1">
+                <label className="block text-white text-xs sm:text-sm font-medium mb-1">
                   Primer Nombre
                 </label>
                 <div className="relative">
@@ -494,7 +540,7 @@ const ActualizarDatosCliente = () => {
               </div>
 
               <div className="relative group">
-                <label className="block text-teal-300 text-xs sm:text-sm font-medium mb-1">
+                <label className="block text-white text-xs sm:text-sm font-medium mb-1">
                   Segundo Nombre
                 </label>
                 <div className="relative">
@@ -512,7 +558,7 @@ const ActualizarDatosCliente = () => {
               </div>
 
               <div className="relative group">
-                <label className="block text-teal-300 text-xs sm:text-sm font-medium mb-1">
+                <label className="block text-white text-xs sm:text-sm font-medium mb-1">
                   Primer Apellido
                 </label>
                 <div className="relative">
@@ -531,7 +577,7 @@ const ActualizarDatosCliente = () => {
               </div>
 
               <div className="relative group">
-                <label className="block text-teal-300 text-xs sm:text-sm font-medium mb-1">
+                <label className="block text-white text-xs sm:text-sm font-medium mb-1">
                   Segundo Apellido
                 </label>
                 <div className="relative">
@@ -549,7 +595,7 @@ const ActualizarDatosCliente = () => {
               </div>
 
               <div className="relative group">
-                <label className="block text-teal-300 text-xs sm:text-sm font-medium mb-1">
+                <label className="block text-white text-xs sm:text-sm font-medium mb-1">
                   Email
                 </label>
                 <div className="relative">
@@ -591,6 +637,7 @@ const ActualizarDatosCliente = () => {
         </form>
       </div>
     </div>
+    </section>
   );
 };
 

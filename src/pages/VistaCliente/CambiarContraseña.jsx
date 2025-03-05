@@ -185,7 +185,202 @@ const CambiarContraseña = () => {
   };
 
   return (
-    <div className="min-h-screen bg-teal-900 flex items-center justify-center w-full py-6 px-4">
+    <section className="relative py-16 px-4 overflow-hidden">
+        {/* Fondo decorativo inspirado en el Valle del Cocora */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-emerald-50 to-white"></div>
+
+          {/* Siluetas de palmeras de cera - Estilo espectacular */}
+          <div className="absolute top-0 left-0 w-full h-full opacity-15">
+            <svg
+              viewBox="0 0 1200 600"
+              className="w-full h-full"
+              preserveAspectRatio="xMidYMid slice"
+            >
+              {/* Fondo de montañas */}
+              <path
+                d="M0,600 L0,400 Q150,300 300,350 Q450,400 600,300 Q750,200 900,350 Q1050,450 1200,400 L1200,600 Z"
+                fill="#047857"
+                fillOpacity="0.05"
+                stroke="none"
+              />
+              
+              {/* Grupo de palmas principales */}
+              <g>
+                {/* Palma central majestuosa */}
+                <path
+                  d="M600,600 C600,500 590,400 580,300 C570,200 560,100 550,50 C600,30 650,100 660,200 C670,300 680,400 680,600"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="10"
+                  strokeLinecap="round"
+                />
+                
+                {/* Hojas de la palma central */}
+                <path
+                  d="M550,100 C520,80 490,90 470,110 M550,100 C580,80 610,90 630,110"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M560,150 C530,120 500,130 480,160 M560,150 C590,120 620,130 640,160"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M570,200 C540,170 510,180 490,210 M570,200 C600,170 630,180 650,210"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                />
+              </g>
+              
+              {/* Grupo de palmas izquierda */}
+              <g>
+                {/* Palma izquierda estilizada */}
+                <path
+                  d="M200,600 C200,450 210,350 220,250 C230,150 240,80 250,40 C260,80 270,150 280,250 C290,350 300,450 300,600"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                />
+                
+                {/* Hojas de la palma izquierda */}
+                <path
+                  d="M250,80 C230,60 210,65 190,85 M250,80 C270,60 290,65 310,85"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M250,130 C230,110 210,115 190,135 M250,130 C270,110 290,115 310,135"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
+              </g>
+              
+              {/* Grupo de palmas derecha */}
+              <g>
+                {/* Palma derecha estilizada */}
+                <path
+                  d="M900,600 C900,450 910,350 920,250 C930,150 940,80 950,40 C960,80 970,150 980,250 C990,350 1000,450 1000,600"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                />
+                
+                {/* Hojas de la palma derecha */}
+                <path
+                  d="M950,80 C930,60 910,65 890,85 M950,80 C970,60 990,65 1010,85"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M950,130 C930,110 910,115 890,135 M950,130 C970,110 990,115 1010,135"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
+              </g>
+              
+              {/* Palmas pequeñas adicionales */}
+              <g>
+                {/* Palma pequeña 1 */}
+                <path
+                  d="M100,600 C100,500 110,450 120,400 C125,350 130,320 135,300 C140,320 145,350 150,400 C160,450 170,500 170,600"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                />
+                
+                {/* Palma pequeña 2 */}
+                <path
+                  d="M400,600 C400,500 410,450 420,400 C425,350 430,320 435,300 C440,320 445,350 450,400 C460,450 470,500 470,600"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                />
+                
+                {/* Palma pequeña 3 */}
+                <path
+                  d="M730,600 C730,500 740,450 750,400 C755,350 760,320 765,300 C770,320 775,350 780,400 C790,450 800,500 800,600"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                />
+                
+                {/* Palma pequeña 4 */}
+                <path
+                  d="M1030,600 C1030,500 1040,450 1050,400 C1055,350 1060,320 1065,300 C1070,320 1075,350 1080,400 C1090,450 1100,500 1100,600"
+                  fill="none"
+                  stroke="#047857"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                />
+              </g>
+              
+              {/* Elementos decorativos */}
+              <g>
+                {/* Nubes estilizadas */}
+                <path
+                  d="M150,100 Q180,80 210,100 Q240,120 270,100 Q300,80 330,100 Q300,130 270,120 Q240,140 210,120 Q180,130 150,100"
+                  fill="#047857"
+                  fillOpacity="0.07"
+                  stroke="#047857"
+                  strokeWidth="2"
+                  strokeOpacity="0.2"
+                />
+                
+                <path
+                  d="M850,150 Q880,130 910,150 Q940,170 970,150 Q1000,130 1030,150 Q1000,180 970,170 Q940,190 910,170 Q880,180 850,150"
+                  fill="#047857"
+                  fillOpacity="0.07"
+                  stroke="#047857"
+                  strokeWidth="2"
+                  strokeOpacity="0.2"
+                />
+                
+                {/* Sol estilizado */}
+                <circle
+                  cx="600"
+                  cy="100"
+                  r="40"
+                  fill="#047857"
+                  fillOpacity="0.1"
+                  stroke="#047857"
+                  strokeWidth="3"
+                  strokeOpacity="0.2"
+                />
+                
+                {/* Rayos de sol */}
+                <path
+                  d="M600,40 L600,10 M560,60 L540,40 M640,60 L660,40 M560,140 L540,160 M640,140 L660,160 M540,100 L510,100 M660,100 L690,100"
+                  stroke="#047857"
+                  strokeWidth="3"
+                  strokeOpacity="0.2"
+                  strokeLinecap="round"
+                />
+              </g>
+            </svg>
+          </div>
+        </div>
+    <div className="min-h-screen  flex items-center justify-center w-full py-6 px-4">
       <div className="w-full max-w-4xl mx-auto">
         <div className="bg-teal-800/70 rounded-xl shadow-xl p-4 sm:p-6 md:p-8 backdrop-blur-sm">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 text-center sm:text-left">
@@ -208,7 +403,7 @@ const CambiarContraseña = () => {
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="space-y-4">
                   <div className="bg-teal-700/0 p-0">
-                    <h3 className="text-xs sm:text-sm uppercase mb-2 text-teal-300 flex items-center">
+                    <h3 className="text-xs sm:text-sm uppercase mb-2 text-white flex items-center">
                       <FaUserShield className="mr-2" />
                       CÉDULA
                     </h3>
@@ -219,13 +414,13 @@ const CambiarContraseña = () => {
                       required
                       value={cedula}
                       onChange={(e) => setCedula(e.target.value)}
-                      className="w-full px-4 py-3 border-0 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all duration-300 bg-teal-600/70 placeholder-teal-200/70"
+                      className="w-full px-4 py-3 border-0 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all duration-300 bg-teal-800 placeholder-teal-200/70"
                       placeholder="Ingrese su cédula"
                     />
                   </div>
                   
                   <div className="bg-teal-700/0 p-0 mt-4">
-                    <h3 className="text-xs sm:text-sm uppercase mb-2 text-teal-300 flex items-center">
+                    <h3 className="text-xs sm:text-sm uppercase mb-2 text-white flex items-center">
                       <FaKey className="mr-2" />
                       NUEVA CONTRASEÑA
                     </h3>
@@ -236,7 +431,7 @@ const CambiarContraseña = () => {
                       required
                       value={contrasenia}
                       onChange={handleContraseniaChange}
-                      className={`w-full px-4 py-3 border-0 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all duration-300 bg-teal-600/70 placeholder-teal-200/70 ${
+                      className={`w-full px-4 py-3 border-0 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all duration-300 bg-teal-800 placeholder-teal-200/70 ${
                         erroresValidacion.length > 0 ? 'ring-2 ring-red-400' : ''
                       }`}
                       placeholder="Ingrese su nueva contraseña"
@@ -257,7 +452,7 @@ const CambiarContraseña = () => {
                   )}
                   
                   <div className="bg-teal-700/0 p-0 mt-4">
-                    <h3 className="text-xs sm:text-sm uppercase mb-2 text-teal-300 flex items-center">
+                    <h3 className="text-xs sm:text-sm uppercase mb-2 text-white flex items-center">
                       <FaKey className="mr-2" />
                       CONFIRMAR CONTRASEÑA
                     </h3>
@@ -268,7 +463,7 @@ const CambiarContraseña = () => {
                       required
                       value={confirmarContrasenia}
                       onChange={(e) => setConfirmarContrasenia(e.target.value)}
-                      className={`w-full px-4 py-3 border-0 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all duration-300 bg-teal-600/70 placeholder-teal-200/70 ${
+                      className={`w-full px-4 py-3 border-0 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all duration-300 bg-teal-800 placeholder-teal-200/70 ${
                         contrasenia !== confirmarContrasenia && confirmarContrasenia 
                           ? 'ring-2 ring-red-400' 
                           : ''
@@ -320,6 +515,7 @@ const CambiarContraseña = () => {
         </div>
       </div>
     </div>
+    </section>
   );
 };
 
