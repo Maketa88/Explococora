@@ -53,6 +53,23 @@ const ActualizarDatosCliente = () => {
       // Procesamos los datos según el formato de respuesta (array u objeto)
       const clienteData = Array.isArray(response.data) ? response.data[0] : response.data;
       
+      // Obtener el número de teléfono de la respuesta
+      let numeroCelular = "";
+      if (clienteData.numeroCelular !== undefined) {
+        numeroCelular = clienteData.numeroCelular;
+      } else if (clienteData.telefono) {
+        // Si telefono es un objeto con propiedad numeroCelular
+        if (typeof clienteData.telefono === 'object' && clienteData.telefono.numeroCelular !== undefined) {
+          numeroCelular = clienteData.telefono.numeroCelular;
+        } 
+        // Si telefono es directamente un string (como en la respuesta actual)
+        else if (typeof clienteData.telefono === 'string') {
+          numeroCelular = clienteData.telefono;
+        }
+      } else if (clienteData.telefonos && clienteData.telefonos.length > 0) {
+        numeroCelular = clienteData.telefonos[0].numeroCelular || "";
+      }
+      
       // Guardar los datos básicos del cliente
       setCliente({
         cedula: clienteData.cedula || cedula,
@@ -68,7 +85,7 @@ const ActualizarDatosCliente = () => {
         primerApellido: clienteData.primerApellido || "",
         segundoApellido: clienteData.segundoApellido || "",
         email: clienteData.email || "",
-        numeroCelular: clienteData.numeroCelular || ""
+        numeroCelular: numeroCelular
       });
       
       // Procesar la foto de perfil
@@ -258,14 +275,17 @@ const ActualizarDatosCliente = () => {
       );
 
       if (response.data) {
-        const nombreCompleto = `${formData.primerNombre} ${formData.segundoNombre} ${formData.primerApellido} ${formData.segundoApellido}`;
-        setCliente({
-          ...cliente,
+        // Después de una actualización exitosa, actualizar el estado local con los datos enviados
+        // en lugar de recargar inmediatamente desde el servidor
+        
+        // Actualizar el estado del cliente con los datos enviados
+        const nombreCompleto = `${formData.primerNombre} ${formData.segundoNombre} ${formData.primerApellido} ${formData.segundoApellido}`.trim();
+        setCliente(prevCliente => ({
+          ...prevCliente,
           nombre_del_cliente: nombreCompleto,
-          email: formData.email,
-          foto_perfil: previewFoto
-        });
-
+          email: formData.email
+        }));
+        
         // Mensaje personalizado según si se actualizó la foto o no
         let mensajeExito = "Tu información ha sido actualizada correctamente.";
         if (foto && !fotoActualizada) {
@@ -274,6 +294,7 @@ const ActualizarDatosCliente = () => {
           mensajeExito += " La foto de perfil también se actualizó correctamente.";
         }
 
+        // Mostrar mensaje de éxito
         Swal.fire({
           html: `
             <div style="
@@ -376,8 +397,8 @@ const ActualizarDatosCliente = () => {
         // Resetear el estado de la foto después de la actualización
         setFoto(null);
         
-        // Forzar una recarga de los datos del cliente
-        await cargarDatosCliente();
+        // No es necesario recargar los datos inmediatamente, ya que ya actualizamos el estado local
+        // Si hay alguna inconsistencia, el usuario puede recargar la página manualmente
       }
     } catch (error) {
       console.error("Error al actualizar:", error);
@@ -506,22 +527,7 @@ const ActualizarDatosCliente = () => {
 
           <div className="bg-teal-700/50 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 shadow-inner">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-              <div className="relative group">
-                <label className="block text-white text-xs sm:text-sm font-medium mb-1">
-                  Cédula
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
-                    <FaIdCard className="h-4 w-4 sm:h-5 sm:w-5 text-teal-300" />
-                  </div>
-                  <input
-                    type="text"
-                    value={cliente.cedula || ""}
-                    disabled
-                    className="pl-8 sm:pl-10 w-full px-3 sm:px-4 py-2 sm:py-3 border border-teal-600 rounded-lg sm:rounded-xl text-white bg-teal-800 text-sm sm:text-base"
-                  />
-                </div>
-              </div>
+              
 
               <div className="relative group">
                 <label className="block text-white text-xs sm:text-sm font-medium mb-1">
@@ -618,7 +624,7 @@ const ActualizarDatosCliente = () => {
 
               <div className="relative group">
                 <label className="block text-white text-xs sm:text-sm font-medium mb-1">
-                  Teléfono Celular
+                  Celular
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
@@ -632,9 +638,12 @@ const ActualizarDatosCliente = () => {
                     value={formData.numeroCelular || ""}
                     onChange={handleInputChange}
                     placeholder="Ej: 3001234567"
+                    pattern="[0-9]{10}"
+                    title="Ingresa un número de 10 dígitos sin espacios ni guiones"
                     className="pl-8 sm:pl-10 w-full px-3 sm:px-4 py-2 sm:py-3 border border-teal-600 rounded-lg sm:rounded-xl text-white bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm sm:text-base"
                   />
                 </div>
+                
               </div>
             </div>
           </div>
