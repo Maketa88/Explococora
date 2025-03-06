@@ -27,6 +27,9 @@ const mapearCamposGuia = (datosGuia) => {
       primerApellido = partesNombre.slice(2).join(" ");
   }
 
+  // Obtener el teléfono de cualquiera de los campos disponibles
+  const telefono = datosGuia.telefono || datosGuia.numeroCelular || datosGuia.numero_celular || datosGuia.celular || "No disponible";
+
   // Crear objeto con los campos mapeados
   return {
     id: datosGuia.id || "",
@@ -38,6 +41,7 @@ const mapearCamposGuia = (datosGuia) => {
     foto: datosGuia.foto || "",
     estado: datosGuia.estado || "inactivo",
     nombreCompleto: datosGuia.nombre_del_guia || "",
+    telefono: telefono,
   };
 };
 
@@ -51,18 +55,60 @@ const GuiasDestacados = () => {
   const [error, setError] = useState(null);
   const { t } = useTranslation();
 
+  // Función para obtener datos adicionales de un guía usando su cédula
+  const obtenerDatosCompletos = async (cedula) => {
+    try {
+      const token = localStorage.getItem("token");
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      
+      const response = await axios.get(`${API_URL}/guia/perfil-completo/${cedula}`, { headers });
+      
+      // Verificar si la respuesta contiene datos
+      if (response.data) {
+        const guiaData = Array.isArray(response.data) ? response.data[0] : response.data;
+        return {
+          telefono: guiaData.telefono || "No disponible",
+          // Puedes agregar más campos si los necesitas
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error(`Error al obtener datos completos del guía ${cedula}:`, error);
+      
+      return null;
+    }
+  };
+
   // Función para cargar los guías desde el backend
   const cargarGuias = async () => {
     setLoading(true);
     setError(null);
 
     try {
+      // Obtener los datos de los guías
       const response = await axios.get(`${API_URL}/guia/todos`);
 
       if (response.data && Array.isArray(response.data)) {
         // Procesar los datos recibidos
         const guiasValidados = response.data.map(mapearCamposGuia);
-        setGuias(guiasValidados);
+        
+        // Para cada guía, intentar obtener datos adicionales si tiene cédula
+        const guiasConDatosCompletos = await Promise.all(
+          guiasValidados.map(async (guia) => {
+            if (guia.cedula) {
+              const datosAdicionales = await obtenerDatosCompletos(guia.cedula);
+              if (datosAdicionales) {
+                // Si el teléfono no está disponible en los datos originales pero sí en los adicionales
+                if (guia.telefono === "No disponible" && datosAdicionales.telefono !== "No disponible") {
+                  return { ...guia, telefono: datosAdicionales.telefono };
+                }
+              }
+            }
+            return guia;
+          })
+        );
+        
+        setGuias(guiasConDatosCompletos);
       } else {
         console.error("Formato de respuesta inesperado:", response.data);
         setError("Error en el formato de datos recibidos");
@@ -197,7 +243,7 @@ const GuiasDestacados = () => {
           )}
 
           {!loading && !error && guias.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 justify-items-center w-full">
               {/* Mostrar todos los guías */}
               {guias.map((guia) => (
                 <CardGuia key={guia.id || guia.cedula} guia={guia} />
