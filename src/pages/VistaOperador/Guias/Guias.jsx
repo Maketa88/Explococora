@@ -482,7 +482,7 @@ const Guias = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {guiasFiltrados().length > 0 ? (
-              guiasFiltrados().map(guia => (
+              guiasFiltrados().map((guia) => (
                 <div 
                   key={guia.id || guia.cedula} 
                   className={`rounded-lg shadow-lg overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'} relative`}
@@ -526,8 +526,9 @@ const Guias = () => {
                       <SelectorEstado
                         estadoActual={guia.estado || 'disponible'}
                         onCambioEstado={(nuevoEstado) => handleCambioEstado(guia.cedula, nuevoEstado)}
-                        cedula={guia.cedula}
                         id={guia.id}
+                        esAdmin={false}
+                        esPropio={true}
                       />
                     </div>
                   </div>

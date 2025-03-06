@@ -3,18 +3,10 @@ import axios from 'axios';
 import { ChevronDown, CheckCircle } from 'lucide-react';
 
 const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, esAdmin = false, esPropio = true, id }) => {
-  // IMPORTANTE: Determinar si este selector es del operador principal o de un guía
-  const esOperadorPrincipal = esPropio && !id;
-  
-  // Usar clave diferente según si es operador principal o guía
-  const claveStorage = esOperadorPrincipal ? 'ultimoEstadoOperador' : `estadoGuia_${id || cedula}`;
-  
-  // Normalizar el estado inicial
-  const estadoGuardado = esOperadorPrincipal ? localStorage.getItem(claveStorage) : null;
-  const estadoNormalizado = estadoGuardado || 
-    (estadoActual && ['disponible', 'ocupado', 'inactivo'].includes(estadoActual) 
-      ? estadoActual 
-      : 'disponible');
+  // Normalizar el estado inicial para evitar valores undefined o inválidos
+  const estadoNormalizado = estadoActual && ['disponible', 'ocupado', 'inactivo'].includes(estadoActual) 
+    ? estadoActual 
+    : 'disponible';
   
   const [mostrarMenu, setMostrarMenu] = useState(false);
   const [estado, setEstado] = useState(estadoNormalizado);
@@ -32,21 +24,16 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
     { nombre: 'inactivo', color: 'bg-red-500 hover:bg-red-600', notifColor: 'bg-red-100 text-red-800 border-red-300' }
   ];
 
-  // Actualizar el localStorage SOLO si es operador principal
+  // Actualizar estado interno cuando cambia estadoActual prop
   useEffect(() => {
-    if (estado && esOperadorPrincipal) {
-      localStorage.setItem(claveStorage, estado);
-      localStorage.setItem('ultimoEstadoTimestamp', Date.now().toString());
-      
-      // Crear evento global SOLO para operador principal
-      window.dispatchEvent(new CustomEvent('estadoOperadorCambiado', { 
-        detail: { estado: estado } 
-      }));
+    if (estadoActual && ['disponible', 'ocupado', 'inactivo'].includes(estadoActual)) {
+      setEstado(estadoActual);
     }
-  }, [estado, esOperadorPrincipal, claveStorage]);
+  }, [estadoActual]);
 
-  // Obtener el color del estado actual
+  // Obtener el color del estado actual - con mejor manejo de casos desconocidos
   const obtenerColorEstado = (nombreEstado) => {
+    // Normalizar estado para búsqueda
     const estadoParaBuscar = nombreEstado && nombreEstado.trim().toLowerCase();
     
     if (!estadoParaBuscar) {
@@ -81,13 +68,13 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
     };
   }, []);
 
-  // Mostrar notificación
+  // Función para mostrar la notificación
   const mostrarToast = (mensaje, estado) => {
     setMensajeNotificacion(mensaje);
     setColorNotificacion(obtenerColorNotificacion(estado));
     setMostrarNotificacion(true);
     
-    // Ocultar después de 3 segundos
+    // Ocultar la notificación después de 3 segundos
     setTimeout(() => {
       setMostrarNotificacion(false);
     }, 3000);
@@ -99,52 +86,31 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
 
   const cambiarEstado = async (nuevoEstado) => {
     try {
-      // Actualizar el estado en la UI primero
-      setEstado(nuevoEstado);
-      setMostrarMenu(false);
-      
-      // Solo para operador principal: guardar en localStorage y sessionStorage
-      if (esOperadorPrincipal) {
-        localStorage.setItem(claveStorage, nuevoEstado);
-        localStorage.setItem('ultimoEstadoTimestamp', Date.now().toString());
-        
-        // Guardar backup solo para operador principal
-        sessionStorage.setItem('estadoOperadorBackup', JSON.stringify({
-          estado: nuevoEstado,
-          timestamp: Date.now()
-        }));
-        
-        // Crear evento global solo para operador principal
-        window.dispatchEvent(new CustomEvent('estadoOperadorCambiado', { 
-          detail: { estado: nuevoEstado } 
-        }));
-      }
-      
-      // Mostrar notificación inmediatamente
-      mostrarToast(`Tu estado ha cambiado a ${formatearEstado(nuevoEstado)}`, nuevoEstado);
-      
-      // Llamar al callback si existe
-      if (typeof onCambioEstado === 'function') {
-        onCambioEstado(nuevoEstado);
-      }
-      
-      // Ahora hacer la llamada al servidor
       let url = 'http://localhost:10101/usuarios/cambiar-estado';
       let data = { nuevoEstado };
       
-      if (cedula) {
-        data.cedula = cedula;
-      } else if (id) {
-        data.id = id;
-      } else {
-        // Intentar obtener cédula del localStorage
-        const cedulaLocal = localStorage.getItem('cedula');
-        if (cedulaLocal) {
-          data.cedula = cedulaLocal;
+      // Si es admin cambiando su propio estado
+      if (esAdmin && esPropio) {
+        data.id = id; // Admin usa ID
+      } 
+      // Si es admin cambiando el estado de otro usuario
+      else if (esAdmin && !esPropio) {
+        if (cedula) {
+          url = `http://localhost:10101/usuarios/cambiar-estado/cedula/${cedula}`;
+        } else if (id) {
+          url = `http://localhost:10101/usuarios/cambiar-estado/id/${id}`;
         } else {
           throw new Error("Se requiere cédula o ID para cambiar el estado");
         }
+      } 
+      // Si es guía u operador cambiando su propio estado
+      else {
+        if (!cedula) {
+          throw new Error("Se requiere cédula para cambiar el estado");
+        }
+        data.cedula = cedula; // Guía y operador usan cédula
       }
+      
       
       const response = await axios.patch(url, data, {
         headers: {
@@ -152,18 +118,30 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
         }
       });
       
-      if (response.status !== 200) {
-        console.error("Error al cambiar estado en el servidor");
+      if (response.status === 200) {
+        console.log("Estado cambiado exitosamente");
+        setEstado(nuevoEstado);
+        
+        // Llamar al callback
+        if (typeof onCambioEstado === 'function') {
+          onCambioEstado(nuevoEstado);
+        }
+        
+        setMostrarMenu(false);
+        
+        // Guardar en localStorage inmediatamente
+        localStorage.setItem("ultimoEstado", nuevoEstado);
+        
+        // Mostrar notificación
+        mostrarToast(`Tu estado ha cambiado a ${formatearEstado(nuevoEstado)}`, nuevoEstado);
       }
     } catch (error) {
       console.error("Error al cambiar estado:", error);
-      // NO revertimos el estado visual para evitar confusión
-      setTimeout(() => {
-        mostrarToast(`Error de conexión, pero tu estado visual se ha actualizado`, 'inactivo');
-      }, 3500);
+      alert(error.response?.data?.message || error.message || "Error al cambiar el estado");
     }
   };
 
+  // Capitaliza la primera letra para mostrarlo más bonito
   const formatearEstado = (estado) => {
     return estado.charAt(0).toUpperCase() + estado.slice(1);
   };

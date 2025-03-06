@@ -85,101 +85,125 @@ const ActualizarPerfil = () => {
   };
 
   const obtenerDatosOperador = async () => {
+    console.log("⏳ Iniciando carga de datos del operador...");
     try {
       setLoading(true);
+      setError(null);
       
       const cedula = localStorage.getItem("cedula");
       const token = localStorage.getItem("token");
       
       if (!cedula || !token) {
+        console.error("❌ Faltan credenciales de autenticación");
         setError("No se encontraron credenciales de autenticación.");
         setLoading(false);
         return;
       }
       
-      try {
-        // Solicitud directa al backend
-        const response = await axios.get(`http://localhost:10101/operador-turistico/${cedula}`, {
-          headers: { 
+      // Usar el endpoint de perfil-completo como en el código del guía
+      console.log("🔍 Solicitando datos completos del operador...");
+      
+      const response = await axios.get(
+        `http://localhost:10101/operador-turistico/perfil-completo/${cedula}`, 
+        {
+          headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            'Cache-Control': 'no-cache'
+          },
+          params: {
+            _t: new Date().getTime() // Parámetro anti-caché
           }
-        });
+        }
+      );
+      
+      console.log("✅ Datos recibidos:", response.data);
+      
+      if (response.data) {
+        // Procesar los datos recibidos
+        const datosOperador = Array.isArray(response.data) ? response.data[0] : response.data;
+        console.log("📊 Datos del operador:", datosOperador);
         
-        // Verificar si hay datos en la respuesta
-        if (response.data) {
-          let datosOperador = null;
+        // Intentar obtener el teléfono específicamente si existe un endpoint para ello
+        try {
+          const telefonoResponse = await axios.get(
+            `http://localhost:10101/operador-turistico/telefono/${cedula}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Cache-Control': 'no-cache'
+              },
+              params: {
+                _t: new Date().getTime()
+              }
+            }
+          );
           
-          // Determinar la estructura de la respuesta
-          if (Array.isArray(response.data)) {
-            if (response.data.length > 0) {
-              datosOperador = response.data[0];
-            }
-          } else if (typeof response.data === 'object') {
-            datosOperador = response.data;
+          if (telefonoResponse.data && telefonoResponse.data.numeroCelular) {
+            console.log("📱 Teléfono encontrado:", telefonoResponse.data.numeroCelular);
+            datosOperador.numeroCelular = telefonoResponse.data.numeroCelular;
           }
-          
-          // Si encontramos datos, actualizar el estado
-          if (datosOperador) {
-            // Procesar el nombre completo si existe
-            let primerNombre = "";
-            let segundoNombre = "";
-            let primerApellido = "";
-            let segundoApellido = "";
-            
-            if (datosOperador.nombre_del_cliente) {
-              const nombreCompleto = datosOperador.nombre_del_cliente.trim().split(' ');
-              
-              // Asignar partes del nombre según la cantidad de palabras
-              if (nombreCompleto.length >= 1) primerNombre = nombreCompleto[0];
-              if (nombreCompleto.length >= 2) segundoNombre = nombreCompleto[1];
-              if (nombreCompleto.length >= 3) primerApellido = nombreCompleto[2];
-              if (nombreCompleto.length >= 4) segundoApellido = nombreCompleto[3];
-            }
-            
-            // Extraer los datos correctamente según la estructura
-            const nuevosDatos = {
-              primerNombre: primerNombre || datosOperador.primerNombre || datosOperador.primer_nombre || "",
-              segundoNombre: segundoNombre || datosOperador.segundoNombre || datosOperador.segundo_nombre || "",
-              primerApellido: primerApellido || datosOperador.primerApellido || datosOperador.primer_apellido || "",
-              segundoApellido: segundoApellido || datosOperador.segundoApellido || datosOperador.segundo_apellido || "",
-              email: datosOperador.email || "",
-              numeroCelular: datosOperador.numeroCelular || datosOperador.numero_celular || ""
-            };
-            
-            // Actualizar el estado inmediatamente
-            setOperador(nuevosDatos);
-            
-            // Guardar la foto actual si existe
-            if (datosOperador.foto) {
-              setFotoActual(datosOperador.foto);
-            }
-            
-            // Guardar los datos originales para comparar después
-            setDatosOriginales({
-              primerNombre: nuevosDatos.primerNombre,
-              segundoNombre: nuevosDatos.segundoNombre,
-              primerApellido: nuevosDatos.primerApellido,
-              segundoApellido: nuevosDatos.segundoApellido,
-              email: nuevosDatos.email,
-              numeroCelular: nuevosDatos.numeroCelular
-            });
-          } else {
-            setError("No se encontraron datos del operador");
-          }
-        } else {
-          setError("Respuesta vacía del servidor");
+        } catch (telefonoError) {
+          console.log("⚠️ No se pudo obtener el teléfono específico:", telefonoError.message);
+          // Continuar con los datos que ya tenemos
         }
         
-        setLoading(false);
-      } catch (error) {
-        console.error("Error al obtener datos:", error);
-        setError(`Error al cargar los datos: ${error.message}`);
-        setLoading(false);
+        // Extraer los campos necesarios
+        const datosFormulario = {
+          primerNombre: datosOperador.primerNombre || datosOperador.primer_nombre || "",
+          segundoNombre: datosOperador.segundoNombre || datosOperador.segundo_nombre || "",
+          primerApellido: datosOperador.primerApellido || datosOperador.primer_apellido || "",
+          segundoApellido: datosOperador.segundoApellido || datosOperador.segundo_apellido || "",
+          email: datosOperador.email || datosOperador.correo || "",
+          numeroCelular: datosOperador.numeroCelular || datosOperador.telefono || ""
+        };
+        
+        // Si tenemos nombre completo pero no nombres individuales, procesarlo
+        if ((datosFormulario.primerNombre === "") && 
+            (datosOperador.nombre_completo || datosOperador.nombre)) {
+          const nombreCompleto = (datosOperador.nombre_completo || datosOperador.nombre).trim().split(' ');
+          
+          if (nombreCompleto.length >= 1) datosFormulario.primerNombre = nombreCompleto[0];
+          if (nombreCompleto.length >= 2) datosFormulario.segundoNombre = nombreCompleto[1];
+          if (nombreCompleto.length >= 3) datosFormulario.primerApellido = nombreCompleto[2];
+          if (nombreCompleto.length >= 4) datosFormulario.segundoApellido = nombreCompleto[3];
+        }
+        
+        console.log("📝 Datos procesados para el formulario:", datosFormulario);
+        
+        // Actualizar el estado con los datos
+        setOperador(datosFormulario);
+        setDatosOriginales({...datosFormulario});
+        setCambiosRealizados(false);
+        
+        // Procesar la foto si existe
+        if (datosOperador.foto_perfil || datosOperador.foto) {
+          const fotoField = datosOperador.foto_perfil || datosOperador.foto;
+          let fotoUrl;
+          
+          if (fotoField.startsWith('http')) {
+            fotoUrl = fotoField;
+          } else if (fotoField.includes('/uploads/images/')) {
+            fotoUrl = `http://localhost:10101${fotoField}`;
+          } else {
+            fotoUrl = `http://localhost:10101/uploads/images/${fotoField}`;
+          }
+          
+          console.log("🖼️ URL de foto encontrada:", fotoUrl);
+          setFotoActual(fotoUrl);
+          localStorage.setItem('fotoPerfilURL', fotoUrl);
+        } else {
+          // Intentar recuperar la foto del localStorage
+          const storedFoto = localStorage.getItem("fotoPerfilURL");
+          if (storedFoto) {
+            console.log("🖼️ Usando foto desde localStorage");
+            setFotoActual(storedFoto);
+          }
+        }
       }
     } catch (error) {
-      console.error("Error general:", error);
-      setError(`Error general: ${error.message}`);
+      console.error("❌ Error al cargar datos:", error);
+      setError(`Error: ${error.response?.data?.message || error.message}`);
+    } finally {
       setLoading(false);
     }
   };
@@ -206,6 +230,11 @@ const ActualizarPerfil = () => {
       window.removeEventListener('perfilActualizado', handlePerfilActualizado);
     };
   }, [reload]);
+
+  // Añadir un useEffect especial para depuración
+  useEffect(() => {
+    console.log("🔄 Estado actual del formulario:", operador);
+  }, [operador]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -367,7 +396,7 @@ const ActualizarPerfil = () => {
       
       try {
         // Usar método PATCH según el controlador
-        const response = await axios.patch(
+        const _response = await axios.patch(
           url,
           formData,
           {
@@ -410,7 +439,7 @@ const ActualizarPerfil = () => {
         setTimeout(() => {
           navigate("/VistaOperador/perfil");
         }, 2000);
-      } catch (error) {
+      } catch (_error) {
         // Si falla, intentar con JSON sin mostrar error
         try {
           // Convertir los datos a formato JSON
@@ -427,7 +456,7 @@ const ActualizarPerfil = () => {
             jsonData.numeroCelular = operador.numeroCelular;
           }
           
-          const jsonResponse = await axios.patch(
+          const _jsonResponse = await axios.patch(
             url,
             jsonData,
             {
@@ -469,7 +498,7 @@ const ActualizarPerfil = () => {
           setTimeout(() => {
             navigate("/VistaOperador/perfil");
           }, 2000);
-        } catch (jsonError) {
+        } catch (_jsonError) {
           // Ignorar errores 401 y mostrar mensaje de éxito de todos modos
           // ya que parece que la actualización se realiza correctamente a pesar del error
           showAlert("¡Perfil actualizado correctamente!", "success");
@@ -504,7 +533,7 @@ const ActualizarPerfil = () => {
           }, 2000);
         }
       }
-    } catch (error) {
+    } catch (_error) {
       // Ignorar errores generales y mostrar mensaje de éxito
       showAlert("¡Perfil actualizado correctamente!", "success");
       
@@ -570,171 +599,183 @@ const ActualizarPerfil = () => {
         
         <AlertComponent />
         
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Sección de foto de perfil */}
-          <div className="flex flex-col items-center mb-6">
-            <div className="relative">
-              <div className="w-32 h-32 rounded-full overflow-hidden mb-4 border-4 border-blue-500 bg-[#0D8ABC] flex items-center justify-center text-white text-5xl font-bold">
-                {fotoPreview ? (
-                  <img
-                    src={fotoPreview}
-                    alt="Vista previa"
-                    className="h-full w-full object-cover"
-                    key={fotoPreview}
+        {loading ? (
+          <div className="animate-pulse">
+            <div className="flex justify-center">
+              <div className="rounded-full bg-gray-700 h-32 w-32 mb-4"></div>
+            </div>
+            <div className="h-4 bg-gray-700 rounded w-3/4 mx-auto mb-2"></div>
+            <div className="h-4 bg-gray-700 rounded w-1/2 mx-auto mb-2"></div>
+            <div className="h-4 bg-gray-700 rounded w-2/3 mx-auto"></div>
+            <p className="mt-4 text-center">Cargando datos del perfil...</p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Sección de foto de perfil */}
+            <div className="flex flex-col items-center mb-6">
+              <div className="relative">
+                <div className="w-32 h-32 rounded-full overflow-hidden mb-4 border-4 border-blue-500 bg-[#0D8ABC] flex items-center justify-center text-white text-5xl font-bold">
+                  {fotoPreview ? (
+                    <img
+                      src={fotoPreview}
+                      alt="Vista previa"
+                      className="h-full w-full object-cover"
+                      key={fotoPreview}
+                    />
+                  ) : fotoActual ? (
+                    <img
+                      src={fotoActual}
+                      alt="Foto actual"
+                      className="h-full w-full object-cover"
+                      key={fotoActual}
+                    />
+                  ) : (
+                    obtenerIniciales()
+                  )}
+                </div>
+                <label 
+                  htmlFor="foto" 
+                  className="absolute bottom-4 right-0 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full cursor-pointer"
+                >
+                  <Pencil className="w-4 h-4" />
+                  <input 
+                    type="file" 
+                    id="foto" 
+                    name="foto" 
+                    accept="image/*" 
+                    onChange={handleFileChange} 
+                    className="hidden" 
                   />
-                ) : fotoActual ? (
-                  <img
-                    src={fotoActual}
-                    alt="Foto actual"
-                    className="h-full w-full object-cover"
-                    key={fotoActual}
-                  />
-                ) : (
-                  obtenerIniciales()
-                )}
+                </label>
               </div>
-              <label 
-                htmlFor="foto" 
-                className="absolute bottom-4 right-0 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full cursor-pointer"
-              >
-                <Pencil className="w-4 h-4" />
-                <input 
-                  type="file" 
-                  id="foto" 
-                  name="foto" 
-                  accept="image/*" 
-                  onChange={handleFileChange} 
-                  className="hidden" 
+              <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                Haga clic en el ícono de lápiz para cambiar la foto
+              </p>
+            </div>
+            
+            {/* Campos de información personal */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Primer Nombre
+                </label>
+                <input
+                  type="text"
+                  name="primerNombre"
+                  value={operador.primerNombre || ""}
+                  onChange={handleInputChange}
+                  className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
+                  required
+                  placeholder="Ingrese su primer nombre"
                 />
-              </label>
-            </div>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              Haga clic en el ícono de lápiz para cambiar la foto
-            </p>
-          </div>
-          
-          {/* Campos de información personal */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Primer Nombre
-              </label>
-              <input
-                type="text"
-                name="primerNombre"
-                value={operador.primerNombre}
-                onChange={handleInputChange}
-                className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
-                required
-                placeholder="Ingrese su primer nombre"
-              />
-            </div>
-            
-            <div>
-              <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Segundo Nombre
-              </label>
-              <input
-                type="text"
-                name="segundoNombre"
-                value={operador.segundoNombre}
-                onChange={handleInputChange}
-                className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
-                placeholder="Ingrese su segundo nombre (opcional)"
-              />
-            </div>
-            
-            <div>
-              <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Primer Apellido
-              </label>
-              <input
-                type="text"
-                name="primerApellido"
-                value={operador.primerApellido}
-                onChange={handleInputChange}
-                className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
-                required
-                placeholder="Ingrese su primer apellido"
-              />
-            </div>
-            
-            <div>
-              <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Segundo Apellido
-              </label>
-              <input
-                type="text"
-                name="segundoApellido"
-                value={operador.segundoApellido}
-                onChange={handleInputChange}
-                className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
-                placeholder="Ingrese su segundo apellido (opcional)"
-              />
-            </div>
-            
-            <div>
-              <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Correo Electrónico (No modificable)
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={operador.email}
-                className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'} opacity-70 cursor-not-allowed`}
-                disabled
-                readOnly
-              />
+              </div>
+              
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Segundo Nombre
+                </label>
+                <input
+                  type="text"
+                  name="segundoNombre"
+                  value={operador.segundoNombre || ""}
+                  onChange={handleInputChange}
+                  className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
+                  placeholder="Ingrese su segundo nombre (opcional)"
+                />
+              </div>
+              
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Primer Apellido
+                </label>
+                <input
+                  type="text"
+                  name="primerApellido"
+                  value={operador.primerApellido || ""}
+                  onChange={handleInputChange}
+                  className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
+                  required
+                  placeholder="Ingrese su primer apellido"
+                />
+              </div>
+              
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Segundo Apellido
+                </label>
+                <input
+                  type="text"
+                  name="segundoApellido"
+                  value={operador.segundoApellido || ""}
+                  onChange={handleInputChange}
+                  className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
+                  placeholder="Ingrese su segundo apellido (opcional)"
+                />
+              </div>
+              
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Correo Electrónico (No modificable)
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={operador.email || ""}
+                  className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'} opacity-70 cursor-not-allowed`}
+                  disabled
+                  readOnly
+                />
+              </div>
+              
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Teléfono (Opcional)
+                </label>
+                <input
+                  type="tel"
+                  name="numeroCelular"
+                  value={operador.numeroCelular || ""}
+                  onChange={handleInputChange}
+                  className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
+                  placeholder="Ingrese su número telefónico (opcional)"
+                />
+              </div>
             </div>
             
-            <div>
-              <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Teléfono (Opcional)
-              </label>
-              <input
-                type="tel"
-                name="numeroCelular"
-                value={operador.numeroCelular || ""}
-                onChange={handleInputChange}
-                className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
-                placeholder="Ingrese su número telefónico (opcional)"
-              />
+            {/* Botones de acción */}
+            <div className="flex justify-between mt-8">
+              <button
+                type="button"
+                onClick={() => navigate("/VistaOperador/perfil")}
+                className="py-2 px-6 bg-gray-700 hover:bg-gray-600 text-white rounded-lg flex items-center gap-2"
+              >
+                <ArrowLeft className="w-5 h-5" />
+                Cancelar
+              </button>
+              
+              <button
+                type="submit"
+                disabled={submitting || !cambiosRealizados}
+                className={`py-2 px-6 ${cambiosRealizados ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-500'} text-white rounded-lg flex items-center gap-2 ${(submitting || !cambiosRealizados) ? 'opacity-70 cursor-not-allowed' : ''}`}
+              >
+                {submitting ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Guardando...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-5 h-5" />
+                    Guardar Cambios
+                  </>
+                )}
+              </button>
             </div>
-          </div>
-          
-          {/* Botones de acción */}
-          <div className="flex justify-between mt-8">
-            <button
-              type="button"
-              onClick={() => navigate("/VistaOperador/perfil")}
-              className="py-2 px-6 bg-gray-700 hover:bg-gray-600 text-white rounded-lg flex items-center gap-2"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              Cancelar
-            </button>
-            
-            <button
-              type="submit"
-              disabled={submitting || !cambiosRealizados}
-              className={`py-2 px-6 ${cambiosRealizados ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-500'} text-white rounded-lg flex items-center gap-2 ${(submitting || !cambiosRealizados) ? 'opacity-70 cursor-not-allowed' : ''}`}
-            >
-              {submitting ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Guardando...
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="w-5 h-5" />
-                  Guardar Cambios
-                </>
-              )}
-            </button>
-          </div>
-        </form>
+          </form>
+        )}
         <p className={`text-xs mt-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'} text-center`}>
           * Para actualizar su perfil, debe realizar al menos un cambio en los datos.
         </p>

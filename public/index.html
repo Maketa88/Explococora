@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta
+    name="description"
+    content="ExploCocora - Sistema de guías turísticos"
+  />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <title>ExploCocora</title>
+  
+  <!-- Agregamos los scripts de inicialización antes que React cargue -->
+  <script>
+    // Protección adicional para estado del operador
+    (function() {
+      try {
+        // Verificar si hay un estado guardado en sessionStorage
+        const backupStr = sessionStorage.getItem('estadoOperadorBackup');
+        const actualStr = localStorage.getItem('ultimoEstadoOperador');
+        
+        // Si tenemos backup pero no actual, o el actual es "disponible", restaurar
+        if (backupStr && (!actualStr || actualStr === 'disponible')) {
+          const backup = JSON.parse(backupStr);
+          if (backup && backup.estado && backup.timestamp) {
+            // Verificar que el backup sea reciente (menos de 1 hora)
+            const ahora = Date.now();
+            if (ahora - backup.timestamp < 3600000) {
+              localStorage.setItem('ultimoEstadoOperador', backup.estado);
+              console.log('Estado restaurado desde backup inicial:', backup.estado);
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Error en script de protección:', e);
+      }
+    })();
+  </script>
+  
+  <!-- Scripts externos -->
+  <script src="%PUBLIC_URL%/init-estado.js"></script>
+  <script src="%PUBLIC_URL%/estado-background.js"></script>
+</head>
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+</body>
+</html> 
