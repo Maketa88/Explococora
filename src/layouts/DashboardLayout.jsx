@@ -337,36 +337,33 @@ const DashboardLayout = ({ children }) => {
     }
   };
 
-  // Añadir nuevo useEffect para establecer estado inicial
-  useEffect(() => {
-    const establecerEstadoInicial = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const cedula = localStorage.getItem('cedula');
-        
-        if (!token || !cedula) return;
+  // Función para manejar la actualización del estado en el header
+  const actualizarEstadoHeader = (nuevoEstado) => {
+    setOperadorEstado(nuevoEstado);
+  };
 
-        // Establecer estado como disponible al iniciar sesión
-        await axios.patch('http://localhost:10101/usuarios/cambiar-estado',
-          {
-            cedula: cedula,
-            nuevoEstado: 'disponible'
-          },
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          }
-        );
-        
-        setOperadorEstado('disponible');
-      } catch (error) {
-        console.error("Error al establecer estado inicial:", error);
+  // Añadir este efecto para escuchar los cambios de estado
+  useEffect(() => {
+    // Escuchar eventos de cambio de estado
+    const handleEstadoCambiado = (event) => {
+      if (event.detail && event.detail.estado) {
+        setOperadorEstado(event.detail.estado);
       }
     };
-
-    establecerEstadoInicial();
-  }, []); // Se ejecuta solo al montar el componente
+    
+    // Cargar estado inicial desde localStorage
+    const estadoGuardado = localStorage.getItem('ultimoEstadoOperador');
+    if (estadoGuardado) {
+      setOperadorEstado(estadoGuardado);
+    }
+    
+    // Escuchar cambios de estado globales
+    window.addEventListener('estadoOperadorCambiado', handleEstadoCambiado);
+    
+    return () => {
+      window.removeEventListener('estadoOperadorCambiado', handleEstadoCambiado);
+    };
+  }, []);
 
   useEffect(() => {
     const handleBeforeUnload = async (e) => {
@@ -489,7 +486,7 @@ const DashboardLayout = ({ children }) => {
               <div className="mr-4">
                 <SelectorEstado 
                   estadoActual={operadorEstado}
-                  onCambioEstado={handleCambioEstado}
+                  onCambioEstado={actualizarEstadoHeader}
                   cedula={localStorage.getItem('cedula')}
                   esAdmin={false}
                   esPropio={true}
@@ -588,6 +585,61 @@ const DashboardLayout = ({ children }) => {
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  );
+};
+
+// Añadir este componente que monitorea y muestra el estado en todas las páginas
+const EstadoIndicator = () => {
+  const [estado, setEstado] = useState('');
+  const [visible, setVisible] = useState(false);
+  
+  useEffect(() => {
+    // Obtener estado inicial
+    const estadoGuardado = localStorage.getItem('ultimoEstadoOperador');
+    if (estadoGuardado) {
+      setEstado(estadoGuardado);
+      setVisible(true);
+    }
+    
+    // Escuchar cambios de estado
+    const handleEstadoCambiado = (event) => {
+      setEstado(event.detail.estado);
+      setVisible(true);
+    };
+    
+    window.addEventListener('estadoOperadorCambiado', handleEstadoCambiado);
+    
+    return () => {
+      window.removeEventListener('estadoOperadorCambiado', handleEstadoCambiado);
+    };
+  }, []);
+  
+  if (!visible) return null;
+  
+  const getEstadoStyles = () => {
+    switch (estado) {
+      case 'disponible':
+        return 'bg-green-100 text-green-800 border-green-300';
+      case 'ocupado':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      case 'inactivo':
+        return 'bg-red-100 text-red-800 border-red-300';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-300';
+    }
+  };
+  
+  return (
+    <div className={`fixed bottom-4 right-4 z-50 px-4 py-2 rounded-full border ${getEstadoStyles()} shadow-lg`}>
+      <div className="flex items-center">
+        <div className={`w-3 h-3 rounded-full mr-2 animate-pulse ${
+          estado === 'disponible' ? 'bg-green-500' : 
+          estado === 'ocupado' ? 'bg-yellow-500' : 
+          'bg-red-500'
+        }`}></div>
+        <span className="font-medium capitalize">{estado}</span>
       </div>
     </div>
   );

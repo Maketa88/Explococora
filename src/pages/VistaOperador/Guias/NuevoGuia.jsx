@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import DashboardLayout from '../../../layouts/DashboardLayout';
-import { ArrowLeft, CheckCircle, Pencil, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Pencil, Eye, EyeOff, AlertCircle, X } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { RegistroCliente } from "../../../services/RegistroCliente";
 
@@ -32,6 +32,44 @@ const NuevoGuia = () => {
     }));
   };
 
+  // Función para mostrar alertas (solo la flotante)
+  const showAlert = (message, type) => {
+    setAlert({
+      show: true,
+      message,
+      type
+    });
+    
+    // Ocultar la alerta después de 5 segundos
+    setTimeout(() => {
+      setAlert(prev => ({ ...prev, show: false }));
+    }, 5000);
+  };
+
+  // Componente de alerta flotante (la única que queremos mantener)
+  const AlertComponent = () => {
+    if (!alert.show) return null;
+    
+    return (
+      <div className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg flex items-center gap-3 z-50 ${
+        alert.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+      }`}>
+        {alert.type === 'success' ? (
+          <CheckCircle className="w-5 h-5" />
+        ) : (
+          <AlertCircle className="w-5 h-5" />
+        )}
+        <span>{alert.message}</span>
+        <button 
+          onClick={() => setAlert(prev => ({ ...prev, show: false }))}
+          className="ml-2 text-white hover:text-gray-200"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+    );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -50,42 +88,23 @@ const NuevoGuia = () => {
       
       const response = await RegistroCliente(guiaData);
       
-      Swal.fire({
-        icon: 'success',
-        title: '¡Éxito!',
-        text: 'Guía registrado exitosamente',
-      }).then(() => {
+      // Mostrar solo la alerta flotante de éxito
+      showAlert("¡Guía registrado exitosamente!", "success");
+      
+      // Eliminar completamente el Swal y solo redirigir después de un breve retraso
+      setTimeout(() => {
         navigate('/VistaOperador/guias');
-      });
+      }, 2000);
     } catch (error) {
       console.error('Error al registrar guía:', error);
-      setAlert({
-        show: true,
-        message: error.message || 'Error al registrar el guía. Por favor, intente nuevamente.',
-        type: 'error'
-      });
+      
+      // Mostrar solo la alerta flotante de error
+      showAlert(error.message || 'Error al registrar el guía. Por favor, intente nuevamente.', "error");
       
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const AlertComponent = () => {
-    if (!alert.show) return null;
-    
-    return (
-      <div className={`p-4 rounded-lg mb-6 flex items-center ${
-        alert.type === 'error' ? 'bg-red-100 text-red-700 border border-red-300' : 'bg-green-100 text-green-700 border border-green-300'
-      }`}>
-        {alert.type === 'error' ? (
-          <AlertCircle className="w-5 h-5 mr-2" />
-        ) : (
-          <CheckCircle className="w-5 h-5 mr-2" />
-        )}
-        {alert.message}
-      </div>
-    );
   };
 
   return (
@@ -95,6 +114,7 @@ const NuevoGuia = () => {
           Registrar Nuevo Guía
         </h2>
         
+        {/* Solo la alerta flotante */}
         <AlertComponent />
         
         <form onSubmit={handleSubmit} className="space-y-6">
