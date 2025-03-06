@@ -9,6 +9,8 @@ const CardGuia = ({ guia }) => {
   const [errorImagen, setErrorImagen] = useState(false);
   // Estado para la URL de la imagen optimizada
   const [imagenOptimizada, setImagenOptimizada] = useState('');
+  // Estado para controlar la animación de entrada
+  const [animacionIniciada, setAnimacionIniciada] = useState(false);
   
   // Efecto para procesar la URL de la imagen cuando cambia guia.foto
   useEffect(() => {
@@ -48,6 +50,16 @@ const CardGuia = ({ guia }) => {
       setImagenOptimizada(guia.foto);
     }
   }, [guia.foto]);
+
+  // Efecto para iniciar la animación después de que el componente se monte
+  useEffect(() => {
+    // Pequeño retraso para asegurar que la animación se vea bien
+    const timer = setTimeout(() => {
+      setAnimacionIniciada(true);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   // Obtener nombres y apellidos de forma más eficiente
   const { nombres, apellidos } = (() => {
@@ -100,7 +112,13 @@ const CardGuia = ({ guia }) => {
   };
 
   return (
-    <div className="relative w-full h-full flex flex-col rounded-xl overflow-hidden shadow-2xl bg-white flex-grow min-h-[auto] sm:min-h-[600px]">
+    <div 
+      className={`relative w-full h-full flex flex-col rounded-xl overflow-hidden shadow-2xl bg-white flex-grow min-h-[auto] sm:min-h-[600px] transition-all duration-1000 ease-out ${
+        animacionIniciada 
+          ? 'opacity-100 transform translate-y-0 rotate-0 scale-100' 
+          : 'opacity-0 transform -translate-y-16 rotate-3 scale-95'
+      }`}
+    >
       {/* Contenedor de la imagen con fondo - Ahora con altura responsiva */}
       <div 
         className="relative w-full bg-gray-100 flex items-center justify-center pt-4 px-4"
@@ -134,19 +152,20 @@ const CardGuia = ({ guia }) => {
       </div>
       
       {/* Contenido - Ahora con altura automática y flex-grow para ocupar espacio disponible */}
-      <div className="p-4 sm:p-6 z-20 bg-white relative shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)] flex-grow flex flex-col justify-between">
+      <div className="p-4 sm:p-6 z-20 bg-teal-50  relative shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)] flex-grow flex flex-col justify-between">
         {/* Información del guía */}
         <div className="space-y-2 sm:space-y-3 text-gray-800">
           <div className="flex items-center mb-3">
             {/* Icono para el nombre - Persona/Guía */}
-            <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-500 mr-2 sm:mr-3 shadow-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 mr-3 sm:mr-4 shadow-lg transform transition-all duration-300 hover:scale-110 hover:rotate-6">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 sm:h-7 sm:w-7 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
               </svg>
             </div>
             <div className="flex flex-col">
-              <span className="text-xs font-semibold text-black">Nombres:</span>
-              <h3 className="font-bold text-lg sm:text-xl text-gray-700">
+              <span className="text-xs font-semibold text-gray-700">Nombres:</span>
+              <h3 className="font-semibold text-lg sm:text-xl text-gray-950">
                 {nombres}
               </h3>
             </div>
@@ -155,14 +174,17 @@ const CardGuia = ({ guia }) => {
           {apellidos && (
             <div className="flex items-center mb-4">
               {/* Icono para el apellido - Familia */}
-              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-purple-500 mr-2 sm:mr-3 shadow-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 mr-3 sm:mr-4 shadow-lg transform transition-all duration-300 hover:scale-110 hover:rotate-6">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 sm:h-7 sm:w-7 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                 </svg>
               </div>
               <div className="flex flex-col">
                 <span className="text-xs font-semibold text-black">Apellidos:</span>
-                <h4 className="font-medium text-base sm:text-lg text-gray-700">
+                <h4 className="font-semibold text-base sm:text-lg text-gray-950">
                   {apellidos}
                 </h4>
               </div>
@@ -170,30 +192,20 @@ const CardGuia = ({ guia }) => {
           )}
           
           <div className="space-y-3 sm:space-y-4 mt-4 sm:mt-5">
-            <div className="flex items-start text-sm">
-              {/* Icono para la cédula */}
-              <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-500 mr-2 sm:mr-3 shadow-md shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-                </svg>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xs font-semibold text-black">Cédula:</span>
-                <span className="text-gray-700 font-medium">{guia.cedula || 'No disponible'}</span>
-              </div>
-            </div>
+           
             
             {guia.email && (
               <div className="flex items-start text-sm">
                 {/* Icono para el email */}
-                <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-green-500 mr-2 sm:mr-3 shadow-md shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-green-400 to-green-600 mr-3 sm:mr-4 shadow-lg transform transition-all duration-300 hover:scale-110 hover:rotate-6 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 sm:h-7 sm:w-7 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
                   </svg>
                 </div>
-                <div className="flex flex-col max-w-[calc(100%-44px)]">
+                <div className="flex flex-col max-w-[calc(100%-60px)]">
                   <span className="text-xs font-semibold text-black">Email:</span>
-                  <span className="truncate text-gray-700 font-medium break-words text-xs sm:text-sm">{guia.email}</span>
+                  <span className="truncate text-gray-950 break-words text-xs sm:text-sm font-semibold">{guia.email}</span>
                 </div>
               </div>
             )}
@@ -202,12 +214,12 @@ const CardGuia = ({ guia }) => {
             {guia.telefono && (
               <div className="flex items-start text-sm">
                 {/* Icono para el teléfono */}
-                <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-500 mr-2 sm:mr-3 shadow-md shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 mr-3 sm:mr-4 shadow-lg transform transition-all duration-300 hover:scale-110 hover:rotate-6 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 sm:h-7 sm:w-7 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                   </svg>
                 </div>
-                <div className="flex flex-col max-w-[calc(100%-44px)]">
+                <div className="flex flex-col max-w-[calc(100%-60px)]">
                   <span className="text-xs font-semibold text-black">Teléfono:</span>
                   <span className="truncate text-gray-700 font-medium text-xs sm:text-sm">{guia.telefono}</span>
                 </div>
@@ -216,10 +228,10 @@ const CardGuia = ({ guia }) => {
           </div>
         </div>
         
-        {/* 5 estrellas al final - Versión con estrellas más grandes */}
-        <div className="flex items-center justify-center pt-1 sm:pt-4 relative">
-          <div className="relative flex items-center justify-center py-1 sm:py-2 px-2 sm:px-4">
-            {/* Estrellas con efecto de rotación al hover */}
+        {/* 5 estrellas al final - Versión con estrellas más grandes y animadas */}
+        <div className="flex items-center justify-center pt-3 sm:pt-5 relative">
+          <div className="relative flex items-center justify-center py-2 sm:py-3 px-2 sm:px-4">
+            {/* Estrellas con efecto de rotación y brillo al hover */}
             <div className="flex items-center relative z-10">
               {[...Array(5)].map((_, index) => (
                 <div 
@@ -228,11 +240,24 @@ const CardGuia = ({ guia }) => {
                 >
                   <svg 
                     xmlns="http://www.w3.org/2000/svg" 
-                    className="h-5 w-5 sm:h-8 sm:w-8 md:h-10 md:w-10 mx-0.5 drop-shadow-lg" 
-                    viewBox="0 0 20 20" 
-                    fill="#FFD700"
+                    className="h-6 w-6 sm:h-8 sm:w-8 md:h-9 md:w-9 mx-0.5 drop-shadow-lg filter hover:drop-shadow-xl transition-all duration-300" 
+                    viewBox="0 0 24 24" 
+                    fill="url(#starGradient)"
+                    stroke="none"
+                    style={{ filter: 'drop-shadow(0 0 2px rgba(255, 215, 0, 0.7))' }}
                   >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    <defs>
+                      <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#FFEA00" />
+                        <stop offset="50%" stopColor="#FFD000" />
+                        <stop offset="100%" stopColor="#FF8C00" />
+                      </linearGradient>
+                      <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="2" result="blur" />
+                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                      </filter>
+                    </defs>
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                   </svg>
                 </div>
               ))}
