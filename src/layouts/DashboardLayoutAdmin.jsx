@@ -24,7 +24,6 @@ import {
   Trash2
 } from 'lucide-react';
 import axios from 'axios';
-import SelectorEstado from '../pages/VistaGuia/CambioEstado/SelectorEstado';
 
 const DashboardLayoutAdmin = ({ children }) => {
   const location = useLocation();
@@ -666,6 +665,22 @@ const DashboardLayoutAdmin = ({ children }) => {
     };
   }, []);
 
+  // Where SelectorEstado was used, replace with a simple indicator
+  const renderEstadoIndicator = () => {
+    const estadoColors = {
+      'disponible': 'bg-green-500',
+      'ocupado': 'bg-yellow-500',
+      'inactivo': 'bg-red-500'
+    };
+
+    return (
+      <div className="flex items-center gap-2">
+        <div className={`w-3 h-3 rounded-full ${estadoColors[estado] || 'bg-gray-500'}`}></div>
+        <span className="capitalize text-sm">{estado}</span>
+      </div>
+    );
+  };
+
   return (
     <div className={`flex h-screen overflow-hidden ${darkMode ? 'bg-teal-950' : 'bg-white'}`}>
       {/* Sidebar */}
@@ -799,13 +814,7 @@ const DashboardLayoutAdmin = ({ children }) => {
             </div>
             <div className="flex items-center gap-4">
               {localStorage.getItem('cedula') && (
-                <SelectorEstado 
-                  estadoActual={estado}
-                  onCambioEstado={setEstado}
-                  cedula={localStorage.getItem('cedula')}
-                  esAdmin={true}
-                  esPropio={true}
-                />
+                renderEstadoIndicator()
               )}
               <button 
                 onClick={() => setDarkMode(!darkMode)}
