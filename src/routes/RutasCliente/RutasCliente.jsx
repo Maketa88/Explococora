@@ -5,13 +5,16 @@ import ContactForm from "../../components/ContactForm/ContactForm";
 import { HistoriaCultura } from "../../components/HistoriaCultura/Body/HistoriaCultura";
 import NuestrasRutas from "../../components/NuestrasRutas/NuestrasRutas";
 import { NuestrosGuias } from "../../components/NuestrosGuias/NuestrosGuias";
-import { Footer } from "../../components/PaginaInicio/Footer/Footer";
+import { FooterCliente } from "../../pages/VistaCliente/Footer/FooterCliente";
 import { PaginaInicio } from "../../pages/PaginaInicio/PaginaInicio";
 import ActualizarDatosCliente from "../../pages/VistaCliente/ActualizarCliente";
 import { BorrarCuenta } from "../../pages/VistaCliente/BorrarCuenta";
 import CambiarContraseña from "../../pages/VistaCliente/CambiarContraseña";
 import { HeaderCliente } from "../../pages/VistaCliente/Header/HeaderCliente";
 import PerfilCliente from "../../pages/VistaCliente/PerfilCliente";
+import QuienesSomosCliente from "../../pages/VistaCliente/QuinesSomosCliente";
+
+
 
 const RutasCliente = () => {
   const [ocultarFooter, setOcultarFooter] = useState(false);
@@ -44,8 +47,9 @@ const RutasCliente = () => {
         <Route path="/EliminarCuenta" element={<BorrarCuenta />} />
         <Route path="/NuestrosGuias" element={<NuestrosGuias />} />
         <Route path="/NuestrasRutas" element={<NuestrasRutas />} />
+        <Route path="/QuienesSomos" element={<QuienesSomosCliente />} />
       </Routes>
-      {!ocultarFooter && <Footer />}
+      {!ocultarFooter && <FooterCliente />}
       <ChatBot />
     </>
   );
