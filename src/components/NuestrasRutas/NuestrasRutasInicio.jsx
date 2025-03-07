@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const NuestrasRutas = () => {
+export const NuestrasRutasInicio = () => {
   const { t } = useTranslation();
   const [rutas, setRutas] = useState([]);
   const [rutasFiltradas, setRutasFiltradas] = useState([]);
@@ -76,7 +76,7 @@ export const NuestrasRutas = () => {
         }
         
         // Limitar a solo 4 fotos
-        const fotosFiltradas = fotosArray.slice(0, 4);
+        const fotosFiltradas = fotosArray.slice(0, 1);
         
         if (fotosFiltradas.length > 0) {
           setRutasConFotos(prevState => ({
@@ -291,4 +291,4 @@ export const NuestrasRutas = () => {
   );
 };
 
-export default NuestrasRutas;
+export default NuestrasRutasInicio;
