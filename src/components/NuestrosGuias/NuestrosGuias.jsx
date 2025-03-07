@@ -75,6 +75,7 @@ const NuestrosGuias = () => {
           : response.data;
         return {
           telefono: guiaData.telefono || "No disponible",
+          descripcion: guiaData.descripcion || guiaData.biografia || guiaData.bio || guiaData.informacion || null,
           // Puedes agregar más campos si los necesitas
         };
       }
@@ -112,8 +113,17 @@ const NuestrosGuias = () => {
                   guia.telefono === "No disponible" &&
                   datosAdicionales.telefono !== "No disponible"
                 ) {
-                  return { ...guia, telefono: datosAdicionales.telefono };
+                  return { 
+                    ...guia, 
+                    telefono: datosAdicionales.telefono,
+                    descripcion: datosAdicionales.descripcion || null
+                  };
                 }
+                // Si solo necesitamos agregar la descripción
+                return {
+                  ...guia,
+                  descripcion: datosAdicionales.descripcion || null
+                };
               }
             }
             return guia;

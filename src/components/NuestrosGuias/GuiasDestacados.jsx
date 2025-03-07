@@ -68,6 +68,7 @@ const GuiasDestacados = () => {
         const guiaData = Array.isArray(response.data) ? response.data[0] : response.data;
         return {
           telefono: guiaData.telefono || "No disponible",
+          descripcion: guiaData.descripcion || guiaData.biografia || guiaData.bio || guiaData.informacion || null,
           // Puedes agregar más campos si los necesitas
         };
       }
@@ -98,10 +99,14 @@ const GuiasDestacados = () => {
             if (guia.cedula) {
               const datosAdicionales = await obtenerDatosCompletos(guia.cedula);
               if (datosAdicionales) {
-                // Si el teléfono no está disponible en los datos originales pero sí en los adicionales
-                if (guia.telefono === "No disponible" && datosAdicionales.telefono !== "No disponible") {
-                  return { ...guia, telefono: datosAdicionales.telefono };
-                }
+                // Combinar los datos adicionales con los datos del guía
+                return { 
+                  ...guia, 
+                  telefono: (guia.telefono === "No disponible" && datosAdicionales.telefono !== "No disponible") 
+                    ? datosAdicionales.telefono 
+                    : guia.telefono,
+                  descripcion: datosAdicionales.descripcion || null
+                };
               }
             }
             return guia;
@@ -299,7 +304,7 @@ const GuiasDestacados = () => {
             )}
 
             {!loading && !error && guias.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 justify-items-center w-full h-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 md:gap-8 justify-items-center w-full h-full">
                 {/* Mostrar todos los guías */}
                 {guias.map((guia) => (
                   <div key={guia.id || guia.cedula} className="h-full w-full flex">
