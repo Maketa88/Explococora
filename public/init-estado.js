@@ -1,6 +1,6 @@
 /**
  * Script de inicialización que se ejecuta antes que cualquier componente React
- * para garantizar que el estado del operador esté disponible inmediatamente
+ * para garantizar que el estado del operador y guías esté disponible inmediatamente
  */
 (function() {
   // Verificar si estamos en la página correcta
@@ -23,6 +23,25 @@
       
       console.log(`Estado protegido: ${estadoActual}`);
     }
+    
+    // También proteger estados de guías
+    const keysGuias = Object.keys(localStorage).filter(key => key.startsWith('estadoGuia_') && !key.includes('timestamp'));
+    
+    keysGuias.forEach(key => {
+      const cedula = key.replace('estadoGuia_', '');
+      const estado = localStorage.getItem(key);
+      
+      if (estado) {
+        const backupGuia = {
+          cedula,
+          estado,
+          timestamp: Date.now()
+        };
+        
+        // Guardar backup en sessionStorage
+        sessionStorage.setItem(`backupGuia_${cedula}`, JSON.stringify(backupGuia));
+      }
+    });
   }
   
   // Función para restaurar el estado si se ha perdido
@@ -49,6 +68,35 @@
         }
       }
     }
+    
+    // Restaurar estados de guías
+    const backupGuias = Object.keys(sessionStorage).filter(key => key.startsWith('backupGuia_'));
+    
+    backupGuias.forEach(key => {
+      try {
+        const backupStr = sessionStorage.getItem(key);
+        if (backupStr) {
+          const backup = JSON.parse(backupStr);
+          
+          if (backup.cedula && backup.estado && backup.timestamp) {
+            const estadoActual = localStorage.getItem(`estadoGuia_${backup.cedula}`);
+            
+            // Restaurar solo si no hay estado o es "disponible"
+            if (!estadoActual || estadoActual === 'disponible') {
+              // Verificar que el backup sea reciente (menos de 1 hora)
+              const ahora = Date.now();
+              if (ahora - backup.timestamp < 3600000) {
+                localStorage.setItem(`estadoGuia_${backup.cedula}`, backup.estado);
+                localStorage.setItem(`estadoGuia_${backup.cedula}_timestamp`, backup.timestamp);
+                console.log(`Estado de guía ${backup.cedula} restaurado: ${backup.estado}`);
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Error al restaurar estado de guía:', e);
+      }
+    });
   }
   
   // Ejecutar al cargar la página
