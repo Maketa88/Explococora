@@ -4,7 +4,7 @@ import { FaLeaf, FaMapMarkedAlt, FaTree, FaUsers } from "react-icons/fa";
 import { GiHorseHead, GiHorseshoe } from "react-icons/gi";
 import quienes from "../../assets/Images/quienessomos.jpg";
 
-const QuienesSomos = () => {
+const QuienesSomosCliente = () => {
   useTranslation();
 
   const fadeIn = {
@@ -201,13 +201,13 @@ const QuienesSomos = () => {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-3 md:gap-4 px-4">
             <a 
-              href="/NuestrasRutas" 
+              href="/VistaCliente/NuestrasRutas" 
               className="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 md:py-3 px-6 md:px-8 rounded-full transition-colors duration-300 shadow-lg text-sm sm:text-base"
             >
               Descubre Nuestras Rutas
             </a>
             <a 
-              href="/ContactForm" 
+              href="/VistaCliente/Contacto"
               className="bg-transparent hover:bg-white text-white hover:text-teal-800 font-bold py-2 md:py-3 px-6 md:px-8 rounded-full border-2 border-white transition-colors duration-300 mt-3 sm:mt-0 text-sm sm:text-base"
             >
               Contáctanos
@@ -224,4 +224,4 @@ const QuienesSomos = () => {
   );
 };
 
-export default QuienesSomos;
+export default QuienesSomosCliente;

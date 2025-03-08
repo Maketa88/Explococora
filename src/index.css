@@ -32,6 +32,45 @@ input[type="password"]::-moz-password {
   .clip-path-wave-bottom {
     clip-path: polygon(0 40%, 100% 0, 100% 100%, 0 60%);
   }
+
+  /* Utilidades para la animación de volteo de carta */
+  .backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  
+  /* Utilidades para mejorar la responsividad */
+  @media (max-width: 640px) {
+    .card-container {
+      min-height: 450px;
+    }
+    
+    .card-front-image {
+      max-height: 180px;
+    }
+    
+    .card-content {
+      padding: 0.75rem;
+    }
+    
+    .card-back {
+      padding: 0.75rem;
+    }
+    
+    /* Ajustes para la descripción en el reverso */
+    .card-back .bg-white\/80 {
+      margin-top: 0;
+    }
+    
+    /* Alturas fijas para encabezado y pie */
+    .card-back .h-16 {
+      height: 3.5rem;
+    }
+    
+    .card-back .h-20 {
+      height: 4rem;
+    }
+  }
 }
 
 /* Animaciones personalizadas */
@@ -57,5 +96,98 @@ input[type="password"]::-moz-password {
   }
   50% {
     opacity: 0.7;
+  }
+}
+
+/* Animación para el indicador de volteo */
+@keyframes pulseIndicator {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+    box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.4);
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+    box-shadow: 0 0 0 5px rgba(5, 150, 105, 0);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+    box-shadow: 0 0 0 0 rgba(5, 150, 105, 0);
+  }
+}
+
+/* Animación para el efecto de volteo de carta */
+@keyframes flipCard {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(180deg);
+  }
+}
+
+@keyframes flipCardBack {
+  0% {
+    transform: rotateY(180deg);
+  }
+  100% {
+    transform: rotateY(0deg);
+  }
+}
+
+/* Media queries para mejorar la responsividad */
+@media (max-width: 640px) {
+  .card-flip-container {
+    perspective: 800px;
+  }
+  
+  .card-flip-inner {
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  
+  .card-front, .card-back {
+    min-height: 450px;
+  }
+  
+  /* Ajustes para pantallas muy pequeñas */
+  @media (max-width: 360px) {
+    .card-container {
+      min-height: 400px;
+    }
+    
+    .card-front-image {
+      max-height: 150px;
+    }
+    
+    .card-content, .card-back {
+      padding: 0.5rem;
+    }
+    
+    .card-back h2 {
+      font-size: 1rem;
+    }
+    
+    .card-back p {
+      font-size: 0.75rem;
+      line-height: 1.3;
+      max-height: 25vh !important;
+    }
+    
+    /* Ajustes para la descripción en el reverso */
+    .card-back .bg-white\/80 {
+      margin-top: 0;
+      padding: 0.5rem;
+    }
+    
+    .card-back .absolute.-top-3\.5 {
+      top: -2.5px;
+    }
+    
+    /* Alturas fijas para encabezado y pie en pantallas muy pequeñas */
+    .card-back .h-16, .card-back .h-20 {
+      height: 3rem;
+    }
   }
 }
