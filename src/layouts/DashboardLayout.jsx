@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import SelectorEstado from '../pages/VistaOperador/CambioEstadoOpe/Selector_Estado_Ope';
 import axios from 'axios';
+import AlertasEstado from '../components/Alertas/AlertasEstado';
 
 const DashboardLayout = ({ children }) => {
   const location = useLocation();
@@ -586,6 +587,9 @@ const DashboardLayout = ({ children }) => {
           </div>
         </div>
       </div>
+
+      {/* Componente de alertas de estado */}
+      <AlertasEstado />
     </div>
   );
 };

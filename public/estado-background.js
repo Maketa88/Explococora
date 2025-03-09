@@ -1,5 +1,5 @@
 /**
- * Servicio de fondo para mantener el estado del operador sincronizado
+ * Servicio de fondo para mantener el estado del operador y guías sincronizado
  * Este script se ejecutará independientemente de las rutas de React
  */
 (function() {
@@ -10,8 +10,8 @@
   const SYNC_INTERVAL = 30000; // 30 segundos
   const API_URL = 'http://localhost:10101';
   
-  // Función para sincronizar el estado
-  async function sincronizarEstado() {
+  // Función para sincronizar el estado del operador
+  async function sincronizarEstadoOperador() {
     try {
       // Obtener datos de la sesión
       const token = localStorage.getItem('token');
@@ -53,19 +53,66 @@
     }
   }
   
+  // Función para sincronizar estados de guías
+  async function sincronizarEstadosGuias() {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      
+      // Obtener lista de todos los estados
+      const response = await fetch(`${API_URL}/usuarios/listar-estados`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (!response.ok) throw new Error('Error al obtener estados');
+      
+      const data = await response.json();
+      
+      // Procesar guías si existen
+      if (data && data.data && data.data.guias && Array.isArray(data.data.guias)) {
+        data.data.guias.forEach(guia => {
+          if (guia.cedula && guia.estado) {
+            const estadoGuardado = localStorage.getItem(`estadoGuia_${guia.cedula}`);
+            
+            // Solo actualizar si el estado ha cambiado
+            if (estadoGuardado !== guia.estado) {
+              localStorage.setItem(`estadoGuia_${guia.cedula}`, guia.estado);
+              localStorage.setItem(`estadoGuia_${guia.cedula}_timestamp`, Date.now().toString());
+              
+              // Disparar evento global
+              window.dispatchEvent(new CustomEvent('estadoGuiaCambiado', { 
+                detail: { cedula: guia.cedula, estado: guia.estado } 
+              }));
+              
+              console.log(`Actualizado estado del guía ${guia.cedula} a ${guia.estado}`);
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error al sincronizar estados de guías:', error);
+    }
+  }
+  
+  // Función principal de sincronización
+  async function sincronizarTodo() {
+    await sincronizarEstadoOperador();
+    await sincronizarEstadosGuias();
+  }
+  
   // Sincronizar al inicio
-  sincronizarEstado();
+  sincronizarTodo();
   
   // Configurar sincronización periódica
-  setInterval(sincronizarEstado, SYNC_INTERVAL);
+  setInterval(sincronizarTodo, SYNC_INTERVAL);
   
   // Sincronizar cuando la ventana recupere el foco
-  window.addEventListener('focus', sincronizarEstado);
+  window.addEventListener('focus', sincronizarTodo);
   
   // Sincronizar al cambiar de visibilidad
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
-      sincronizarEstado();
+      sincronizarTodo();
     }
   });
   
@@ -74,7 +121,7 @@
   const observer = new MutationObserver(() => {
     if (lastUrl !== location.href) {
       lastUrl = location.href;
-      sincronizarEstado();
+      sincronizarTodo();
     }
   });
   

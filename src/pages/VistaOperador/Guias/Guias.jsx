@@ -5,6 +5,8 @@ import { Mail, Phone, MapPin, Calendar, CheckCircle, XCircle, Search, Filter, Re
 import { useNavigate } from 'react-router-dom';
 import SelectorEstado from '../CambioEstadoOpe/Selector_Estado_Ope';
 import logoExplococora from '../../../assets/Images/logo.webp';
+import EstadoGuia from '../../../components/Guias/EstadoGuia';
+import guiaEstadoService from '../../../services/guiaEstadoService';
 
 const Guias = () => {
   const navigate = useNavigate();
@@ -17,6 +19,14 @@ const Guias = () => {
   const [filtroEstado, setFiltroEstado] = useState('todos'); // todos, disponible, ocupado, inactivo
   const [ordenarPor, setOrdenarPor] = useState('nombre'); // nombre, fecha, experiencia
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
+  
+  // Contadores de estados
+  const [contadores, setContadores] = useState({
+    total: 0,
+    disponibles: 0,
+    ocupados: 0,
+    inactivos: 0
+  });
 
   // Función para redirigir a la página de nuevo guía
   const handleAddGuia = () => {
@@ -53,6 +63,39 @@ const Guias = () => {
       console.error(`Error al obtener estado del operador ${cedula}:`, error);
       return 'disponible';
     }
+  };
+
+  // Función para actualizar contadores basados en la lista de guías
+  const actualizarContadores = (listaGuias) => {
+    if (!Array.isArray(listaGuias)) return;
+    
+    const conteo = {
+      total: listaGuias.length,
+      disponibles: 0,
+      ocupados: 0,
+      inactivos: 0
+    };
+    
+    listaGuias.forEach(guia => {
+      const estado = guia.estado || guiaEstadoService.getEstado(guia.cedula) || 'disponible';
+      
+      switch (estado) {
+        case 'disponible':
+          conteo.disponibles++;
+          break;
+        case 'ocupado':
+          conteo.ocupados++;
+          break;
+        case 'inactivo':
+          conteo.inactivos++;
+          break;
+        default:
+          // Asumimos que es disponible por defecto
+          conteo.disponibles++;
+      }
+    });
+    
+    setContadores(conteo);
   };
 
   useEffect(() => {
@@ -204,6 +247,9 @@ const Guias = () => {
         const guiasCompletosData = await Promise.all(guiasCompletosPromises);
         setGuiasCompletos(guiasCompletosData);
         
+        // Inicializar contadores
+        actualizarContadores(guiasCompletosData);
+        
         setLoading(false);
       } catch (error) {
         console.error("Error al obtener guías:", error);
@@ -268,6 +314,37 @@ const Guias = () => {
     
     return resultado;
   };
+
+  // Añadir este efecto para escuchar cambios de estado
+  useEffect(() => {
+    // Función que actualiza los contadores cuando cambia el estado de un guía
+    const handleEstadoCambiado = (event) => {
+      if (!event.detail || !event.detail.cedula) return;
+      
+      // Actualizar el guía en la lista
+      setGuiasCompletos(prevGuias => {
+        const nuevosGuias = prevGuias.map(guia => {
+          if (guia.cedula === event.detail.cedula) {
+            return { ...guia, estado: event.detail.nuevoEstado };
+          }
+          return guia;
+        });
+        
+        // Actualizar contadores con la nueva lista
+        actualizarContadores(nuevosGuias);
+        
+        return nuevosGuias;
+      });
+    };
+    
+    // Suscribirse al evento global de cambio de estado de guías
+    window.addEventListener('guiaEstadoCambiado', handleEstadoCambiado);
+    
+    // Limpieza al desmontar
+    return () => {
+      window.removeEventListener('guiaEstadoCambiado', handleEstadoCambiado);
+    };
+  }, []);
 
   return (
     <DashboardLayout>
@@ -412,53 +489,61 @@ const Guias = () => {
           </div>
         )}
 
-        {/* Tarjetas de estadísticas */}
+        {/* Tarjetas de contadores */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className={`p-4 rounded-lg ${darkMode ? 'bg-blue-900' : 'bg-blue-50'} flex items-center justify-between`}>
-            <div>
-              <p className={`text-sm ${darkMode ? 'text-blue-300' : 'text-blue-600'}`}>Total de Guías</p>
-              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-blue-700'}`}>
-                {guiasCompletos.length}
-              </p>
-            </div>
-            <div className={`p-3 rounded-full ${darkMode ? 'bg-blue-800' : 'bg-blue-100'}`}>
-              <UserPlus className={`w-6 h-6 ${darkMode ? 'text-blue-300' : 'text-blue-600'}`} />
+          <div className={`p-4 rounded-lg ${darkMode ? 'bg-blue-900' : 'bg-blue-700'} text-white shadow-md`}>
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold">Total de Guías</h3>
+                <p className="text-3xl font-bold">{contadores.total}</p>
+              </div>
+              <div className="bg-blue-600 p-3 rounded-full">
+                <svg className="h-6 w-6 text-blue-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
             </div>
           </div>
           
-          <div className={`p-4 rounded-lg ${darkMode ? 'bg-green-900' : 'bg-green-50'} flex items-center justify-between`}>
-            <div>
-              <p className={`text-sm ${darkMode ? 'text-green-300' : 'text-green-600'}`}>Guías Disponibles</p>
-              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-green-700'}`}>
-                {guiasCompletos.filter(g => g.estado === 'disponible').length}
-              </p>
-            </div>
-            <div className={`p-3 rounded-full ${darkMode ? 'bg-green-800' : 'bg-green-100'}`}>
-              <CheckCircle className={`w-6 h-6 ${darkMode ? 'text-green-300' : 'text-green-600'}`} />
-            </div>
-          </div>
-
-          <div className={`p-4 rounded-lg ${darkMode ? 'bg-yellow-900' : 'bg-yellow-50'} flex items-center justify-between`}>
-            <div>
-              <p className={`text-sm ${darkMode ? 'text-yellow-300' : 'text-yellow-600'}`}>Guías Ocupados</p>
-              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-yellow-700'}`}>
-                {guiasCompletos.filter(g => g.estado === 'ocupado').length}
-              </p>
-            </div>
-            <div className={`p-3 rounded-full ${darkMode ? 'bg-yellow-800' : 'bg-yellow-100'}`}>
-              <Briefcase className={`w-6 h-6 ${darkMode ? 'text-yellow-300' : 'text-yellow-600'}`} />
+          <div className={`p-4 rounded-lg ${darkMode ? 'bg-green-900' : 'bg-green-600'} text-white shadow-md`}>
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold">Guías Disponibles</h3>
+                <p className="text-3xl font-bold">{contadores.disponibles}</p>
+              </div>
+              <div className="bg-green-500 p-3 rounded-full">
+                <svg className="h-6 w-6 text-green-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
             </div>
           </div>
-
-          <div className={`p-4 rounded-lg ${darkMode ? 'bg-red-900' : 'bg-red-50'} flex items-center justify-between`}>
-            <div>
-              <p className={`text-sm ${darkMode ? 'text-red-300' : 'text-red-600'}`}>Guías Inactivos</p>
-              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-red-700'}`}>
-                {guiasCompletos.filter(g => g.estado === 'inactivo').length}
-              </p>
+          
+          <div className={`p-4 rounded-lg ${darkMode ? 'bg-yellow-800' : 'bg-yellow-600'} text-white shadow-md`}>
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold">Guías Ocupados</h3>
+                <p className="text-3xl font-bold">{contadores.ocupados}</p>
+              </div>
+              <div className="bg-yellow-500 p-3 rounded-full">
+                <svg className="h-6 w-6 text-yellow-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
             </div>
-            <div className={`p-3 rounded-full ${darkMode ? 'bg-red-800' : 'bg-red-100'}`}>
-              <XCircle className={`w-6 h-6 ${darkMode ? 'text-red-300' : 'text-red-600'}`} />
+          </div>
+          
+          <div className={`p-4 rounded-lg ${darkMode ? 'bg-red-900' : 'bg-red-600'} text-white shadow-md`}>
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold">Guías Inactivos</h3>
+                <p className="text-3xl font-bold">{contadores.inactivos}</p>
+              </div>
+              <div className="bg-red-500 p-3 rounded-full">
+                <svg className="h-6 w-6 text-red-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
             </div>
           </div>
         </div>
@@ -523,12 +608,14 @@ const Guias = () => {
                     
                     {/* Estado del guía en la esquina */}
                     <div className="absolute top-2 right-2">
-                      <SelectorEstado
-                        estadoActual={guia.estado || 'disponible'}
-                        onCambioEstado={(nuevoEstado) => handleCambioEstado(guia.cedula, nuevoEstado)}
-                        id={guia.id}
-                        esAdmin={false}
-                        esPropio={true}
+                      <EstadoGuia 
+                        cedula={guia.cedula} 
+                        nombre={construirNombreCompleto(guia)}
+                        tamanio="normal" 
+                        onChangeEstado={(nuevoEstado) => {
+                          console.log(`Guía ${guia.primerNombre}: ${nuevoEstado}`);
+                          // Opcionalmente puedes actualizar el estado local si lo necesitas
+                        }}
                       />
                     </div>
                   </div>
