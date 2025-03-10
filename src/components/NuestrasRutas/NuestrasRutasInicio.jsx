@@ -49,7 +49,7 @@ export const NuestrasRutasInicio = () => {
 
     fetchRutas();
   }, []);
-  
+
   // Función para obtener las fotos de una ruta específica
   const obtenerFotosRuta = async (idRuta) => {
     try {
