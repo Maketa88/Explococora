@@ -47,6 +47,7 @@ const RutasCliente = () => {
         <Route path="/EliminarCuenta" element={<BorrarCuenta />} />
         <Route path="/NuestrosGuias" element={<NuestrosGuias />} />
         <Route path="/NuestrasRutas" element={<NuestrasRutas />} />
+        <Route path="/NuestrasRutas/:idRuta" element={<NuestrasRutas />} />
         <Route path="/QuienesSomos" element={<QuienesSomosCliente />} />
       </Routes>
       {!ocultarFooter && <FooterCliente />}

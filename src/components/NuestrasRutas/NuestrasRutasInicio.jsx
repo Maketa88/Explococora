@@ -150,8 +150,20 @@ export const NuestrasRutasInicio = () => {
   const verDetallesRuta = (idRuta) => {
     // Asegurarse de que el ID sea un número si es posible
     const rutaId = !isNaN(parseInt(idRuta)) ? parseInt(idRuta) : idRuta;
-    console.log(`Navegando a la ruta con ID: ${rutaId}`);
-    navigate(`/NuestrasRutas/${rutaId}`);
+    
+    // Verificar si estamos en la vista de cliente
+    const currentPath = window.location.pathname;
+    const isClientView = currentPath.includes('/VistaCliente');
+    
+    console.log(`Navegando a la ruta con ID: ${rutaId}, desde vista cliente: ${isClientView}`);
+    
+    if (isClientView) {
+      // Si estamos en la vista de cliente, mantener el contexto de cliente
+      navigate(`/VistaCliente/NuestrasRutas/${rutaId}`);
+    } else {
+      // Si no, usar la ruta normal
+      navigate(`/NuestrasRutas/${rutaId}`);
+    }
   };
 
   return (

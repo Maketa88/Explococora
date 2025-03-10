@@ -1,11 +1,13 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 export const NuestrasRutas = () => {
   const { t } = useTranslation();
   const { idRuta } = useParams(); // Obtener el parámetro de la URL
+  const navigate = useNavigate();
+  const location = useLocation();
   const [rutas, setRutas] = useState([]);
   const [rutasFiltradas, setRutasFiltradas] = useState([]);
   const [rutasConFotos, setRutasConFotos] = useState({});
@@ -14,6 +16,9 @@ export const NuestrasRutas = () => {
   const [cargandoFotos, setCargandoFotos] = useState({});
   const [rutaSeleccionada, setRutaSeleccionada] = useState(null);
   
+  // Determinar si estamos en la vista de cliente
+  const isClientView = location.pathname.includes('/VistaCliente');
+  
   // Estados para los filtros
   const [filtros, setFiltros] = useState({
     dificultad: '',
@@ -21,6 +26,15 @@ export const NuestrasRutas = () => {
     estado: '',
     tipo: ''
   });
+
+  // Función para volver a la vista anterior
+  const volverAtras = () => {
+    if (isClientView) {
+      navigate('/VistaCliente/NuestrasRutas');
+    } else {
+      navigate('/NuestrasRutas');
+    }
+  };
 
   useEffect(() => {
     const fetchRutas = async () => {
@@ -175,9 +189,23 @@ export const NuestrasRutas = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-center mb-8 text-green-600">
-        {rutaSeleccionada ? rutaSeleccionada.nombreRuta : t('tituloRutas', 'Nuestras Rutas')}
-      </h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-4xl font-bold text-center text-green-600">
+          {rutaSeleccionada ? rutaSeleccionada.nombreRuta : t('tituloRutas', 'Nuestras Rutas')}
+        </h1>
+        
+        {rutaSeleccionada && (
+          <button
+            onClick={volverAtras}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            {t('volver', 'Volver')}
+          </button>
+        )}
+      </div>
       
       {!rutaSeleccionada && (
         <div className="flex justify-between items-center mb-6">
