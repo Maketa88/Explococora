@@ -301,7 +301,7 @@ export const NuestrasRutas = () => {
         // Vista detallada de una ruta específica
         <div className="fixed inset-0 bg-teal-800 overflow-auto z-50">
           {/* Barra superior con botón de volver y título */}
-          <div className="bg-teal-900 py-2 px-4 flex items-center shadow-md">
+          <div className="bg-teal-900 py-2 px-4 flex flex-wrap items-center shadow-md">
             <button
               onClick={() => navigate('/')}
               className="bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-all duration-300 hover:scale-105 mr-3"
@@ -311,38 +311,38 @@ export const NuestrasRutas = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
             </button>
-            <h1 className="text-xl md:text-2xl font-bold text-white drop-shadow-lg">
+            <h1 className="text-xl md:text-2xl font-bold text-white drop-shadow-lg truncate max-w-[calc(100%-3rem)]">
               {rutaSeleccionada.nombreRuta}
             </h1>
           </div>
           
           {/* Barra de etiquetas */}
-          <div className="bg-teal-800 py-3 px-4 flex flex-wrap items-center gap-3 shadow-md">
-            <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-semibold shadow-md ${
+          <div className="bg-teal-800 py-3 px-4 flex flex-wrap items-center gap-2 sm:gap-3 shadow-md">
+            <span className={`inline-block px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold shadow-md ${
               rutaSeleccionada.dificultad === 'Facil' ? 'bg-green-600 text-white' : 
               rutaSeleccionada.dificultad === 'Moderada' ? 'bg-yellow-600 text-white' : 
               'bg-red-600 text-white'
             }`}>
               <span className="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-4 sm:w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                 </svg>
                 {rutaSeleccionada.dificultad}
               </span>
             </span>
-            <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-semibold shadow-md ${
+            <span className={`inline-block px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold shadow-md ${
               rutaSeleccionada.estado === 'Activa' ? 'bg-green-600 text-white' : 'bg-gray-600 text-white'
             }`}>
               <span className="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-4 sm:w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 {rutaSeleccionada.estado}
               </span>
             </span>
-            <span className="inline-block px-3 py-1.5 bg-teal-600 text-white rounded-full text-sm font-semibold shadow-md">
+            <span className="inline-block px-2 sm:px-3 py-1 sm:py-1.5 bg-teal-600 text-white rounded-full text-xs sm:text-sm font-semibold shadow-md">
               <span className="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-4 sm:w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                 </svg>
                 {rutaSeleccionada.tipo}
@@ -354,12 +354,12 @@ export const NuestrasRutas = () => {
           <div className="min-h-screen">
             {/* Contenido principal - Dividido en dos columnas */}
             <div className="bg-white">
-              <div className="container mx-auto px-4 py-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
                   {/* Columna izquierda - Galería */}
-                  <div className="bg-teal-50 p-6 rounded-xl shadow-lg border border-teal-200 h-full">
-                    <h2 className="text-2xl font-bold text-teal-800 mb-6 flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="bg-teal-50 p-3 sm:p-6 shadow-lg border border-teal-200 h-full">
+                    <h2 className="text-xl sm:text-2xl font-bold text-teal-800 mb-3 sm:mb-6 flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                       {t('galeria', 'Galería de Imágenes')}
@@ -388,71 +388,71 @@ export const NuestrasRutas = () => {
                   </div>
                   
                   {/* Columna derecha - Información */}
-                  <div className="flex flex-col space-y-6 h-full">
+                  <div className="flex flex-col space-y-4 sm:space-y-6 h-full">
                     {/* Descripción con estilo */}
-                    <div className="bg-teal-50 p-6 rounded-xl shadow-lg border border-teal-200 relative flex-grow">
-                      <div className="absolute -top-4 left-6 bg-teal-800 text-white px-6 py-1.5 rounded-full text-sm font-semibold shadow-lg">
+                    <div className="bg-teal-50 p-4 sm:p-6 shadow-lg border border-teal-200 relative flex-grow">
+                      <div className="absolute -top-3 sm:-top-4 left-4 sm:left-6 bg-teal-800 text-white px-3 sm:px-6 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold shadow-lg">
                         <span className="flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-5 sm:w-5 mr-1 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                           {t('descripcion', 'Descripción')}
                         </span>
                       </div>
-                      <p className="text-gray-700 leading-relaxed mt-3">{rutaSeleccionada.descripcion}</p>
+                      <p className="text-gray-700 leading-relaxed mt-2 sm:mt-3 text-sm sm:text-base">{rutaSeleccionada.descripcion}</p>
                     </div>
                     
                     {/* Tarjetas de información */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="bg-teal-50 p-4 rounded-xl shadow-md border border-teal-200">
-                        <div className="flex items-center mb-2">
-                          <div className="bg-teal-800 p-2 rounded-lg mr-3 shadow-md">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                      <div className="bg-teal-50 p-3 sm:p-4 shadow-md border border-teal-200">
+                        <div className="flex items-center mb-1 sm:mb-2">
+                          <div className="bg-teal-800 p-1.5 sm:p-2 rounded-lg mr-2 sm:mr-3 shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                           </div>
                           <div>
-                            <h3 className="text-sm font-semibold text-teal-800">{t('duracion', 'Duración')}</h3>
-                            <p className="text-xl font-bold text-teal-900">{rutaSeleccionada.duracion}</p>
+                            <h3 className="text-xs sm:text-sm font-semibold text-teal-800">{t('duracion', 'Duración')}</h3>
+                            <p className="text-base sm:text-xl font-bold text-teal-900">{rutaSeleccionada.duracion}</p>
                           </div>
                         </div>
                       </div>
                       
-                      <div className="bg-teal-50 p-4 rounded-xl shadow-md border border-teal-200">
-                        <div className="flex items-center mb-2">
-                          <div className="bg-teal-800 p-2 rounded-lg mr-3 shadow-md">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="bg-teal-50 p-3 sm:p-4 shadow-md border border-teal-200">
+                        <div className="flex items-center mb-1 sm:mb-2">
+                          <div className="bg-teal-800 p-1.5 sm:p-2 rounded-lg mr-2 sm:mr-3 shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                             </svg>
                           </div>
                           <div>
-                            <h3 className="text-sm font-semibold text-teal-800">{t('distancia', 'Distancia')}</h3>
-                            <p className="text-xl font-bold text-teal-900">{rutaSeleccionada.distancia} km</p>
+                            <h3 className="text-xs sm:text-sm font-semibold text-teal-800">{t('distancia', 'Distancia')}</h3>
+                            <p className="text-base sm:text-xl font-bold text-teal-900">{rutaSeleccionada.distancia} km</p>
                           </div>
                         </div>
                       </div>
                       
-                      <div className="bg-teal-50 p-4 rounded-xl shadow-md border border-teal-200">
-                        <div className="flex items-center mb-2">
-                          <div className="bg-teal-800 p-2 rounded-lg mr-3 shadow-md">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="bg-teal-50 p-3 sm:p-4 shadow-md border border-teal-200">
+                        <div className="flex items-center mb-1 sm:mb-2">
+                          <div className="bg-teal-800 p-1.5 sm:p-2 rounded-lg mr-2 sm:mr-3 shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
                           </div>
                           <div>
-                            <h3 className="text-sm font-semibold text-teal-800">{t('capacidadMaxima', 'Capacidad Máxima')}</h3>
-                            <p className="text-xl font-bold text-teal-900">{rutaSeleccionada.capacidadMaxima} personas</p>
+                            <h3 className="text-xs sm:text-sm font-semibold text-teal-800">{t('capacidadMaxima', 'Capacidad Máxima')}</h3>
+                            <p className="text-base sm:text-xl font-bold text-teal-900">{rutaSeleccionada.capacidadMaxima} personas</p>
                           </div>
                         </div>
                       </div>
                     </div>
                     
                     {/* Botón para reservar */}
-                    <div className="flex justify-center mt-6">
+                    <div className="flex justify-center mt-2 sm:mt-6">
                       <button 
-                        className="bg-teal-800 hover:bg-teal-700 text-white py-3 px-8 rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl flex items-center"
+                        className="bg-teal-800 hover:bg-teal-700 text-white py-2 sm:py-3 px-6 sm:px-8 rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl flex items-center text-sm sm:text-base"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                         {t('reservarRuta', 'Reservar esta ruta')}
@@ -524,9 +524,9 @@ const GaleriaVertical = ({ fotos, nombreRuta }) => {
   const [fotoSeleccionada, setFotoSeleccionada] = useState(0);
   
   return (
-    <div className="flex flex-col space-y-4 h-full">
+    <div className="flex flex-col space-y-2 sm:space-y-4 h-full">
       {/* Imagen grande arriba */}
-      <div className="h-[400px] rounded-xl overflow-hidden shadow-lg border border-teal-300 relative group">
+      <div className="h-[250px] sm:h-[350px] md:h-[400px] overflow-hidden shadow-lg border border-teal-300 relative group">
         <div className="absolute inset-0 bg-gradient-to-t from-teal-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
         <img 
           src={fotos[fotoSeleccionada]} 
@@ -540,11 +540,11 @@ const GaleriaVertical = ({ fotos, nombreRuta }) => {
       </div>
       
       {/* Miniaturas abajo */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-4 gap-1 sm:gap-2">
         {fotos.map((foto, index) => (
           <div 
             key={index} 
-            className={`h-24 rounded-lg overflow-hidden shadow-md cursor-pointer transition-all duration-300 transform hover:scale-105 border-2 ${fotoSeleccionada === index ? 'border-teal-600 ring-2 ring-teal-400/30' : 'border-transparent opacity-70 hover:opacity-100'}`}
+            className={`h-16 sm:h-20 md:h-24 overflow-hidden shadow-md cursor-pointer transition-all duration-300 transform hover:scale-105 border-2 ${fotoSeleccionada === index ? 'border-teal-600 ring-2 ring-teal-400/30' : 'border-transparent opacity-70 hover:opacity-100'}`}
             onClick={() => setFotoSeleccionada(index)}
           >
             <img 
