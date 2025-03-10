@@ -66,6 +66,7 @@ export const RutasExplococora = () => {
         <Route path="/Historia" element={<HistoriaCultura />} />
         <Route path="/NuestrosGuias" element={<NuestrosGuias />} />
         <Route path="/NuestrasRutas" element={<NuestrasRutas />} />
+        <Route path="/NuestrasRutas/:idRuta" element={<NuestrasRutas />} />
         <Route path="/Ingreso" element={<InicioSesion />} />
         <Route path="/Registro" element={<Registro />} />
         <Route path="/ContactForm" element={<ContactForm />} />
@@ -79,3 +80,4 @@ export const RutasExplococora = () => {
 };
 
 export default RutasExplococora;
+
