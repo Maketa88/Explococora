@@ -2,17 +2,17 @@ import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-const EliminarGuia = ({ guia, onClose, onDeleteSuccess }) => {
+const EliminarOperador = ({ operador, onClose, onDeleteSuccess }) => {
   // Replace the placeholder with a Base64 encoded image
   const placeholderImage = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIj48cmVjdCB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiM2QjcyODAiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSIxMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgYWxpZ25tZW50LWJhc2VsaW5lPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmaWxsPSIjRkZGRkZGIj5ObyBGb3RvPC90ZXh0Pjwvc3ZnPg==";
   const [isDeleting, setIsDeleting] = useState(false);
   const [countdownActive, setCountdownActive] = useState(false);
-  const [countdown, setCountdown] = useState(2);
+  const [countdown, setCountdown] = useState(5);
   const countdownRef = useRef(null);
 
   const startCountdown = () => {
     setCountdownActive(true);
-    setCountdown(2);
+    setCountdown(5);
     
     countdownRef.current = setInterval(() => {
       setCountdown(prev => {
@@ -44,11 +44,11 @@ const EliminarGuia = ({ guia, onClose, onDeleteSuccess }) => {
         return;
       }
 
-      const cedula = guia.cedula;
+      const cedula = operador.cedula;
       
       // Lista de posibles endpoints para probar
       const endpoints = [
-        `http://localhost:10101/guia/eliminar/${cedula}`
+        `http://localhost:10101/operador-turistico/eliminar/${cedula}`
       ];
       
       let success = false;
@@ -56,7 +56,7 @@ const EliminarGuia = ({ guia, onClose, onDeleteSuccess }) => {
       // Probar cada endpoint hasta encontrar uno que funcione
       for (const endpoint of endpoints) {
         try {
-          console.log(`Intentando eliminar guía con endpoint: ${endpoint}`);
+          console.log(`Intentando eliminar operador con endpoint: ${endpoint}`);
           const response = await axios.delete(endpoint, {
             headers: {
               Authorization: `Bearer ${token}`
@@ -65,26 +65,23 @@ const EliminarGuia = ({ guia, onClose, onDeleteSuccess }) => {
           
           if (response.status === 200 || response.status === 204) {
             success = true;
+            console.log("Operador eliminado con éxito");
             break;
           }
-        } catch (err) {
-          console.warn(`Error con endpoint ${endpoint}:`, err.message);
+        } catch (error) {
+          console.error(`Error con endpoint ${endpoint}:`, error);
         }
       }
       
       if (success) {
-        toast.success("Guía eliminado correctamente");
-        // Llamar a la función de éxito pasada como prop
-        if (onDeleteSuccess) {
-          onDeleteSuccess(cedula);
-        }
-        onClose();
+        toast.success("Operador eliminado correctamente");
+        onDeleteSuccess(operador.cedula);
       } else {
-        toast.error("No se pudo eliminar el guía. Intente nuevamente.");
+        toast.error("No se pudo eliminar el operador. Por favor, inténtelo de nuevo.");
       }
     } catch (error) {
-      console.error("Error al eliminar guía:", error);
-      toast.error(error.response?.data?.message || "Error al eliminar el guía");
+      console.error("Error al eliminar operador:", error);
+      toast.error("Error al eliminar operador: " + (error.response?.data?.message || error.message));
     } finally {
       setIsDeleting(false);
     }
@@ -101,8 +98,8 @@ const EliminarGuia = ({ guia, onClose, onDeleteSuccess }) => {
         <div className="flex items-center gap-4 mb-6 p-4 bg-gray-900/50 rounded-lg">
           <div className="relative">
             <img 
-              src={guia.foto || placeholderImage} 
-              alt={`${guia.primerNombre} ${guia.primerApellido}`} 
+              src={operador.foto || placeholderImage} 
+              alt={`${operador.primerNombre} ${operador.primerApellido}`} 
               className="w-20 h-20 rounded-full object-cover border-2 border-red-500 shadow-lg"
             />
             <div className="absolute -top-1 -right-1 bg-red-600 w-6 h-6 rounded-full flex items-center justify-center">
@@ -112,15 +109,15 @@ const EliminarGuia = ({ guia, onClose, onDeleteSuccess }) => {
             </div>
           </div>
           <div>
-            <p className="text-white font-bold text-lg">{guia.primerNombre} {guia.primerApellido}</p>
-            <p className="text-gray-400 text-sm">Cédula: {guia.cedula}</p>
+            <p className="text-white font-bold text-lg">{operador.primerNombre} {operador.primerApellido}</p>
+            <p className="text-gray-400 text-sm">Cédula: {operador.cedula}</p>
             <div className="mt-1 inline-block px-2 py-1 bg-red-900/30 text-red-400 text-xs rounded-full">
               Será eliminado permanentemente
             </div>
           </div>
         </div>
         <p className="text-gray-300 mb-6 bg-yellow-800/20 border-l-4 border-yellow-600 pl-3 py-2 italic">
-          ¿Está seguro que desea eliminar este guía? Esta acción no se puede deshacer.
+          ¿Está seguro que desea eliminar este operador? Esta acción no se puede deshacer.
         </p>
         
         {countdownActive && (
@@ -142,13 +139,6 @@ const EliminarGuia = ({ guia, onClose, onDeleteSuccess }) => {
             disabled={isDeleting || countdownActive}
           >
             Cancelar
-          </button>
-          <button
-            onClick={handleActualDelete}
-            className="bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2.5 px-5 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 transform hover:-translate-y-0.5"
-            disabled={isDeleting || countdownActive}
-          >
-            Eliminar sin conteo
           </button>
           <button
             onClick={handleDelete}
@@ -178,4 +168,4 @@ const EliminarGuia = ({ guia, onClose, onDeleteSuccess }) => {
   );
 };
 
-export default EliminarGuia;
+export default EliminarOperador;

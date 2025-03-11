@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import SelectorEstado from '../pages/VistaGuia/CambioEstado/SelectorEstado';
+import estadoServiceGuia from '../services/estadoServiceGuia';
 
 const DashboardLayoutGuia = ({ children }) => {
   const location = useLocation();
@@ -75,37 +76,59 @@ const DashboardLayoutGuia = ({ children }) => {
     }
   }, [location.pathname]);
 
-  // Añadir este efecto para cambiar estado a disponible al iniciar sesión-jhojan
+  // Modificar este efecto para obtener el estado guardado en lugar de cambiarlo a disponible
   useEffect(() => {
-    const cambiarEstadoAlIniciar = async () => {
+    const inicializarEstado = async () => {
       try {
         const cedula = localStorage.getItem("cedula");
         const token = localStorage.getItem("token");
         
-        // Si hay cédula y token, significa que el usuario ha iniciado sesión-jhojan
+        // Si hay cédula y token, significa que el usuario ha iniciado sesión
         if (cedula && token) {
+          // Intentar obtener el último estado conocido del servicio centralizado
+          const estadoGuardado = estadoServiceGuia.getEstado();
           
-          // Llamar a la API para cambiar estado
-          await axios.patch('http://localhost:10101/usuarios/cambiar-estado', 
-            { nuevoEstado: "disponible", cedula }, 
-            {
-              headers: {
-                'Authorization': `Bearer ${token}`
+          // Establecer el estado visual desde el servicio
+          setEstado(estadoGuardado);
+          
+          // Solo si no hay estado guardado o es la primera sesión, establecer a disponible
+          if (!estadoGuardado || estadoGuardado === 'disponible') {
+            // Llamar a la API para cambiar estado
+            await axios.patch('http://localhost:10101/usuarios/cambiar-estado', 
+              { nuevoEstado: "disponible", cedula }, 
+              {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
               }
+            );
+            
+            // Actualizar estado local y en el servicio centralizado
+            setEstado("disponible");
+            estadoServiceGuia.setEstado("disponible");
+          } else {
+            // Si hay un estado guardado, verificar con el servidor y sincronizar
+            try {
+              await axios.patch('http://localhost:10101/usuarios/cambiar-estado', 
+                { nuevoEstado: estadoGuardado, cedula }, 
+                {
+                  headers: {
+                    'Authorization': `Bearer ${token}`
+                  }
+                }
+              );
+            } catch (syncError) {
+              console.error("Error al sincronizar el estado con el servidor:", syncError);
             }
-          );
-          
-          // Actualizar estado local y localStorage
-          setEstado("disponible");
-          localStorage.setItem("ultimoEstado", "disponible");
+          }
         }
       } catch (error) {
-        console.error("Error al cambiar estado al iniciar sesión:", error);
+        console.error("Error al inicializar estado:", error);
       }
     };
     
-    cambiarEstadoAlIniciar();
-  }, []); // Solo se ejecuta al montar el componente-jhojan
+    inicializarEstado();
+  }, []); // Solo se ejecuta al montar el componente
 
   // Modificar el useEffect para cargar inmediatamente los datos del perfil
   useEffect(() => {
@@ -669,6 +692,28 @@ const DashboardLayoutGuia = ({ children }) => {
     };
   }, []);
 
+  // Actualizar el SelectorEstado para que use estadoServiceGuia
+  const handleCambioEstado = (nuevoEstado) => {
+    setEstado(nuevoEstado);
+    // Actualizar el servicio centralizado
+    estadoServiceGuia.setEstado(nuevoEstado);
+  };
+
+  // Agregar un listener para sincronizar el estado del layout con el componente EstadoGuia
+  useEffect(() => {
+    const handleEstadoChange = (event) => {
+      if (event.detail && event.detail.estado) {
+        setEstado(event.detail.estado);
+      }
+    };
+    
+    window.addEventListener('estadoGuiaCambiado', handleEstadoChange);
+    
+    return () => {
+      window.removeEventListener('estadoGuiaCambiado', handleEstadoChange);
+    };
+  }, []);
+
   return (
     <div className={`flex h-screen overflow-hidden ${darkMode ? 'bg-teal-950' : 'bg-white'}`}>
       {/* Sidebar */}
@@ -804,7 +849,7 @@ const DashboardLayoutGuia = ({ children }) => {
               {localStorage.getItem('cedula') && (
                 <SelectorEstado 
                   estadoActual={estado}
-                  onCambioEstado={setEstado}
+                  onCambioEstado={handleCambioEstado}
                   cedula={localStorage.getItem('cedula')}
                   esAdmin={false}
                   esPropio={true}

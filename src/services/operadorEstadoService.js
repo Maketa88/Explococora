@@ -1,7 +1,7 @@
 /**
- * Servicio para gestionar los estados de los guías
+ * Servicio para gestionar los estados de los operadores
  */
-class GuiaEstadoService {
+class OperadorEstadoService {
   constructor() {
     this.estados = new Map(); // Mapa para almacenar estados por cédula
     this.callbacks = new Map(); // Callbacks de actualización
@@ -16,7 +16,7 @@ class GuiaEstadoService {
     }, 1000);
   }
   
-  // Obtener estado de un guía específico
+  // Obtener estado de un operador específico
   getEstado(cedula) {
     if (!cedula) return 'disponible';
     
@@ -26,7 +26,7 @@ class GuiaEstadoService {
     }
     
     // Intentar obtener desde localStorage
-    const estadoGuardado = localStorage.getItem(`estadoGuia_${cedula}`);
+    const estadoGuardado = localStorage.getItem(`estadoOperador_${cedula}`);
     if (estadoGuardado) {
       this.estados.set(cedula, estadoGuardado);
       return estadoGuardado;
@@ -38,7 +38,7 @@ class GuiaEstadoService {
     return 'disponible'; // Estado por defecto mientras se sincroniza
   }
   
-  // Establecer estado de un guía
+  // Establecer estado de un operador
   setEstado(cedula, estado) {
     if (!cedula) return false;
     
@@ -46,14 +46,14 @@ class GuiaEstadoService {
     this.estados.set(cedula, estado);
     
     // Guardar en localStorage
-    localStorage.setItem(`estadoGuia_${cedula}`, estado);
-    localStorage.setItem(`estadoGuia_${cedula}_timestamp`, Date.now().toString());
+    localStorage.setItem(`estadoOperador_${cedula}`, estado);
+    localStorage.setItem(`estadoOperador_${cedula}_timestamp`, Date.now().toString());
     
     // Notificar a los componentes suscritos
     this.notificarCambio(cedula, estado);
     
     // Notificar mediante evento global
-    window.dispatchEvent(new CustomEvent('estadoGuiaCambiado', { 
+    window.dispatchEvent(new CustomEvent('estadoOperadorCambiado', { 
       detail: { cedula, estado } 
     }));
     
@@ -68,7 +68,7 @@ class GuiaEstadoService {
         // Silenciosamente fallar sin mostrar mensaje en la consola
         return false;
       }
-            
+          
       // Usar la ruta específica para listar estados (requiere rol admin u operador)
       const response = await fetch(`${this.API_URL}/listar-estados`, {
         headers: { 
@@ -77,9 +77,12 @@ class GuiaEstadoService {
         }
       });
       
-      if (!response.ok) {        
+      if (!response.ok) {
+        console.warn(`Error al obtener estados (${response.status}): ${response.statusText}`);
+        
         // Si es un error de autorización, podemos intentar obtener estados individuales
         if (response.status === 401 || response.status === 403) {
+          console.log('Intentando obtener estados de operadores individuales...');
           // Aquí podríamos implementar una estrategia alternativa si es necesario
         }
         
@@ -88,18 +91,18 @@ class GuiaEstadoService {
       
       const data = await response.json();
       
-      // Procesar guías - asumimos que el backend devuelve {data: {guias: [...]}}
-      if (data && data.data && data.data.guias && Array.isArray(data.data.guias)) {
-        console.log(`Recibidos ${data.data.guias.length} estados de guías del servidor`);
+      // Procesar operadores - asumimos que el backend devuelve {data: {operadores: [...]}}
+      if (data && data.data && data.data.operadores && Array.isArray(data.data.operadores)) {
+        console.log(`Recibidos ${data.data.operadores.length} estados de operadores del servidor`);
         
-        data.data.guias.forEach(guia => {
-          if (guia.cedula && guia.estado) {
-            const estadoActual = this.getEstado(guia.cedula);
+        data.data.operadores.forEach(operador => {
+          if (operador.cedula && operador.estado) {
+            const estadoActual = this.getEstado(operador.cedula);
             
             // Solo actualizar si hay cambio
-            if (estadoActual !== guia.estado) {
-              console.log(`Actualizando guía ${guia.cedula}: ${estadoActual} → ${guia.estado}`);
-              this.setEstado(guia.cedula, guia.estado);
+            if (estadoActual !== operador.estado) {
+              console.log(`Actualizando operador ${operador.cedula}: ${estadoActual} → ${operador.estado}`);
+              this.setEstado(operador.cedula, operador.estado);
             }
           }
         });
@@ -109,6 +112,7 @@ class GuiaEstadoService {
         return false;
       }
     } catch (error) {
+      console.error('Error al sincronizar estados de operadores:', error);
       return false;
     }
   }
@@ -116,7 +120,7 @@ class GuiaEstadoService {
   // Inicializar escucha de eventos
   inicializarEventos() {
     // Escuchar eventos globales de cambio de estado
-    window.addEventListener('estadoGuiaCambiado', (event) => {
+    window.addEventListener('estadoOperadorCambiado', (event) => {
       const { cedula, estado } = event.detail;
       
       // Actualizar estado en memoria
@@ -141,7 +145,7 @@ class GuiaEstadoService {
     });
   }
   
-  // Suscribir componente a actualizaciones de un guía específico
+  // Suscribir componente a actualizaciones de un operador específico
   suscribirActualizacion(cedula, callback) {
     if (!this.callbacks.has(cedula)) {
       this.callbacks.set(cedula, new Set());
@@ -170,7 +174,7 @@ class GuiaEstadoService {
     }
   }
   
-  // Obtener el estado desde el servidor para un guía específico
+  // Obtener el estado desde el servidor para un operador específico
   async obtenerEstadoDesdeServidor(cedula) {
     try {
       const token = localStorage.getItem('token');
@@ -185,7 +189,7 @@ class GuiaEstadoService {
       });
       
       if (!response.ok) {
-        console.warn(`Error al obtener estado del guía ${cedula} (${response.status})`);
+        console.warn(`Error al obtener estado del operador ${cedula} (${response.status})`);
         return null;
       }
       
@@ -199,16 +203,15 @@ class GuiaEstadoService {
         
         return nuevoEstado;
       } else {
-        console.warn('Formato inesperado en la respuesta para estado de guía:', data);
         return null;
       }
     } catch (error) {
-      console.error(`Error al obtener estado del guía ${cedula}:`, error);
+      console.error(`Error al obtener estado del operador ${cedula}:`, error);
       return null;
     }
   }
   
-  // Cambiar estado de un guía
+  // Cambiar estado de un operador
   async cambiarEstado(cedula, nuevoEstado) {
     try {
       const token = localStorage.getItem('token');
@@ -230,7 +233,7 @@ class GuiaEstadoService {
       });
       
       if (!response.ok) {
-        console.warn(`Error al cambiar estado del guía ${cedula} en el servidor (${response.status})`);
+        console.warn(`Error al cambiar estado del operador ${cedula} en el servidor (${response.status})`);
         
         // Aquí podrías optar por revertir el cambio local si el servidor lo rechaza
         // this.obtenerEstadoDesdeServidor(cedula).catch(console.error);
@@ -240,12 +243,12 @@ class GuiaEstadoService {
       
       return true;
     } catch (error) {
-      console.error(`Error al cambiar estado del guía ${cedula}:`, error);
+      console.error(`Error al cambiar estado del operador ${cedula}:`, error);
       return false;
     }
   }
 }
 
 // Exportar instancia única
-const guiaEstadoService = new GuiaEstadoService();
-export default guiaEstadoService; 
+const operadorEstadoService = new OperadorEstadoService();
+export default operadorEstadoService;
