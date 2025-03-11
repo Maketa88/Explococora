@@ -9,7 +9,6 @@ export const NuestrasRutasInicio = () => {
   const [rutasFiltradas, setRutasFiltradas] = useState([]);
   const [rutasConFotos, setRutasConFotos] = useState({});
   const [error, setError] = useState(null);
-  const [mostrarFiltros, setMostrarFiltros] = useState(false);
   const [cargandoFotos, setCargandoFotos] = useState({});
   const navigate = useNavigate();
   
@@ -20,6 +19,9 @@ export const NuestrasRutasInicio = () => {
     estado: '',
     tipo: ''
   });
+  
+  // Estado para controlar la visibilidad del panel de filtros
+  const [filtroAbierto, setFiltroAbierto] = useState(false);
 
   useEffect(() => {
     const fetchRutas = async () => {
@@ -172,25 +174,62 @@ export const NuestrasRutasInicio = () => {
         {t('tituloRutas', 'Nuestras Rutas')}
       </h1>
       
-      <div className="flex justify-between items-center mb-6">
-        <button
-          onClick={() => setMostrarFiltros(!mostrarFiltros)}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+      {/* Botón para mostrar/ocultar filtros */}
+      <div className="flex justify-center mb-4">
+        <button 
+          onClick={() => setFiltroAbierto(!filtroAbierto)}
+          className="bg-teal-600 hover:bg-teal-700 text-white font-medium py-2 px-4 rounded-full shadow-md transition-all duration-300 flex items-center"
         >
-          {mostrarFiltros ? t('ocultarFiltros', 'Ocultar Filtros') : t('mostrarFiltros', 'Mostrar Filtros')}
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+          {filtroAbierto ? t('ocultarFiltros', 'Ocultar Filtros') : t('mostrarFiltros', 'Mostrar Filtros')}
         </button>
       </div>
       
-      {mostrarFiltros && (
-        <div className="bg-green-100 p-4 rounded-lg mb-8 shadow-md">
-          <h2 className="text-xl font-semibold text-green-700 mb-3">{t('filtrarRutas', 'Filtrar Rutas')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-green-700 mb-1">{t('dificultad', 'Dificultad')}</label>
+      {/* Filtro centrado y más pequeño */}
+      <div className={`mx-auto max-w-4xl mb-8 flex justify-center transform transition-all duration-500 ease-in-out overflow-hidden ${filtroAbierto ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0'}`}>
+        <div className="bg-gradient-to-br from-white to-teal-50 rounded-lg shadow-md overflow-hidden border border-teal-100 relative w-full"
+          style={{
+            backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z\' fill=\'%230d9488\' fill-opacity=\'0.03\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")',
+          }}
+        >
+          {/* Cinta decorativa en la esquina */}
+          <div className="absolute -right-8 -top-2 w-28 h-8 bg-teal-600 text-white text-xs font-bold px-0 py-1 shadow-md transform rotate-45 z-10 flex items-center justify-center">
+            <span className="text-white text-xs tracking-wider uppercase">{t('filtros', 'FILTROS')}</span>
+          </div>
+          
+          {/* Encabezado de los filtros */}
+          <div className="bg-gradient-to-r from-teal-800 to-teal-700 text-white p-2 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-5 rounded-full -mt-6 -mr-6"></div>
+            <div className="absolute bottom-0 left-0 w-10 h-10 bg-white opacity-5 rounded-full -mb-5 -ml-5"></div>
+            
+            <h2 className="text-base font-bold mb-0 relative z-10 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              {t('filtrarRutas', 'Filtrar Rutas')}
+            </h2>
+          </div>
+          
+          {/* Contenido de los filtros */}
+          <div className="p-3 relative">
+            {/* Elementos decorativos */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-teal-50 rounded-full -mt-16 -mr-16 opacity-30"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-teal-50 rounded-full -mb-12 -ml-12 opacity-30"></div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 relative z-10">
+              <div className="bg-white bg-opacity-70 p-2 rounded-lg shadow-sm border border-teal-100 transform transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+                <label className="block text-teal-800 font-medium mb-1 flex-items-center text-xs">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  {t('dificultad', 'Dificultad')}
+                </label>
               <select
                 value={filtros.dificultad}
                 onChange={(e) => setFiltros({...filtros, dificultad: e.target.value})}
-                className="w-full p-2 rounded border border-green-300 focus:border-green-500 focus:ring focus:ring-green-200"
+                  className="w-full p-1 text-xs rounded-lg border border-teal-200 focus:border-teal-500 focus:ring focus:ring-teal-200 bg-white bg-opacity-90 shadow-inner text-teal-800"
               >
                 <option value="">{t('todas', 'Todas')}</option>
                 <option value="Facil">{t('facil', 'Fácil')}</option>
@@ -199,12 +238,17 @@ export const NuestrasRutasInicio = () => {
               </select>
             </div>
             
-            <div>
-              <label className="block text-green-700 mb-1">{t('duracion', 'Duración')}</label>
+              <div className="bg-white bg-opacity-70 p-2 rounded-lg shadow-sm border border-teal-100 transform transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+                <label className="block text-teal-800 font-medium mb-1 flex-items-center text-xs">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {t('duracion', 'Duración')}
+                </label>
               <select
                 value={filtros.duracion}
                 onChange={(e) => setFiltros({...filtros, duracion: e.target.value})}
-                className="w-full p-2 rounded border border-green-300 focus:border-green-500 focus:ring focus:ring-green-200"
+                  className="w-full p-1 text-xs rounded-lg border border-teal-200 focus:border-teal-500 focus:ring focus:ring-teal-200 bg-white bg-opacity-90 shadow-inner text-teal-800"
               >
                 <option value="">{t('todas', 'Todas')}</option>
                 <option value="corta">{t('corta', 'Corta')}</option>
@@ -213,12 +257,17 @@ export const NuestrasRutasInicio = () => {
               </select>
             </div>
             
-            <div>
-              <label className="block text-green-700 mb-1">{t('estado', 'Estado')}</label>
+              <div className="bg-white bg-opacity-70 p-2 rounded-lg shadow-sm border border-teal-100 transform transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+                <label className="block text-teal-800 font-medium mb-1 flex-items-center text-xs">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {t('estado', 'Estado')}
+                </label>
               <select
                 value={filtros.estado}
                 onChange={(e) => setFiltros({...filtros, estado: e.target.value})}
-                className="w-full p-2 rounded border border-green-300 focus:border-green-500 focus:ring focus:ring-green-200"
+                  className="w-full p-1 text-xs rounded-lg border border-teal-200 focus:border-teal-500 focus:ring focus:ring-teal-200 bg-white bg-opacity-90 shadow-inner text-teal-800"
               >
                 <option value="">{t('todos', 'Todos')}</option>
                 <option value="Activa">{t('activa', 'Activa')}</option>
@@ -226,12 +275,17 @@ export const NuestrasRutasInicio = () => {
               </select>
             </div>
             
-            <div>
-              <label className="block text-green-700 mb-1">{t('tipo', 'Tipo')}</label>
+              <div className="bg-white bg-opacity-70 p-2 rounded-lg shadow-sm border border-teal-100 transform transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+                <label className="block text-teal-800 font-medium mb-1 flex-items-center text-xs">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  </svg>
+                  {t('tipo', 'Tipo')}
+                </label>
               <select
                 value={filtros.tipo}
                 onChange={(e) => setFiltros({...filtros, tipo: e.target.value})}
-                className="w-full p-2 rounded border border-green-300 focus:border-green-500 focus:ring focus:ring-green-200"
+                  className="w-full p-1 text-xs rounded-lg border border-teal-200 focus:border-teal-500 focus:ring focus:ring-teal-200 bg-white bg-opacity-90 shadow-inner text-teal-800"
               >
                 <option value="">{t('todos', 'Todos')}</option>
                 <option value="Cabalgata">{t('cabalgata', 'Cabalgata')}</option>
@@ -241,24 +295,40 @@ export const NuestrasRutasInicio = () => {
             </div>
           </div>
           
-          <div className="flex justify-end mt-4 gap-2">
+            <div className="flex justify-center mt-3 gap-3 relative z-10">
             <button
               onClick={limpiarFiltros}
-              className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
+                className="bg-white text-teal-700 px-3 py-1 rounded-lg hover:bg-gray-100 transition-all duration-300 shadow-sm hover:shadow border border-teal-200 flex items-center text-xs"
             >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               {t('limpiar', 'Limpiar')}
             </button>
             <button
               onClick={aplicarFiltros}
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                className="bg-gradient-to-r from-teal-700 to-teal-600 hover:from-teal-800 hover:to-teal-700 text-white px-4 py-1 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center text-xs"
             >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
               {t('aplicarFiltros', 'Aplicar Filtros')}
             </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {error && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-lg shadow-sm max-w-4xl mx-auto">
+          <div className="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-red-700">{error}</p>
           </div>
         </div>
       )}
-      
-      {error && <p className="text-red-500">{error}</p>}
       
       {Array.isArray(rutasFiltradas) && rutasFiltradas.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 justify-items-center mx-auto max-w-6xl">
