@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 export const NuestrasRutasInicio = () => {
   const { t } = useTranslation();
   const [rutas, setRutas] = useState([]);
-  const [rutasFiltradas, setRutasFiltradas] = useState([]);
   const [rutasConFotos, setRutasConFotos] = useState({});
   const [error, setError] = useState(null);
   const [cargandoFotos, setCargandoFotos] = useState({});
@@ -25,7 +24,6 @@ export const NuestrasRutasInicio = () => {
 
         if (Array.isArray(response.data)) {
           setRutas(response.data);
-          setRutasFiltradas(response.data);
           
           // Obtener fotos para cada ruta
           response.data.forEach(ruta => {
@@ -126,7 +124,7 @@ export const NuestrasRutasInicio = () => {
 
   // Función para obtener las tres primeras rutas
   const obtenerTresPrimerasRutas = () => {
-    return rutasFiltradas.slice(0, 3);
+    return rutas.slice(0, 3);
   };
 
   return (
@@ -190,7 +188,7 @@ export const NuestrasRutasInicio = () => {
         </div>
       )}
       
-      {Array.isArray(rutasFiltradas) && rutasFiltradas.length > 0 ? (
+      {Array.isArray(rutas) && rutas.length > 0 ? (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 justify-items-center mx-auto max-w-6xl">
             {obtenerTresPrimerasRutas().map((ruta) => (
@@ -336,7 +334,7 @@ export const NuestrasRutasInicio = () => {
           </div>
           
           {/* Botón "Ver más" */}
-          {rutasFiltradas.length > 3 && (
+          {rutas.length > 3 && (
             <div className="flex justify-center mt-8 mb-4">
               <button 
                 onClick={navegarAPaginaCompleta}
