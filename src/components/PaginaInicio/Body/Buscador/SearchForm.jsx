@@ -1833,7 +1833,7 @@ export const SearchForm = ({ onSearch }) => {
                 {generatingRoute ? (
                   <>
                     <div className="w-full max-w-2xl mb-8">
-                      <div className="relative aspect-video rounded-xl overflow-hidden shadow-lg">
+                      <div className="relative aspect-video rounded-xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-500">
                         <video
                           src="/videos/ia_generando.mp4"
                           autoPlay
@@ -1841,43 +1841,73 @@ export const SearchForm = ({ onSearch }) => {
                           muted
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0  flex flex-col justify-end p-6">
-                          <h3 className="text-white text-2xl font-bold">Inteligencia Artificial</h3>
-                          <p className="text-white/90">Creando tu ruta personalizada...</p>
-                        </div>
+                        {/* Overlays de fondo oscuro eliminados */}
                         
-                        {/* Efectos de IA trabajando */}
+                        {/* Efectos de IA trabajando - versión mejorada */}
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="relative w-32 h-32">
-                            <div className="absolute inset-0 border-4 border-teal-500 rounded-full opacity-30 animate-ping"></div>
-                            <div className="absolute inset-2 border-4 border-teal-400 rounded-full opacity-50 animate-ping" style={{ animationDelay: '0.3s' }}></div>
-                            <div className="absolute inset-4 border-4 border-teal-300 rounded-full opacity-70 animate-ping" style={{ animationDelay: '0.6s' }}></div>
-                            <div className="absolute inset-6 border-4 border-teal-200 rounded-full opacity-90 animate-ping" style={{ animationDelay: '0.9s' }}></div>
+                          <div className="relative w-36 h-36">
+                            {/* Círculos concéntricos con estilos mejorados */}
+                            <div className="absolute inset-0 border-4 border-teal-500/60 rounded-full opacity-40 animate-[ping_2.5s_ease-in-out_infinite]"></div>
+                            <div className="absolute inset-2 border-4 border-teal-400/70 rounded-full opacity-60 animate-[ping_2.8s_ease-in-out_infinite]" style={{ animationDelay: '0.3s' }}></div>
+                            <div className="absolute inset-4 border-4 border-teal-300/80 rounded-full opacity-80 animate-[ping_3.2s_ease-in-out_infinite]" style={{ animationDelay: '0.6s' }}></div>
+                            <div className="absolute inset-6 border-4 border-white/90 rounded-full opacity-90 animate-[ping_3.5s_ease-in-out_infinite]" style={{ animationDelay: '0.9s' }}></div>
+                            
+                            {/* Elemento central */}
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="w-14 h-14 bg-teal-500/30 backdrop-blur-sm rounded-full flex items-center justify-center">
+                                <div className="w-10 h-10 bg-white/90 rounded-full animate-pulse"></div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                     
                     <div className="flex flex-col items-center">
-                      <div className="w-16 h-16 border-t-4 border-teal-600 border-solid rounded-full animate-spin mb-4"></div>
-                      <h2 className="text-2xl font-bold text-gray-800 mb-2">Generando tu ruta perfecta</h2>
-                      <p className="text-gray-600 text-center max-w-md">
+                      {/* Indicador de carga mejorado */}
+                      <div className="relative w-20 h-20 mb-5">
+                        <div className="absolute inset-0 border-4 border-teal-200 rounded-full"></div>
+                        <div className="absolute inset-0 border-4 border-t-teal-800 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-3 h-3 bg-teal-800 rounded-full"></div>
+                        </div>
+                      </div>
+                      
+                      <h2 className="text-2xl font-bold text-teal-800 mb-3 tracking-wide">Generando tu ruta perfecta</h2>
+                      <p className="text-gray-700 text-center max-w-md mb-6 font-medium">
                         Nuestra IA está analizando tus preferencias y creando una ruta personalizada con los mejores puntos de interés.
                       </p>
                       
-                      {/* Mensajes de procesamiento */}
-                      <div className="mt-6 bg-gray-100 rounded-lg p-4 w-full max-w-md">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                          <p className="text-sm text-gray-700">Analizando preferencias de búsqueda...</p>
+                      {/* Mensajes de procesamiento con estilos mejorados */}
+                      <div className="mt-2 bg-gradient-to-br from-teal-50 to-white rounded-xl p-6 w-full max-w-md shadow-lg border border-teal-100">
+                        <div className="flex items-center space-x-3 mb-4">
+                          <div className="w-4 h-4 bg-teal-800 rounded-full animate-pulse shadow-md flex-shrink-0"></div>
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-teal-800">Analizando preferencias de búsqueda...</p>
+                            <div className="h-1 w-full bg-teal-100 rounded-full mt-1.5 overflow-hidden">
+                              <div className="h-full bg-teal-800 rounded-full animate-pulse" style={{ width: '100%' }}></div>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-2 mb-2">
-                          <div className="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></div>
-                          <p className="text-sm text-gray-700">Identificando puntos de interés...</p>
+                        
+                        <div className="flex items-center space-x-3 mb-4">
+                          <div className="w-4 h-4 bg-teal-700 rounded-full animate-pulse shadow-md flex-shrink-0"></div>
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-teal-700">Identificando puntos de interés...</p>
+                            <div className="h-1 w-full bg-teal-100 rounded-full mt-1.5 overflow-hidden">
+                              <div className="h-full bg-teal-700 rounded-full animate-pulse" style={{ width: '75%' }}></div>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></div>
-                          <p className="text-sm text-gray-700">Optimizando ruta para mejor experiencia...</p>
+                        
+                        <div className="flex items-center space-x-3">
+                          <div className="w-4 h-4 bg-teal-600 rounded-full animate-pulse shadow-md flex-shrink-0"></div>
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-teal-600">Optimizando ruta para mejor experiencia...</p>
+                            <div className="h-1 w-full bg-teal-100 rounded-full mt-1.5 overflow-hidden">
+                              <div className="h-full bg-teal-600 rounded-full animate-pulse" style={{ width: '45%' }}></div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1885,26 +1915,41 @@ export const SearchForm = ({ onSearch }) => {
                 ) : generatedRoute && (
                   <>
                     <div className="w-full max-w-2xl mb-8">
-                      <div className="relative aspect-video rounded-xl overflow-hidden shadow-lg">
+                      <div className="relative aspect-video rounded-xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-300">
                         <img 
                           src="https://cdn.pixabay.com/photo/2023/05/17/15/57/ai-generated-8000455_1280.jpg" 
                           alt="Ruta generada por IA" 
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70 flex flex-col justify-end p-6">
-                          <h3 className="text-white text-2xl font-bold">{generatedRoute.nombreRuta}</h3>
-                          <div className="flex items-center mt-2">
-                            <span className="bg-teal-500 text-white px-3 py-1 rounded-full text-sm mr-3">
+                        {/* Decoración de esquinas */}
+                        <div className="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-white/40 rounded-tl-lg"></div>
+                        <div className="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-white/40 rounded-tr-lg"></div>
+                        <div className="absolute bottom-0 left-0 w-16 h-16 border-b-4 border-l-4 border-white/40 rounded-bl-lg"></div>
+                        <div className="absolute bottom-0 right-0 w-16 h-16 border-b-4 border-r-4 border-white/40 rounded-br-lg"></div>
+                        
+                        {/* Gradiente de superposición mejorado */}
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/80 flex flex-col justify-end p-6">
+                          <div className="flex items-center mb-2">
+                            <div className="w-3 h-3 bg-teal-500 rounded-full mr-2 animate-pulse"></div>
+                            <h3 className="text-white text-2xl font-bold tracking-wide drop-shadow-md">{generatedRoute.nombreRuta}</h3>
+                          </div>
+                          
+                          <div className="flex items-center space-x-3 mb-2">
+                            <span className="bg-teal-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-sm backdrop-blur-sm">
                               {generatedRoute.dificultad}
                             </span>
-                            <span className="flex items-center text-white/90">
+                            <span className="flex items-center text-white/90 bg-black/30 px-3 py-1 rounded-full text-sm backdrop-blur-sm">
                               <Clock className="w-4 h-4 mr-1" /> {generatedRoute.duracion}
                             </span>
                           </div>
+                          
+                          <p className="text-white/90 backdrop-blur-sm bg-black/20 p-2 rounded-lg inline-block">
+                            <span className="font-medium">Ruta generada por IA</span> • Hecha para ti
+                          </p>
                         </div>
                         
                         {/* Efecto de completado */}
-                        <div className="absolute top-4 right-4 bg-green-500 text-white rounded-full p-2 shadow-lg">
+                        <div className="absolute top-4 right-4 bg-gradient-to-br from-green-400 to-green-600 text-white rounded-full p-2 shadow-lg transform rotate-12 hover:rotate-0 transition-transform duration-300">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
@@ -2079,17 +2124,36 @@ export const SearchForm = ({ onSearch }) => {
       
       {/* Mensajes de error */}
       {error && (
-        <div className="mt-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded w-full max-w-4xl mx-auto">
-          <p>{error}</p>
+        <div className="mt-6 bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-lg shadow-md w-full max-w-4xl mx-auto flex items-start">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 mt-0.5 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <p className="font-medium">Ocurrió un error durante la búsqueda</p>
+            <p className="text-sm mt-1">{error}</p>
+          </div>
         </div>
       )}
       
       {/* Indicador de carga */}
       {isSearching && !showAIRouteGenerator && (
         <div className="mt-8 w-full max-w-4xl mx-auto">
-          <div className="flex justify-center items-center gap-3">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-600"></div>
-            <span className="text-teal-600 font-medium">Buscando rutas...</span>
+          <div className="flex flex-col justify-center items-center gap-4 bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg">
+            <div className="relative">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-3 border-b-3 border-teal-600"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="h-2 w-2 bg-teal-600 rounded-full"></div>
+              </div>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-teal-700 font-semibold text-lg">Buscando rutas...</span>
+              <span className="text-gray-500 text-sm mt-1">Estamos procesando tu solicitud</span>
+            </div>
+            
+            {/* Barra de progreso animada */}
+            <div className="w-64 h-1.5 bg-gray-200 rounded-full overflow-hidden mt-2">
+              <div className="h-full bg-teal-500 rounded-full animate-pulse" style={{ width: '65%' }}></div>
+            </div>
           </div>
         </div>
       )}
