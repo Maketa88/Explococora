@@ -2,7 +2,6 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from '../../pages/VistaAdmin/Dashboard/Dashboard';
 import VisualizarRutas from '../../pages/VistaAdmin/VisualizarRutas/VisualizarRutas';
-import RutasAsignadas from '../../pages/VistaAdmin/RutasAsignadas/RutasAsignadas';
 import VerifiedCustomers from '../../pages/VistaAdmin/Customers/VerifiedCustomers';
 import Settings from '../../pages/VistaAdmin/Settings/Settings';
 import CambioEstado from '../../pages/VistaAdmin/CambioEstado/CambioEstado';
@@ -18,7 +17,6 @@ const RutasAdmin = () => {
     <Routes>
       <Route path="/" element={<Navigate to="/VistaAdmin/Dashboard" replace />} />
       <Route path="/Dashboard" element={<Dashboard />} />
-      <Route path="/RutasAsignadas" element={<RutasAsignadas />} />
       <Route path="/VerifiedCustomers" element={<VerifiedCustomers />} />
       <Route path="/Settings" element={<Settings />} />
       <Route path="/Gestionrutas" element={<VisualizarRutas />} />

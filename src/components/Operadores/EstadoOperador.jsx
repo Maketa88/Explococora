@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Check, BellRing, Ban, ChevronDown, X } from 'lucide-react';
-import guiaEstadoService from '../../services/guiaEstadoService';
+import operadorEstadoService from '../../services/operadorEstadoService';
 
 // Configuración de colores y estilos para cada estado - estilo call center como el original
 const ESTADOS_CONFIG = {
@@ -55,8 +55,8 @@ const AlertaEstado = ({ nombre, estado, onClose }) => {
   );
 };
 
-const EstadoGuia = ({ cedula, nombre, tamanio = 'normal', onChangeEstado = null }) => {
-  const [estado, setEstado] = useState(guiaEstadoService.getEstado(cedula) || 'disponible');
+const EstadoOperador = ({ cedula, nombre, tamanio = 'normal', onChangeEstado = null }) => {
+  const [estado, setEstado] = useState(operadorEstadoService.getEstado(cedula) || 'disponible');
   const [cargando, setCargando] = useState(false);
   const [mostrarSelector, setMostrarSelector] = useState(false);
   const [mostrarAlerta, setMostrarAlerta] = useState(false);
@@ -67,20 +67,20 @@ const EstadoGuia = ({ cedula, nombre, tamanio = 'normal', onChangeEstado = null 
       setCargando(true);
       
       // Intentar obtener estado desde servicio (memoria o localStorage)
-      const estadoGuardado = guiaEstadoService.getEstado(cedula);
+      const estadoGuardado = operadorEstadoService.getEstado(cedula);
       if (estadoGuardado) {
         setEstado(estadoGuardado);
       }
       
       // Suscribirse a cambios
-      const cancelarSuscripcion = guiaEstadoService.suscribirActualizacion(
+      const cancelarSuscripcion = operadorEstadoService.suscribirActualizacion(
         cedula,
         (nuevoEstado) => setEstado(nuevoEstado)
       );
       
       // Intentar obtener estado fresco desde servidor (en segundo plano)
       try {
-        const estadoServidor = await guiaEstadoService.obtenerEstadoDesdeServidor(cedula);
+        const estadoServidor = await operadorEstadoService.obtenerEstadoDesdeServidor(cedula);
         if (estadoServidor && estadoServidor !== estado) {
           setEstado(estadoServidor);
         }
@@ -103,10 +103,10 @@ const EstadoGuia = ({ cedula, nombre, tamanio = 'normal', onChangeEstado = null 
       }
     };
     
-    window.addEventListener('estadoGuiaCambiado', handleEstadoCambiado);
+    window.addEventListener('estadoOperadorCambiado', handleEstadoCambiado);
     
     return () => {
-      window.removeEventListener('estadoGuiaCambiado', handleEstadoCambiado);
+      window.removeEventListener('estadoOperadorCambiado', handleEstadoCambiado);
     };
   }, [cedula, estado]);
   
@@ -119,7 +119,7 @@ const EstadoGuia = ({ cedula, nombre, tamanio = 'normal', onChangeEstado = null 
     
     try {
       // Actualizar estado a través del servicio (local + servidor)
-      await guiaEstadoService.cambiarEstado(cedula, nuevoEstado);
+      await operadorEstadoService.cambiarEstado(cedula, nuevoEstado);
       
       // Mostrar alerta de cambio de estado
       setMostrarAlerta(true);
@@ -133,7 +133,7 @@ const EstadoGuia = ({ cedula, nombre, tamanio = 'normal', onChangeEstado = null 
       }
       
       // Emitir evento global para la alerta
-      window.dispatchEvent(new CustomEvent('guiaEstadoCambiado', {
+      window.dispatchEvent(new CustomEvent('operadorEstadoCambiado', {
         detail: {
           cedula,
           nombre,
@@ -238,4 +238,4 @@ const EstadoGuia = ({ cedula, nombre, tamanio = 'normal', onChangeEstado = null 
   );
 };
 
-export default EstadoGuia; 
+export default EstadoOperador;

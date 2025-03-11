@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import DashboardLayoutAdmin from '../../../layouts/DashboardLayoutAdmin';
-import { Mail, Phone, MapPin, Calendar, CheckCircle, XCircle, Search, Filter, RefreshCw, UserPlus, Award, Star, Briefcase, Globe, Languages, CreditCard, Trash2, Edit, Plus } from 'lucide-react';
+import { Mail, Phone, MapPin, Calendar, CheckCircle, XCircle, Search, Filter, RefreshCw, UserPlus, Award, Star, Briefcase, Globe, Languages, CreditCard, Trash2, Edit, Plus, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import logoExplococora from '../../../assets/Images/logo.webp';
 import { toast } from 'react-toastify';
 import EliminarGuia from './EliminarGuia';
 import CrearGuia from './CrearGuia';
 import EditarGuia from './EditarGuia';
+import EstadoGuia from '../../../components/Guias/EstadoGuia';
 
 const Guias = () => {
   const navigate = useNavigate();
@@ -26,6 +27,10 @@ const Guias = () => {
   const [showEditarGuiaModal, setShowEditarGuiaModal] = useState(false);
   const [guiaSeleccionado, setGuiaSeleccionado] = useState(null);
   const [guiaParaEditar, setGuiaParaEditar] = useState(null);
+  const [showDetallesModal, setShowDetallesModal] = useState(false);
+  const [guiaDetalle, setGuiaDetalle] = useState(null);
+  const [showImagenModal, setShowImagenModal] = useState(false);
+  const [imagenAmpliada, setImagenAmpliada] = useState(null);
 
   // Función para abrir modal de crear guía
   const handleOpenCrearGuiaModal = () => {
@@ -94,7 +99,7 @@ const Guias = () => {
   };
 
   // Nueva función para obtener el estado del operador
-  const obtenerEstadoOperador = async (cedula) => {
+  const obtenerEstadoGuia = async (cedula) => {
     if (!cedula) return 'disponible';
     
     try {
@@ -108,7 +113,7 @@ const Guias = () => {
       
       return response.data?.data?.estado || 'disponible';
     } catch (error) {
-      console.error(`Error al obtener estado del operador ${cedula}:`, error);
+      console.error(`Error al obtener estado del Guia ${cedula}:`, error);
       return 'disponible';
     }
   };
@@ -122,22 +127,117 @@ const Guias = () => {
         return;
       }
 
-      // Aquí irá la llamada a la API para actualizar el estado
-      // Por ahora, actualizamos solo en el frontend
-      const guiasActualizados = guiasCompletos.map(g => {
-        if (g.cedula === guia.cedula) {
-          return { ...g, estado: nuevoEstado };
+      // Llamada a la API para actualizar el estado
+      const response = await axios.patch(
+        `http://localhost:10101/usuarios/cambiar-estado/cedula/${guia.cedula}`,
+        { 
+          estado: nuevoEstado 
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         }
-        return g;
-      });
-      
-      setGuiasCompletos(guiasActualizados);
-      toast.success(`Estado del guía actualizado a: ${nuevoEstado}`);
+      );
+
+      if (response.data && response.data.success) {
+        // Actualizar el estado en el frontend
+        const guiasActualizados = guiasCompletos.map(g => {
+          if (g.cedula === guia.cedula) {
+            return { ...g, estado: nuevoEstado };
+          }
+          return g;
+        });
+        
+        setGuiasCompletos(guiasActualizados);
+        toast.success(`Estado del guía actualizado a: ${nuevoEstado}`);
+      } else {
+        throw new Error(response.data?.message || "Error al actualizar estado");
+      }
     } catch (error) {
       console.error("Error al actualizar estado:", error);
-      toast.error("No se pudo actualizar el estado del guía");
+      toast.error(error.response?.data?.message || "No se pudo actualizar el estado del guía");
     }
   };
+
+  // Función para actualizar estados en tiempo real
+  const actualizarEstados = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        toast.error("No hay token de autenticación. Por favor, inicie sesión nuevamente.");
+        return;
+      }
+      
+      const response = await axios.get('http://localhost:10101/usuarios/listar-estados', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.data && response.data.success) {
+        // Actualizar solo los estados manteniendo el resto de la información
+        const nuevosEstados = response.data.data || [];
+        
+        setGuiasCompletos(prevGuias => {
+          return prevGuias.map(guia => {
+            const estadoActualizado = nuevosEstados.find(
+              e => e.cedula === guia.cedula || e.id === guia.id
+            );
+            
+            if (estadoActualizado) {
+              return {
+                ...guia,
+                estado: estadoActualizado.estado
+              };
+            }
+            return guia;
+          });
+        });
+        
+        toast.success("Estados actualizados correctamente");
+      } else {
+        throw new Error(response.data?.message || "Error al actualizar estados");
+      }
+    } catch (error) {
+      console.error("Error al actualizar estados:", error);
+      toast.error(error.response?.data?.message || "No se pudieron actualizar los estados");
+    }
+  };
+
+  // Añadir este efecto para escuchar cambios de estado
+  useEffect(() => {
+    // Función que actualiza los guías cuando cambia el estado
+    const handleEstadoCambiado = (event) => {
+      if (!event.detail || !event.detail.cedula) return;
+      
+      // Actualizar el guía en la lista
+      setGuiasCompletos(prevGuias => {
+        const nuevosGuias = prevGuias.map(guia => {
+          if (guia.cedula === event.detail.cedula) {
+            return { ...guia, estado: event.detail.nuevoEstado };
+          }
+          return guia;
+        });
+        
+        return nuevosGuias;
+      });
+    };
+    
+    // Suscribirse al evento global de cambio de estado
+    window.addEventListener('guiaEstadoCambiado', handleEstadoCambiado);
+    
+    // Configurar intervalo para actualizar estados cada 30 segundos
+    const intervalId = setInterval(actualizarEstados, 30000);
+    
+    // Limpieza al desmontar
+    return () => {
+      window.removeEventListener('guiaEstadoCambiado', handleEstadoCambiado);
+      clearInterval(intervalId);
+    };
+  }, []);
 
   useEffect(() => {
     const fetchGuias = async () => {
@@ -159,7 +259,6 @@ const Guias = () => {
         const endpoints = [
           'http://localhost:10101/guia/todos',
           'http://localhost:10101/guias/todos',
-          'http://localhost:10101/operador-turistico/guias'
         ];
         
         let guiasData = [];
@@ -248,7 +347,7 @@ const Guias = () => {
               });
               
               // Obtener el estado actual del operador
-              const estado = await obtenerEstadoOperador(guia.cedula);
+              const estado = await obtenerEstadoGuia(guia.cedula);
               
               let datosPerfil = null;
               
@@ -287,6 +386,9 @@ const Guias = () => {
         
         const guiasCompletosData = await Promise.all(guiasCompletosPromises);
         setGuiasCompletos(guiasCompletosData);
+        
+        // Actualizar estados inmediatamente después de cargar los guías
+        await actualizarEstados();
         
         setLoading(false);
       } catch (error) {
@@ -371,6 +473,186 @@ const Guias = () => {
         >
           <Edit className="w-4 h-4" />
         </button>
+      </div>
+    );
+  };
+
+  // Función para abrir modal de detalles
+  const handleOpenDetallesModal = (guia) => {
+    setGuiaDetalle(guia);
+    setShowDetallesModal(true);
+  };
+
+  // Función para mostrar imagen ampliada
+  const handleMostrarImagenAmpliada = (imagenUrl) => {
+    setImagenAmpliada(imagenUrl);
+    setShowImagenModal(true);
+  };
+
+  // Componente para imagen ampliada
+  const ImagenAmpliadaModal = ({ imagenUrl, onClose }) => {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4">
+        <div className="relative max-w-4xl w-full max-h-[90vh]">
+          <button 
+            onClick={onClose}
+            className="absolute top-4 right-4 text-white hover:text-gray-300"
+          >
+            <X className="h-8 w-8" />
+          </button>
+          <img 
+            src={imagenUrl} 
+            alt="Imagen ampliada" 
+            className="max-w-full max-h-[85vh] mx-auto object-contain"
+          />
+        </div>
+      </div>
+    );
+  };
+
+  // Componente para ver detalles completos del guía
+  const DetallesGuiaModal = ({ guia, onClose }) => {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+        <div className="relative bg-gray-900 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto text-white">
+          <div className="flex justify-between items-center p-4 border-b border-gray-700">
+            <h2 className="text-xl font-bold">Perfil completo del guía</h2>
+            <button 
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-200"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
+          
+          <div className="p-6">
+            <div className="flex flex-col md:flex-row gap-6">
+              <div className="flex-shrink-0 flex flex-col items-center">
+                <div 
+                  className="w-40 h-40 rounded-full overflow-hidden border-4 border-blue-500 mx-auto cursor-pointer"
+                  onClick={() => handleMostrarImagenAmpliada(
+                    guia.foto
+                      ? (guia.foto.startsWith('http') ? guia.foto : `http://localhost:10101/uploads/images/${guia.foto}`)
+                      : "https://i.pinimg.com/736x/8d/37/31/8d3731a57b8209114c08488eeb0b6a64.jpg"
+                  )}
+                >
+                  <img
+                    src={
+                      guia.foto
+                        ? (guia.foto.startsWith('http') ? guia.foto : `http://localhost:10101/uploads/images/${guia.foto}`)
+                        : "https://i.pinimg.com/736x/8d/37/31/8d3731a57b8209114c08488eeb0b6a64.jpg"
+                    }
+                    alt={`Foto de ${guia.primerNombre || ''} ${guia.primerApellido || ''}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "https://i.pinimg.com/736x/8d/37/31/8d3731a57b8209114c08488eeb0b6a64.jpg";
+                    }}
+                  />
+                </div>
+                <div className="mt-3 text-center">
+                  <div 
+                    className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
+                      guia.estado === 'disponible' ? 'bg-green-700 text-green-100' : 
+                      guia.estado === 'ocupado' ? 'bg-yellow-700 text-yellow-100' : 
+                      'bg-red-700 text-red-100'
+                    }`}
+                  >
+                    {guia.estado === 'disponible' ? 'Disponible' : 
+                     guia.estado === 'ocupado' ? 'Ocupado' : 
+                     'Inactivo'}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex-grow">
+                <h1 className="text-2xl font-bold mb-1">{construirNombreCompleto(guia)}</h1>
+                <p className="text-lg text-gray-300 mb-4">
+                  {guia.especialidad || 'Guía Turístico General'}
+                  {guia.calificacion && (
+                    <span className="ml-2 inline-flex items-center text-yellow-500">
+                      <Star className="w-4 h-4 fill-current" />
+                      <span className="text-sm ml-1">{guia.calificacion}</span>
+                    </span>
+                  )}
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="flex items-center">
+                    <CreditCard className="w-5 h-5 mr-3 text-blue-400" />
+                    <div>
+                      <span className="text-gray-400">Cédula:</span>
+                      <span className="ml-2">{guia.cedula || 'No disponible'}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <Mail className="w-5 h-5 mr-3 text-blue-400" />
+                    <div>
+                      <span className="text-gray-400">Email:</span>
+                      <span className="ml-2">{guia.email || 'No disponible'}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <Phone className="w-5 h-5 mr-3 text-green-400" />
+                    <div>
+                      <span className="text-gray-400">Teléfono:</span>
+                      <span className="ml-2">{guia.telefono || guia.numeroCelular || guia.numero_celular || 'No disponible'}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <MapPin className="w-5 h-5 mr-3 text-red-400" />
+                    <div>
+                      <span className="text-gray-400">Ubicación:</span>
+                      <span className="ml-2">{guia.ubicacion || 'No especificada'}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <Calendar className="w-5 h-5 mr-3 text-blue-400" />
+                    <div>
+                      <span className="text-gray-400">Fecha de registro:</span>
+                      <span className="ml-2">{new Date(guia.fecha_registro || Date.now()).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <Globe className="w-5 h-5 mr-3 text-purple-400" />
+                    <div>
+                      <span className="text-gray-400">Idiomas:</span>
+                      <span className="ml-2">{guia.idiomas || 'No especificados'}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {guia.descripcion && (
+              <div className="mt-6">
+                <h2 className="text-xl font-semibold mb-2">Descripción</h2>
+                <p className="text-gray-300">
+                  {guia.descripcion}
+                </p>
+              </div>
+            )}
+            
+            <div className="flex justify-end mt-6 gap-3">
+              <button
+                onClick={() => {
+                  setGuiaParaEditar(guia);
+                  setShowEditarGuiaModal(true);
+                  onClose();
+                }}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
+              >
+                Editar información
+              </button>
+              <button
+                onClick={onClose}
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     );
   };
@@ -614,13 +896,13 @@ const Guias = () => {
                           src={
                             guia.foto
                               ? (guia.foto.startsWith('http') ? guia.foto : `http://localhost:10101/uploads/images/${guia.foto}`)
-                              : `https://ui-avatars.com/api/?name=${guia.primerNombre ? guia.primerNombre.charAt(0) : ''}${guia.primerApellido ? guia.primerApellido.charAt(0) : ''}&background=0D8ABC&color=fff&size=128`
+                              : "https://i.pinimg.com/736x/8d/37/31/8d3731a57b8209114c08488eeb0b6a64.jpg"
                           }
                           alt={`Foto de ${guia.primerNombre || ''} ${guia.primerApellido || ''}`}
                           className="w-full h-full object-cover rounded-full"
                           onError={(e) => {
                             e.target.onerror = null;
-                            e.target.src = `https://ui-avatars.com/api/?name=${guia.primerNombre ? guia.primerNombre.charAt(0) : ''}${guia.primerApellido ? guia.primerApellido.charAt(0) : ''}&background=0D8ABC&color=fff&size=128`;
+                            e.target.src = "https://i.pinimg.com/736x/8d/37/31/8d3731a57b8209114c08488eeb0b6a64.jpg";
                           }}
                         />
                       </div>
@@ -628,17 +910,15 @@ const Guias = () => {
                     
                     {/* Insignia de estado */}
                     <div className="absolute top-2 right-2">
-                      <div 
-                        className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center ${
-                          guia.estado === 'disponible' ? 'bg-green-100 text-green-800' : 
-                          guia.estado === 'ocupado' ? 'bg-yellow-100 text-yellow-800' : 
-                          'bg-red-100 text-red-800'
-                        }`}
-                      >
-                        {guia.estado === 'disponible' ? 'Disponible' : 
-                         guia.estado === 'ocupado' ? 'Ocupado' : 
-                         'Inactivo'}
-                      </div>
+                      <EstadoGuia 
+                        cedula={guia.cedula} 
+                        nombre={construirNombreCompleto(guia)}
+                        tamanio="normal" 
+                        onChangeEstado={(nuevoEstado) => {
+                          // Actualizar el estado en la base de datos
+                          actualizarEstadoGuia(guia, nuevoEstado);
+                        }}
+                      />
                     </div>
                   </div>
                   
@@ -685,47 +965,22 @@ const Guias = () => {
                     {/* Botones de acción */}
                     <div className="flex justify-center gap-2 mt-4">
                       <button 
-                        onClick={() => navigate(`/VistaAdmin/guias/${guia.cedula}`)}
+                        onClick={() => handleOpenDetallesModal(guia)}
                         className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium flex-1"
                       >
                         Ver detalles
                       </button>
                       
                       {/* Menú desplegable para cambiar estado */}
-                      <div className="relative flex-1 group">
-                        <button 
-                          className={`w-full px-4 py-2 rounded-md text-sm font-medium ${
-                            guia.estado === 'disponible' ? 'bg-green-600 hover:bg-green-700' : 
-                            guia.estado === 'ocupado' ? 'bg-yellow-600 hover:bg-yellow-700' : 
-                            'bg-red-600 hover:bg-red-700'
-                          } text-white`}
-                        >
-                          {guia.estado === 'disponible' ? 'Disponible' : 
-                           guia.estado === 'ocupado' ? 'Ocupado' : 
-                           'Inactivo'}
-                        </button>
-                        <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg hidden group-hover:block z-10">
-                          <div className="py-1">
-                            <button 
-                              onClick={() => actualizarEstadoGuia(guia, 'disponible')}
-                              className="block w-full text-left px-4 py-2 text-sm text-green-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                            >
-                              Disponible
-                            </button>
-                            <button 
-                              onClick={() => actualizarEstadoGuia(guia, 'ocupado')}
-                              className="block w-full text-left px-4 py-2 text-sm text-yellow-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                            >
-                              Ocupado
-                            </button>
-                            <button 
-                              onClick={() => actualizarEstadoGuia(guia, 'inactivo')}
-                              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                            >
-                              Inactivo
-                            </button>
-                          </div>
-                        </div>
+                      <div className="relative flex-1">
+                        <EstadoGuia 
+                          cedula={guia.cedula} 
+                          nombre={construirNombreCompleto(guia)}
+                          tamanio="boton"
+                          onChangeEstado={(nuevoEstado) => {
+                            actualizarEstadoGuia(guia, nuevoEstado);
+                          }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -787,6 +1042,22 @@ const Guias = () => {
             setGuiaParaEditar(null);
           }}
           onGuiaUpdated={handleGuiaUpdated}
+        />
+      )}
+
+      {/* Modal para ver detalles completos del guía */}
+      {showDetallesModal && guiaDetalle && (
+        <DetallesGuiaModal 
+          guia={guiaDetalle}
+          onClose={() => setShowDetallesModal(false)}
+        />
+      )}
+
+      {/* Modal para mostrar imagen ampliada */}
+      {showImagenModal && (
+        <ImagenAmpliadaModal 
+          imagenUrl={imagenAmpliada}
+          onClose={() => setShowImagenModal(false)}
         />
       )}
     </DashboardLayoutAdmin>
