@@ -137,6 +137,100 @@ input[type="password"]::-moz-password {
   }
 }
 
+/* Animación para el efecto de shimmer en las barras de progreso */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Animación para las partículas flotantes */
+@keyframes float {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(20px);
+    opacity: 0;
+  }
+}
+
+/* Animación para las burbujas flotantes más lentas */
+@keyframes floatSlow {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.1;
+  }
+  25% {
+    transform: translateY(-20%) translateX(5%);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-40%) translateX(-5%);
+    opacity: 0.2;
+  }
+  75% {
+    transform: translateY(-60%) translateX(10%);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(-100%) translateX(0%);
+    opacity: 0;
+  }
+}
+
+/* Animación de línea de escaneo */
+@keyframes scanline {
+  0% {
+    left: -100%;
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.2;
+  }
+  100% {
+    left: 200%;
+    opacity: 0.8;
+  }
+}
+
+/* Animación de efecto de escaneo vertical */
+@keyframes scanEffect {
+  0% {
+    top: -100%;
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    top: 100%;
+    opacity: 0.1;
+  }
+}
+
+/* Animación para código binario flotante */
+@keyframes floatBinary {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0.3;
+  }
+}
+
 /* Media queries para mejorar la responsividad */
 @media (max-width: 640px) {
   .card-flip-container {
