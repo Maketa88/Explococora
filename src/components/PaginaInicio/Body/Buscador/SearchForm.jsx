@@ -16,6 +16,9 @@ export const SearchForm = ({ onSearch }) => {
   const [showAIRouteGenerator, setShowAIRouteGenerator] = useState(false);
   const [generatingRoute, setGeneratingRoute] = useState(false);
   const [generatedRoute, setGeneratedRoute] = useState(null);
+  // Nuevos estados para manejar las fotos
+  const [rutaConFoto, setRutaConFoto] = useState(null);
+  const [cargandoFoto, setCargandoFoto] = useState(false);
 
   // Cargar todas las rutas al iniciar el componente
   useEffect(() => {
@@ -1555,6 +1558,57 @@ export const SearchForm = ({ onSearch }) => {
     return false;
   };
 
+  // Nueva función para obtener las fotos de una ruta
+  const obtenerFotosRuta = async (idRuta) => {
+    try {
+      // Verificar que el ID sea válido
+      if (!idRuta || isNaN(idRuta)) {
+        console.warn("ID de ruta no válido:", idRuta);
+        setCargandoFoto(false);
+        return;
+      }
+      
+      setCargandoFoto(true);
+      const response = await axios.get(`http://localhost:10101/rutas/fotos-publicas/${idRuta}`);
+      
+      if (response.data && response.data.fotos && Array.isArray(response.data.fotos)) {
+        let fotosArray = [];
+        
+        // Extraer las URLs de las fotos según la estructura exacta
+        const primerElemento = response.data.fotos[0];
+        
+        if (Array.isArray(primerElemento)) {
+          // Extraer las URLs de los objetos en el primer elemento
+          primerElemento.map(item => {
+            if (item && typeof item === 'object' && item.foto && typeof item.foto === 'string') {
+              fotosArray.push(item.foto);
+            }
+          });
+        }
+        
+        // Limitar a solo 1 foto
+        const fotosFiltradas = fotosArray.slice(0, 1);
+        
+        if (fotosFiltradas.length > 0) {
+          setRutaConFoto(fotosFiltradas[0]);
+        }
+      }
+      setCargandoFoto(false);
+    } catch (error) {
+      console.error(`Error al obtener fotos para la ruta ${idRuta}:`, error);
+      setCargandoFoto(false);
+    }
+  };
+
+  // Efecto para cargar la foto cuando se genera una ruta
+  useEffect(() => {
+    if (generatedRoute && generatedRoute.idRuta) {
+      obtenerFotosRuta(generatedRoute.idRuta);
+    } else {
+      setRutaConFoto(null);
+    }
+  }, [generatedRoute]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onSearch && onSearch({ query: searchQuery });
@@ -1846,11 +1900,13 @@ export const SearchForm = ({ onSearch }) => {
 
             // Generar la ruta principal personalizada (la mejor coincidencia)
             const aiGeneratedRoute = {
+              idRuta: bestRoute.idRuta, // Aseguramos que se guarde el ID para obtener la foto
               nombreRuta: bestRoute.nombreRuta,
               dificultad: bestRoute.dificultad,
               duracion: bestRoute.duracion,
               descripcion: bestRoute.descripcion,
               calificacion: bestRoute.calificacion,
+              distancia: bestRoute.distancia, // Añadimos la distancia real
               puntos: bestRoute.puntos || generateRoutePoints(bestRoute),
               condicionDetectada: condicionDetectada,
             };
@@ -1888,11 +1944,13 @@ export const SearchForm = ({ onSearch }) => {
           } else {
             // No hay rutas que coincidan con la búsqueda
             const aiGeneratedRoute = {
+              idRuta: null, // No hay ID específico para esta ruta generada
               nombreRuta: `Ruta personalizada: ${searchQuery}`,
               dificultad: "Moderada",
               duracion: "2-3 horas",
               descripcion: `Lo sentimos, no encontramos una ruta que coincida exactamente con "${searchQuery}". Hemos generado esta sugerencia basada en tus intereses.`,
               calificacion: 4,
+              distancia: "5.0 km", // Añadimos una distancia predeterminada
               puntos: [
                 "Punto de partida en el Centro de Visitantes",
                 "Mirador panorámico con vistas al valle",
@@ -1927,11 +1985,13 @@ export const SearchForm = ({ onSearch }) => {
           const selectedRoute = rutasFiltradas[randomIndex];
 
           const aiGeneratedRoute = {
+            idRuta: selectedRoute.idRuta, // Añadir el ID de la ruta seleccionada
             nombreRuta: selectedRoute.nombreRuta,
             dificultad: selectedRoute.dificultad,
             duracion: selectedRoute.duracion,
             descripcion: selectedRoute.descripcion,
             calificacion: selectedRoute.calificacion,
+            distancia: selectedRoute.distancia, // Añadimos la distancia real
             puntos: selectedRoute.puntos || generateRoutePoints(selectedRoute),
           };
 
@@ -2476,11 +2536,34 @@ export const SearchForm = ({ onSearch }) => {
                     <>
                       <div className="w-full max-w-2xl mb-8">
                         <div className="relative aspect-video rounded-xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-300">
-                          <img
-                            src="https://cdn.pixabay.com/photo/2023/05/17/15/57/ai-generated-8000455_1280.jpg"
-                            alt="Ruta generada por IA"
-                            className="w-full h-full object-cover"
-                          />
+                          {cargandoFoto ? (
+                            // Estado de carga
+                            <div className="flex justify-center items-center h-full bg-gray-100">
+                              <div className="animate-pulse flex space-x-1">
+                                <div className="h-2 w-2 bg-teal-600 rounded-full animate-bounce"></div>
+                                <div className="h-2 w-2 bg-teal-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                                <div className="h-2 w-2 bg-teal-600 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                              </div>
+                            </div>
+                          ) : rutaConFoto ? (
+                            // Mostrar la foto de la API
+                            <img
+                              src={rutaConFoto}
+                              alt={`Foto de ${generatedRoute.nombreRuta}`}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = 'https://cdn.pixabay.com/photo/2023/05/17/15/57/ai-generated-8000455_1280.jpg';
+                              }}
+                            />
+                          ) : (
+                            // Imagen de respaldo si no hay foto
+                            <img
+                              src="https://cdn.pixabay.com/photo/2023/05/17/15/57/ai-generated-8000455_1280.jpg"
+                              alt="Ruta generada por IA"
+                              className="w-full h-full object-cover"
+                            />
+                          )}
                           {/* Decoración de esquinas */}
                           <div className="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-white/40 rounded-tl-lg"></div>
                           <div className="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-white/40 rounded-tr-lg"></div>
@@ -2616,7 +2699,13 @@ export const SearchForm = ({ onSearch }) => {
                               <div className="flex justify-between items-center">
                                 <div>
                                   <p className="font-medium">Distancia total</p>
-                                  <p className="text-lg font-bold">5.2 km</p>
+                                  <p className="text-lg font-bold">
+                                    {generatedRoute.distancia ? 
+                                      generatedRoute.distancia.toString().includes('km') ? 
+                                        generatedRoute.distancia : 
+                                        `${generatedRoute.distancia} km` 
+                                      : "5.2 km"}
+                                  </p>
                                 </div>
                                 <div>
                                   <p className="font-medium">Elevación</p>
