@@ -2147,7 +2147,7 @@ export const SearchForm = ({ onSearch }) => {
                       </div>
 
                       {/* Contenedor principal de procesamiento de IA con efectos futuristas */}
-                      <div className="mt-2 bg-gradient-to-br from-teal-900/90 to-teal-800/90 backdrop-blur-md rounded-xl p-5 w-full max-w-4xl shadow-2xl border border-teal-600/50 relative overflow-hidden">
+                      <div className="mt-2 bg-gradient-to-br from-teal-900/90 to-teal-800/90 backdrop-blur-md rounded-xl p-5 w-full max-w-5xl shadow-2xl border border-teal-600/50 relative overflow-hidden">
                         {/* Efecto de "red neuronal" en el fondo */}
                         <div className="absolute inset-0 z-0 opacity-20">
                           {[...Array(15)].map((_, i) => (
