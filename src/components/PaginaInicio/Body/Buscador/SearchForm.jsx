@@ -1,6 +1,10 @@
 import axios from "axios";
 import { ArrowRight, Clock, MapPin } from "lucide-react";
 import { useEffect, useState } from "react";
+import commonKeywordsData from "../../../../data/commonKeywords.json";
+import conditionPatternsData from "../../../../data/conditionPatterns.json";
+import routesData from "../../../../data/routes.json";
+import timePatternsData from "../../../../data/timePatterns.json";
 
 export const SearchForm = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -15,154 +19,6 @@ export const SearchForm = ({ onSearch }) => {
 
   // Cargar todas las rutas al iniciar el componente
   useEffect(() => {
-    // Datos de muestra para desarrollo (solo usados si la API falla)
-    const sampleRoutes = [
-      {
-        id: 1,
-        nombreRuta: "Planchon",
-        duracion: "1-2 horas",
-        descripcion:
-          "Una caminata fácil y corta hasta un mirador con impresionantes vistas del valle.",
-        dificultad: "Facil",
-        puntuacion: 99,
-        calificacion: 2.5,
-        tipoActividad: "Cabalgata y Caminata",
-        estado: "Inactiva",
-      },
-      {
-        id: 2,
-        nombreRuta: "Peña de la Virgen",
-        duracion: "2-3 horas",
-        descripcion:
-          "Una caminata moderada hasta una gran roca con una estatua de la Virgen María, ofreciendo vistas panorámicas.",
-        dificultad: "Moderada",
-        puntuacion: 99,
-        calificacion: 5,
-        tipoActividad: "Cabalgata y Caminata",
-        estado: "Activa",
-      },
-      {
-        id: 3,
-        nombreRuta: "Casa la Esperanza",
-        duracion: "3-4 horas",
-        descripcion:
-          "Una caminata desafiante hasta una antigua casa de campo, ofreciendo vistas únicas del valle.",
-        dificultad: "Desafiante",
-        puntuacion: 99,
-        calificacion: 2,
-        tipoActividad: "Cabalgata y Caminata",
-        estado: "Activa",
-      },
-      {
-        id: 4,
-        nombreRuta: "Mirador de Camino",
-        duracion: "1-2 horas",
-        descripcion:
-          "Una caminata fácil hasta un mirador con vistas al río y las montañas.",
-        dificultad: "Facil",
-        puntuacion: 99,
-        calificacion: 3,
-        tipoActividad: "cabalgata y caminata",
-        estado: "Activa",
-      },
-      {
-        id: 5,
-        nombreRuta: "Mirador del Camino y Ríos",
-        duracion: "2-3 horas",
-        descripcion:
-          "Una caminata moderada que combina las vistas del Mirador de Camino con un paseo junto a los ríos.",
-        dificultad: "Moderada",
-        puntuacion: 99,
-        calificacion: 3.5,
-        tipoActividad: "cabalgata y caminata",
-        estado: "Activa",
-      },
-      {
-        id: 6,
-        nombreRuta: "Mirador del Camino y Peña de la Virgen",
-        duracion: "3-4 horas",
-        descripcion:
-          "Una caminata combinada que ofrece lo mejor de ambos mundos, con vistas desde el Mirador de Camino y la Peña de la Virgen.",
-        dificultad: "Moderada",
-        puntuacion: 99,
-        calificacion: 5,
-        tipoActividad: "cabalgata y caminata",
-        estado: "Activa",
-      },
-      {
-        id: 7,
-        nombreRuta: "Mirador de Palmas",
-        duracion: "2-3 horas",
-        descripcion:
-          "Una caminata moderada hasta un mirador con vistas a las palmas de cera más altas del mundo.",
-        dificultad: "Moderada",
-        puntuacion: 99,
-        calificacion: 3.5,
-        tipoActividad: "cabalgata y caminata",
-        estado: "Activa",
-      },
-      {
-        id: 8,
-        nombreRuta: "Mirador de Camino y Palmas",
-        duracion: "3-4 horas",
-        descripcion:
-          "Una caminata combinada que te lleva al Mirador de Camino y al Mirador de Palmas.",
-        dificultad: "Moderada",
-        puntuacion: 99,
-        calificacion: 4,
-        tipoActividad: "cabalgata y caminata",
-        estado: "Activa",
-      },
-      {
-        id: 9,
-        nombreRuta: "Mirador del Cóndor",
-        duracion: "4-5 horas",
-        descripcion:
-          "Una caminata desafiante hasta un mirador con la posibilidad de avistar cóndores, las aves más grandes del mundo.",
-        dificultad: "Desafiante",
-        puntuacion: 99,
-        calificacion: 2,
-        tipoActividad: "cabalgata y caminata",
-        estado: "Activa",
-      },
-      {
-        id: 10,
-        nombreRuta: "Camino, Palmas y Río",
-        duracion: "4-5 horas",
-        descripcion:
-          "Una caminata combinada que incluye el Mirador de Camino, el Mirador de Palmas y un paseo junto al río.",
-        dificultad: "Moderada",
-        puntuacion: 99,
-        calificacion: 4.5,
-        tipoActividad: "cabalgata y caminata",
-        estado: "Activa",
-      },
-      {
-        id: 11,
-        nombreRuta: "Camino, Palmas y Peña",
-        duracion: "5-6 horas",
-        descripcion:
-          "Una caminata combinada que incluye el Mirador de Camino, el Mirador de Palmas y la Peña de la Virgen.",
-        dificultad: "Desafiante",
-        puntuacion: 99,
-        calificacion: 2.5,
-        tipoActividad: "cabalgata y caminata",
-        estado: "Activa",
-      },
-      {
-        id: 12,
-        nombreRuta: "Camino, Palmas, Cóndor y Peña",
-        duracion: "6-7 horas",
-        descripcion:
-          "La caminata más completa y desafiante, que incluye todos los miradores y la posibilidad de avistar cóndores.",
-        dificultad: "Desafiante",
-        puntuacion: 99,
-        calificacion: 2.5,
-        tipoActividad: "cabalgata y caminata",
-        estado: "Activa",
-      },
-    ];
-
     // Función para procesar las rutas con palabras clave y datos adicionales
     const processRoutes = (routes) => {
       return routes.map((route) => {
@@ -249,8 +105,8 @@ export const SearchForm = ({ onSearch }) => {
           setAllRoutes(processRoutes(response.data));
         } else {
           setError("La respuesta de la API no tiene el formato esperado");
-          // Usar datos de muestra en caso de formato incorrecto
-          setAllRoutes(processRoutes(sampleRoutes));
+          // Usar datos de muestra del archivo JSON en caso de formato incorrecto
+          setAllRoutes(processRoutes(routesData));
         }
       } catch (err) {
         console.error("Error al cargar rutas:", err);
@@ -258,9 +114,9 @@ export const SearchForm = ({ onSearch }) => {
           "No se pudieron cargar las rutas. Por favor, intente más tarde."
         );
 
-        // En caso de error, usar datos de muestra
+        // En caso de error, usar datos de muestra del archivo JSON
         console.log("Usando datos de muestra como respaldo");
-        setAllRoutes(processRoutes(sampleRoutes));
+        setAllRoutes(processRoutes(routesData));
       } finally {
         setIsSearching(false);
       }
@@ -740,13 +596,13 @@ export const SearchForm = ({ onSearch }) => {
       if (minsMatch) {
         const minutes = parseInt(minsMatch[1]);
         totalMinutes += minutes;
-        console.log(`  Minutos: ${minutes}`);
+        `  Minutos: ${minutes}`;
       }
 
       if (secsMatch) {
         const seconds = parseInt(secsMatch[1]);
         totalMinutes += seconds / 60;
-        console.log(`  Segundos: ${seconds} = ${seconds / 60} minutos`);
+        `  Segundos: ${seconds} = ${seconds / 60} minutos`;
       }
     }
 
@@ -760,16 +616,16 @@ export const SearchForm = ({ onSearch }) => {
         text.includes("cuarto de hora")
       ) {
         totalMinutes = 15;
-        console.log("  Expresión verbal: cuarto de hora = 15 minutos");
+        ("  Expresión verbal: cuarto de hora = 15 minutos");
       } else if (text.includes("tres cuartos de hora")) {
         totalMinutes = 45;
-        console.log("  Expresión verbal: tres cuartos de hora = 45 minutos");
+        ("  Expresión verbal: tres cuartos de hora = 45 minutos");
       } else if (text.includes("hora y media")) {
         totalMinutes = 90;
         console.log("  Expresión verbal: hora y media = 90 minutos");
       } else if (text.includes("dos horas y media")) {
         totalMinutes = 150;
-        console.log("  Expresión verbal: dos horas y media = 150 minutos");
+        ("  Expresión verbal: dos horas y media = 150 minutos");
       }
 
       // Detectar números escritos como palabras
@@ -877,6 +733,15 @@ export const SearchForm = ({ onSearch }) => {
     return totalMinutes;
   };
 
+  // Convertir los patrones de texto del archivo JSON a objetos RegExp
+  const convertPatternsToRegExp = (patternsData) => {
+    const result = {};
+    for (const [key, patterns] of Object.entries(patternsData)) {
+      result[key] = patterns.map((pattern) => new RegExp(pattern, "i"));
+    }
+    return result;
+  };
+
   // Función para calcular puntuación de relevancia de una ruta para una búsqueda
   const calculateRelevanceScore = (route, query) => {
     if (!query.trim()) return 0;
@@ -908,48 +773,8 @@ export const SearchForm = ({ onSearch }) => {
       return 0;
     }
 
-    // Detectar patrones de condición física o estados especiales
-    const condicionPatterns = {
-      rutasFaciles: [
-        /soy\s+(gordo|gordito|obeso|pesado|rellenito|de\s+huesos?\s+grandes?)/i,
-        /tengo\s+(sobrepeso|obesidad|kilos\s+de\s+más)/i,
-        /estoy\s+(gordo|gordito|pasado\s+de\s+peso|fuera\s+de\s+forma|embarazada|embarazo)/i,
-        /en\s+(estado\s+de\s+)?embarazo/i,
-        /llevo\s+mucho\s+sin\s+hacer\s+ejercicio/i,
-        /(soy\s+|estoy\s+)?(principiante|novato|novata|nueva|nuevo)/i,
-        /primera\s+vez/i,
-        /no\s+(estoy\s+|me\s+siento\s+)?(en\s+forma|preparado|preparada)/i,
-        /tengo\s+(niños?|hijos?\s+pequeños?|bebés?)/i,
-        /con\s+(niños?|hijos?\s+pequeños?|bebés?|familia)/i,
-        /voy\s+con\s+(mis\s+)?(hij[oa]s?|pequeños?|niños?|peques)/i,
-        /tercera\s+edad/i,
-        /soy\s+(mayor|anciano|anciana|viejo|vieja)/i,
-        /tengo\s+más\s+de\s+(6[0-9]|[7-9][0-9])/i,
-        /problemas?\s+(de\s+)?(rodilla|cadera|espalda|respiratorios|cardiacos?|corazón)/i,
-      ],
-      rutasModeradamente: [
-        /soy\s+(normal|promedio|regular|común|del\s+montón)/i,
-        /estoy\s+en\s+(forma\s+regular|forma\s+moderada)/i,
-        /hago\s+ejercicio\s+(de\s+vez\s+en\s+cuando|ocasionalmente|a\s+veces)/i,
-        /actividad\s+física\s+(moderada|regular|ocasional)/i,
-        /estado\s+físico\s+(normal|regular|promedio)/i,
-        /nivel\s+(intermedio|medio)/i,
-        /experiencia\s+media/i,
-        /algo\s+de\s+experiencia/i,
-      ],
-      rutasDificiles: [
-        /soy\s+(delgado|atlético|deportista|activo|flaco|fitness|fuerte)/i,
-        /estoy\s+(en\s+forma|bien\s+preparado|preparado\s+físicamente)/i,
-        /hago\s+(mucho\s+ejercicio|deporte\s+regularmente|entrenamiento)/i,
-        /me\s+gusta\s+el\s+desafío/i,
-        /busco\s+(reto|desafío|aventura\s+extrema|adrenalina)/i,
-        /nivel\s+(avanzado|experto)/i,
-        /experiencia\s+(avanzada|alta)/i,
-        /resistencia\s+(alta|buena)/i,
-        /condición\s+física\s+(excelente|muy\s+buena|óptima)/i,
-        /soy\s+(corredor|maratonista|ciclista|escalador|montañista)/i,
-      ],
-    };
+    // Usar los patrones importados del archivo JSON
+    const condicionPatterns = convertPatternsToRegExp(conditionPatternsData);
 
     // Verificar si la búsqueda contiene algún patrón de condición física
     let tipoRutaRecomendada = null;
@@ -961,11 +786,9 @@ export const SearchForm = ({ onSearch }) => {
         if (patron.test(normalizedQuery)) {
           tipoRutaRecomendada = tipo;
           intensidadRecomendacion = 100; // Alta confianza cuando hay mención explícita
-          (
-            `Detectada condición física para ${tipo}: ${
-              normalizedQuery.match(patron)[0]
-            }`
-          );
+          `Detectada condición física para ${tipo}: ${
+            normalizedQuery.match(patron)[0]
+          }`;
           break;
         }
       }
@@ -1077,63 +900,7 @@ export const SearchForm = ({ onSearch }) => {
     }
 
     // Lista de palabras clave comunes para autocompletado
-    const commonKeywords = {
-      fa: ["facil", "fácil"],
-      fac: ["facil", "fácil"],
-      di: ["dificil", "difícil", "desafiante"],
-      dif: ["dificil", "difícil", "desafiante"],
-      mo: ["moderada", "moderado", "montaña", "montana"],
-      mod: ["moderada", "moderado"],
-      ca: [
-        "camino",
-        "caminata",
-        "caminar",
-        "cabalgata",
-        "caballo",
-        "casa",
-        "cascada",
-      ],
-      cam: ["camino", "caminata", "caminatas", "caminar"],
-      cab: ["cabalgata", "caballo", "caballos"],
-      mi: ["mirador", "miradores", "minuto", "minutos", "mínimo"],
-      mir: ["mirador", "miradores"],
-      vi: ["vista", "vistas", "virgen"],
-      vist: ["vista", "vistas"],
-      pa: ["palma", "palmas", "panorámica", "panorama"],
-      pan: ["panorámica", "panorama"],
-      pal: ["palma", "palmas"],
-      se: ["sendero", "senderismo"],
-      sen: ["sendero", "senderismo"],
-      pe: ["peña", "pequeña", "pequeño"],
-      peq: ["pequeña", "pequeño", "corta", "corto"],
-      peñ: ["peña"],
-      co: ["corta", "corto", "cóndor", "condor"],
-      cor: ["corta", "corto"],
-      con: ["cóndor", "condor"],
-      la: ["larga", "largo"],
-      lar: ["larga", "largo"],
-      // Términos de tiempo
-      hor: ["hora", "horas", "horario"],
-      min: ["minuto", "minutos", "mínimo"],
-      tie: ["tiempo", "tiempos"],
-      dur: ["duración", "dura", "durar", "durando"],
-      // Valores específicos de tiempo
-      30: ["30 minutos", "media hora"],
-      45: ["45 minutos", "tres cuartos de hora"],
-      60: ["60 minutos", "1 hora", "una hora"],
-      90: ["90 minutos", "1.5 horas", "hora y media"],
-      120: ["120 minutos", "2 horas", "dos horas"],
-      180: ["180 minutos", "3 horas", "tres horas"],
-      240: ["240 minutos", "4 horas", "cuatro horas"],
-      // Expresiones de comparación
-      men: ["menos", "menos de", "menor que"],
-      mas: ["más", "más de", "mayor que"],
-      // Calificadores de tiempo
-      rap: ["rápida", "rápido", "veloz", "express"],
-      med: ["media", "medium", "mediana"],
-      ext: ["extensa", "extenso", "extendida"],
-      bre: ["breve", "brevedad"],
-    };
+    const commonKeywords = commonKeywordsData;
 
     // Buscar posibles autocompletados para los términos parciales
     const expandedTerms = [];
@@ -1674,53 +1441,12 @@ export const SearchForm = ({ onSearch }) => {
 
     // Normalizar la consulta
     const queryLower = query.toLowerCase().trim();
-    (`Analizando si es búsqueda de tiempo: "${queryLower}"`);
+    `Analizando si es búsqueda de tiempo: "${queryLower}"`;
 
     // 1. Formatos de tiempo explícitos
-    const explicitTimePatterns = [
-      // Formato estándar (2 horas, 30 minutos)
-      /\b(\d+)\s*(h|hr|hrs|hora|horas|m|min|mins|minuto|minutos|segundo|segundos)\b/i,
-
-      // Formato de rango (1-2 horas, 30-45 minutos)
-      /\b(\d+)[\s-]*(\d+)\s*(h|hr|hrs|hora|horas|m|min|mins|minuto|minutos)\b/i,
-
-      // Formato compuesto (2h 30m, 2:30h, 2h30)
-      /\b(\d+)\s*h\w*\s*(?:y\s*)?(\d+)\s*m\b/i,
-      /\b(\d+):(\d+)\s*(?:h|hora|horas)?\b/i,
-      /\b(\d+)h(\d+)\b/i,
-
-      // Formato decimal (1.5 horas)
-      /\b(\d+\.\d+)\s*(h|hr|hrs|hora|horas)\b/i,
-
-      // ¡NUEVOS PATRONES! - Específicos para 60 minutos / 1 hora
-      /\b(una|1)\s+(hora)\b/i,
-      /\b(sesenta|60)\s+(minutos|min|mins)\b/i,
-      /\b(media\s+hora\s+y\s+media)\b/i,
-      /\bruta\s+de\s+(una|1)\s+hora\b/i,
-      /\bruta\s+de\s+(sesenta|60)\s+minutos\b/i,
-      /\brecorrido\s+de\s+(una|1)\s+hora\b/i,
-      /\bcaminata\s+de\s+(una|1)\s+hora\b/i,
-      /\bruta\s+que\s+dure\s+(una|1)\s+hora\b/i,
-      /\bque\s+dure\s+(una|1)\s+hora\b/i,
-      /\bque\s+dure\s+(sesenta|60)\s+minutos\b/i,
-      /\bdure\s+(una|1)\s+hora\b/i,
-      /\bdure\s+(sesenta|60)\s+minutos\b/i,
-
-      // ¡NUEVOS PATRONES! - Para aproximar tiempos cercanos a 1 hora
-      /\b(20|veinte)\s+(minutos|min|mins)\b/i,
-      /\b(25|veinticinco)\s+(minutos|min|mins)\b/i,
-      /\b(30|treinta)\s+(minutos|min|mins)\b/i,
-      /\b(35|treinta\s+y\s+cinco)\s+(minutos|min|mins)\b/i,
-      /\b(40|cuarenta)\s+(minutos|min|mins)\b/i,
-      /\b(45|cuarenta\s+y\s+cinco)\s+(minutos|min|mins)\b/i,
-      /\b(50|cincuenta)\s+(minutos|min|mins)\b/i,
-      /\bruta\s+de\s+(20|veinte|25|veinticinco|30|treinta|35|treinta\s+y\s+cinco|40|cuarenta|45|cuarenta\s+y\s+cinco|50|cincuenta)\s+(minutos|min|mins)\b/i,
-      /\brecorrido\s+de\s+(20|veinte|25|veinticinco|30|treinta|35|treinta\s+y\s+cinco|40|cuarenta|45|cuarenta\s+y\s+cinco|50|cincuenta)\s+(minutos|min|mins)\b/i,
-      /\bque\s+dure\s+(20|veinte|25|veinticinco|30|treinta|35|treinta\s+y\s+cinco|40|cuarenta|45|cuarenta\s+y\s+cinco|50|cincuenta)\s+(minutos|min|mins)\b/i,
-      /\bdure\s+(20|veinte|25|veinticinco|30|treinta|35|treinta\s+y\s+cinco|40|cuarenta|45|cuarenta\s+y\s+cinco|50|cincuenta)\s+(minutos|min|mins)\b/i,
-      /\bmedia\s+hora\b/i,
-      /\bcuarto\s+de\s+hora\b/i,
-    ];
+    const explicitTimePatterns = timePatternsData.map(
+      (pattern) => new RegExp(pattern, "i")
+    );
 
     for (const pattern of explicitTimePatterns) {
       if (pattern.test(queryLower)) {
@@ -2006,9 +1732,7 @@ export const SearchForm = ({ onSearch }) => {
 
         // Si encontramos coincidencias (exactas o parciales), procesarlas
         if (matchingRoutes.length > 0) {
-          (
-            `Se encontraron ${matchingRoutes.length} coincidencias de búsqueda.`
-          );
+          `Se encontraron ${matchingRoutes.length} coincidencias de búsqueda.`;
 
           // Ordenar por puntuación de relevancia (descendente)
           matchingRoutes.sort((a, b) => b.relevanceScore - a.relevanceScore);
@@ -2029,12 +1753,8 @@ export const SearchForm = ({ onSearch }) => {
                   route.dificultad.toLowerCase() === "fácil")
             );
 
-            (
-              `Encontradas ${rutasFaciles.length} rutas fáciles disponibles:`
-            );
-            rutasFaciles.forEach((ruta) =>
-              (` - ${ruta.nombreRuta}`)
-            );
+            `Encontradas ${rutasFaciles.length} rutas fáciles disponibles:`;
+            rutasFaciles.forEach((ruta) => ` - ${ruta.nombreRuta}`);
 
             // Añadir rutas fáciles que no estaban en los resultados iniciales
             rutasFaciles.forEach((rutaFacil) => {
@@ -2072,27 +1792,21 @@ export const SearchForm = ({ onSearch }) => {
               (route) => route.relevanceScore >= scoreThreshold
             );
 
-            (
-              `Se encontraron ${topRoutes.length} rutas de alta coincidencia con puntuación sobre ${scoreThreshold}`
-            );
+            `Se encontraron ${topRoutes.length} rutas de alta coincidencia con puntuación sobre ${scoreThreshold}`;
 
             // Elegimos una ruta aleatoria entre las mejores
             const randomIndex = Math.floor(Math.random() * topRoutes.length);
             bestRoute = topRoutes[randomIndex];
 
-            (
-              `Seleccionada aleatoriamente: ${bestRoute.nombreRuta} (${
-                randomIndex + 1
-              } de ${topRoutes.length} mejores rutas)`
-            );
+            `Seleccionada aleatoriamente: ${bestRoute.nombreRuta} (${
+              randomIndex + 1
+            } de ${topRoutes.length} mejores rutas)`;
           }
 
-          (
-            "Mejor ruta encontrada:",
+          "Mejor ruta encontrada:",
             bestRoute.nombreRuta,
             "con puntuación:",
-            bestRoute.relevanceScore
-          );
+            bestRoute.relevanceScore;
 
           // Elegir la mejor ruta generada
           if (matchingRoutes.length > 0) {
@@ -2117,9 +1831,7 @@ export const SearchForm = ({ onSearch }) => {
                 (route) => route.relevanceScore >= scoreThreshold
               );
 
-              (
-                `Se encontraron ${topRoutes.length} rutas de alta coincidencia con puntuación sobre ${scoreThreshold}`
-              );
+              `Se encontraron ${topRoutes.length} rutas de alta coincidencia con puntuación sobre ${scoreThreshold}`;
 
               // Elegimos una ruta aleatoria entre las mejores
               const randomIndex = Math.floor(Math.random() * topRoutes.length);

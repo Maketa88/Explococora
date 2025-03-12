@@ -1,0 +1,41 @@
+{
+  "rutasFaciles": [
+    "soy\\s+(gordo|gordito|obeso|pesado|rellenito|de\\s+huesos?\\s+grandes?)",
+    "tengo\\s+(sobrepeso|obesidad|kilos\\s+de\\s+más)",
+    "estoy\\s+(gordo|gordito|pasado\\s+de\\s+peso|fuera\\s+de\\s+forma|embarazada|embarazo)",
+    "en\\s+(estado\\s+de\\s+)?embarazo",
+    "llevo\\s+mucho\\s+sin\\s+hacer\\s+ejercicio",
+    "(soy\\s+|estoy\\s+)?(principiante|novato|novata|nueva|nuevo)",
+    "primera\\s+vez",
+    "no\\s+(estoy\\s+|me\\s+siento\\s+)?(en\\s+forma|preparado|preparada)",
+    "tengo\\s+(niños?|hijos?\\s+pequeños?|bebés?)",
+    "con\\s+(niños?|hijos?\\s+pequeños?|bebés?|familia)",
+    "voy\\s+con\\s+(mis\\s+)?(hij[oa]s?|pequeños?|niños?|peques)",
+    "tercera\\s+edad",
+    "soy\\s+(mayor|anciano|anciana|viejo|vieja)",
+    "tengo\\s+más\\s+de\\s+(6[0-9]|[7-9][0-9])",
+    "problemas?\\s+(de\\s+)?(rodilla|cadera|espalda|respiratorios|cardiacos?|corazón)"
+  ],
+  "rutasModeradamente": [
+    "soy\\s+(normal|promedio|regular|común|del\\s+montón)",
+    "estoy\\s+en\\s+(forma\\s+regular|forma\\s+moderada)",
+    "hago\\s+ejercicio\\s+(de\\s+vez\\s+en\\s+cuando|ocasionalmente|a\\s+veces)",
+    "actividad\\s+física\\s+(moderada|regular|ocasional)",
+    "estado\\s+físico\\s+(normal|regular|promedio)",
+    "nivel\\s+(intermedio|medio)",
+    "experiencia\\s+media",
+    "algo\\s+de\\s+experiencia"
+  ],
+  "rutasDificiles": [
+    "soy\\s+(delgado|atlético|deportista|activo|flaco|fitness|fuerte)",
+    "estoy\\s+(en\\s+forma|bien\\s+preparado|preparado\\s+físicamente)",
+    "hago\\s+(mucho\\s+ejercicio|deporte\\s+regularmente|entrenamiento)",
+    "me\\s+gusta\\s+el\\s+desafío",
+    "busco\\s+(reto|desafío|aventura\\s+extrema|adrenalina)",
+    "nivel\\s+(avanzado|experto)",
+    "experiencia\\s+(avanzada|alta)",
+    "resistencia\\s+(alta|buena)",
+    "condición\\s+física\\s+(excelente|muy\\s+buena|óptima)",
+    "soy\\s+(corredor|maratonista|ciclista|escalador|montañista)"
+  ]
+}
