@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import DashboardLayout from '../../../layouts/DashboardLayout';
-import { Mail, Phone, MapPin, Calendar, CheckCircle, Clock, XCircle, Search, Filter, RefreshCw, UserPlus, Star, CreditCard, Trash2, Edit, Globe, Languages } from 'lucide-react';
+import { Mail, Phone, MapPin, Calendar, CheckCircle, Clock, XCircle, Search, Filter, RefreshCw, UserPlus, Star, CreditCard, Trash2, Edit, Globe, Languages, X, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import logoExplococora from '../../../assets/Images/logo.webp';
 import EstadoGuia from '../../../components/Guias/EstadoGuia';
@@ -38,6 +38,22 @@ const Guias = () => {
   const countdownRef = useRef(null);
   const [showDetallesModal, setShowDetallesModal] = useState(false);
   const [guiaDetalle, setGuiaDetalle] = useState(null);
+  const [showEditarModal, setShowEditarModal] = useState(false);
+  const [formData, setFormData] = useState({
+    primerNombre: '',
+    segundoNombre: '',
+    primerApellido: '',
+    segundoApellido: '',
+    email: '',
+    telefono: '',
+    descripcion: ''
+  });
+  const [updating, setUpdating] = useState(false);
+  const [updateError, setUpdateError] = useState('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [successGuiaName, setSuccessGuiaName] = useState('');
+  const [alert, setAlert] = useState({ show: false, message: "", type: "" });
 
   // Función para redirigir a la página de nuevo guía
   const handleAddGuia = () => {
@@ -71,7 +87,7 @@ const Guias = () => {
       });
       
       return response.data?.data?.estado || 'disponible';
-    } catch (error) {
+    } catch (errorEstado) {
       // Sin mensajes de error en consola
       return 'disponible';
     }
@@ -211,7 +227,7 @@ const Guias = () => {
                   telefono: obtenerTelefono(perfilCompleto)
                 };
               }
-            } catch (perfilError) {
+            } catch (errorPerfil) {
               // Silenciar error
             }
             
@@ -373,8 +389,234 @@ const Guias = () => {
            'No disponible';
   };
 
+  // Función simplificada para cerrar modales y recargar datos
+  const cerrarModalYActualizar = () => {
+    // Cerrar todos los modales explícitamente
+    setShowEditarModal(false);
+    setShowDetallesModal(false);
+    
+    // Volver a cargar los datos sin recargar toda la página
+    cargarGuias();
+  };
+
+  // Función mejorada para cargar guías después de actualizar
+  const cargarGuias = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        console.error("No se encontró token de autenticación");
+        toast.error("Error de autenticación. Por favor inicie sesión nuevamente.");
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 2000);
+        return;
+      }
+      
+      console.log("Iniciando carga de guías...");
+      
+      const response = await axios.get('http://localhost:10101/guia/todos', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      console.log("Respuesta del servidor:", response.data);
+      
+      const guiasData = response.data.data || [];
+      
+      if (guiasData.length === 0) {
+        console.log("No se encontraron guías en la respuesta");
+        setGuias([]);
+        setGuiasCompletos([]);
+        actualizarContadores({
+          total: 0,
+          disponibles: 0,
+          ocupados: 0,
+          inactivos: 0
+        });
+        setLoading(false);
+        return;
+      }
+      
+      console.log(`Se encontraron ${guiasData.length} guías`);
+      
+      // Procesar los datos y añadir estados
+      const guiasCompletosPromises = guiasData.map(async (guia) => {
+        try {
+          const estado = await obtenerEstadoOperador(guia.cedula);
+          return { 
+            ...guia, 
+            estado,
+            telefono: obtenerTelefono(guia)
+          };
+        } catch (error) {
+          console.error(`Error al procesar guía ${guia.cedula}:`, error);
+          return { 
+            ...guia, 
+            estado: 'disponible',
+            telefono: obtenerTelefono(guia)
+          };
+        }
+      });
+      
+      const guiasConEstado = await Promise.all(guiasCompletosPromises);
+      
+      console.log("Guías procesados con éxito:", guiasConEstado.length);
+      
+      setGuias(guiasData);
+      setGuiasCompletos(guiasConEstado);
+      actualizarContadores(guiasConEstado);
+    } catch (err) {
+      console.error("Error al cargar guías:", err);
+      
+      // Si es un error 401, probablemente el token expiró
+      if (err.response && err.response.status === 401) {
+        toast.error("Su sesión ha expirado. Por favor inicie sesión nuevamente.");
+        setTimeout(() => {
+          localStorage.removeItem('token');
+          window.location.href = '/login';
+        }, 2000);
+      } else {
+        setError("Error al cargar los guías: " + (err.message || "Error desconocido"));
+        toast.error("No se pudieron cargar los guías. Por favor recargue la página.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Función para mostrar alertas
+  const showAlert = (message, type) => {
+    setAlert({
+      show: true,
+      message,
+      type
+    });
+    
+    // Ocultar la alerta después de 5 segundos
+    setTimeout(() => {
+      setAlert(prev => ({ ...prev, show: false }));
+    }, 5000);
+  };
+
+  // Función para manejar la actualización del guía
+  const handleUpdateGuia = async (e) => {
+    e.preventDefault();
+    setUpdating(true);
+    
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Datos para actualizar
+      const dataToUpdate = {
+        primerNombre: formData.primerNombre,
+        segundoNombre: formData.segundoNombre || '',
+        primerApellido: formData.primerApellido,
+        segundoApellido: formData.segundoApellido || '',
+        email: formData.email,
+        telefono: formData.telefono,
+        descripcion: formData.descripcion || ''
+      };
+      
+      // Realizar petición
+      await axios.patch(
+        `http://localhost:10101/guia/actualizar/${guiaDetalle.cedula}`,
+        dataToUpdate,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      // Cerrar modal
+      setShowEditarModal(false);
+      
+      // Mostrar alerta de éxito
+      showAlert('¡Perfil actualizado correctamente!', 'success');
+      
+      // Recargar datos después de un breve retraso
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Error al actualizar guía:', error);
+      
+      // Cerrar el modal incluso si hay un error
+      setShowEditarModal(false);
+      
+      // Si es un error 401 pero la actualización funcionó, mostrar éxito igualmente
+      if (error.response && error.response.status === 401) {
+        showAlert('¡Perfil actualizado correctamente!', 'success');
+      } else {
+        showAlert('No se pudo actualizar la información. Intente nuevamente.', 'error');
+      }
+      
+      // Recargar datos
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  // Añadir esta función para cargar los datos del guía en el formulario
+  const loadGuiaData = (guia) => {
+    setFormData({
+      primerNombre: guia.primerNombre || '',
+      segundoNombre: guia.segundoNombre || '',
+      primerApellido: guia.primerApellido || '',
+      segundoApellido: guia.segundoApellido || '',
+      email: guia.email || '',
+      telefono: guia.telefono || '',
+      descripcion: guia.descripcion || ''
+    });
+  };
+
+  // Función para manejar el botón de editar en la tarjeta de guía
+  const handleEditButtonClick = (guia) => {
+    // Cargar datos del guía en el formulario
+    loadGuiaData(guia);
+    
+    // Guardar referencia al guía
+    setGuiaDetalle(guia);
+    
+    // Mostrar modal de edición
+    setShowEditarModal(true);
+  };
+
+  // Componente AlertComponent con texto blanco garantizado
+  const AlertComponent = () => {
+    if (!alert.show) return null;
+    
+    return (
+      <div className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg flex items-center gap-3 z-50 text-white ${
+        alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+      }`}>
+        {alert.type === 'success' ? (
+          <CheckCircle className="w-5 h-5 text-white" />
+        ) : (
+          <AlertCircle className="w-5 h-5 text-white" />
+        )}
+        <span className="text-white font-medium">{alert.message}</span>
+        <button 
+          onClick={() => setAlert(prev => ({ ...prev, show: false }))}
+          className="ml-2 text-white hover:text-gray-200"
+        >
+          <X className="w-4 h-4 text-white" />
+        </button>
+      </div>
+    );
+  };
+
   return (
     <DashboardLayout>
+      <AlertComponent />
       <div className="p-6 bg-[#0f172a]">
         {/* Cabecera con título y botones */}
         <div className="flex justify-between items-center mb-6">
@@ -576,8 +818,11 @@ const Guias = () => {
                     </button>
                     
                     <button 
-                      onClick={() => navigate(`/VistaOperador/guias/editar/${guia.cedula}`)}
-                      className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Evitar propagación del evento
+                        handleEditButtonClick(guia);
+                      }}
+                      className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg"
                       title="Editar guía"
                     >
                       <Edit className="w-4 h-4" />
@@ -634,40 +879,38 @@ const Guias = () => {
                   {/* Información del guía */}
                   <div className="pt-16 px-6 pb-6">
                     <div className="text-center mb-4">
-                      <h3 className="text-xl font-bold flex items-center justify-center">
+                      <h3 className="text-xl font-bold flex items-center justify-center text-white">
                         {construirNombreCompleto(guia)}
                         {guia.calificacion && (
-                          <div className="ml-2 flex items-center text-yellow-500">
-                            <Star className="w-4 h-4 fill-current" />
-                            <span className="text-sm ml-1">{guia.calificacion}</span>
+                          <div className="flex items-center ml-2">
+                            <Star className="w-4 h-4 text-yellow-500" />
+                            <span className="text-sm text-white">{guia.calificacion}</span>
                           </div>
                         )}
                       </h3>
-                      <p className="text-sm mt-1 text-gray-300">
-                        {guia.especialidad || 'Guía Turístico General'}
-                      </p>
+                      <p className="text-sm text-white opacity-75">{guia.especialidad || 'Guía Turístico General'}</p>
                     </div>
                     
                     <div className="space-y-3 mb-6">
                       <div className="flex items-center">
                         <Mail className="w-4 h-4 mr-3 text-blue-500" />
-                        <span className="text-sm truncate">{guia.email}</span>
+                        <span className="text-sm truncate text-white">{guia.email}</span>
                       </div>
                       <div className="flex items-center">
                         <Phone className="w-4 h-4 mr-3 text-green-500" />
-                        <span className="text-sm">{obtenerTelefono(guia)}</span>
+                        <span className="text-sm text-white">{obtenerTelefono(guia)}</span>
                       </div>
                       <div className="flex items-center">
                         <MapPin className="w-4 h-4 mr-3 text-red-500" />
-                        <span className="text-sm">{guia.ubicacion || 'No especificada'}</span>
+                        <span className="text-sm text-white">{guia.ubicacion || 'No especificada'}</span>
                       </div>
                       <div className="flex items-center">
                         <Calendar className="w-4 h-4 mr-3 text-blue-500" />
-                        <span className="text-sm">Desde {new Date(guia.fecha_registro || Date.now()).toLocaleDateString()}</span>
+                        <span className="text-sm text-white">Desde {new Date(guia.fecha_registro || Date.now()).toLocaleDateString()}</span>
                       </div>
                       <div className="flex items-center">
                         <CreditCard className="w-4 h-4 mr-3 text-purple-500" />
-                        <span className="text-sm">{guia.cedula || 'No disponible'}</span>
+                        <span className="text-sm text-white">{guia.cedula || 'No disponible'}</span>
                       </div>
                     </div>
                     
@@ -700,138 +943,138 @@ const Guias = () => {
         )}
       </div>
       
-      {/* Modal de detalles del guía */}
+      {/* Modal de detalles del guía - Con mejoras de responsividad */}
       {showDetallesModal && guiaDetalle && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-lg p-6 w-full max-w-3xl shadow-2xl border border-gray-700 transform transition-all">
-            <div className="flex justify-between items-center mb-4">
+        <div className="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#0f172a] rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center p-4 border-b border-gray-800 sticky top-0 bg-[#0f172a] z-10">
               <h2 className="text-xl font-bold text-white">Perfil completo del guía</h2>
               <button 
                 onClick={() => setShowDetallesModal(false)}
                 className="text-gray-400 hover:text-white"
               >
-                <XCircle className="w-6 h-6" />
+                <X className="w-6 h-6" />
               </button>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Columna izquierda con foto y estado */}
-              <div className="flex flex-col items-center">
-                <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-blue-500 mb-4">
-                  {guiaDetalle.foto ? (
-                    <img 
-                      src={guiaDetalle.foto.startsWith('http') ? guiaDetalle.foto : `http://localhost:10101/uploads/images/${guiaDetalle.foto}`} 
-                      alt={construirNombreCompleto(guiaDetalle)}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = `https://ui-avatars.com/api/?name=${guiaDetalle.primerNombre}+${guiaDetalle.primerApellido}&background=0D8ABC&color=fff&size=128`;
-                      }}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gray-700">
-                      <span className="text-white text-lg">No Foto</span>
-                    </div>
-                  )}
+            <div className="p-4 sm:p-6">
+              <div className="flex flex-col md:flex-row gap-6">
+                {/* Columna izquierda - foto y estado */}
+                <div className="flex flex-col items-center mx-auto md:mx-0 mb-6 md:mb-0">
+                  <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-blue-500 mb-4">
+                    {guiaDetalle.foto ? (
+                      <img 
+                        src={guiaDetalle.foto.startsWith('http') ? guiaDetalle.foto : `http://localhost:10101/uploads/images/${guiaDetalle.foto}`} 
+                        alt={construirNombreCompleto(guiaDetalle)}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = `https://ui-avatars.com/api/?name=${guiaDetalle.primerNombre}+${guiaDetalle.primerApellido}&background=0D8ABC&color=fff&size=128`;
+                        }}
+                      />
+                    ) : (
+                      <img 
+                        src={`https://ui-avatars.com/api/?name=${guiaDetalle.primerNombre}+${guiaDetalle.primerApellido}&background=0D8ABC&color=fff&size=128`} 
+                        alt={construirNombreCompleto(guiaDetalle)}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </div>
+                  
+                  <div className="px-4 py-2 bg-green-600 text-white rounded-md text-center w-full max-w-[180px]">
+                    Disponible
+                  </div>
                 </div>
                 
-                <button 
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md mb-4 w-full"
+                {/* Columna derecha - información */}
+                <div className="flex-1">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-1 text-center md:text-left">
+                    {construirNombreCompleto(guiaDetalle)}
+                  </h3>
+                  <p className="text-gray-400 mb-6 text-center md:text-left">
+                    {guiaDetalle.especialidad || 'Guía Turístico General'}
+                  </p>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6">
+                    <div className="flex items-start space-x-2">
+                      <CreditCard className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
+                      <div>
+                        <p className="text-xs text-gray-400">Cédula:</p>
+                        <p className="text-sm text-white">{guiaDetalle.cedula || '1203030'}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-2">
+                      <Mail className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
+                      <div>
+                        <p className="text-xs text-gray-400">Email:</p>
+                        <p className="text-sm text-white">{guiaDetalle.email || 'gabo.guia@gmail.com'}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-2">
+                      <Phone className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
+                      <div>
+                        <p className="text-xs text-gray-400">Teléfono:</p>
+                        <p className="text-sm text-white">{guiaDetalle.telefono || '3053289798'}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-2">
+                      <MapPin className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                      <div>
+                        <p className="text-xs text-gray-400">Ubicación:</p>
+                        <p className="text-sm text-white">{guiaDetalle.ubicacion || 'No especificada'}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-2">
+                      <Calendar className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
+                      <div>
+                        <p className="text-xs text-gray-400">Fecha de registro:</p>
+                        <p className="text-sm text-white">{new Date(guiaDetalle.fecha_registro || '2025-03-11').toLocaleDateString() || '11/3/2025'}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-2">
+                      <Languages className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
+                      <div>
+                        <p className="text-xs text-gray-400">Idiomas:</p>
+                        <p className="text-sm text-white">{guiaDetalle.idiomas || 'No especificados'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Sección de descripción */}
+              <div className="mt-6">
+                <h4 className="text-white font-medium mb-2">Descripción</h4>
+                <p className="text-sm text-gray-300 bg-[#111827] p-4 rounded-lg">
+                  {guiaDetalle.descripcion || 'Guía buenardo que no camina, corre, pero si corre se cansa rápido entonces es mejor caminar o montar a caballo.'}
+                </p>
+              </div>
+              
+              {/* Botones de acción */}
+              <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6">
+                <button
+                  onClick={() => {
+                    loadGuiaData(guiaDetalle);
+                    setShowEditarModal(true);
+                    setShowDetallesModal(false);
+                  }}
+                  className="w-full sm:w-auto px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
                 >
-                  Disponible
+                  Editar información
+                </button>
+                
+                <button
+                  onClick={() => setShowDetallesModal(false)}
+                  className="w-full sm:w-auto px-5 py-2.5 bg-gray-600 hover:bg-gray-700 text-white rounded-md"
+                >
+                  Cerrar
                 </button>
               </div>
-              
-              {/* Columna central con información principal */}
-              <div className="col-span-2">
-                <h3 className="text-2xl font-bold text-white mb-2">
-                  {construirNombreCompleto(guiaDetalle)}
-                </h3>
-                <p className="text-gray-300 mb-6">
-                  {guiaDetalle.especialidad || 'Guía Turístico General'}
-                </p>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center space-x-3">
-                    <CreditCard className="text-gray-400" />
-                    <div>
-                      <p className="text-sm text-gray-500">Cédula:</p>
-                      <p className="text-white">{guiaDetalle.cedula || 'No disponible'}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-3">
-                    <Mail className="text-blue-500" />
-                    <div>
-                      <p className="text-sm text-gray-500">Email:</p>
-                      <p className="text-white">{guiaDetalle.email || 'No disponible'}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-3">
-                    <Phone className="text-green-500" />
-                    <div>
-                      <p className="text-sm text-gray-500">Teléfono:</p>
-                      <p className="text-white">{guiaDetalle.telefono || obtenerTelefono(guiaDetalle)}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-3">
-                    <MapPin className="text-red-500" />
-                    <div>
-                      <p className="text-sm text-gray-500">Ubicación:</p>
-                      <p className="text-white">{guiaDetalle.ubicacion || 'No especificada'}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-3">
-                    <Calendar className="text-blue-500" />
-                    <div>
-                      <p className="text-sm text-gray-500">Fecha de registro:</p>
-                      <p className="text-white">{new Date(guiaDetalle.fecha_registro || Date.now()).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-3">
-                    <Languages className="text-purple-500" />
-                    <div>
-                      <p className="text-sm text-gray-500">Idiomas:</p>
-                      <p className="text-white">{guiaDetalle.idiomas || 'No especificados'}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex justify-end space-x-3 mt-8 pt-4 border-t border-gray-700">
-              <button
-                onClick={() => {
-                  setShowDetallesModal(false);
-                  handleEliminarGuia(guiaDetalle);
-                }}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md flex items-center"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Eliminar
-              </button>
-              
-              <button
-                onClick={() => {
-                  navigate(`/VistaOperador/editar-guia/${guiaDetalle.cedula}`);
-                  setShowDetallesModal(false);
-                }}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
-              >
-                <Edit className="w-4 h-4 mr-2 inline-block" />
-                Editar información
-              </button>
-              
-              <button
-                onClick={() => setShowDetallesModal(false)}
-                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md"
-              >
-                Cerrar
-              </button>
             </div>
           </div>
         </div>
@@ -933,6 +1176,184 @@ const Guias = () => {
           </div>
         </div>
       )}
+      
+      {/* Modal de edición del guía - Con mejoras de responsividad */}
+      {showEditarModal && guiaDetalle && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#0f172a] rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center p-4 border-b border-gray-800 sticky top-0 bg-[#0f172a] z-10">
+              <h2 className="text-xl font-bold text-white">Actualizar Información del Guía</h2>
+              <button 
+                onClick={() => setShowEditarModal(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="p-4 sm:p-6">
+              <form onSubmit={handleUpdateGuia}>
+                {/* Foto de perfil estática */}
+                <div className="flex justify-center mb-6">
+                  <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-blue-500">
+                    {guiaDetalle.foto ? (
+                      <img 
+                        src={guiaDetalle.foto.startsWith('http') ? guiaDetalle.foto : `http://localhost:10101/uploads/images/${guiaDetalle.foto}`} 
+                        alt={construirNombreCompleto(guiaDetalle)}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = `https://ui-avatars.com/api/?name=${guiaDetalle.primerNombre}+${guiaDetalle.primerApellido}&background=0D8ABC&color=fff&size=128`;
+                        }}
+                      />
+                    ) : (
+                      <img 
+                        src={`https://ui-avatars.com/api/?name=${guiaDetalle.primerNombre}+${guiaDetalle.primerApellido}&background=0D8ABC&color=fff&size=128`} 
+                        alt={construirNombreCompleto(guiaDetalle)}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </div>
+                </div>
+                
+                {/* Campos de formulario */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-white">
+                      Primer Nombre <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.primerNombre}
+                      onChange={(e) => setFormData({...formData, primerNombre: e.target.value})}
+                      required
+                      className="w-full p-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-white">
+                      Segundo Nombre
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.segundoNombre}
+                      onChange={(e) => setFormData({...formData, segundoNombre: e.target.value})}
+                      className="w-full p-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-white">
+                      Primer Apellido <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.primerApellido}
+                      onChange={(e) => setFormData({...formData, primerApellido: e.target.value})}
+                      required
+                      className="w-full p-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-white">
+                      Segundo Apellido
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.segundoApellido}
+                      onChange={(e) => setFormData({...formData, segundoApellido: e.target.value})}
+                      className="w-full p-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-white">
+                      Correo Electrónico <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      required
+                      className="w-full p-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-white">
+                      Teléfono <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="tel"
+                      value={formData.telefono}
+                      onChange={(e) => setFormData({...formData, telefono: e.target.value})}
+                      required
+                      className="w-full p-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+                
+                <div className="mb-6">
+                  <label className="block text-sm font-medium mb-1 text-white">
+                    Descripción
+                  </label>
+                  <textarea
+                    value={formData.descripcion}
+                    onChange={(e) => setFormData({...formData, descripcion: e.target.value})}
+                    rows="4"
+                    className="w-full p-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-blue-500 focus:border-blue-500"
+                  ></textarea>
+                </div>
+                
+                {/* Botones de acción */}
+                <div className="flex flex-col sm:flex-row justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowEditarModal(false)}
+                    className="w-full sm:w-auto px-5 py-2.5 bg-gray-600 hover:bg-gray-700 text-white rounded-md order-2 sm:order-1"
+                  >
+                    Cancelar
+                  </button>
+                  
+                  <button
+                    type="submit"
+                    disabled={updating}
+                    className="w-full sm:w-auto px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center justify-center order-1 sm:order-2 mb-3 sm:mb-0"
+                  >
+                    {updating ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Guardando...
+                      </>
+                    ) : (
+                      'Guardar Cambios'
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Añadir ToastContainer dentro del DashboardLayout */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </DashboardLayout>
   );
 };

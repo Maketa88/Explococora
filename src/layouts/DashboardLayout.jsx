@@ -253,12 +253,6 @@ const DashboardLayout = ({ children }) => {
       section: "Guías"
     },
     {
-      title: "Guías Verificados",
-      icon: <UserCheck className="w-5 h-5" />,
-      path: "/VistaOperador/guias-verificados",
-      section: "Guías"
-    },
-    {
       title: "Products",
       icon: <Package className="w-5 h-5" />,
       path: "/VistaOperador/products",
