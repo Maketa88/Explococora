@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import DashboardLayout from '../../../layouts/DashboardLayout';
-import { Mail, Phone, MapPin, Calendar, CheckCircle, XCircle, Search, Filter, RefreshCw, UserPlus, Award, Star, Briefcase, Globe, Languages, CreditCard } from 'lucide-react';
+import { Mail, Phone, MapPin, Calendar, CheckCircle, Clock, XCircle, Search, Filter, RefreshCw, UserPlus, Star, CreditCard, Trash2, Edit, Globe, Languages } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import SelectorEstado from '../CambioEstadoOpe/Selector_Estado_Ope';
 import logoExplococora from '../../../assets/Images/logo.webp';
 import EstadoGuia from '../../../components/Guias/EstadoGuia';
 import guiaEstadoService from '../../../services/guiaEstadoService';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Swal from 'sweetalert2';
 
 const Guias = () => {
   const navigate = useNavigate();
@@ -14,7 +16,7 @@ const Guias = () => {
   const [guiasCompletos, setGuiasCompletos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('todos'); // todos, disponible, ocupado, inactivo
   const [ordenarPor, setOrdenarPor] = useState('nombre'); // nombre, fecha, experiencia
@@ -27,6 +29,15 @@ const Guias = () => {
     ocupados: 0,
     inactivos: 0
   });
+
+  const [guiaAEliminar, setGuiaAEliminar] = useState(null);
+  const [showEliminarModal, setShowEliminarModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [countdownActive, setCountdownActive] = useState(false);
+  const [countdown, setCountdown] = useState(2);
+  const countdownRef = useRef(null);
+  const [showDetallesModal, setShowDetallesModal] = useState(false);
+  const [guiaDetalle, setGuiaDetalle] = useState(null);
 
   // Función para redirigir a la página de nuevo guía
   const handleAddGuia = () => {
@@ -45,14 +56,15 @@ const Guias = () => {
     return `${primerNombre} ${segundoNombre} ${primerApellido} ${segundoApellido}`.trim();
   };
 
-  // Nueva función para obtener el estado del operador
+  // Función corregida para obtener el estado del operador
   const obtenerEstadoOperador = async (cedula) => {
     if (!cedula) return 'disponible';
     
     try {
       const token = localStorage.getItem('token');
       
-      const response = await axios.get(`http://localhost:10101/usuarios/consultar-estado/${cedula}`, {
+      // Ruta corregida según tu configuración de API
+      const response = await axios.get(`http://localhost:10101/usuarios/consultar-estado/cedula/${cedula}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -60,15 +72,13 @@ const Guias = () => {
       
       return response.data?.data?.estado || 'disponible';
     } catch (error) {
-      console.error(`Error al obtener estado del operador ${cedula}:`, error);
+      // Sin mensajes de error en consola
       return 'disponible';
     }
   };
 
   // Función para actualizar contadores basados en la lista de guías
   const actualizarContadores = (listaGuias) => {
-    if (!Array.isArray(listaGuias)) return;
-    
     const conteo = {
       total: listaGuias.length,
       disponibles: 0,
@@ -77,7 +87,7 @@ const Guias = () => {
     };
     
     listaGuias.forEach(guia => {
-      const estado = guia.estado || guiaEstadoService.getEstado(guia.cedula) || 'disponible';
+      const estado = guia.estado || 'disponible';
       
       switch (estado) {
         case 'disponible':
@@ -90,12 +100,42 @@ const Guias = () => {
           conteo.inactivos++;
           break;
         default:
-          // Asumimos que es disponible por defecto
           conteo.disponibles++;
       }
     });
     
     setContadores(conteo);
+  };
+
+  // Función para filtrar guías según búsqueda y filtros
+  const guiasFiltrados = () => {
+    return guiasCompletos.filter(guia => {
+      // Filtro por término de búsqueda en nombre o cédula
+      const nombreCompleto = construirNombreCompleto(guia).toLowerCase();
+      const cedula = (guia.cedula || '').toString().toLowerCase();
+      const termino = searchTerm.toLowerCase();
+      
+      const coincideTermino = 
+        nombreCompleto.includes(termino) || 
+        cedula.includes(termino);
+      
+      // Filtro por estado
+      const coincideEstado = 
+        filtroEstado === 'todos' || 
+        guia.estado === filtroEstado;
+      
+      return coincideTermino && coincideEstado;
+    }).sort((a, b) => {
+      // Ordenar según criterio seleccionado
+      if (ordenarPor === 'nombre') {
+        return construirNombreCompleto(a).localeCompare(construirNombreCompleto(b));
+      } else if (ordenarPor === 'fecha') {
+        const fechaA = new Date(a.fecha_registro || 0);
+        const fechaB = new Date(b.fecha_registro || 0);
+        return fechaB - fechaA; // Más reciente primero
+      }
+      return 0;
+    });
   };
 
   useEffect(() => {
@@ -112,8 +152,6 @@ const Guias = () => {
           return;
         }
         
-        console.log("Intentando obtener guías con token:", token.substring(0, 10) + "...");
-        
         // Lista de posibles endpoints para probar
         const endpoints = [
           'http://localhost:10101/guia/todos',
@@ -122,12 +160,11 @@ const Guias = () => {
         ];
         
         let guiasData = [];
-        let successEndpoint = '';
+        let encontrado = false;
         
         // Probar cada endpoint hasta encontrar uno que funcione
         for (const endpoint of endpoints) {
           try {
-            console.log(`Intentando endpoint: ${endpoint}`);
             const response = await axios.get(endpoint, {
               headers: {
                 Authorization: `Bearer ${token}`
@@ -135,125 +172,73 @@ const Guias = () => {
             });
             
             if (response.data) {
-              if (Array.isArray(response.data)) {
-                guiasData = response.data;
-              } else if (response.data && typeof response.data === 'object') {
-                guiasData = response.data.guias || response.data.data || response.data.results || [];
-                
-                if (!Array.isArray(guiasData) && typeof guiasData === 'object') {
-                  guiasData = [guiasData];
-                }
-              }
-              
-              successEndpoint = endpoint;
-              console.log(`Éxito con endpoint: ${endpoint}`);
-              break; // Salir del bucle si encontramos un endpoint que funciona
+              guiasData = Array.isArray(response.data) ? response.data : 
+                          (response.data.data || response.data.guias || []);
+              encontrado = true;
+              break;
             }
           } catch (err) {
-            console.warn(`Error con endpoint ${endpoint}:`, err.message);
+            // Silenciar errores específicos
           }
         }
         
-        if (guiasData.length === 0) {
-          // Si no pudimos obtener datos, usar datos de ejemplo para desarrollo
-          console.warn("No se pudo obtener datos de guías reales, usando datos de ejemplo");
-          guiasData = [
-            {
-              id: 1,
-              primerNombre: "Carlos",
-              segundoNombre: "Alberto",
-              primerApellido: "Rodríguez",
-              segundoApellido: "Gómez",
-              cedula: "1234567890",
-              email: "carlos@example.com",
-              telefono: "3001234567",
-              numeroCelular: "3001234567",
-              fecha_registro: "2023-01-15",
-              verificado: true,
-              experiencia: 5,
-              idiomas: "Español, Inglés",
-              ubicacion: "Armenia, Quindío"
-            },
-            {
-              id: 2,
-              primerNombre: "Ana",
-              segundoNombre: "María",
-              primerApellido: "López",
-              segundoApellido: "Pérez",
-              cedula: "0987654321",
-              email: "ana@example.com",
-              telefono: "3009876543",
-              numeroCelular: "3009876543",
-              fecha_registro: "2023-02-20",
-              verificado: false,
-              experiencia: 3,
-              idiomas: "Español",
-              ubicacion: "Salento, Quindío"
-            }
-          ];
+        if (!encontrado || !guiasData.length) {
+          setError("No se pudieron obtener los guías. Por favor, intente más tarde.");
+          setLoading(false);
+          return;
         }
         
-        setGuias(guiasData);
-        
-        // Obtener datos completos para cada guía si es posible
+        // Añadir el estado a cada guía
         const guiasCompletosPromises = guiasData.map(async (guia) => {
-          if (guia.cedula) {
+          try {
+            // Obtener el estado
+            const estado = await obtenerEstadoOperador(guia.cedula);
+            
+            // Intentar obtener perfil completo para cada guía
             try {
-              // Intentar obtener datos completos del guía
               const perfilResponse = await axios.get(`http://localhost:10101/guia/perfil-completo/${guia.cedula}`, {
                 headers: {
                   Authorization: `Bearer ${token}`
                 }
               });
               
-              // Obtener el estado actual del operador
-              const estado = await obtenerEstadoOperador(guia.cedula);
-              
-              let datosPerfil = null;
-              
               if (perfilResponse.data) {
-                if (Array.isArray(perfilResponse.data)) {
-                  if (perfilResponse.data.length > 0) {
-                    if (Array.isArray(perfilResponse.data[0])) {
-                      if (perfilResponse.data[0].length > 0) {
-                        datosPerfil = perfilResponse.data[0][0];
-                      }
-                    } else {
-                      datosPerfil = perfilResponse.data[0];
-                    }
-                  }
-                } else if (typeof perfilResponse.data === 'object') {
-                  datosPerfil = perfilResponse.data;
-                }
-              }
-              
-              if (datosPerfil) {
-                // Combinar los datos originales con los datos de perfil completo
-                return {
-                  ...guia,
-                  ...datosPerfil,
-                  estado: estado,
-                  telefono: datosPerfil.telefono || datosPerfil.numeroCelular || datosPerfil.numero_celular || guia.telefono || guia.numeroCelular || guia.numero_celular || "No disponible"
+                const perfilCompleto = perfilResponse.data.data || perfilResponse.data;
+                return { 
+                  ...guia, 
+                  ...perfilCompleto,
+                  estado, 
+                  telefono: obtenerTelefono(perfilCompleto)
                 };
               }
             } catch (perfilError) {
-              console.warn(`No se pudo obtener perfil completo para ${guia.cedula}:`, perfilError.message);
+              // Silenciar error
             }
+            
+            // Si no pudimos obtener el perfil completo, devolvemos lo básico
+            return { 
+              ...guia, 
+              estado,
+              telefono: obtenerTelefono(guia)
+            };
+          } catch (error) {
+            return { 
+              ...guia, 
+              estado: 'disponible',
+              telefono: obtenerTelefono(guia)
+            };
           }
-          
-          return { ...guia, estado: estado };
         });
         
-        const guiasCompletosData = await Promise.all(guiasCompletosPromises);
-        setGuiasCompletos(guiasCompletosData);
+        const guiasConEstado = await Promise.all(guiasCompletosPromises);
         
-        // Inicializar contadores
-        actualizarContadores(guiasCompletosData);
-        
+        setGuias(guiasData);
+        setGuiasCompletos(guiasConEstado);
+        actualizarContadores(guiasConEstado);
         setLoading(false);
-      } catch (error) {
-        console.error("Error al obtener guías:", error);
-        setError(`Error al cargar guías: ${error.message}`);
+      } catch (err) {
+        console.error("Error al cargar guías:", err);
+        setError("Error al cargar los guías: " + err.message);
         setLoading(false);
       }
     };
@@ -261,184 +246,212 @@ const Guias = () => {
     fetchGuias();
   }, []);
 
-  // Implementación del buscador y filtros
-  const handleSearch = (e) => {
-    e.preventDefault();
-    // La búsqueda se aplica instantáneamente
+  // Función para mostrar el modal de eliminación
+  const handleEliminarGuia = (guia) => {
+    setGuiaAEliminar(guia);
+    setShowEliminarModal(true);
   };
 
-  // Función para manejar el cambio de estado de un guía
-  const handleCambioEstado = (cedula, nuevoEstado) => {
-    setGuiasCompletos(prevGuias => 
-      prevGuias.map(guia => 
-        guia.cedula === cedula ? { ...guia, estado: nuevoEstado } : guia
-      )
-    );
-  };
-
-  const guiasFiltrados = () => {
-    let resultado = [...guiasCompletos];
+  // Función para iniciar la cuenta regresiva
+  const startCountdown = () => {
+    setCountdownActive(true);
+    setCountdown(2);
     
-    // Aplicar filtro por estado del operador
-    if (filtroEstado !== 'todos') {
-      resultado = resultado.filter(guia => guia.estado === filtroEstado);
-    }
-    
-    // Aplicar búsqueda por término
-    if (searchTerm.trim() !== '') {
-      const termino = searchTerm.toLowerCase();
-      resultado = resultado.filter(guia => {
-        // Crear nombre completo para búsqueda
-        const nombreCompleto = construirNombreCompleto(guia).toLowerCase();
-        
-        return nombreCompleto.includes(termino) || 
-               (guia.cedula && guia.cedula.toLowerCase().includes(termino)) ||
-               (guia.email && guia.email.toLowerCase().includes(termino)) ||
-               (guia.ubicacion && guia.ubicacion.toLowerCase().includes(termino));
+    countdownRef.current = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(countdownRef.current);
+          setCountdownActive(false);
+          handleActualDelete();
+          return 0;
+        }
+        return prev - 1;
       });
-    }
-    
-    // Aplicar ordenamiento
-    resultado.sort((a, b) => {
-      if (ordenarPor === 'nombre') {
-        const nombreA = construirNombreCompleto(a).toLowerCase();
-        const nombreB = construirNombreCompleto(b).toLowerCase();
-        return nombreA.localeCompare(nombreB);
-      } else if (ordenarPor === 'fecha') {
-        const fechaA = new Date(a.fecha_registro || 0);
-        const fechaB = new Date(b.fecha_registro || 0);
-        return fechaB - fechaA; // Más reciente primero
-      }
-      return 0;
-    });
-    
-    return resultado;
+    }, 1000);
   };
 
-  // Añadir este efecto para escuchar cambios de estado
-  useEffect(() => {
-    // Función que actualiza los contadores cuando cambia el estado de un guía
-    const handleEstadoCambiado = (event) => {
-      if (!event.detail || !event.detail.cedula) return;
+  // Función para cancelar la cuenta regresiva
+  const cancelCountdown = () => {
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      setCountdownActive(false);
+    }
+  };
+
+  // Función para eliminar un guía
+  const handleActualDelete = async () => {
+    if (!guiaAEliminar) return;
+    
+    try {
+      setIsDeleting(true);
+      const token = localStorage.getItem('token');
       
-      // Actualizar el guía en la lista
-      setGuiasCompletos(prevGuias => {
-        const nuevosGuias = prevGuias.map(guia => {
-          if (guia.cedula === event.detail.cedula) {
-            return { ...guia, estado: event.detail.nuevoEstado };
-          }
-          return guia;
-        });
-        
-        // Actualizar contadores con la nueva lista
-        actualizarContadores(nuevosGuias);
-        
-        return nuevosGuias;
+      if (!token) {
+        setIsDeleting(false);
+        setShowEliminarModal(false);
+        return;
+      }
+
+      const cedula = guiaAEliminar.cedula;
+      
+      const response = await axios.delete(`http://localhost:10101/guia/eliminar/${cedula}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       });
-    };
+      
+      if (response.status === 200 || response.status === 204) {
+        // Remover el guía de la lista
+        setGuiasCompletos(prev => prev.filter(g => g.cedula !== cedula));
+        // Actualizar contadores
+        actualizarContadores(guiasCompletos.filter(g => g.cedula !== cedula));
+      }
+    } catch (error) {
+      console.error("Error al eliminar guía:", error);
+    } finally {
+      setIsDeleting(false);
+      setShowEliminarModal(false);
+      setGuiaAEliminar(null);
+    }
+  };
+
+  // Función para manejar cambios de estado
+  const handleCambioEstado = (cedula, nuevoEstado) => {
+    // Actualizar el estado en la UI inmediatamente
+    setGuiasCompletos(prev => prev.map(guia => 
+      guia.cedula === cedula ? {...guia, estado: nuevoEstado} : guia
+    ));
     
-    // Suscribirse al evento global de cambio de estado de guías
-    window.addEventListener('guiaEstadoCambiado', handleEstadoCambiado);
+    // Actualizar contadores
+    actualizarContadores(guiasCompletos.map(guia => 
+      guia.cedula === cedula ? {...guia, estado: nuevoEstado} : guia
+    ));
+  };
+
+  // Función para mostrar el modal de detalles y cargar los datos completos
+  const handleVerDetalles = async (guia) => {
+    try {
+      setGuiaDetalle(guia); // Primero mostramos los datos básicos
+      setShowDetallesModal(true);
+      
+      // Luego cargamos los datos completos
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`http://localhost:10101/guia/perfil-completo/${guia.cedula}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      if (response.data) {
+        // Actualizar con los datos completos
+        const perfilCompleto = response.data.data || response.data;
+        setGuiaDetalle({
+          ...guia,
+          ...perfilCompleto,
+          telefono: obtenerTelefono(perfilCompleto)
+        });
+      }
+    } catch (error) {
+      console.error("Error al cargar perfil completo:", error);
+      // No hacemos nada en caso de error, ya tenemos los datos básicos
+    }
+  };
+  
+  // Función para obtener el número de teléfono de cualquier formato posible
+  const obtenerTelefono = (guia) => {
+    if (!guia) return 'No disponible';
     
-    // Limpieza al desmontar
-    return () => {
-      window.removeEventListener('guiaEstadoCambiado', handleEstadoCambiado);
-    };
-  }, []);
+    // Verificar todas las posibles propiedades donde podría estar el teléfono
+    return guia.telefono || 
+           guia.celular || 
+           guia.numeroCelular || 
+           guia.numero_celular || 
+           guia.numeroDeTelefono ||
+           guia.telefonoContacto ||
+           guia.numeroTelefono ||
+           guia.telefonoMovil ||
+           'No disponible';
+  };
 
   return (
     <DashboardLayout>
-      <div className={`p-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <h1 className="text-2xl font-bold">Gestión de Guías</h1>
+      <div className="p-6 bg-[#0f172a]">
+        {/* Cabecera con título y botones */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-white">Gestión de Guías</h1>
           
-          <div className="flex flex-wrap gap-2">
-            <div className="flex">
+          <div className="flex items-center space-x-2">
+            {/* Barra de búsqueda con ancho fijo */}
+            <div className="relative">
               <input
                 type="text"
                 placeholder="Buscar por nombre, cédula o email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className={`px-4 py-2 rounded-l-md ${darkMode ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-800'} min-w-[400px]`}
+                className="w-[350px] py-2 px-4 pr-10 rounded-lg bg-[#1e293b] text-white border-none focus:ring-2 focus:ring-blue-500"
               />
-              <button 
-                onClick={handleSearch}
-                className={`px-3 py-2 rounded-r-md ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
-              >
-                <Search className="w-5 h-5" />
+              <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 p-1.5 rounded-lg">
+                <Search className="w-4 h-4 text-white" />
               </button>
             </div>
             
+            {/* Botón de filtros */}
             <button
               onClick={() => setMostrarFiltros(!mostrarFiltros)}
-              className={`px-3 py-2 rounded-md flex items-center ${darkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-purple-500 hover:bg-purple-600'} text-white`}
+              className={`py-2 px-4 ${mostrarFiltros ? 'bg-purple-700' : 'bg-purple-600 hover:bg-purple-700'} text-white rounded-lg flex items-center`}
             >
-              <Filter className="w-5 h-5 mr-1.5" />
+              <Filter className="w-5 h-5 mr-2" />
               Filtros
             </button>
             
+            {/* Botón de nuevo guía */}
             <button
               onClick={handleAddGuia}
-              className={`px-3 py-2 rounded-md flex items-center ${darkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'} text-white`}
+              className="py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center"
             >
-              <UserPlus className="w-5 h-5 mr-1.5" />
+              <UserPlus className="w-5 h-5 mr-2" />
               Nuevo guía
             </button>
             
+            {/* Botón de actualizar */}
             <button
               onClick={() => window.location.reload()}
-              className={`px-3 py-2 rounded-md flex items-center ${darkMode ? 'bg-gray-600 hover:bg-gray-700' : 'bg-gray-500 hover:bg-gray-600'} text-white`}
+              className="py-2 px-4 bg-gray-600 hover:bg-gray-700 text-white rounded-lg flex items-center"
             >
-              <RefreshCw className="w-5 h-5 mr-1.5" />
+              <RefreshCw className="w-5 h-5 mr-2" />
               Actualizar
             </button>
           </div>
         </div>
         
-        {/* Panel de filtros */}
+        {/* Sección de filtros - solo visible cuando mostrarFiltros es true */}
         {mostrarFiltros && (
-          <div className={`mb-6 p-4 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="mb-6 p-4 rounded-lg bg-[#1e293b] transition-all duration-300 ease-in-out">
+            <div className="flex justify-between items-center">
               <div>
-                <h3 className="text-sm font-medium mb-2">Estado</h3>
+                <p className="text-white text-sm font-medium mb-3">Estado</p>
                 <div className="flex space-x-2">
-                  <button
+                  <button 
                     onClick={() => setFiltroEstado('todos')}
-                    className={`px-3 py-1 text-sm rounded-md ${
-                      filtroEstado === 'todos' 
-                        ? (darkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white') 
-                        : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-800')
-                    }`}
+                    className={`py-1.5 px-3 rounded-md text-sm font-medium ${filtroEstado === 'todos' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
                   >
                     Todos
                   </button>
-                  <button
+                  <button 
                     onClick={() => setFiltroEstado('disponible')}
-                    className={`px-3 py-1 text-sm rounded-md ${
-                      filtroEstado === 'disponible' 
-                        ? (darkMode ? 'bg-green-600 text-white' : 'bg-green-500 text-white') 
-                        : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-800')
-                    }`}
+                    className={`py-1.5 px-3 rounded-md text-sm font-medium ${filtroEstado === 'disponible' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
                   >
                     Disponible
                   </button>
-                  <button
+                  <button 
                     onClick={() => setFiltroEstado('ocupado')}
-                    className={`px-3 py-1 text-sm rounded-md ${
-                      filtroEstado === 'ocupado' 
-                        ? (darkMode ? 'bg-yellow-600 text-white' : 'bg-yellow-500 text-white') 
-                        : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-800')
-                    }`}
+                    className={`py-1.5 px-3 rounded-md text-sm font-medium ${filtroEstado === 'ocupado' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
                   >
                     Ocupado
                   </button>
-                  <button
+                  <button 
                     onClick={() => setFiltroEstado('inactivo')}
-                    className={`px-3 py-1 text-sm rounded-md ${
-                      filtroEstado === 'inactivo' 
-                        ? (darkMode ? 'bg-red-600 text-white' : 'bg-red-500 text-white') 
-                        : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-800')
-                    }`}
+                    className={`py-1.5 px-3 rounded-md text-sm font-medium ${filtroEstado === 'inactivo' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
                   >
                     Inactivo
                   </button>
@@ -446,104 +459,84 @@ const Guias = () => {
               </div>
               
               <div>
-                <h3 className="text-sm font-medium mb-2">Ordenar por</h3>
+                <p className="text-white text-sm font-medium mb-3">Ordenar por</p>
                 <div className="flex space-x-2">
-                  <button
+                  <button 
                     onClick={() => setOrdenarPor('nombre')}
-                    className={`px-3 py-1 text-sm rounded-md ${
-                      ordenarPor === 'nombre' 
-                        ? (darkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white') 
-                        : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-800')
-                    }`}
+                    className={`py-1.5 px-3 rounded-md text-sm font-medium ${ordenarPor === 'nombre' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
                   >
                     Nombre
                   </button>
-                  <button
+                  <button 
                     onClick={() => setOrdenarPor('fecha')}
-                    className={`px-3 py-1 text-sm rounded-md ${
-                      ordenarPor === 'fecha' 
-                        ? (darkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white') 
-                        : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-800')
-                    }`}
+                    className={`py-1.5 px-3 rounded-md text-sm font-medium ${ordenarPor === 'fecha' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
                   >
                     Más recientes
                   </button>
                 </div>
               </div>
               
-              <div className="flex items-end">
-                <button
-                  onClick={() => {
-                    setSearchTerm('');
-                    setFiltroEstado('todos');
-                    setOrdenarPor('nombre');
-                  }}
-                  className={`px-3 py-1 text-sm rounded-md ${
-                    darkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
-                  }`}
-                >
-                  Limpiar filtros
-                </button>
-              </div>
+              <button 
+                onClick={() => {
+                  setSearchTerm('');
+                  setFiltroEstado('todos');
+                  setOrdenarPor('nombre');
+                }}
+                className="py-1.5 px-3 bg-gray-700 hover:bg-gray-600 text-white rounded-md text-sm font-medium"
+              >
+                Limpiar filtros
+              </button>
             </div>
           </div>
         )}
-
-        {/* Tarjetas de contadores */}
+        
+        {/* Tarjetas de estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className={`p-4 rounded-lg ${darkMode ? 'bg-blue-900' : 'bg-blue-700'} text-white shadow-md`}>
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="text-lg font-semibold">Total de Guías</h3>
-                <p className="text-3xl font-bold">{contadores.total}</p>
-              </div>
-              <div className="bg-blue-600 p-3 rounded-full">
-                <svg className="h-6 w-6 text-blue-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
+          <div className="p-4 rounded-lg bg-blue-900 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-blue-300">Total de Guías</p>
+              <p className="text-2xl font-bold text-white">
+                {contadores.total}
+              </p>
+            </div>
+            <div className="p-3 rounded-full bg-blue-800">
+              <UserPlus className="w-6 h-6 text-blue-300" />
             </div>
           </div>
           
-          <div className={`p-4 rounded-lg ${darkMode ? 'bg-green-900' : 'bg-green-600'} text-white shadow-md`}>
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="text-lg font-semibold">Guías Disponibles</h3>
-                <p className="text-3xl font-bold">{contadores.disponibles}</p>
-              </div>
-              <div className="bg-green-500 p-3 rounded-full">
-                <svg className="h-6 w-6 text-green-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
+          <div className="p-4 rounded-lg bg-green-900 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-green-300">Guías Disponibles</p>
+              <p className="text-2xl font-bold text-white">
+                {contadores.disponibles}
+              </p>
+            </div>
+            <div className="p-3 rounded-full bg-green-800">
+              <CheckCircle className="w-6 h-6 text-green-300" />
             </div>
           </div>
           
-          <div className={`p-4 rounded-lg ${darkMode ? 'bg-yellow-800' : 'bg-yellow-600'} text-white shadow-md`}>
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="text-lg font-semibold">Guías Ocupados</h3>
-                <p className="text-3xl font-bold">{contadores.ocupados}</p>
-              </div>
-              <div className="bg-yellow-500 p-3 rounded-full">
-                <svg className="h-6 w-6 text-yellow-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
+          <div className="p-4 rounded-lg bg-yellow-900 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-yellow-300">Guías Ocupados</p>
+              <p className="text-2xl font-bold text-white">
+                {contadores.ocupados}
+              </p>
+            </div>
+            <div className="p-3 rounded-full bg-yellow-800">
+              <Clock className="w-6 h-6 text-yellow-300" />
             </div>
           </div>
           
-          <div className={`p-4 rounded-lg ${darkMode ? 'bg-red-900' : 'bg-red-600'} text-white shadow-md`}>
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="text-lg font-semibold">Guías Inactivos</h3>
-                <p className="text-3xl font-bold">{contadores.inactivos}</p>
-              </div>
-              <div className="bg-red-500 p-3 rounded-full">
-                <svg className="h-6 w-6 text-red-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
+          <div className="p-4 rounded-lg bg-red-900 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-red-300">Guías Inactivos</p>
+              <p className="text-2xl font-bold text-white">
+                {contadores.inactivos}
+              </p>
+            </div>
+            <div className="p-3 rounded-full bg-red-800">
+              <XCircle className="w-6 h-6 text-red-300" />
             </div>
           </div>
         </div>
@@ -572,6 +565,25 @@ const Guias = () => {
                   key={guia.id || guia.cedula} 
                   className={`rounded-lg shadow-lg overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'} relative`}
                 >
+                  {/* Botones de acción */}
+                  <div className="absolute top-2 left-2 flex space-x-2 z-10">
+                    <button 
+                      onClick={() => handleEliminarGuia(guia)}
+                      className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-lg"
+                      title="Eliminar guía"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    
+                    <button 
+                      onClick={() => navigate(`/VistaOperador/guias/editar/${guia.cedula}`)}
+                      className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg"
+                      title="Editar guía"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                  </div>
+                  
                   {/* Cabecera con imagen */}
                   <div 
                     className="h-36 relative bg-cover bg-center bg-no-repeat"
@@ -613,8 +625,7 @@ const Guias = () => {
                         nombre={construirNombreCompleto(guia)}
                         tamanio="normal" 
                         onChangeEstado={(nuevoEstado) => {
-                          console.log(`Guía ${guia.primerNombre}: ${nuevoEstado}`);
-                          // Opcionalmente puedes actualizar el estado local si lo necesitas
+                          handleCambioEstado(guia.cedula, nuevoEstado);
                         }}
                       />
                     </div>
@@ -632,7 +643,7 @@ const Guias = () => {
                           </div>
                         )}
                       </h3>
-                      <p className={`text-sm mt-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      <p className="text-sm mt-1 text-gray-300">
                         {guia.especialidad || 'Guía Turístico General'}
                       </p>
                     </div>
@@ -644,7 +655,7 @@ const Guias = () => {
                       </div>
                       <div className="flex items-center">
                         <Phone className="w-4 h-4 mr-3 text-green-500" />
-                        <span className="text-sm">{guia.telefono || guia.numeroCelular || guia.numero_celular || 'No disponible'}</span>
+                        <span className="text-sm">{obtenerTelefono(guia)}</span>
                       </div>
                       <div className="flex items-center">
                         <MapPin className="w-4 h-4 mr-3 text-red-500" />
@@ -660,10 +671,9 @@ const Guias = () => {
                       </div>
                     </div>
                     
-                    {/* Botón de acción */}
                     <div className="flex justify-center">
                       <button 
-                        onClick={() => navigate(`/VistaOperador/guias/${guia.cedula}`)}
+                        onClick={() => handleVerDetalles(guia)}
                         className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium w-full max-w-[200px]"
                       >
                         Ver detalles
@@ -673,34 +683,256 @@ const Guias = () => {
                 </div>
               ))
             ) : (
-              <div className={`col-span-3 text-center py-12 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                <div className="flex flex-col items-center">
-                  <XCircle className="w-16 h-16 mb-4 opacity-30" />
-                  <h3 className="text-xl font-semibold mb-2">No se encontraron guías</h3>
-                  <p className="mb-6">No hay guías que coincidan con los criterios de búsqueda.</p>
-                  <div className="flex space-x-4">
-                    <button 
-                      onClick={() => {
-                        setSearchTerm('');
-                        setFiltroEstado('todos');
-                      }}
-                      className={`px-4 py-2 rounded-md ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
-                    >
-                      Limpiar filtros
-                    </button>
-                    <button 
-                      onClick={handleAddGuia}
-                      className={`px-4 py-2 rounded-md ${darkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'} text-white`}
-                    >
-                      Añadir nuevo guía
-                    </button>
-                  </div>
-                </div>
+              <div className="col-span-full p-8 rounded-lg text-center bg-gray-700">
+                <p className="text-xl">No se encontraron guías con los filtros aplicados</p>
+                <button 
+                  onClick={() => {
+                    setSearchTerm('');
+                    setFiltroEstado('todos');
+                  }}
+                  className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+                >
+                  Limpiar filtros
+                </button>
               </div>
             )}
           </div>
         )}
       </div>
+      
+      {/* Modal de detalles del guía */}
+      {showDetallesModal && guiaDetalle && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-gray-800 rounded-lg p-6 w-full max-w-3xl shadow-2xl border border-gray-700 transform transition-all">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-white">Perfil completo del guía</h2>
+              <button 
+                onClick={() => setShowDetallesModal(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                <XCircle className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Columna izquierda con foto y estado */}
+              <div className="flex flex-col items-center">
+                <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-blue-500 mb-4">
+                  {guiaDetalle.foto ? (
+                    <img 
+                      src={guiaDetalle.foto.startsWith('http') ? guiaDetalle.foto : `http://localhost:10101/uploads/images/${guiaDetalle.foto}`} 
+                      alt={construirNombreCompleto(guiaDetalle)}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = `https://ui-avatars.com/api/?name=${guiaDetalle.primerNombre}+${guiaDetalle.primerApellido}&background=0D8ABC&color=fff&size=128`;
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-700">
+                      <span className="text-white text-lg">No Foto</span>
+                    </div>
+                  )}
+                </div>
+                
+                <button 
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md mb-4 w-full"
+                >
+                  Disponible
+                </button>
+              </div>
+              
+              {/* Columna central con información principal */}
+              <div className="col-span-2">
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  {construirNombreCompleto(guiaDetalle)}
+                </h3>
+                <p className="text-gray-300 mb-6">
+                  {guiaDetalle.especialidad || 'Guía Turístico General'}
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center space-x-3">
+                    <CreditCard className="text-gray-400" />
+                    <div>
+                      <p className="text-sm text-gray-500">Cédula:</p>
+                      <p className="text-white">{guiaDetalle.cedula || 'No disponible'}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <Mail className="text-blue-500" />
+                    <div>
+                      <p className="text-sm text-gray-500">Email:</p>
+                      <p className="text-white">{guiaDetalle.email || 'No disponible'}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <Phone className="text-green-500" />
+                    <div>
+                      <p className="text-sm text-gray-500">Teléfono:</p>
+                      <p className="text-white">{guiaDetalle.telefono || obtenerTelefono(guiaDetalle)}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <MapPin className="text-red-500" />
+                    <div>
+                      <p className="text-sm text-gray-500">Ubicación:</p>
+                      <p className="text-white">{guiaDetalle.ubicacion || 'No especificada'}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <Calendar className="text-blue-500" />
+                    <div>
+                      <p className="text-sm text-gray-500">Fecha de registro:</p>
+                      <p className="text-white">{new Date(guiaDetalle.fecha_registro || Date.now()).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <Languages className="text-purple-500" />
+                    <div>
+                      <p className="text-sm text-gray-500">Idiomas:</p>
+                      <p className="text-white">{guiaDetalle.idiomas || 'No especificados'}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-3 mt-8 pt-4 border-t border-gray-700">
+              <button
+                onClick={() => {
+                  setShowDetallesModal(false);
+                  handleEliminarGuia(guiaDetalle);
+                }}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md flex items-center"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Eliminar
+              </button>
+              
+              <button
+                onClick={() => {
+                  navigate(`/VistaOperador/editar-guia/${guiaDetalle.cedula}`);
+                  setShowDetallesModal(false);
+                }}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
+              >
+                <Edit className="w-4 h-4 mr-2 inline-block" />
+                Editar información
+              </button>
+              
+              <button
+                onClick={() => setShowDetallesModal(false)}
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Modal de eliminación */}
+      {showEliminarModal && guiaAEliminar && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-2xl border border-gray-700 transform transition-all">
+            <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-700 pb-2">Confirmar Eliminación</h2>
+            <div className="flex items-center gap-4 mb-6 p-4 bg-gray-900/50 rounded-lg">
+              <div className="relative">
+                {guiaAEliminar.foto ? (
+                  <img 
+                    src={guiaAEliminar.foto.startsWith('http') ? guiaAEliminar.foto : `http://localhost:10101/uploads/images/${guiaAEliminar.foto}`} 
+                    alt={construirNombreCompleto(guiaAEliminar)}
+                    className="w-20 h-20 rounded-full object-cover border-2 border-red-500 shadow-lg"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = `https://ui-avatars.com/api/?name=No+Foto&background=6B7280&color=fff&size=128`;
+                    }}
+                  />
+                ) : (
+                  <div className="w-20 h-20 rounded-full bg-gray-600 border-2 border-red-500 flex items-center justify-center shadow-lg">
+                    <span className="text-white text-sm">No Foto</span>
+                  </div>
+                )}
+                <div className="absolute -top-1 -right-1 bg-red-600 w-6 h-6 rounded-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-4 h-4 text-white">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+              </div>
+              <div>
+                <p className="text-white font-bold text-lg">{construirNombreCompleto(guiaAEliminar)}</p>
+                <p className="text-gray-400 text-sm">Cédula: {guiaAEliminar.cedula}</p>
+                <div className="mt-1 inline-block px-2 py-1 bg-red-900/30 text-red-400 text-xs rounded-full">
+                  Será eliminado permanentemente
+                </div>
+              </div>
+            </div>
+            <p className="text-gray-300 mb-6 bg-yellow-800/20 border-l-4 border-yellow-600 pl-3 py-2 italic">
+              ¿Está seguro que desea eliminar este guía? Esta acción no se puede deshacer.
+            </p>
+            
+            {countdownActive && (
+              <div className="mb-6 bg-red-900/20 border border-red-600 rounded-lg p-4 text-center">
+                <p className="text-white mb-2">Eliminando en <span className="font-bold text-2xl text-red-500">{countdown}</span> segundos</p>
+                <button 
+                  onClick={cancelCountdown}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
+                >
+                  Cancelar eliminación
+                </button>
+              </div>
+            )}
+            
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setShowEliminarModal(false);
+                  setGuiaAEliminar(null);
+                }}
+                className="bg-gray-700 hover:bg-gray-600 text-white font-medium py-2.5 px-5 rounded-lg transition-all duration-300"
+                disabled={isDeleting || countdownActive}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleActualDelete}
+                className="bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2.5 px-5 rounded-lg transition-all duration-300"
+                disabled={isDeleting || countdownActive}
+              >
+                Eliminar sin conteo
+              </button>
+              <button
+                onClick={startCountdown}
+                className="bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white font-bold py-2.5 px-5 rounded-lg transition-all duration-300 flex items-center justify-center"
+                disabled={isDeleting || countdownActive}
+              >
+                {isDeleting ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Eliminando...
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Eliminar
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 };
