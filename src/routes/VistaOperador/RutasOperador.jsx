@@ -5,8 +5,6 @@ import Rutas from '../../pages/VistaOperador/Rutas/Rutas';
 import Reports from '../../pages/VistaOperador/Reports/Reports';
 import Guias from '../../pages/VistaOperador/Guias/Guias';
 import NuevoGuia from '../../pages/VistaOperador/Guias/NuevoGuia';
-// Comentamos esta importación hasta crear el archivo
-// import GuiasVerificados from '../../pages/VistaOperador/Guias/GuiasVerificados';
 import Products from '../../pages/VistaOperador/Products/Products';
 import NewProduct from '../../pages/VistaOperador/Products/NewProduct';
 import Inventory from '../../pages/VistaOperador/Products/Inventory';
@@ -23,8 +21,6 @@ const RutasOperador = () => {
       <Route path="/reports" element={<Reports />} />
       <Route path="/guias" element={<Guias />} />
       <Route path="/nuevo-guia" element={<NuevoGuia />} />
-      {/* Comentamos esta ruta hasta tener el componente */}
-      {/* <Route path="/guias-verificados" element={<GuiasVerificados />} /> */}
       <Route path="/products" element={<Products />} />
       <Route path="/new-product" element={<NewProduct />} />
       <Route path="/inventory" element={<Inventory />} />
