@@ -39,7 +39,7 @@ export const Carrusel = () => {
   }, [currentImage, previousImage]);
   
   const handleSearch = (searchData) => {
-    console.log('Datos de búsqueda:', searchData);
+    ('Datos de búsqueda:', searchData);
   };
 
   return (

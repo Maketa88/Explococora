@@ -961,7 +961,7 @@ export const SearchForm = ({ onSearch }) => {
         if (patron.test(normalizedQuery)) {
           tipoRutaRecomendada = tipo;
           intensidadRecomendacion = 100; // Alta confianza cuando hay mención explícita
-          console.log(
+          (
             `Detectada condición física para ${tipo}: ${
               normalizedQuery.match(patron)[0]
             }`
@@ -1674,7 +1674,7 @@ export const SearchForm = ({ onSearch }) => {
 
     // Normalizar la consulta
     const queryLower = query.toLowerCase().trim();
-    console.log(`Analizando si es búsqueda de tiempo: "${queryLower}"`);
+    (`Analizando si es búsqueda de tiempo: "${queryLower}"`);
 
     // 1. Formatos de tiempo explícitos
     const explicitTimePatterns = [
@@ -2006,7 +2006,7 @@ export const SearchForm = ({ onSearch }) => {
 
         // Si encontramos coincidencias (exactas o parciales), procesarlas
         if (matchingRoutes.length > 0) {
-          console.log(
+          (
             `Se encontraron ${matchingRoutes.length} coincidencias de búsqueda.`
           );
 
@@ -2029,11 +2029,11 @@ export const SearchForm = ({ onSearch }) => {
                   route.dificultad.toLowerCase() === "fácil")
             );
 
-            console.log(
+            (
               `Encontradas ${rutasFaciles.length} rutas fáciles disponibles:`
             );
             rutasFaciles.forEach((ruta) =>
-              console.log(` - ${ruta.nombreRuta}`)
+              (` - ${ruta.nombreRuta}`)
             );
 
             // Añadir rutas fáciles que no estaban en los resultados iniciales
@@ -2072,7 +2072,7 @@ export const SearchForm = ({ onSearch }) => {
               (route) => route.relevanceScore >= scoreThreshold
             );
 
-            console.log(
+            (
               `Se encontraron ${topRoutes.length} rutas de alta coincidencia con puntuación sobre ${scoreThreshold}`
             );
 
@@ -2080,14 +2080,14 @@ export const SearchForm = ({ onSearch }) => {
             const randomIndex = Math.floor(Math.random() * topRoutes.length);
             bestRoute = topRoutes[randomIndex];
 
-            console.log(
+            (
               `Seleccionada aleatoriamente: ${bestRoute.nombreRuta} (${
                 randomIndex + 1
               } de ${topRoutes.length} mejores rutas)`
             );
           }
 
-          console.log(
+          (
             "Mejor ruta encontrada:",
             bestRoute.nombreRuta,
             "con puntuación:",
@@ -2117,7 +2117,7 @@ export const SearchForm = ({ onSearch }) => {
                 (route) => route.relevanceScore >= scoreThreshold
               );
 
-              console.log(
+              (
                 `Se encontraron ${topRoutes.length} rutas de alta coincidencia con puntuación sobre ${scoreThreshold}`
               );
 
@@ -2372,13 +2372,6 @@ export const SearchForm = ({ onSearch }) => {
 
                     <div className="flex flex-col items-center">
                       {/* Indicador de carga mejorado */}
-                      <div className="relative w-20 h-20 mb-5">
-                        <div className="absolute inset-0 border-4 border-teal-200 rounded-full"></div>
-                        <div className="absolute inset-0 border-4 border-t-teal-800 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-3 h-3 bg-teal-800 rounded-full"></div>
-                        </div>
-                      </div>
 
                       <h2 className="text-2xl font-bold text-teal-800 mb-3 tracking-wide">
                         Generando tu ruta perfecta
@@ -2566,7 +2559,7 @@ export const SearchForm = ({ onSearch }) => {
                               xmlns="http://www.w3.org/2000/svg"
                             >
                               <path
-                                d="M15%,20% Q25%,25% 30%,35% T50%,45% T65%,60% T80%,75%"
+                                d="M15,20 Q25,25 30,35 T50,45 T65,60 T80,75"
                                 fill="none"
                                 stroke="#0d9488"
                                 strokeWidth="3"
