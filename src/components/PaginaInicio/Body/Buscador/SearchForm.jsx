@@ -2041,13 +2041,13 @@ export const SearchForm = ({ onSearch }) => {
                 {generatingRoute ? (
                   <>
                     <div className="w-full max-w-xl mb-9">
-                      <div className="relative aspect-video rounded-xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-500">
+                      <div className="relative aspect-video rounded-xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-500 bg-black/95">
                         <video
                           src="/videos/ia_generando.mp4"
                           autoPlay
                           loop
                           muted
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover opacity-90"
                         />
                         {/* Partículas animadas flotantes */}
                         <div className="absolute inset-0 pointer-events-none overflow-hidden">
