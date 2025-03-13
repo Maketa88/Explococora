@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { VistaIAGenerandoRuta } from './IAGenerandoRuta'
+import { VistaIAGenerandoRuta } from './IAGenerandoRuta/VistaIAGenerandoRuta'
 
 export const SearchForm = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [mostrarIA, setMostrarIA] = useState(false)
+  const [consultaActual, setConsultaActual] = useState('')
   const { t } = useTranslation()
 
   // Efecto para controlar el scroll del body cuando la modal está abierta
@@ -53,6 +54,7 @@ export const SearchForm = ({ onSearch }) => {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (searchQuery.trim()) {
+      setConsultaActual(searchQuery)
       setMostrarIA(true)
       if (onSearch) {
         onSearch(searchQuery)
@@ -79,7 +81,7 @@ export const SearchForm = ({ onSearch }) => {
           </button>
           
           <div className="p-8 md:p-10 pt-12">
-            <VistaIAGenerandoRuta />
+            <VistaIAGenerandoRuta consulta={consultaActual} />
           </div>
         </div>
       </div>

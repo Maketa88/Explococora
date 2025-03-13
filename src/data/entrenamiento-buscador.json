@@ -1,0 +1,365 @@
+{
+  "consultas": [
+    {
+      "texto": "quiero una ruta fácil",
+      "variaciones": [
+        "busco una ruta sencilla",
+        "necesito un sendero fácil",
+        "rutas para principiantes",
+        "caminata simple",
+        "ruta sin dificultad"
+      ],
+      "filtros": {
+        "dificultad": "Facil"
+      },
+      "explicacion": "Cuando el usuario busca rutas fáciles, se deben mostrar solo las rutas con dificultad 'Facil'."
+    },
+    {
+      "texto": "quiero una ruta difícil",
+      "variaciones": [
+        "busco una ruta desafiante",
+        "necesito un sendero difícil",
+        "rutas para expertos",
+        "caminata exigente",
+        "ruta con mucha dificultad",
+        "sendero para aventureros"
+      ],
+      "filtros": {
+        "dificultad": "Desafiante"
+      },
+      "explicacion": "Cuando el usuario busca rutas difíciles o desafiantes, se deben mostrar solo las rutas con dificultad 'Desafiante'."
+    },
+    {
+      "texto": "quiero una ruta moderada",
+      "variaciones": [
+        "busco una ruta intermedia",
+        "necesito un sendero de dificultad media",
+        "rutas para nivel intermedio",
+        "caminata moderada",
+        "ni muy fácil ni muy difícil"
+      ],
+      "filtros": {
+        "dificultad": "Moderada"
+      },
+      "explicacion": "Cuando el usuario busca rutas moderadas o intermedias, se deben mostrar solo las rutas con dificultad 'Moderada'."
+    },
+    {
+      "texto": "quiero una ruta de 30 minutos",
+      "variaciones": [
+        "busco una ruta corta de media hora",
+        "necesito un sendero que dure 30 min",
+        "caminata de 30 minutos",
+        "ruta rápida de media hora"
+      ],
+      "filtros": {
+        "duracion": "30 Min"
+      },
+      "explicacion": "Cuando el usuario busca rutas de 30 minutos o media hora, se deben mostrar solo las rutas con duración '30 Min'."
+    },
+    {
+      "texto": "quiero una ruta de 1 hora",
+      "variaciones": [
+        "busco una ruta de una hora",
+        "necesito un sendero que dure 60 minutos",
+        "caminata de 1 hora",
+        "ruta de 60 min"
+      ],
+      "filtros": {
+        "duracion": "1 Hora"
+      },
+      "explicacion": "Cuando el usuario busca rutas de 1 hora, se deben mostrar solo las rutas con duración '1 Hora'."
+    },
+    {
+      "texto": "quiero una ruta de 2 horas",
+      "variaciones": [
+        "busco una ruta de dos horas",
+        "necesito un sendero que dure 120 minutos",
+        "caminata de 2 horas",
+        "ruta larga de dos horas"
+      ],
+      "filtros": {
+        "duracion": "2 Horas"
+      },
+      "explicacion": "Cuando el usuario busca rutas de 2 horas, se deben mostrar solo las rutas con duración '2 Horas'."
+    },
+    {
+      "texto": "estoy embarazada",
+      "variaciones": [
+        "soy una mujer embarazada",
+        "estoy en estado de gestación",
+        "estoy esperando un bebé",
+        "estoy en estado de embarazo",
+        "rutas para embarazadas"
+      ],
+      "filtros": {
+        "dificultad": "Facil",
+        "duracion_maxima": "1 Hora"
+      },
+      "explicacion": "Cuando el usuario menciona estar embarazada, se deben mostrar rutas fáciles y preferiblemente de corta duración (máximo 1 hora)."
+    },
+    {
+      "texto": "tengo sobrepeso",
+      "variaciones": [
+        "soy una persona con sobrepeso",
+        "estoy gordo",
+        "tengo exceso de peso",
+        "soy obeso",
+        "rutas para personas con sobrepeso"
+      ],
+      "filtros": {
+        "dificultad": "Facil",
+        "distancia_maxima": 3
+      },
+      "explicacion": "Cuando el usuario menciona tener sobrepeso, se deben mostrar rutas fáciles y preferiblemente de corta distancia (máximo 3 km)."
+    },
+    {
+      "texto": "soy atlético",
+      "variaciones": [
+        "estoy en buena forma física",
+        "soy deportista",
+        "tengo buena condición física",
+        "soy una persona atlética",
+        "estoy en forma",
+        "soy delgado y activo"
+      ],
+      "filtros": {
+        "dificultad": "Desafiante"
+      },
+      "explicacion": "Cuando el usuario menciona ser atlético o estar en buena forma física, se deben mostrar rutas desafiantes."
+    },
+    {
+      "texto": "quiero ver palmas de cera",
+      "variaciones": [
+        "me interesan las palmas de cera",
+        "rutas con palmas de cera",
+        "senderos para ver palmas",
+        "caminata con palmas de cera"
+      ],
+      "filtros": {
+        "nombre_contiene": "Palmas"
+      },
+      "explicacion": "Cuando el usuario menciona palmas de cera, se deben mostrar rutas que incluyan 'Palmas' en su nombre o descripción."
+    },
+    {
+      "texto": "quiero ver el río",
+      "variaciones": [
+        "me interesan rutas con río",
+        "senderos junto al río",
+        "caminata cerca del río",
+        "rutas con vistas al río"
+      ],
+      "filtros": {
+        "nombre_contiene": "Río"
+      },
+      "explicacion": "Cuando el usuario menciona ríos, se deben mostrar rutas que incluyan 'Río' en su nombre o descripción."
+    },
+    {
+      "texto": "quiero ver cóndores",
+      "variaciones": [
+        "me interesan los cóndores",
+        "rutas para avistar cóndores",
+        "senderos con cóndores",
+        "caminata para ver aves grandes"
+      ],
+      "filtros": {
+        "nombre_contiene": "Cóndor"
+      },
+      "explicacion": "Cuando el usuario menciona cóndores, se deben mostrar rutas que incluyan 'Cóndor' en su nombre o descripción."
+    },
+    {
+      "texto": "voy con niños",
+      "variaciones": [
+        "llevo niños conmigo",
+        "rutas para hacer con niños",
+        "senderos aptos para niños",
+        "caminata familiar con niños",
+        "excursión con niños pequeños"
+      ],
+      "filtros": {
+        "dificultad": "Facil",
+        "duracion_maxima": "1 Hora"
+      },
+      "explicacion": "Cuando el usuario menciona ir con niños, se deben mostrar rutas fáciles y de corta duración."
+    },
+    {
+      "texto": "soy principiante",
+      "variaciones": [
+        "es mi primera caminata",
+        "no tengo experiencia en senderismo",
+        "nunca he hecho trekking",
+        "soy novato en rutas",
+        "primera vez que hago una ruta"
+      ],
+      "filtros": {
+        "dificultad": "Facil",
+        "distancia_maxima": 3
+      },
+      "explicacion": "Cuando el usuario menciona ser principiante, se deben mostrar rutas fáciles y de corta distancia."
+    },
+    {
+      "texto": "quiero una ruta con vistas panorámicas",
+      "variaciones": [
+        "busco vistas impresionantes",
+        "rutas con miradores",
+        "senderos con buenas vistas",
+        "caminatas con paisajes",
+        "rutas para tomar fotos del paisaje"
+      ],
+      "filtros": {
+        "nombre_contiene": "Mirador"
+      },
+      "explicacion": "Cuando el usuario menciona vistas panorámicas o miradores, se deben mostrar rutas que incluyan 'Mirador' en su nombre."
+    },
+    {
+      "texto": "tengo poco tiempo",
+      "variaciones": [
+        "dispongo de poco tiempo",
+        "necesito una ruta rápida",
+        "no tengo mucho tiempo disponible",
+        "busco algo corto",
+        "ruta express"
+      ],
+      "filtros": {
+        "duracion_maxima": "1 Hora"
+      },
+      "explicacion": "Cuando el usuario menciona tener poco tiempo, se deben mostrar rutas de corta duración (máximo 1 hora)."
+    },
+    {
+      "texto": "quiero una aventura completa",
+      "variaciones": [
+        "busco una experiencia completa",
+        "quiero ver de todo en una ruta",
+        "ruta con varias atracciones",
+        "sendero que combine varios lugares",
+        "caminata con múltiples puntos de interés"
+      ],
+      "filtros": {
+        "nombre_contiene": "Camino, Palmas"
+      },
+      "explicacion": "Cuando el usuario busca una aventura completa, se deben mostrar rutas combinadas que incluyan varios puntos de interés."
+    },
+    {
+      "texto": "voy solo",
+      "variaciones": [
+        "haré la ruta solo",
+        "senderismo en solitario",
+        "caminata individual",
+        "trekking sin compañía",
+        "excursión en solitario"
+      ],
+      "filtros": {
+        "dificultad_maxima": "Moderada"
+      },
+      "explicacion": "Cuando el usuario menciona ir solo, por seguridad se deben mostrar rutas de dificultad máxima moderada."
+    },
+    {
+      "texto": "soy mayor de 60 años",
+      "variaciones": [
+        "soy una persona mayor",
+        "tengo más de 60 años",
+        "soy de la tercera edad",
+        "soy adulto mayor",
+        "rutas para personas mayores"
+      ],
+      "filtros": {
+        "dificultad": "Facil",
+        "distancia_maxima": 3
+      },
+      "explicacion": "Cuando el usuario menciona ser mayor de 60 años, se deben mostrar rutas fáciles y de corta distancia."
+    },
+    {
+      "texto": "quiero una ruta cerca de la Virgen",
+      "variaciones": [
+        "rutas que pasen por la Virgen",
+        "senderos cerca de la estatua de la Virgen",
+        "caminata a la Virgen María",
+        "excursión a la Peña de la Virgen"
+      ],
+      "filtros": {
+        "nombre_contiene": "Virgen"
+      },
+      "explicacion": "Cuando el usuario menciona la Virgen, se deben mostrar rutas que incluyan 'Virgen' en su nombre o descripción."
+    }
+  ],
+  "recomendaciones": [
+    {
+      "condicion": "dificultad=Facil",
+      "mensaje": "Esta ruta es ideal para principiantes, personas mayores, embarazadas o familias con niños. No requiere experiencia previa en senderismo."
+    },
+    {
+      "condicion": "dificultad=Moderada",
+      "mensaje": "Esta ruta requiere cierta condición física. Es recomendable tener algo de experiencia previa en senderismo."
+    },
+    {
+      "condicion": "dificultad=Desafiante",
+      "mensaje": "Esta ruta es exigente y requiere buena condición física. No es recomendable para principiantes, personas con problemas de salud o movilidad reducida."
+    },
+    {
+      "condicion": "duracion=30 Min",
+      "mensaje": "Esta ruta es muy corta, perfecta si dispones de poco tiempo o quieres una actividad rápida."
+    },
+    {
+      "condicion": "duracion=1 Hora",
+      "mensaje": "Esta ruta tiene una duración moderada, ideal para una actividad de media mañana o media tarde."
+    },
+    {
+      "condicion": "duracion>1 Hora",
+      "mensaje": "Esta ruta es larga, asegúrate de llevar agua, protección solar y algún refrigerio."
+    },
+    {
+      "condicion": "nombre_contiene=Mirador",
+      "mensaje": "Esta ruta ofrece vistas panorámicas impresionantes. No olvides llevar tu cámara."
+    },
+    {
+      "condicion": "nombre_contiene=Palmas",
+      "mensaje": "En esta ruta podrás admirar las majestuosas palmas de cera, el árbol nacional de Colombia."
+    },
+    {
+      "condicion": "nombre_contiene=Río",
+      "mensaje": "Esta ruta pasa cerca de ríos o arroyos. Podrás disfrutar del sonido del agua y refrescarte."
+    },
+    {
+      "condicion": "nombre_contiene=Cóndor",
+      "mensaje": "En esta ruta podrías avistar cóndores, las aves voladoras más grandes del mundo. Lleva binoculares si es posible."
+    }
+  ],
+  "instrucciones_procesamiento": {
+    "analisis_consulta": "Analizar la consulta del usuario para identificar palabras clave relacionadas con dificultad, duración, condición física o puntos de interés.",
+    "coincidencia_patrones": "Comparar la consulta con los patrones predefinidos y sus variaciones para determinar la intención del usuario.",
+    "aplicacion_filtros": "Aplicar los filtros correspondientes a la intención identificada para obtener resultados relevantes.",
+    "personalizacion_resultados": "Ordenar los resultados según la relevancia para la consulta específica del usuario.",
+    "recomendaciones_adicionales": "Añadir recomendaciones personalizadas basadas en las características de las rutas y la consulta del usuario."
+  },
+  "ejemplos_procesamiento": [
+    {
+      "consulta_usuario": "Estoy embarazada y quiero hacer una caminata corta",
+      "analisis": "Se identifica 'embarazada' (condición física especial) y 'caminata corta' (duración)",
+      "filtros_aplicados": {
+        "dificultad": "Facil",
+        "duracion_maxima": "1 Hora"
+      },
+      "resultado_esperado": ["Planchon", "Mirador de Camino"],
+      "recomendacion": "Estas rutas son ideales para embarazadas por su baja dificultad y corta duración. Recuerda llevar agua y caminar a tu propio ritmo."
+    },
+    {
+      "consulta_usuario": "Soy atlético y quiero ver cóndores",
+      "analisis": "Se identifica 'atlético' (buena condición física) y 'cóndores' (punto de interés)",
+      "filtros_aplicados": {
+        "dificultad": "Desafiante",
+        "nombre_contiene": "Cóndor"
+      },
+      "resultado_esperado": ["Mirador del Cóndor"],
+      "recomendacion": "Esta ruta desafiante es perfecta para personas atléticas y ofrece la posibilidad de avistar cóndores. Lleva binoculares y prepárate para una experiencia única."
+    },
+    {
+      "consulta_usuario": "Tengo poco tiempo pero quiero ver algo bonito",
+      "analisis": "Se identifica 'poco tiempo' (duración corta) y 'algo bonito' (vistas/paisaje)",
+      "filtros_aplicados": {
+        "duracion_maxima": "1 Hora",
+        "nombre_contiene": "Mirador"
+      },
+      "resultado_esperado": ["Mirador de Camino"],
+      "recomendacion": "Esta ruta corta te ofrece hermosas vistas en poco tiempo. Perfecta para una escapada rápida con paisajes impresionantes."
+    }
+  ]
+} 

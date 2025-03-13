@@ -1,15 +1,21 @@
 import { useEffect, useState } from 'react';
+import { iaBuscadorService } from '../../../../../services/IABuscadorService';
+import './animaciones.css';
 import { PanelProcesamiento } from './PanelProcesamiento';
 import { ResultadoRuta } from './ResultadoRuta';
 import { VideoIA } from './VideoIA';
-import './animaciones.css';
 
-export const VistaIAGenerandoRuta = () => {
+export const VistaIAGenerandoRuta = ({ consulta = '' }) => {
   const [tiempoRestante, setTiempoRestante] = useState(10);
   const [mostrarResultado, setMostrarResultado] = useState(false);
+  const [resultadoIA, setResultadoIA] = useState(null);
 
-  // Efecto para simular que después de un tiempo se muestran los resultados
+  // Efecto para procesar la consulta con el servicio de IA
   useEffect(() => {
+    // Procesar la consulta con el servicio de IA
+    const resultado = iaBuscadorService.procesarConsulta(consulta);
+    setResultadoIA(resultado);
+    
     // Simulación de mostrar resultados después de un tiempo
     const timer = setTimeout(() => {
       // Mostrar resultados
@@ -31,7 +37,7 @@ export const VistaIAGenerandoRuta = () => {
       clearTimeout(timer);
       clearInterval(intervalo);
     };
-  }, []);
+  }, [consulta]);
 
   return (
     <div className="w-full flex flex-col items-center">
@@ -41,7 +47,7 @@ export const VistaIAGenerandoRuta = () => {
           <PanelProcesamiento tiempoRestante={tiempoRestante} />
         </>
       ) : (
-        <ResultadoRuta />
+        <ResultadoRuta resultadoIA={resultadoIA} consulta={consulta} />
       )}
     </div>
   );
