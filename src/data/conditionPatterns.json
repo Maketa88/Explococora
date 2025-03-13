@@ -14,7 +14,13 @@
     "tercera\\s+edad",
     "soy\\s+(mayor|anciano|anciana|viejo|vieja)",
     "tengo\\s+más\\s+de\\s+(6[0-9]|[7-9][0-9])",
-    "problemas?\\s+(de\\s+)?(rodilla|cadera|espalda|respiratorios|cardiacos?|corazón)"
+    "problemas?\\s+(de\\s+)?(rodilla|cadera|espalda|respiratorios|cardiacos?|corazón)",
+    "busco\\s+(algo\\s+)?(fácil|facil|sencillo|tranquilo|corto|rápido)",
+    "quiero\\s+(algo\\s+)?(fácil|facil|sencillo|tranquilo|corto|rápido)",
+    "prefiero\\s+(algo\\s+)?(fácil|facil|sencillo|tranquilo|corto|rápido)",
+    "poco\\s+tiempo",
+    "ruta\\s+(corta|fácil|facil|rápida|rapida)",
+    "menos\\s+de\\s+(1|una)\\s+(hora|hr)"
   ],
   "rutasModeradamente": [
     "soy\\s+(normal|promedio|regular|común|del\\s+montón)",
@@ -24,7 +30,15 @@
     "estado\\s+físico\\s+(normal|regular|promedio)",
     "nivel\\s+(intermedio|medio)",
     "experiencia\\s+media",
-    "algo\\s+de\\s+experiencia"
+    "algo\\s+de\\s+experiencia",
+    "busco\\s+(algo\\s+)?(moderado|intermedio|normal)",
+    "quiero\\s+(algo\\s+)?(moderado|intermedio|normal)",
+    "prefiero\\s+(algo\\s+)?(moderado|intermedio|normal)",
+    "tiempo\\s+moderado",
+    "ruta\\s+(moderada|intermedia|normal)",
+    "entre\\s+(1|una)\\s+y\\s+(2|dos)\\s+(horas|hrs)",
+    "combinación\\s+de\\s+rutas",
+    "ruta\\s+combinada"
   ],
   "rutasDificiles": [
     "soy\\s+(delgado|atlético|deportista|activo|flaco|fitness|fuerte)",
@@ -36,6 +50,15 @@
     "experiencia\\s+(avanzada|alta)",
     "resistencia\\s+(alta|buena)",
     "condición\\s+física\\s+(excelente|muy\\s+buena|óptima)",
-    "soy\\s+(corredor|maratonista|ciclista|escalador|montañista)"
+    "soy\\s+(corredor|maratonista|ciclista|escalador|montañista)",
+    "busco\\s+(algo\\s+)?(difícil|dificil|desafiante|retador|largo|completo)",
+    "quiero\\s+(algo\\s+)?(difícil|dificil|desafiante|retador|largo|completo)",
+    "prefiero\\s+(algo\\s+)?(difícil|dificil|desafiante|retador|largo|completo)",
+    "mucho\\s+tiempo",
+    "ruta\\s+(larga|difícil|dificil|desafiante|completa)",
+    "más\\s+de\\s+(2|dos)\\s+(horas|hrs)",
+    "ver\\s+(todo|todos\\s+los\\s+miradores)",
+    "quiero\\s+ver\\s+(cóndores|condores)",
+    "avistamiento\\s+de\\s+(cóndores|condores)"
   ]
 }
