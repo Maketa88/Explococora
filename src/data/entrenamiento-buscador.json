@@ -7,7 +7,9 @@
         "necesito un sendero fácil",
         "rutas para principiantes",
         "caminata simple",
-        "ruta sin dificultad"
+        "ruta sin dificultad",
+        "ruta facil",
+        "facil"
       ],
       "filtros": {
         "dificultad": "Facil"
@@ -22,7 +24,8 @@
         "rutas para expertos",
         "caminata exigente",
         "ruta con mucha dificultad",
-        "sendero para aventureros"
+        "sendero para aventureros",
+        "quiero una ruta muy difícil"
       ],
       "filtros": {
         "dificultad": "Desafiante"
@@ -49,7 +52,10 @@
         "busco una ruta corta de media hora",
         "necesito un sendero que dure 30 min",
         "caminata de 30 minutos",
-        "ruta rápida de media hora"
+        "ruta rápida de media hora",
+        "ruta de media hora",
+        "ruta de 30 minutos"
+        
       ],
       "filtros": {
         "duracion": "30 Min"
