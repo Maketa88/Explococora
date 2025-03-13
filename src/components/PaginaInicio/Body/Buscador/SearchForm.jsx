@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { VistaIAGenerandoRuta } from './IAGenerandoRuta'
 
@@ -6,6 +7,48 @@ export const SearchForm = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [mostrarIA, setMostrarIA] = useState(false)
   const { t } = useTranslation()
+
+  // Efecto para controlar el scroll del body cuando la modal está abierta
+  useEffect(() => {
+    const header = document.querySelector('header')
+    
+    if (mostrarIA) {
+      // Deshabilitar scroll en el body cuando la modal está abierta
+      document.body.style.overflow = 'hidden'
+      
+      // Ocultar el header cuando el modal está abierto
+      if (header) {
+        // Guardar el z-index original
+        header.dataset.originalZIndex = header.style.zIndex || ''
+        header.dataset.originalPosition = header.style.position || ''
+        
+        // Aplicar nuevos estilos para ocultar el header
+        header.style.zIndex = '-1'
+        header.style.position = 'relative'
+      }
+    } else {
+      // Restaurar scroll cuando se cierra
+      document.body.style.overflow = 'auto'
+      
+      // Restaurar el header
+      if (header) {
+        // Restaurar los estilos originales
+        header.style.zIndex = header.dataset.originalZIndex || ''
+        header.style.position = header.dataset.originalPosition || ''
+      }
+    }
+    
+    // Limpieza al desmontar
+    return () => {
+      document.body.style.overflow = 'auto'
+      
+      // Restaurar el header
+      if (header) {
+        header.style.zIndex = header.dataset.originalZIndex || ''
+        header.style.position = header.dataset.originalPosition || ''
+      }
+    }
+  }, [mostrarIA])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -15,6 +58,32 @@ export const SearchForm = ({ onSearch }) => {
         onSearch(searchQuery)
       }
     }
+  }
+
+  // Componente Modal que se renderizará en el portal
+  const Modal = () => {
+    if (!mostrarIA) return null
+    
+    return (
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-start justify-center overflow-y-auto py-10 px-4">
+        <div className="relative w-full max-w-5xl mx-auto mt-20 mb-10 bg-white rounded-2xl shadow-2xl">
+          {/* Botón para cerrar - ahora fuera del contenedor principal para asegurar visibilidad */}
+          <button 
+            onClick={() => setMostrarIA(false)}
+            className="absolute -top-4 -right-4 bg-teal-600 hover:bg-teal-700 text-white rounded-full p-3 z-[10000] transition-colors duration-300 shadow-lg"
+            aria-label="Cerrar"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          
+          <div className="p-8 md:p-10 pt-12">
+            <VistaIAGenerandoRuta />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -43,27 +112,8 @@ export const SearchForm = ({ onSearch }) => {
         </button>
       </form>
 
-      {/* Vista de IA generando ruta como pantalla superpuesta */}
-      {mostrarIA && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center overflow-auto">
-          <div className="relative w-full max-w-5xl mx-auto my-8 bg-white rounded-2xl shadow-2xl">
-            {/* Botón para cerrar */}
-            <button 
-              onClick={() => setMostrarIA(false)}
-              className="absolute top-4 right-4 bg-teal-600 hover:bg-teal-700 text-white rounded-full p-2 z-50 transition-colors duration-300"
-              aria-label="Cerrar"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            
-            <div className="p-6 md:p-8">
-              <VistaIAGenerandoRuta />
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Renderizar el modal en un portal */}
+      {mostrarIA && createPortal(<Modal />, document.body)}
     </>
   )
 }

@@ -15,11 +15,7 @@ export const VistaIAGenerandoRuta = () => {
 
   return (
     <div className="w-full flex flex-col items-center">
-      <div className="text-center mb-6">
-        <h2 className="text-3xl md:text-4xl font-bold text-teal-600">
-          IA Generando Tu Ruta Perfecta
-        </h2>
-      </div>
+      
       
       <VideoIA />
       <PanelProcesamiento />
