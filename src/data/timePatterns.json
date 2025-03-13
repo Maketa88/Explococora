@@ -29,5 +29,10 @@
   "\\bque\\s+dure\\s+(20|veinte|25|veinticinco|30|treinta|35|treinta\\s+y\\s+cinco|40|cuarenta|45|cuarenta\\s+y\\s+cinco|50|cincuenta)\\s+(minutos|min|mins)\\b",
   "\\bdure\\s+(20|veinte|25|veinticinco|30|treinta|35|treinta\\s+y\\s+cinco|40|cuarenta|45|cuarenta\\s+y\\s+cinco|50|cincuenta)\\s+(minutos|min|mins)\\b",
   "\\bmedia\\s+hora\\b",
-  "\\bcuarto\\s+de\\s+hora\\b"
+  "\\bcuarto\\s+de\\s+hora\\b",
+  "\\b(\\d+)\\s+Hora\\s+y\\s+(\\d+)\\s+Min\\b",
+  "\\b(\\d+)\\s+Horas\\s+y\\s+(\\d+)\\s+Min\\b",
+  "\\b(\\d+)\\s+Hora\\b",
+  "\\b(\\d+)\\s+Horas\\b",
+  "\\b(\\d+)\\s+Min\\b"
 ] 

@@ -16,6 +16,9 @@ export const SearchForm = ({ onSearch }) => {
   const [showAIRouteGenerator, setShowAIRouteGenerator] = useState(false);
   const [generatingRoute, setGeneratingRoute] = useState(false);
   const [generatedRoute, setGeneratedRoute] = useState(null);
+  // Nuevos estados para manejar las fotos
+  const [rutaConFoto, setRutaConFoto] = useState(null);
+  const [cargandoFoto, setCargandoFoto] = useState(false);
 
   // Cargar todas las rutas al iniciar el componente
   useEffect(() => {
@@ -1555,6 +1558,57 @@ export const SearchForm = ({ onSearch }) => {
     return false;
   };
 
+  // Nueva función para obtener las fotos de una ruta
+  const obtenerFotosRuta = async (idRuta) => {
+    try {
+      // Verificar que el ID sea válido
+      if (!idRuta || isNaN(idRuta)) {
+        console.warn("ID de ruta no válido:", idRuta);
+        setCargandoFoto(false);
+        return;
+      }
+      
+      setCargandoFoto(true);
+      const response = await axios.get(`http://localhost:10101/rutas/fotos-publicas/${idRuta}`);
+      
+      if (response.data && response.data.fotos && Array.isArray(response.data.fotos)) {
+        let fotosArray = [];
+        
+        // Extraer las URLs de las fotos según la estructura exacta
+        const primerElemento = response.data.fotos[0];
+        
+        if (Array.isArray(primerElemento)) {
+          // Extraer las URLs de los objetos en el primer elemento
+          primerElemento.map(item => {
+            if (item && typeof item === 'object' && item.foto && typeof item.foto === 'string') {
+              fotosArray.push(item.foto);
+            }
+          });
+        }
+        
+        // Limitar a solo 1 foto
+        const fotosFiltradas = fotosArray.slice(0, 1);
+        
+        if (fotosFiltradas.length > 0) {
+          setRutaConFoto(fotosFiltradas[0]);
+        }
+      }
+      setCargandoFoto(false);
+    } catch (error) {
+      console.error(`Error al obtener fotos para la ruta ${idRuta}:`, error);
+      setCargandoFoto(false);
+    }
+  };
+
+  // Efecto para cargar la foto cuando se genera una ruta
+  useEffect(() => {
+    if (generatedRoute && generatedRoute.idRuta) {
+      obtenerFotosRuta(generatedRoute.idRuta);
+    } else {
+      setRutaConFoto(null);
+    }
+  }, [generatedRoute]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onSearch && onSearch({ query: searchQuery });
@@ -1776,7 +1830,7 @@ export const SearchForm = ({ onSearch }) => {
           if (matchingRoutes.length === 1) {
             // Si solo hay una ruta, usamos esa
             bestRoute = matchingRoutes[0];
-            console.log(`Solo hay una coincidencia: ${bestRoute.nombreRuta}`);
+            `Solo hay una coincidencia: ${bestRoute.nombreRuta}`;
           } else {
             // Si hay más de una ruta, buscamos cuáles tienen puntuación similar
             // Consideramos como buenas coincidencias aquellas con al menos 85% de la puntuación de la mejor ruta
@@ -1816,9 +1870,7 @@ export const SearchForm = ({ onSearch }) => {
             // Primera opción: ruta con la puntuación más alta
             if (matchingRoutes.length === 1) {
               bestRoute = matchingRoutes[0];
-              console.log(
-                `Solo hay una ruta coincidente: ${bestRoute.nombreRuta}`
-              );
+              `Solo hay una ruta coincidente: ${bestRoute.nombreRuta}`;
             } else {
               // Si hay más de una ruta, buscamos cuáles tienen puntuación similar
               // Consideramos como buenas coincidencias aquellas con al menos 85%
@@ -1848,11 +1900,13 @@ export const SearchForm = ({ onSearch }) => {
 
             // Generar la ruta principal personalizada (la mejor coincidencia)
             const aiGeneratedRoute = {
+              idRuta: bestRoute.idRuta, // Aseguramos que se guarde el ID para obtener la foto
               nombreRuta: bestRoute.nombreRuta,
               dificultad: bestRoute.dificultad,
               duracion: bestRoute.duracion,
               descripcion: bestRoute.descripcion,
               calificacion: bestRoute.calificacion,
+              distancia: bestRoute.distancia, // Añadimos la distancia real
               puntos: bestRoute.puntos || generateRoutePoints(bestRoute),
               condicionDetectada: condicionDetectada,
             };
@@ -1890,11 +1944,13 @@ export const SearchForm = ({ onSearch }) => {
           } else {
             // No hay rutas que coincidan con la búsqueda
             const aiGeneratedRoute = {
+              idRuta: null, // No hay ID específico para esta ruta generada
               nombreRuta: `Ruta personalizada: ${searchQuery}`,
               dificultad: "Moderada",
               duracion: "2-3 horas",
               descripcion: `Lo sentimos, no encontramos una ruta que coincida exactamente con "${searchQuery}". Hemos generado esta sugerencia basada en tus intereses.`,
               calificacion: 4,
+              distancia: "5.0 km", // Añadimos una distancia predeterminada
               puntos: [
                 "Punto de partida en el Centro de Visitantes",
                 "Mirador panorámico con vistas al valle",
@@ -1929,11 +1985,13 @@ export const SearchForm = ({ onSearch }) => {
           const selectedRoute = rutasFiltradas[randomIndex];
 
           const aiGeneratedRoute = {
+            idRuta: selectedRoute.idRuta, // Añadir el ID de la ruta seleccionada
             nombreRuta: selectedRoute.nombreRuta,
             dificultad: selectedRoute.dificultad,
             duracion: selectedRoute.duracion,
             descripcion: selectedRoute.descripcion,
             calificacion: selectedRoute.calificacion,
+            distancia: selectedRoute.distancia, // Añadimos la distancia real
             puntos: selectedRoute.puntos || generateRoutePoints(selectedRoute),
           };
 
@@ -2016,11 +2074,11 @@ export const SearchForm = ({ onSearch }) => {
         {/* Recuadro de IA generando rutas */}
         {showAIRouteGenerator && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 transition-all duration-300 ease-out transform scale-100 opacity-100 relative">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-10 transition-all duration-300 ease-out transform scale-100 opacity-100 relative">
               {/* Botón para cerrar el recuadro */}
               <button
                 onClick={() => setShowAIRouteGenerator(false)}
-                className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 rounded-full p-2 transition-colors z-10 shadow-md"
+                className="absolute top-4 right-4 bg-teal-500 hover:bg-teal-700 rounded-full p-2 transition-colors z-10 shadow-md"
                 aria-label="Cerrar"
               >
                 <svg
@@ -2042,16 +2100,60 @@ export const SearchForm = ({ onSearch }) => {
               <div className="flex flex-col items-center">
                 {generatingRoute ? (
                   <>
-                    <div className="w-full max-w-2xl mb-8">
-                      <div className="relative aspect-video rounded-xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-500">
+                    <div className="w-full max-w-xl mb-9">
+                      <div className="relative aspect-video rounded-xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-500 bg-black/95">
                         <video
                           src="/videos/ia_generando.mp4"
                           autoPlay
                           loop
                           muted
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover opacity-90"
                         />
-                        {/* Overlays de fondo oscuro eliminados */}
+                        {/* Partículas animadas flotantes */}
+                        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                          {/* Partículas brillantes */}
+                          {[...Array(12)].map((_, i) => (
+                            <div
+                              key={i}
+                              className="absolute rounded-full bg-white"
+                              style={{
+                                width: `${Math.random() * 6 + 2}px`,
+                                height: `${Math.random() * 6 + 2}px`,
+                                top: `${Math.random() * 100}%`,
+                                left: `${Math.random() * 100}%`,
+                                opacity: Math.random() * 0.5 + 0.2,
+                                animation: `float ${
+                                  Math.random() * 10 + 15
+                                }s linear infinite`,
+                                animationDelay: `${Math.random() * 5}s`,
+                              }}
+                            />
+                          ))}
+
+                          {/* Burbujas de colores */}
+                          {[...Array(8)].map((_, i) => (
+                            <div
+                              key={i + 20}
+                              className="absolute rounded-full"
+                              style={{
+                                width: `${Math.random() * 15 + 5}px`,
+                                height: `${Math.random() * 15 + 5}px`,
+                                background: `rgba(${
+                                  Math.random() * 100 + 20
+                                }, ${Math.random() * 200 + 55}, ${
+                                  Math.random() * 150 + 105
+                                }, ${Math.random() * 0.3 + 0.1})`,
+                                top: `${Math.random() * 100}%`,
+                                left: `${Math.random() * 100}%`,
+                                filter: "blur(1px)",
+                                animation: `floatSlow ${
+                                  Math.random() * 20 + 20
+                                }s ease-in-out infinite`,
+                                animationDelay: `${-Math.random() * 10}s`,
+                              }}
+                            />
+                          ))}
+                        </div>
 
                         {/* Efectos de IA trabajando - versión mejorada */}
                         <div className="absolute inset-0 flex items-center justify-center">
@@ -2083,60 +2185,346 @@ export const SearchForm = ({ onSearch }) => {
                     </div>
 
                     <div className="flex flex-col items-center">
-                      {/* Indicador de carga mejorado */}
+                      {/* Título futurista con efecto de escaneo */}
+                      <div className="relative mb-9">
+                        <h2 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-300 via-teal-400 to-teal-300 tracking-wider">
+                          IA GENERANDO TU RUTA PERFECTA
+                        </h2>
+                        <div className="absolute inset-0 overflow-hidden">
+                          <div
+                            className="w-full h-1 bg-teal-400/50 absolute top-1/2 transform -translate-y-1/2"
+                            style={{
+                              boxShadow: "0 0 15px 3px rgba(45, 212, 191, 0.5)",
+                              animation:
+                                "scanline 3s ease-in-out infinite alternate",
+                            }}
+                          ></div>
+                        </div>
+                        <div className="absolute -top-4 -left-4 w-3 h-3 border-t-2 border-l-2 border-teal-300"></div>
+                        <div className="absolute -top-4 -right-4 w-3 h-3 border-t-2 border-r-2 border-teal-300"></div>
+                        <div className="absolute -bottom-4 -left-4 w-3 h-3 border-b-2 border-l-2 border-teal-300"></div>
+                        <div className="absolute -bottom-4 -right-4 w-3 h-3 border-b-2 border-r-2 border-teal-300"></div>
+                      </div>
 
-                      <h2 className="text-2xl font-bold text-teal-800 mb-3 tracking-wide">
-                        Generando tu ruta perfecta
-                      </h2>
-                      <p className="text-gray-700 text-center max-w-md mb-6 font-medium">
-                        Nuestra IA está analizando tus preferencias y creando
-                        una ruta personalizada con los mejores puntos de
-                        interés.
-                      </p>
+                      {/* Contenedor principal de procesamiento de IA con efectos futuristas */}
+                      <div className="mt-2 bg-gradient-to-br from-teal-900/90 to-teal-800/90 backdrop-blur-md rounded-xl p-5 w-full max-w-5xl shadow-2xl border border-teal-600/50 relative overflow-hidden">
+                        {/* Efecto de "red neuronal" en el fondo */}
+                        <div className="absolute inset-0 z-0 opacity-20">
+                          {[...Array(15)].map((_, i) => (
+                            <div
+                              key={`node-${i}`}
+                              className="absolute rounded-full bg-teal-200"
+                              style={{
+                                width: `${Math.random() * 4 + 2}px`,
+                                height: `${Math.random() * 4 + 2}px`,
+                                top: `${Math.random() * 100}%`,
+                                left: `${Math.random() * 100}%`,
+                                boxShadow:
+                                  "0 0 6px 2px rgba(45, 212, 191, 0.7)",
+                              }}
+                            ></div>
+                          ))}
+                          {[...Array(20)].map((_, i) => (
+                            <div
+                              key={`line-${i}`}
+                              className="absolute bg-teal-400/30"
+                              style={{
+                                height: "1px",
+                                width: `${Math.random() * 50 + 30}px`,
+                                top: `${Math.random() * 100}%`,
+                                left: `${Math.random() * 100}%`,
+                                transform: `rotate(${Math.random() * 360}deg)`,
+                                opacity: Math.random() * 0.5 + 0.3,
+                              }}
+                            ></div>
+                          ))}
+                        </div>
 
-                      {/* Mensajes de procesamiento con estilos mejorados */}
-                      <div className="mt-2 bg-gradient-to-br from-teal-50 to-white rounded-xl p-6 w-full max-w-md shadow-lg border border-teal-100">
-                        <div className="flex items-center space-x-3 mb-4">
-                          <div className="w-4 h-4 bg-teal-800 rounded-full animate-pulse shadow-md flex-shrink-0"></div>
-                          <div className="flex-1">
-                            <p className="text-sm font-semibold text-teal-800">
-                              Analizando preferencias de búsqueda...
-                            </p>
-                            <div className="h-1 w-full bg-teal-100 rounded-full mt-1.5 overflow-hidden">
+                        {/* Efecto de escaneo horizontal */}
+                        <div
+                          className="absolute inset-0 opacity-10"
+                          style={{
+                            background:
+                              "linear-gradient(transparent, rgba(45, 212, 191, 0.8), transparent)",
+                            backgroundSize: "100% 100%",
+                            animation: "scanEffect 3s ease-in-out infinite",
+                          }}
+                        ></div>
+
+                        {/* Código binario flotante */}
+                        <div className="absolute inset-0 overflow-hidden text-[8px] text-teal-500/20 select-none pointer-events-none">
+                          {[...Array(20)].map((_, i) => (
+                            <div
+                              key={`binary-${i}`}
+                              className="absolute whitespace-nowrap"
+                              style={{
+                                top: `${Math.random() * 100}%`,
+                                left: `${Math.random() * 100}%`,
+                                transform: `translateX(-50%)`,
+                                animation: `floatBinary ${
+                                  Math.random() * 10 + 20
+                                }s linear infinite`,
+                              }}
+                            >
+                              {[...Array(20)]
+                                .map(() => (Math.random() > 0.5 ? "1" : "0"))
+                                .join(" ")}
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Circuito decorativo superior */}
+                        <div className="absolute top-0 left-0 right-0 h-5 overflow-hidden">
+                          <div className="h-px bg-teal-500 absolute top-0 left-5 right-5"></div>
+                          <div className="h-5 w-px bg-teal-500 absolute top-0 left-5"></div>
+                          <div className="h-5 w-px bg-teal-500 absolute top-0 left-20"></div>
+                          <div className="h-5 w-px bg-teal-500 absolute top-0 right-5"></div>
+                          <div className="h-5 w-px bg-teal-500 absolute top-0 right-20"></div>
+                          <div className="h-px bg-teal-500 absolute top-5 left-5 w-15"></div>
+                          <div className="h-px bg-teal-500 absolute top-5 right-5 w-15"></div>
+                        </div>
+
+                        {/* Circuito decorativo inferior */}
+                        <div className="absolute bottom-0 left-0 right-0 h-5 overflow-hidden">
+                          <div className="h-px bg-teal-500 absolute bottom-0 left-5 right-5"></div>
+                          <div className="h-5 w-px bg-teal-500 absolute bottom-0 left-5"></div>
+                          <div className="h-5 w-px bg-teal-500 absolute bottom-0 left-20"></div>
+                          <div className="h-5 w-px bg-teal-500 absolute bottom-0 right-5"></div>
+                          <div className="h-5 w-px bg-teal-500 absolute bottom-0 right-20"></div>
+                          <div className="h-px bg-teal-500 absolute bottom-5 left-5 w-15"></div>
+                          <div className="h-px bg-teal-500 absolute bottom-5 right-5 w-15"></div>
+                        </div>
+
+                        {/* Componentes de análisis - en disposición horizontal */}
+                        <div className="grid grid-cols-3 gap-12 relative z-10">
+                          {/* Primer componente: Analizando preferencias */}
+                          <div className="flex flex-col items-center">
+                            <div className="flex items-center justify-center mb-1">
+                              <div className="w-8 h-8 bg-teal-950 rounded-lg flex items-center justify-center shadow-lg border border-teal-700 relative overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-br from-teal-700/30 to-transparent"></div>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 text-teal-300"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                </div>
+                                <div className="absolute -bottom-4 -left-4 w-8 h-8 bg-teal-400/10 rounded-full animate-pulse"></div>
+                              </div>
+                            </div>
+                            <div className="flex flex-col items-center justify-center h-16">
+                              <p className="text-xs font-bold text-teal-300 tracking-wider uppercase">
+                                ANALIZANDO PREFERENCIAS
+                              </p>
+                              <div className="flex justify-center h-6">
+                                <span className="inline-flex">
+                                  <span className="animate-bounce mx-px text-teal-400">
+                                    ●
+                                  </span>
+                                  <span
+                                    className="animate-bounce mx-px text-teal-400"
+                                    style={{ animationDelay: "0.2s" }}
+                                  >
+                                    ●
+                                  </span>
+                                  <span
+                                    className="animate-bounce mx-px text-teal-400"
+                                    style={{ animationDelay: "0.4s" }}
+                                  >
+                                    ●
+                                  </span>
+                                </span>
+                              </div>
+                              <div className="text-xs text-teal-400 font-mono h-4 flex items-center justify-center">
+                                100%
+                              </div>
+                            </div>
+                            <div className="h-1.5 w-full bg-teal-950 rounded-md overflow-hidden relative mt-1">
+                              <div className="absolute inset-0 opacity-25">
+                                {[...Array(4)].map((_, i) => (
+                                  <div
+                                    key={`tick-a-${i}`}
+                                    className="absolute w-px h-full bg-teal-300"
+                                    style={{ left: `${i * (100 / 3)}%` }}
+                                  ></div>
+                                ))}
+                              </div>
                               <div
-                                className="h-full bg-teal-800 rounded-full animate-pulse"
+                                className="h-full rounded-md relative overflow-hidden"
                                 style={{ width: "100%" }}
-                              ></div>
+                              >
+                                <div
+                                  className="absolute inset-0 bg-gradient-to-r from-teal-400 via-teal-300 to-teal-400 rounded-md"
+                                  style={{
+                                    backgroundSize: "200% 100%",
+                                    animation: "shimmer 2s infinite linear",
+                                  }}
+                                ></div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-transparent to-teal-300/20"></div>
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        <div className="flex items-center space-x-3 mb-4">
-                          <div className="w-4 h-4 bg-teal-700 rounded-full animate-pulse shadow-md flex-shrink-0"></div>
-                          <div className="flex-1">
-                            <p className="text-sm font-semibold text-teal-700">
-                              Identificando puntos de interés...
-                            </p>
-                            <div className="h-1 w-full bg-teal-100 rounded-full mt-1.5 overflow-hidden">
+                          {/* Segundo componente: Identificando puntos */}
+                          <div className="flex flex-col items-center">
+                            <div className="flex items-center justify-center mb-1">
+                              <div className="w-8 h-8 bg-teal-950 rounded-lg flex items-center justify-center shadow-lg border border-teal-700 relative overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-br from-teal-700/30 to-transparent"></div>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 text-teal-300"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                </div>
+                                <div
+                                  className="absolute -bottom-4 -left-4 w-8 h-8 bg-teal-400/10 rounded-full animate-pulse"
+                                  style={{ animationDelay: "0.3s" }}
+                                ></div>
+                              </div>
+                            </div>
+                            <div className="flex flex-col items-center justify-center h-16">
+                              <p className="text-xs font-bold text-teal-300 tracking-wider uppercase">
+                                IDENTIFICANDO PUNTOS
+                              </p>
+                              <div className="flex justify-center h-6">
+                                <span className="inline-flex">
+                                  <span className="animate-bounce mx-px text-teal-400">
+                                    ●
+                                  </span>
+                                  <span
+                                    className="animate-bounce mx-px text-teal-400"
+                                    style={{ animationDelay: "0.2s" }}
+                                  >
+                                    ●
+                                  </span>
+                                  <span
+                                    className="animate-bounce mx-px text-teal-400"
+                                    style={{ animationDelay: "0.4s" }}
+                                  >
+                                    ●
+                                  </span>
+                                </span>
+                              </div>
+                              <div className="text-xs text-teal-400 font-mono h-4 flex items-center justify-center">
+                                75%
+                              </div>
+                            </div>
+                            <div className="h-1.5 w-full bg-teal-950 rounded-md overflow-hidden relative mt-1">
+                              <div className="absolute inset-0 opacity-25">
+                                {[...Array(4)].map((_, i) => (
+                                  <div
+                                    key={`tick-b-${i}`}
+                                    className="absolute w-px h-full bg-teal-300"
+                                    style={{ left: `${i * (100 / 3)}%` }}
+                                  ></div>
+                                ))}
+                              </div>
                               <div
-                                className="h-full bg-teal-700 rounded-full animate-pulse"
+                                className="h-full rounded-md relative overflow-hidden"
                                 style={{ width: "75%" }}
-                              ></div>
+                              >
+                                <div
+                                  className="absolute inset-0 bg-gradient-to-r from-teal-400 via-teal-300 to-teal-400 rounded-md"
+                                  style={{
+                                    backgroundSize: "200% 100%",
+                                    animation: "shimmer 2s infinite linear",
+                                  }}
+                                ></div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-transparent to-teal-300/20"></div>
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        <div className="flex items-center space-x-3">
-                          <div className="w-4 h-4 bg-teal-600 rounded-full animate-pulse shadow-md flex-shrink-0"></div>
-                          <div className="flex-1">
-                            <p className="text-sm font-semibold text-teal-600">
-                              Optimizando ruta para mejor experiencia...
-                            </p>
-                            <div className="h-1 w-full bg-teal-100 rounded-full mt-1.5 overflow-hidden">
+                          {/* Tercer componente: Optimizando ruta */}
+                          <div className="flex flex-col items-center">
+                            <div className="flex items-center justify-center mb-1">
+                              <div className="w-8 h-8 bg-teal-950 rounded-lg flex items-center justify-center shadow-lg border border-teal-700 relative overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-br from-teal-700/30 to-transparent"></div>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 text-teal-300"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                </div>
+                                <div
+                                  className="absolute -bottom-4 -left-4 w-8 h-8 bg-teal-400/10 rounded-full animate-pulse"
+                                  style={{ animationDelay: "0.6s" }}
+                                ></div>
+                              </div>
+                            </div>
+                            <div className="flex flex-col items-center justify-center h-16">
+                              <p className="text-xs font-bold text-teal-300 tracking-wider uppercase">
+                                OPTIMIZANDO RUTA
+                              </p>
+                              <div className="flex justify-center h-6">
+                                <span className="inline-flex">
+                                  <span className="animate-bounce mx-px text-teal-400">
+                                    ●
+                                  </span>
+                                  <span
+                                    className="animate-bounce mx-px text-teal-400"
+                                    style={{ animationDelay: "0.2s" }}
+                                  >
+                                    ●
+                                  </span>
+                                  <span
+                                    className="animate-bounce mx-px text-teal-400"
+                                    style={{ animationDelay: "0.4s" }}
+                                  >
+                                    ●
+                                  </span>
+                                </span>
+                              </div>
+                              <div className="text-xs text-teal-400 font-mono h-4 flex items-center justify-center">
+                                45%
+                              </div>
+                            </div>
+                            <div className="h-1.5 w-full bg-teal-950 rounded-md overflow-hidden relative mt-1">
+                              <div className="absolute inset-0 opacity-25">
+                                {[...Array(4)].map((_, i) => (
+                                  <div
+                                    key={`tick-c-${i}`}
+                                    className="absolute w-px h-full bg-teal-300"
+                                    style={{ left: `${i * (100 / 3)}%` }}
+                                  ></div>
+                                ))}
+                              </div>
                               <div
-                                className="h-full bg-teal-600 rounded-full animate-pulse"
+                                className="h-full rounded-md relative overflow-hidden"
                                 style={{ width: "45%" }}
-                              ></div>
+                              >
+                                <div
+                                  className="absolute inset-0 bg-gradient-to-r from-teal-400 via-teal-300 to-teal-400 rounded-md"
+                                  style={{
+                                    backgroundSize: "200% 100%",
+                                    animation: "shimmer 2s infinite linear",
+                                  }}
+                                ></div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-transparent to-teal-300/20"></div>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -2148,11 +2536,34 @@ export const SearchForm = ({ onSearch }) => {
                     <>
                       <div className="w-full max-w-2xl mb-8">
                         <div className="relative aspect-video rounded-xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-300">
-                          <img
-                            src="https://cdn.pixabay.com/photo/2023/05/17/15/57/ai-generated-8000455_1280.jpg"
-                            alt="Ruta generada por IA"
-                            className="w-full h-full object-cover"
-                          />
+                          {cargandoFoto ? (
+                            // Estado de carga
+                            <div className="flex justify-center items-center h-full bg-gray-100">
+                              <div className="animate-pulse flex space-x-1">
+                                <div className="h-2 w-2 bg-teal-600 rounded-full animate-bounce"></div>
+                                <div className="h-2 w-2 bg-teal-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                                <div className="h-2 w-2 bg-teal-600 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                              </div>
+                            </div>
+                          ) : rutaConFoto ? (
+                            // Mostrar la foto de la API
+                            <img
+                              src={rutaConFoto}
+                              alt={`Foto de ${generatedRoute.nombreRuta}`}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = 'https://cdn.pixabay.com/photo/2023/05/17/15/57/ai-generated-8000455_1280.jpg';
+                              }}
+                            />
+                          ) : (
+                            // Imagen de respaldo si no hay foto
+                            <img
+                              src="https://cdn.pixabay.com/photo/2023/05/17/15/57/ai-generated-8000455_1280.jpg"
+                              alt="Ruta generada por IA"
+                              className="w-full h-full object-cover"
+                            />
+                          )}
                           {/* Decoración de esquinas */}
                           <div className="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-white/40 rounded-tl-lg"></div>
                           <div className="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-white/40 rounded-tr-lg"></div>
@@ -2288,7 +2699,13 @@ export const SearchForm = ({ onSearch }) => {
                               <div className="flex justify-between items-center">
                                 <div>
                                   <p className="font-medium">Distancia total</p>
-                                  <p className="text-lg font-bold">5.2 km</p>
+                                  <p className="text-lg font-bold">
+                                    {generatedRoute.distancia ? 
+                                      generatedRoute.distancia.toString().includes('km') ? 
+                                        generatedRoute.distancia : 
+                                        `${generatedRoute.distancia} km` 
+                                      : "5.2 km"}
+                                  </p>
                                 </div>
                                 <div>
                                   <p className="font-medium">Elevación</p>
@@ -2466,36 +2883,6 @@ export const SearchForm = ({ onSearch }) => {
           <div>
             <p className="font-medium">Ocurrió un error durante la búsqueda</p>
             <p className="text-sm mt-1">{error}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Indicador de carga */}
-      {isSearching && !showAIRouteGenerator && (
-        <div className="mt-8 w-full max-w-4xl mx-auto">
-          <div className="flex flex-col justify-center items-center gap-4 bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg">
-            <div className="relative">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-3 border-b-3 border-teal-600"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="h-2 w-2 bg-teal-600 rounded-full"></div>
-              </div>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="text-teal-700 font-semibold text-lg">
-                Buscando rutas...
-              </span>
-              <span className="text-gray-500 text-sm mt-1">
-                Estamos procesando tu solicitud
-              </span>
-            </div>
-
-            {/* Barra de progreso animada */}
-            <div className="w-64 h-1.5 bg-gray-200 rounded-full overflow-hidden mt-2">
-              <div
-                className="h-full bg-teal-500 rounded-full animate-pulse"
-                style={{ width: "65%" }}
-              ></div>
-            </div>
           </div>
         </div>
       )}
