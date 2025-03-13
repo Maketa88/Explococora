@@ -65,8 +65,8 @@ export const SearchForm = ({ onSearch }) => {
     if (!mostrarIA) return null
     
     return (
-      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-start justify-center overflow-y-auto py-10 px-4">
-        <div className="relative w-full max-w-4xl mx-auto mt-20 mb-10 bg-white rounded-2xl shadow-2xl">
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-start justify-center overflow-y-auto py-3 px-4">
+        <div className="relative w-full max-w-4xl mx-auto mt-2 mb-2 bg-white rounded-2xl shadow-2xl">
           {/* Botón para cerrar - ahora fuera del contenedor principal para asegurar visibilidad */}
           <button 
             onClick={() => setMostrarIA(false)}
