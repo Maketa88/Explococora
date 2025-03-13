@@ -1,0 +1,122 @@
+/* Animaciones para los efectos de IA */
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+  }
+  25% {
+    transform: translateY(-10px) translateX(5px);
+  }
+  50% {
+    transform: translateY(0) translateX(10px);
+  }
+  75% {
+    transform: translateY(10px) translateX(5px);
+  }
+}
+
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-15px) translateX(15px);
+  }
+}
+
+@keyframes scanline {
+  0%, 100% {
+    left: -20%;
+  }
+  50% {
+    left: 120%;
+  }
+}
+
+@keyframes scanEffect {
+  0%, 100% {
+    transform: translateY(-100%);
+  }
+  50% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes floatBinary {
+  0% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(-50%) translateY(-100px);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 200% 0%;
+  }
+}
+
+/* Nuevas animaciones para los indicadores de progreso */
+@keyframes shimmerEffect {
+  0% {
+    transform: translateX(-100%);
+  }
+  50%, 100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes bubbleRise {
+  0% {
+    transform: translateY(0) scale(0.8);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-10px) scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-20px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.3;
+    box-shadow: 0 0 5px 2px rgba(45, 212, 191, 0.3);
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 15px 5px rgba(45, 212, 191, 0.7);
+  }
+}
+
+@keyframes orbitRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes numberCount {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 

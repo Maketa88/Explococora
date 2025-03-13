@@ -285,3 +285,23 @@ input[type="password"]::-moz-password {
     }
   }
 }
+
+/* Estilos para el modal */
+.modal-portal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99999;
+}
+
+/* Asegurarse de que ningún elemento tenga un z-index mayor que el modal */
+.modal-portal * {
+  z-index: auto;
+}
+
+/* Cuando el modal está abierto, ocultar el scroll del body */
+body.modal-open {
+  overflow: hidden;
+}
