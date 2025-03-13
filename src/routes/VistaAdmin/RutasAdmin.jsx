@@ -12,6 +12,7 @@ import PerfilAdmin from '../../pages/VistaAdmin/PerfilAdmin/PerfilAdmin';
 import GestionGuias from '../../pages/VistaAdmin/GestionUsuarios/GestionGuias';
 import GestionOperadores from '../../pages/VistaAdmin/GestionUsuarios/GestionOperadores';
 
+
 const RutasAdmin = () => {
   return (
     <Routes>
@@ -27,7 +28,8 @@ const RutasAdmin = () => {
       <Route path="/EliminarUsuario" element={<EliminarUsuario />} />
       <Route path="/GestionGuias" element={<GestionGuias />} />
       <Route path="/GestionOperadores" element={<GestionOperadores />} />
-      
+
+
     </Routes>
   );
 };

@@ -288,12 +288,6 @@ const DashboardLayoutAdmin = ({ children }) => {
       section: "Rutas"
     },
     {
-      title: "Crear Ruta",
-      icon: <FileText className="w-5 h-5" />,
-      path: "/VistaAdmin/CrearRuta",
-      section: "Rutas"
-    },
-    {
       title: "Reportes",
       icon: <Package className="w-5 h-5" />,
       path: "/VistaAdmin/Reportes",
@@ -306,38 +300,14 @@ const DashboardLayoutAdmin = ({ children }) => {
       section: "Informes"
     },
     {
-      title: "Configuración",
-      icon: <Settings className="w-5 h-5" />,
-      path: "/VistaAdmin/Configuracion",
-      section: "Sistema"
+      title: "GestionPaquetes",
+      icon: <PackagePlus className="w-5 h-5" />,
+      path: "/VistaAdmin/GestionPaquetes",
+      section: "Rutas"
     },
-    {
-      title: "Cambiar Contraseña",
-      icon: <Key className="w-5 h-5" />,
-      path: "/VistaAdmin/CambiarContraseña",
-      section: "Sistema"
-    },
-    {
-      title: "Perfil Admin",
-      icon: <User className="w-5 h-5" />,
-      path: "/VistaAdmin/PerfilAdmin",
-      section: "Sistema"
-    },
-    {
-      title: "Actualizar Datos",
-      icon: <Edit className="w-5 h-5" />,
-      path: "/VistaAdmin/ActualizarAdmin",
-      section: "Sistema"
-    },
-    {
-      title: "Eliminar Cuenta",
-      icon: <Trash2 className="w-5 h-5" />,
-      path: "/VistaAdmin/EliminarUsuario",
-      section: "Sistema"
-    }
   ];
   
-  const sections = ["Dashboard", "Usuarios", "Rutas", "Guías", "Informes", "Sistema"];
+  const sections = ["Dashboard", "Usuarios", "Rutas", , "Informes", ];
 
   const toggleMenu = (e) => {
     e.stopPropagation();

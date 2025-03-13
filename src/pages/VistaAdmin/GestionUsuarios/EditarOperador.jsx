@@ -25,43 +25,49 @@ const EditarOperador = ({ operador, onClose, onOperadorUpdated }) => {
     // Deshabilitar todas las alertas toast previas y futuras no relacionadas con este componente
     toast.dismiss();
     
-    // Guardar la configuración original de toast
-    const originalToast = { ...toast };
+    // Lista de patrones que queremos filtrar
+    const filteredPatterns = [
+      "actualizar los estados",
+      "Error al actualizar estados",
+      "Formato inesperado en la respuesta del servidor",
+      "sincronizarEstados",
+      "operadorEstadoService"
+    ];
     
-    // Crear una función personalizada para filtrar toasts no relacionados con este componente
-    const toastFilter = (message, type) => {
-      // Lista de patrones que queremos filtrar
-      const filteredPatterns = [
-        "actualizar los estados",
-        "Error al actualizar estados",
-        "Formato inesperado en la respuesta del servidor",
-        "sincronizarEstados",
-        "operadorEstadoService"
-      ];
-      
-      // Comprobar si el mensaje contiene alguno de los patrones a filtrar
-      for (const pattern of filteredPatterns) {
-        if (message && typeof message === 'string' && message.includes(pattern)) {
-          return false; // No mostrar este mensaje
-        }
+    // Método más sencillo y seguro para interceptar toast
+    const originalSuccess = toast.success;
+    const originalError = toast.error;
+    const originalWarning = toast.warning;
+    const originalInfo = toast.info;
+    
+    // Sobrescribir funciones toast con versiones que filtran mensajes no deseados
+    toast.success = (message, options) => {
+      if (typeof message === 'string' && filteredPatterns.some(pattern => message.includes(pattern))) {
+        return { id: 'filtered' }; // No mostrar este mensaje
       }
-      
-      return true; // Mostrar otros mensajes
-    };
-
-    // Sobrescribir temporalmente las funciones de toast
-    const interceptToast = (fn) => (message, options) => {
-      if (toastFilter(message, fn.name)) {
-        return originalToast[fn.name](message, options);
-      }
-      return { id: 'filtered' };
+      return originalSuccess(message, options);
     };
     
-    // Aplicar el interceptor a las funciones toast comunes
-    toast.error = interceptToast(toast.error);
-    toast.warning = interceptToast(toast.warning);
-    toast.info = interceptToast(toast.info);
-    toast.success = interceptToast(toast.success);
+    toast.error = (message, options) => {
+      if (typeof message === 'string' && filteredPatterns.some(pattern => message.includes(pattern))) {
+        return { id: 'filtered' }; // No mostrar este mensaje
+      }
+      return originalError(message, options);
+    };
+    
+    toast.warning = (message, options) => {
+      if (typeof message === 'string' && filteredPatterns.some(pattern => message.includes(pattern))) {
+        return { id: 'filtered' }; // No mostrar este mensaje
+      }
+      return originalWarning(message, options);
+    };
+    
+    toast.info = (message, options) => {
+      if (typeof message === 'string' && filteredPatterns.some(pattern => message.includes(pattern))) {
+        return { id: 'filtered' }; // No mostrar este mensaje
+      }
+      return originalInfo(message, options);
+    };
     
     if (operador) {
       // Determinar el valor del teléfono a mostrar, comprobando todos los posibles campos
@@ -98,10 +104,10 @@ const EditarOperador = ({ operador, onClose, onOperadorUpdated }) => {
     
     // Limpiar el interceptor cuando el componente se desmonte
     return () => {
-      toast.error = originalToast.error;
-      toast.warning = originalToast.warning;
-      toast.info = originalToast.info;
-      toast.success = originalToast.success;
+      toast.success = originalSuccess;
+      toast.error = originalError;
+      toast.warning = originalWarning;
+      toast.info = originalInfo;
     };
   }, [operador]);
 

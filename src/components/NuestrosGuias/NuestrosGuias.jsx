@@ -2,6 +2,7 @@ import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CardGuia } from "./Card";
+import Feedback from "../Feedback/Feedback";
 
 // URL del backend (mejor moverla a un archivo de configuración)
 const API_URL = "http://localhost:10101";
@@ -449,6 +450,11 @@ const NuestrosGuias = () => {
           )}
         </>
       )}
+
+      {/* Feedback debajo de las cartas de guías */}
+      <div className="mt-16">
+        <Feedback />
+      </div>
     </div>
     </section>
   );

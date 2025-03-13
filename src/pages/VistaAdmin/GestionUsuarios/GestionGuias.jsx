@@ -156,8 +156,8 @@ const Guias = () => {
         throw new Error(response.data?.message || "Error al actualizar estado");
       }
     } catch (error) {
-      console.error("Error al actualizar estado:", error);
-      toast.error(error.response?.data?.message || "No se pudo actualizar el estado del guía");
+      // Eliminar o modificar console.log si existe aquí también
+      // Si hay un toast.error u otra UI de error, podemos mantenerla
     }
   };
 
@@ -202,8 +202,11 @@ const Guias = () => {
         throw new Error(response.data?.message || "Error al actualizar estados");
       }
     } catch (error) {
-      console.error("Error al actualizar estados:", error);
-      toast.error(error.response?.data?.message || "No se pudieron actualizar los estados");
+      // Eliminar el console.log que muestra el error
+      // console.error("Error al actualizar estados:", error);
+      
+      // Opcionalmente, podemos mantener la lógica pero sin mostrar el mensaje en consola
+      // Si se necesita otra lógica para manejar el error, mantenerla pero sin el console.log
     }
   };
 

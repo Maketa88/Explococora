@@ -1042,7 +1042,7 @@ const Operadores = () => {
             setShowEditarOperadorModal(false);
             setOperadorParaEditar(null);
           }}
-          onGuiaUpdated={handleOperadorUpdated}
+          onOperadorUpdated={handleOperadorUpdated}
         />
       )}
 
