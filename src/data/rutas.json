@@ -1,0 +1,112 @@
+[
+  {
+    "nombre": "Planchon",
+    "duracion": "30 Min",
+    "descripcion": "Una caminata fácil y corta hasta un mirador con impresionantes vistas del valle.",
+    "dificultad": "Facil",
+    "valoracion": 99,
+    "distancia": 2.5,
+    "tipoActividad": "Cabalgata y Caminata",
+    "estado": "Activa"
+  },
+  {
+    "nombre": "Peña de la Virgen",
+    "duracion": "1 Hora",
+    "descripcion": "Una caminata moderada hasta una gran roca con una estatua de la Virgen María, ofreciendo vistas panorámicas.",
+    "dificultad": "Moderada",
+    "valoracion": 99,
+    "distancia": 5,
+    "tipoActividad": "Cabalgata y Caminata",
+    "estado": "Activa"
+  },
+  {
+    "nombre": "Casa la Esperanza",
+    "duracion": "1 Hora y 30 Min",
+    "descripcion": "Una caminata desafiante hasta una antigua casa de campo, ofreciendo vistas únicas del valle.",
+    "dificultad": "Desafiante",
+    "valoracion": 99,
+    "distancia": 2,
+    "tipoActividad": "Cabalgata y Caminata",
+    "estado": "Activa"
+  },
+  {
+    "nombre": "Mirador de Camino",
+    "duracion": "1 Hora",
+    "descripcion": "Una caminata fácil hasta un mirador con vistas al río y las montañas.",
+    "dificultad": "Facil",
+    "valoracion": 99,
+    "distancia": 3,
+    "tipoActividad": "Cabalgata y Caminata",
+    "estado": "Activa"
+  },
+  {
+    "nombre": "Mirador del Camino y Ríos",
+    "duracion": "1 Hora y 30 Min",
+    "descripcion": "Una caminata moderada que combina las vistas del Mirador de Camino con un paseo junto a los ríos.",
+    "dificultad": "Moderada",
+    "valoracion": 99,
+    "distancia": 3.5,
+    "tipoActividad": "Cabalgata y Caminata",
+    "estado": "Activa"
+  },
+  {
+    "nombre": "Mirador del Camino y Peña de la Virgen",
+    "duracion": "1 Hora y 40 Min",
+    "descripcion": "Una caminata combinada que ofrece lo mejor de ambos mundos, con vistas desde el Mirador de Camino y la Peña de la Virgen.",
+    "dificultad": "Moderada",
+    "valoracion": 99,
+    "distancia": 5,
+    "tipoActividad": "Cabalgata y Caminata",
+    "estado": "Activa"
+  },
+  {
+    "nombre": "Mirador de Palmas",
+    "duracion": "1 Hora y 40 Min",
+    "descripcion": "Una caminata moderada hasta un mirador con vistas a las palmas de cera más altas del mundo.",
+    "dificultad": "Moderada",
+    "valoracion": 99,
+    "distancia": 3.5,
+    "tipoActividad": "Cabalgata y Caminata",
+    "estado": "Activa"
+  },
+  {
+    "nombre": "Mirador de Camino y Palmas",
+    "duracion": "2 Horas",
+    "descripcion": "Una caminata combinada que te lleva al Mirador de Camino y al Mirador de Palmas.",
+    "dificultad": "Moderada",
+    "valoracion": 99,
+    "distancia": 4,
+    "tipoActividad": "Cabalgata y Caminata",
+    "estado": "Activa"
+  },
+  {
+    "nombre": "Mirador del Cóndor",
+    "duracion": "2 Horas",
+    "descripcion": "Una caminata desafiante hasta un mirador con la posibilidad de avistar cóndores, las aves más grandes del mundo.",
+    "dificultad": "Desafiante",
+    "valoracion": 99,
+    "distancia": 2,
+    "tipoActividad": "Cabalgata y Caminata",
+    "estado": "Activa"
+  },
+  {
+    "nombre": "Camino, Palmas y Río",
+    "duracion": "2 Horas y 15 Min",
+    "descripcion": "Una caminata combinada que incluye el Mirador de Camino, el Mirador de Palmas y un paseo junto al río.",
+    "dificultad": "Moderada",
+    "valoracion": 99,
+    "distancia": 4.5,
+    "tipoActividad": "Cabalgata y Caminata",
+    "estado": "Activa"
+  },
+  {
+    "nombre": "Camino, Palmas y Peña",
+    "duracion": "2 Horas y 30 Min",
+    "descripcion": "Una caminata combinada que incluye el Mirador de Camino, el Mirador de Palmas y la Peña de la Virgen.",
+    "dificultad": "Desafiante",
+    "valoracion": 99,
+    "distancia": 2.5,
+    "tipoActividad": "Cabalgata y Caminata",
+    "estado": "Activa"
+  }
+] 

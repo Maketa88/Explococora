@@ -66,7 +66,12 @@ const LineasConexion = () => {
   );
 };
 
-export function PanelProcesamiento() {
+export function PanelProcesamiento({ tiempoRestante = 10 }) {
+  // Calcular porcentajes basados en el tiempo restante (10 segundos total)
+  const porcentajeBusqueda = 100;
+  const porcentajeUbicacion = Math.min(100, 100 - (tiempoRestante / 10) * 25);
+  const porcentajeOptimizacion = Math.min(100, 100 - (tiempoRestante / 10) * 55);
+
   return (
     <div className="w-full bg-white rounded-xl p-3 md:p-4 lg:p-6 shadow-lg border border-gray-100 relative overflow-hidden">
       {/* Fondo con patrón de cuadrícula */}
@@ -91,20 +96,20 @@ export function PanelProcesamiento() {
         <IndicadorProgreso
           icono={iconos.busqueda}
           titulo="ANALIZANDO PREFERENCIAS"
-          porcentaje={100}
+          porcentaje={porcentajeBusqueda}
         />
 
         <IndicadorProgreso
           icono={iconos.ubicacion}
           titulo="IDENTIFICANDO PUNTOS"
-          porcentaje={75}
+          porcentaje={porcentajeUbicacion}
           animationDelay="0.3s"
         />
 
         <IndicadorProgreso
           icono={iconos.configuracion}
           titulo="OPTIMIZANDO RUTA"
-          porcentaje={45}
+          porcentaje={porcentajeOptimizacion}
           animationDelay="0.6s"
         />
       </div>
@@ -112,7 +117,7 @@ export function PanelProcesamiento() {
       {/* Mensaje de estado */}
       <div className="mt-4 md:mt-6 text-center relative z-10">
         <p className="text-teal-600 text-xs md:text-sm animate-pulse">
-          Procesando datos... Por favor espera un momento
+          Procesando datos... Por favor espera {tiempoRestante} segundos
         </p>
       </div>
     </div>
