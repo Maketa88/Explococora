@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
-import ChatBot from "../../components/Chatbot/Chatbot";
+import ChatBot from "../../components/chatbot/Chatbot";
 import ContactForm from "../../components/ContactForm/ContactForm";
 import { HistoriaCultura } from "../../components/HistoriaCultura/Body/HistoriaCultura";
 import { PaginaNoEncontrada } from "../../components/HistoriaCultura/Body/PaginanoEncontrada/paginaNoEncontrada";
@@ -16,6 +16,7 @@ import VistaGuia from "../../pages/VistaGuia/VistaGuia";
 import VistaOperador from "../../pages/VistaOperador/VistaOperador";
 import NuestrasRutas from "../../components/NuestrasRutas/NuestrasRutas";
 import Feedback from "../../components/Feedback/Feedback";
+import { VerificacionOTP } from '../../components/VerificacionOTP/VerificacionOTP';
 
 
 export const RutasExplococora = () => {
@@ -74,6 +75,7 @@ export const RutasExplococora = () => {
         <Route path="/ContactForm" element={<ContactForm />} />
         <Route path="/QuienesSomos" element={<QuienesSomos />} />
         <Route path="/Feedback" element={<Feedback />} />
+        <Route path="/verificar-otp" element={<VerificacionOTP />} />
         <Route path="/*" element={<PaginaNoEncontrada />} />
       </Routes>
       <Footer />
