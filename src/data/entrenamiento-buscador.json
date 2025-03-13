@@ -279,6 +279,117 @@
         "nombre_contiene": "Virgen"
       },
       "explicacion": "Cuando el usuario menciona la Virgen, se deben mostrar rutas que incluyan 'Virgen' en su nombre o descripción."
+    },
+    {
+      "texto": "quiero hacer la ruta planchón",
+      "variaciones": [
+        "ruta planchón",
+        "caminata planchón",
+        "sendero planchón",
+        "mirador planchón",
+        "cabalgata planchón"
+      ],
+      "filtros": {
+        "nombre_contiene": "Planchon"
+      },
+      "explicacion": "Cuando el usuario menciona específicamente Planchón, se debe mostrar la ruta con ese nombre."
+    },
+    {
+      "texto": "caminata fácil en el valle",
+      "variaciones": [
+        "sendero fácil",
+        "rutas fáciles en el Valle",
+        "caminata para principiantes",
+        "rutas accesibles",
+        "caminatas sin esfuerzo",
+        "¿Qué rutas son fáciles en la zona?"
+      ],
+      "filtros": {
+        "dificultad": "Facil"
+      },
+      "explicacion": "Cuando el usuario busca rutas fáciles en el valle, se deben mostrar solo las rutas con dificultad 'Facil'."
+    },
+    {
+      "texto": "caminata de menos de una hora",
+      "variaciones": [
+        "caminata de 30 minutos",
+        "ruta corta para caminar",
+        "caminata rápida en el Valle",
+        "sendero corto con mirador",
+        "¿Qué rutas duran menos de una hora?",
+        "caminatas de menos de 1 hora"
+      ],
+      "filtros": {
+        "duracion_maxima": "1 Hora"
+      },
+      "explicacion": "Cuando el usuario busca rutas cortas o de menos de una hora, se deben mostrar rutas con duración máxima de 1 hora."
+    },
+    {
+      "texto": "rutas para cabalgata",
+      "variaciones": [
+        "caminatas con opción de caballo",
+        "senderos para caminar y cabalgar",
+        "¿Dónde puedo hacer cabalgata en la zona?",
+        "caminatas activas en el Valle"
+      ],
+      "filtros": {
+        "tipo_actividad": "Cabalgata y Caminata"
+      },
+      "explicacion": "Cuando el usuario busca rutas para cabalgata, se deben mostrar rutas que ofrezcan la opción de cabalgata."
+    },
+    {
+      "texto": "caminatas con vistas hermosas",
+      "variaciones": [
+        "sendero con mirador en el Valle",
+        "caminata con vistas panorámicas",
+        "¿Dónde puedo ver el valle desde un mirador?",
+        "caminata con vistas impresionantes"
+      ],
+      "filtros": {
+        "nombre_contiene": "Mirador"
+      },
+      "explicacion": "Cuando el usuario busca rutas con vistas panorámicas, se deben mostrar rutas que incluyan 'Mirador' en su nombre."
+    },
+    {
+      "texto": "caminatas para embarazadas",
+      "variaciones": [
+        "rutas aptas para personas mayores",
+        "caminatas sin mucha inclinación",
+        "caminatas para niños",
+        "senderos sin dificultad",
+        "caminatas relajantes"
+      ],
+      "filtros": {
+        "dificultad": "Facil",
+        "duracion_maxima": "1 Hora"
+      },
+      "explicacion": "Cuando el usuario busca rutas para personas con condiciones especiales como embarazadas, mayores o niños, se deben mostrar rutas fáciles y de corta duración."
+    },
+    {
+      "texto": "caminata popular en el Valle",
+      "variaciones": [
+        "rutas más visitadas",
+        "caminata recomendada en la zona",
+        "sendero bien valorado"
+      ],
+      "filtros": {
+        "valoracion_minima": 95
+      },
+      "explicacion": "Cuando el usuario busca rutas populares o recomendadas, se deben mostrar las rutas mejor valoradas."
+    },
+    {
+      "texto": "caminata fácil de 30 minutos con mirador",
+      "variaciones": [
+        "ruta accesible con cabalgata y mirador",
+        "sendero corto y fácil con vistas",
+        "caminata corta para toda la familia"
+      ],
+      "filtros": {
+        "dificultad": "Facil",
+        "duracion": "30 Min",
+        "nombre_contiene": "Mirador"
+      },
+      "explicacion": "Cuando el usuario hace una búsqueda combinada de dificultad, duración y vistas, se deben aplicar todos estos filtros."
     }
   ],
   "recomendaciones": [
@@ -321,6 +432,18 @@
     {
       "condicion": "nombre_contiene=Cóndor",
       "mensaje": "En esta ruta podrías avistar cóndores, las aves voladoras más grandes del mundo. Lleva binoculares si es posible."
+    },
+    {
+      "condicion": "tipo_actividad=Cabalgata y Caminata",
+      "mensaje": "Esta ruta ofrece la posibilidad de realizarla a pie o a caballo. La cabalgata te permitirá disfrutar del paisaje de una manera diferente."
+    },
+    {
+      "condicion": "nombre_contiene=Planchon",
+      "mensaje": "La ruta del Planchón es una de las más populares por sus impresionantes vistas y su corta duración, perfecta para disfrutar sin demasiado esfuerzo."
+    },
+    {
+      "condicion": "valoracion>95",
+      "mensaje": "Esta es una de nuestras rutas mejor valoradas por los visitantes. ¡Prepárate para vivir una experiencia inolvidable!"
     }
   ],
   "instrucciones_procesamiento": {
@@ -360,6 +483,26 @@
       },
       "resultado_esperado": ["Mirador de Camino"],
       "recomendacion": "Esta ruta corta te ofrece hermosas vistas en poco tiempo. Perfecta para una escapada rápida con paisajes impresionantes."
+    },
+    {
+      "consulta_usuario": "Quiero hacer cabalgata y ver buenas vistas",
+      "analisis": "Se identifica 'cabalgata' (tipo de actividad) y 'buenas vistas' (preferencia de paisaje)",
+      "filtros_aplicados": {
+        "tipo_actividad": "Cabalgata y Caminata",
+        "nombre_contiene": "Mirador"
+      },
+      "resultado_esperado": ["Mirador de Camino", "Mirador de Palmas"],
+      "recomendacion": "Estas rutas ofrecen la posibilidad de cabalgata y cuentan con miradores para disfrutar de vistas panorámicas. Una experiencia completa para los amantes de la naturaleza."
+    },
+    {
+      "consulta_usuario": "Busco la ruta más popular que sea corta",
+      "analisis": "Se identifica 'más popular' (alta valoración) y 'corta' (duración breve)",
+      "filtros_aplicados": {
+        "valoracion_minima": 95,
+        "duracion_maxima": "1 Hora"
+      },
+      "resultado_esperado": ["Planchon", "Mirador de Camino"],
+      "recomendacion": "Estas rutas son muy populares entre nuestros visitantes por su corta duración y las hermosas vistas que ofrecen."
     }
   ]
 } 

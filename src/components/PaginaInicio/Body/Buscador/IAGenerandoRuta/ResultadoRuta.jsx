@@ -199,10 +199,31 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
         });
       }
 
+      // Aplicar filtros de duración exacta
+      if (filtros.duracion) {
+        rutasFiltradas = rutasFiltradas.filter(
+          (ruta) => ruta.duracion === filtros.duracion
+        );
+      }
+
       // Aplicar filtros de distancia máxima
       if (filtros.distancia_maxima) {
         rutasFiltradas = rutasFiltradas.filter(
           (ruta) => parseFloat(ruta.distancia) <= filtros.distancia_maxima
+        );
+      }
+
+      // Aplicar filtros de tipo de actividad
+      if (filtros.tipo_actividad) {
+        rutasFiltradas = rutasFiltradas.filter(
+          (ruta) => ruta.tipoActividad === filtros.tipo_actividad
+        );
+      }
+
+      // Aplicar filtros de valoración mínima
+      if (filtros.valoracion_minima) {
+        rutasFiltradas = rutasFiltradas.filter(
+          (ruta) => ruta.valoracion >= filtros.valoracion_minima
         );
       }
 

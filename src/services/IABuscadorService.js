@@ -137,6 +137,22 @@ class IABuscadorService {
             const valoresCombinados = [...new Set([...valoresActuales, ...valoresNuevos])];
             filtrosCombinados[clave] = valoresCombinados.join(', ');
           }
+          // Para valoracion_minima, priorizar la mayor
+          else if (clave === 'valoracion_minima' && valor > filtrosCombinados[clave]) {
+            filtrosCombinados[clave] = valor;
+          }
+          // Para tipo_actividad, mantener el valor existente si es diferente (no hay prioridad clara)
+          else if (clave === 'tipo_actividad' && valor !== filtrosCombinados[clave]) {
+            // Mantenemos el existente, ya que no hay una prioridad clara entre tipos de actividad
+            // Si hay una actividad combinada como "Cabalgata y Caminata", la priorizamos
+            if (valor.includes(" y ") && !filtrosCombinados[clave].includes(" y ")) {
+              filtrosCombinados[clave] = valor;
+            }
+          }
+          // Para duración exacta, mantener el valor más reciente (podrían ser conflictivos)
+          else if (clave === 'duracion') {
+            filtrosCombinados[clave] = valor; // El último valor sobreescribe
+          }
         } else {
           // Si no existe, simplemente añadirlo
           filtrosCombinados[clave] = valor;
@@ -182,13 +198,34 @@ class IABuscadorService {
       if (filtros[clave]) {
         if (operador === '=' && filtros[clave] === valor) {
           recomendacionesAplicables.push(recomendacion.mensaje);
-        } else if (operador === '>' && this.convertirAMinutos(filtros[clave]) > this.convertirAMinutos(valor)) {
-          recomendacionesAplicables.push(recomendacion.mensaje);
+        } else if (operador === '>') {
+          // Manejar diferentes tipos de comparaciones
+          let cumpleCondicion = false;
+          
+          if (clave === 'duracion' || clave === 'duracion_maxima') {
+            // Para duración, convertir a minutos
+            cumpleCondicion = this.convertirAMinutos(filtros[clave]) > this.convertirAMinutos(valor);
+          } else if (clave === 'valoracion_minima' || clave === 'distancia_maxima') {
+            // Para valores numéricos, convertir a número
+            cumpleCondicion = parseFloat(filtros[clave]) > parseFloat(valor);
+          } else {
+            // Para otros casos
+            cumpleCondicion = filtros[clave] > valor;
+          }
+          
+          if (cumpleCondicion) {
+            recomendacionesAplicables.push(recomendacion.mensaje);
+          }
         }
       } else if (clave === 'nombre_contiene' && filtros.nombre_contiene) {
         // Caso especial para nombre_contiene que puede tener múltiples valores
         const valoresFiltro = filtros.nombre_contiene.split(', ');
         if (valoresFiltro.includes(valor)) {
+          recomendacionesAplicables.push(recomendacion.mensaje);
+        }
+      } else if (clave === 'tipo_actividad' && filtros.tipo_actividad) {
+        // Caso especial para tipo_actividad
+        if (filtros.tipo_actividad.includes(valor)) {
           recomendacionesAplicables.push(recomendacion.mensaje);
         }
       }
