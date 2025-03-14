@@ -9,7 +9,8 @@
         "caminata simple",
         "ruta sin dificultad",
         "ruta facil",
-        "facil"
+        "facil",
+        "muy facil"
       ],
       "filtros": {
         "dificultad": "Facil"
@@ -19,13 +20,20 @@
     {
       "texto": "quiero una ruta difícil",
       "variaciones": [
-        "busco una ruta desafiante",
+        "ruta desafiante",
+        "desafiante",
+        "muy desafiante",
         "necesito un sendero difícil",
         "rutas para expertos",
         "caminata exigente",
         "ruta con mucha dificultad",
         "sendero para aventureros",
-        "quiero una ruta muy difícil"
+        "ruta difícil",
+        "dificil",
+        "muy dificil",
+        "ruta dura",
+        "dura",
+        "muy dura"
       ],
       "filtros": {
         "dificultad": "Desafiante"
@@ -39,7 +47,9 @@
         "necesito un sendero de dificultad media",
         "rutas para nivel intermedio",
         "caminata moderada",
-        "ni muy fácil ni muy difícil"
+        "ni muy fácil ni muy difícil",
+        "medio",
+        "nivel intermedio"
       ],
       "filtros": {
         "dificultad": "Moderada"
@@ -50,12 +60,33 @@
       "texto": "quiero una ruta de 30 minutos",
       "variaciones": [
         "busco una ruta corta de media hora",
-        "necesito un sendero que dure 30 min",
-        "caminata de 30 minutos",
+        "30 min",
+        "20 min",
+        "10 min",
+        "15 min",
+        "25 min",
         "ruta rápida de media hora",
         "ruta de media hora",
-        "ruta de 30 minutos"
-        
+        "20 minutos",
+        "10 minutos",
+        "30 minutos",
+        "15 minutos",
+        "25 minutos",
+        "media hora",
+        "35 minutos",
+        "35 min",
+        "dispongo de poco tiempo",
+        "necesito una ruta rápida",
+        "no tengo mucho tiempo disponible",
+        "no tengo mucho tiempo",
+        "busco algo corto",
+        "ruta express",
+        "rapido",
+        "rapida",
+        "corta",
+        "muy corta",
+        "corto",
+        "muy corto"
       ],
       "filtros": {
         "duracion": "30 Min"
@@ -66,9 +97,18 @@
       "texto": "quiero una ruta de 1 hora",
       "variaciones": [
         "busco una ruta de una hora",
-        "necesito un sendero que dure 60 minutos",
-        "caminata de 1 hora",
-        "ruta de 60 min"
+        "60 minutos",
+        "60 min",
+        "1 hora",
+        "una hora",
+        "50 minutos",
+        "50 min",
+        "45 minutos",
+        "45 min",
+        "40 minutos",
+        "40 min",
+        "55 minutos",
+        "55 min"
       ],
       "filtros": {
         "duracion": "1 Hora"
@@ -78,10 +118,10 @@
     {
       "texto": "quiero una ruta de 2 horas",
       "variaciones": [
-        "busco una ruta de dos horas",
+        "dos horas",
+        "2 horas",
         "necesito un sendero que dure 120 minutos",
-        "caminata de 2 horas",
-        "ruta larga de dos horas"
+        "caminata de 2 horas"
       ],
       "filtros": {
         "duracion": "2 Horas"
@@ -89,13 +129,116 @@
       "explicacion": "Cuando el usuario busca rutas de 2 horas, se deben mostrar solo las rutas con duración '2 Horas'."
     },
     {
+      "texto": "quiero una ruta de 2 horas y 15 minutos",
+      "variaciones": [
+        "busco una ruta de dos horas y cuarto",
+        "135 minutos",
+        "135 min",
+        "2 horas y 15 min",
+        "2 horas y 15 minutos",
+        "2 horas y cuarto",
+        "dos horas y cuarto",
+        "dos horas y 15 minutos",
+        "2:15 horas",
+        "2.25 horas",
+        "2 horas 15 minutos",
+        "dos horas 15 minutos",
+        "2h15m"
+      ],
+      "filtros": {
+        "duracion": "2 Horas y 15 Min"
+      },
+      "explicacion": "Cuando el usuario busca rutas de 2 horas y 15 minutos, se deben mostrar solo las rutas con duración '2 Horas y 15 Min'."
+    },
+    {
+      "texto": "quiero una ruta de 2 horas y 30 minutos",
+      "variaciones": [
+        "busco una ruta de dos horas y media",
+        "150 minutos",
+        "150 min",
+        "2 horas y 30 min",
+        "2 horas y 30 minutos",
+        "2 horas y media",
+        "dos horas y media",
+        "dos horas y 30 minutos",
+        "2:30 horas",
+        "2.5 horas",
+        "2 horas 30 minutos",
+        "2h30m",
+        "dos horas 30 minutos",
+        "tres horas",
+        "3 horas",
+        "2 horas y 40 minutos",
+        "2 horas 40 minutos",
+        "dos horas y 40 minutos",
+        "dos horas 40 minutos",
+        "2h40m",
+        "2 horas y 50 minutos",
+        "2 horas 50 minutos",
+        "dos horas y 50 minutos",
+        "dos horas 50 minutos",
+        "2h50m",
+        "2 horas y 55 minutos",
+        "2 horas 55 minutos",
+        "dos horas y 55 minutos",
+        "dos horas 55 minutos",
+        "2h55m"
+      ],
+      "filtros": {
+        "duracion": "2 Horas y 30 Min"
+      },
+      "explicacion": "Cuando el usuario busca rutas de 2 horas y 30 minutos, se deben mostrar solo las rutas con duración '2 Horas y 30 Min'."
+    },
+    {
+      "texto": "quiero una ruta de 1 hora y 30 minutos",
+      "variaciones": [
+        "busco una ruta de hora y media",
+        "90 minutos",
+        "90 min",
+        "1 hora y 30 min",
+        "1 hora y 30 minutos",
+        "1 hora y media",
+        "una hora y media",
+        "hora y media",
+        "1:30 horas",
+        "1.5 horas",
+        "1 hora 30 minutos",
+        "1h30m",
+        "una hora 30 minutos"
+      ],
+      "filtros": {
+        "duracion": "1 Hora y 30 Min"
+      },
+      "explicacion": "Cuando el usuario busca rutas de 1 hora y 30 minutos, se deben mostrar solo las rutas con duración '1 Hora y 30 Min'."
+    },
+    {
+      "texto": "quiero una ruta de 1 hora y 40 minutos",
+      "variaciones": [
+        "busco una ruta de 1 hora y 40 min",
+        "100 minutos",
+        "100 min",
+        "1 hora y 40 min",
+        "una hora y cuarenta minutos",
+        "1:40 horas",
+        "1.67 horas",
+        "1 hora 40 minutos",
+        "1h40m",
+        "casi dos horas",
+        "una hora 40 minutos"
+      ],
+      "filtros": {
+        "duracion": "1 Hora y 40 Min"
+      },
+      "explicacion": "Cuando el usuario busca rutas de 1 hora y 40 minutos, se deben mostrar solo las rutas con duración '1 Hora y 40 Min'."
+    },
+    {
       "texto": "estoy embarazada",
       "variaciones": [
-        "soy una mujer embarazada",
-        "estoy en estado de gestación",
+        "embarazada",
+        "gestación",
         "estoy esperando un bebé",
-        "estoy en estado de embarazo",
-        "rutas para embarazadas"
+        "embarazo",
+        "embarazadas"
       ],
       "filtros": {
         "dificultad": "Facil",
@@ -107,10 +250,15 @@
       "texto": "tengo sobrepeso",
       "variaciones": [
         "soy una persona con sobrepeso",
-        "estoy gordo",
-        "tengo exceso de peso",
-        "soy obeso",
-        "rutas para personas con sobrepeso"
+        "gordo",
+        "gorda",
+        "exceso de peso",
+        "obeso",
+        "obesos",
+        "obesas",
+        "obesidad",
+        "personas con sobrepeso",
+        "gordos"
       ],
       "filtros": {
         "dificultad": "Facil",
@@ -123,10 +271,13 @@
       "variaciones": [
         "estoy en buena forma física",
         "soy deportista",
-        "tengo buena condición física",
+        "buena condición física",
         "soy una persona atlética",
         "estoy en forma",
-        "soy delgado y activo"
+        "delgado",
+        "delgada",
+        "flaco",
+        "flaca"
       ],
       "filtros": {
         "dificultad": "Desafiante"
@@ -139,7 +290,9 @@
         "me interesan las palmas de cera",
         "rutas con palmas de cera",
         "senderos para ver palmas",
-        "caminata con palmas de cera"
+        "caminata con palmas de cera",
+        "palmas",
+        "palmas de cera"
       ],
       "filtros": {
         "nombre_contiene": "Palmas"
@@ -148,12 +301,7 @@
     },
     {
       "texto": "quiero ver el río",
-      "variaciones": [
-        "me interesan rutas con río",
-        "senderos junto al río",
-        "caminata cerca del río",
-        "rutas con vistas al río"
-      ],
+      "variaciones": ["río", "ríos", "rio", "rios", "arroyos", "arroyo"],
       "filtros": {
         "nombre_contiene": "Río"
       },
@@ -162,10 +310,11 @@
     {
       "texto": "quiero ver cóndores",
       "variaciones": [
-        "me interesan los cóndores",
-        "rutas para avistar cóndores",
-        "senderos con cóndores",
-        "caminata para ver aves grandes"
+        "cóndores",
+        "cóndor",
+        "condor",
+        "condores",
+        "aves grandes"
       ],
       "filtros": {
         "nombre_contiene": "Cóndor"
@@ -175,11 +324,15 @@
     {
       "texto": "voy con niños",
       "variaciones": [
-        "llevo niños conmigo",
-        "rutas para hacer con niños",
-        "senderos aptos para niños",
-        "caminata familiar con niños",
-        "excursión con niños pequeños"
+        "niños",
+        "niñas",
+        "niña",
+        "niño",
+        "niños pequeños",
+        "niñas pequeñas",
+        "niños grandes",
+        "niñas grandes",
+        "niños pequeños"
       ],
       "filtros": {
         "dificultad": "Facil",
@@ -193,8 +346,11 @@
         "es mi primera caminata",
         "no tengo experiencia en senderismo",
         "nunca he hecho trekking",
-        "soy novato en rutas",
-        "primera vez que hago una ruta"
+        "novato",
+        "primera vez que hago una ruta",
+        "principiante",
+        "principiantes",
+        "amateur"
       ],
       "filtros": {
         "dificultad": "Facil",
@@ -206,30 +362,26 @@
       "texto": "quiero una ruta con vistas panorámicas",
       "variaciones": [
         "busco vistas impresionantes",
-        "rutas con miradores",
+
         "senderos con buenas vistas",
         "caminatas con paisajes",
-        "rutas para tomar fotos del paisaje"
+        "rutas para tomar fotos del paisaje",
+        "mirador",
+        "miradores",
+        "vista espectacular",
+        "paisaje",
+        "paisajes",
+        "hermoso",
+        "hermosos",
+        "hermosa",
+        "hermosas"
       ],
       "filtros": {
         "nombre_contiene": "Mirador"
       },
       "explicacion": "Cuando el usuario menciona vistas panorámicas o miradores, se deben mostrar rutas que incluyan 'Mirador' en su nombre."
     },
-    {
-      "texto": "tengo poco tiempo",
-      "variaciones": [
-        "dispongo de poco tiempo",
-        "necesito una ruta rápida",
-        "no tengo mucho tiempo disponible",
-        "busco algo corto",
-        "ruta express"
-      ],
-      "filtros": {
-        "duracion_maxima": "1 Hora"
-      },
-      "explicacion": "Cuando el usuario menciona tener poco tiempo, se deben mostrar rutas de corta duración (máximo 1 hora)."
-    },
+
     {
       "texto": "quiero una aventura completa",
       "variaciones": [
@@ -265,7 +417,17 @@
         "tengo más de 60 años",
         "soy de la tercera edad",
         "soy adulto mayor",
-        "rutas para personas mayores"
+        "rutas para personas mayores",
+        "adulto mayor",
+        "adultos mayores",
+        "anciano",
+        "ancianos",
+        "anciana",
+        "ancianas",
+        "abuelo",
+        "abuela",
+        "abuelos",
+        "abuelas"
       ],
       "filtros": {
         "dificultad": "Facil",
@@ -279,7 +441,9 @@
         "rutas que pasen por la Virgen",
         "senderos cerca de la estatua de la Virgen",
         "caminata a la Virgen María",
-        "excursión a la Peña de la Virgen"
+        "excursión a la Peña de la Virgen",
+        "virgen",
+        "virgen maria"
       ],
       "filtros": {
         "nombre_contiene": "Virgen"
@@ -420,6 +584,22 @@
       "mensaje": "Esta ruta tiene una duración moderada, ideal para una actividad de media mañana o media tarde."
     },
     {
+      "condicion": "duracion=1 Hora y 30 Min",
+      "mensaje": "Esta ruta tiene una duración intermedia, perfecta para quienes buscan una experiencia más completa sin llegar a ser demasiado exigente en tiempo."
+    },
+    {
+      "condicion": "duracion=1 Hora y 40 Min",
+      "mensaje": "Esta ruta tiene una duración considerable, ideal para excursionistas que buscan una experiencia más prolongada y completa del entorno natural."
+    },
+    {
+      "condicion": "duracion=2 Horas y 15 Min",
+      "mensaje": "Esta ruta es bastante larga y requiere buena condición física. Perfecta para quienes buscan una experiencia inmersiva en la naturaleza. Lleva agua suficiente y algún refrigerio."
+    },
+    {
+      "condicion": "duracion=2 Horas y 30 Min",
+      "mensaje": "Esta ruta es extensa y requiere buena preparación física. Ideal para excursionistas experimentados que buscan una aventura completa. Asegúrate de llevar suficiente agua, alimentos y protección solar."
+    },
+    {
       "condicion": "duracion>1 Hora",
       "mensaje": "Esta ruta es larga, asegúrate de llevar agua, protección solar y algún refrigerio."
     },
@@ -511,4 +691,4 @@
       "recomendacion": "Estas rutas son muy populares entre nuestros visitantes por su corta duración y las hermosas vistas que ofrecen."
     }
   ]
-} 
+}
