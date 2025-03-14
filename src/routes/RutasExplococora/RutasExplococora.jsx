@@ -17,54 +17,29 @@ import VistaOperador from "../../pages/VistaOperador/VistaOperador";
 import NuestrasRutas from "../../components/NuestrasRutas/NuestrasRutas";
 import Feedback from "../../components/Feedback/Feedback";
 import { VerificacionOTP } from '../../components/VerificacionOTP/VerificacionOTP';
-
+import ProtectedRoute from "../../components/ProtectedRoute/ProtectedRoute";
+import AccesoDenegado from "../../components/AccesoDenegado/AccesoDenegado";
+import { useAuth } from "../../context/AuthContext";
 
 export const RutasExplococora = () => {
   const location = useLocation();
-  const isOperadorRoute = location.pathname.includes("/VistaOperador");
-  const isGuiaRoute = location.pathname.includes("/VistaGuia");
-  const isClienteRoute = location.pathname.includes("/VistaCliente");
-  const isAdminRoute = location.pathname.includes("/VistaAdmin");
-
-  if (isOperadorRoute) {
-    return (
-      <Routes>
-        <Route path="/VistaOperador/*" element={<VistaOperador />} />
-      </Routes>
-    );
-  }
-
-  if (isGuiaRoute) {
-    return (
-      <Routes>
-        <Route
-          path="/VistaGuia"
-          element={<Navigate to="/VistaGuia/PerfilGuia" replace />}
-        />
-        <Route path="/VistaGuia/*" element={<VistaGuia />} />
-      </Routes>
-    );
-  }
-
-  if (isClienteRoute) {
-    return (
-      <Routes>
-        <Route path="/VistaCliente/*" element={<VistaCliente />} />
-      </Routes>
-    );
-  }
-  if (isAdminRoute) {
-    return (
-      <Routes>
-        <Route path="/VistaAdmin/*" element={<VistaAdmin />} />
-      </Routes>
-    );
-  }
+  
+  // Verificar si estamos en una ruta de panel de administración
+  const isAdminPanel = location.pathname.includes('/VistaAdmin');
+  const isGuiaPanel = location.pathname.includes('/VistaGuia');
+  const isOperadorPanel = location.pathname.includes('/VistaOperador');
+  const isClientePanel = location.pathname.includes('/VistaCliente');
+  
+  // Si estamos en alguna vista interna, no mostrar el header y footer público
+  const isInternalPanel = isAdminPanel || isGuiaPanel || isOperadorPanel || isClientePanel;
 
   return (
     <div className="min-h-screen">
-      <Header />
+      {/* Mostrar Header solo si no estamos en un panel interno */}
+      {!isInternalPanel && <Header />}
+      
       <Routes>
+        {/* Rutas públicas */}
         <Route path="/" element={<PaginaInicio />} />
         <Route path="/Historia" element={<HistoriaCultura />} />
         <Route path="/NuestrosGuias" element={<NuestrosGuias />} />
@@ -76,10 +51,35 @@ export const RutasExplococora = () => {
         <Route path="/QuienesSomos" element={<QuienesSomos />} />
         <Route path="/Feedback" element={<Feedback />} />
         <Route path="/verificar-otp" element={<VerificacionOTP />} />
+        <Route path="/acceso-denegado" element={<AccesoDenegado />} />
+
+        {/* Rutas protegidas */}
+        <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+          <Route path="/VistaAdmin/*" element={<VistaAdmin />} />
+        </Route>
+
+        <Route element={<ProtectedRoute allowedRoles={['guia']} />}>
+          <Route path="/VistaGuia/*" element={<VistaGuia />} />
+        </Route>
+
+        <Route element={<ProtectedRoute allowedRoles={['operador']} />}>
+          <Route path="/VistaOperador/*" element={<VistaOperador />} />
+        </Route>
+
+        <Route element={<ProtectedRoute allowedRoles={['Cliente']} />}>
+          <Route path="/VistaCliente/*" element={<VistaCliente />} />
+        </Route>
+
         <Route path="/*" element={<PaginaNoEncontrada />} />
       </Routes>
-      <Footer />
-      <ChatBot />
+      
+      {/* Mostrar Footer y ChatBot solo si no estamos en un panel interno */}
+      {!isInternalPanel && (
+        <>
+          <Footer />
+          <ChatBot />
+        </>
+      )}
     </div>
   );
 };
