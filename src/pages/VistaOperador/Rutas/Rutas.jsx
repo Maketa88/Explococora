@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import DashboardLayout from '../../../layouts/DashboardLayout';
 import axios from 'axios';
-import { Pencil, Plus, Trash, Mountain, X, Filter, RefreshCw, Eye, ChevronLeft, ChevronRight, Search } from 'lucide-react';
-import { toast } from 'react-toastify';
+import { Pencil, Plus, Trash, Mountain, X, Filter, RefreshCw, Eye, ChevronLeft, ChevronRight, Search, XCircle, Check } from 'lucide-react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Rutas = () => {
   const [rutas, setRutas] = useState([]);
@@ -26,12 +27,23 @@ const Rutas = () => {
   });
   const [imagenes, setImagenes] = useState([]);
   const [imagenesPreview, setImagenesPreview] = useState([]);
+  const [fotosCompletas, setFotosCompletas] = useState([]);
   const [activeRoute, setActiveRoute] = useState(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [alert, setAlert] = useState({ show: false, message: '', type: '' });
-  const [token, setToken] = useState(localStorage.getItem('token') || '');
+  const [token] = useState(localStorage.getItem('token') || '');
   const [isDetailView, setIsDetailView] = useState(false);
+  const [eliminandoFoto, setEliminandoFoto] = useState(false);
+  
+  // Estado para confirmación de eliminación estilo Guias.jsx
+  const [confirmacionEliminar, setConfirmacionEliminar] = useState({
+    mostrar: false,
+    tipo: '', // 'ruta' o 'foto'
+    id: null,
+    nombre: '',
+    mensaje: ''
+  });
   
   // Nuevos estados para manejar las fotos de las rutas en la lista
   const [rutasConFotos, setRutasConFotos] = useState({});
@@ -47,6 +59,10 @@ const Rutas = () => {
 
   // Añadir el estado para el término de búsqueda
   const [terminoBusqueda, setTerminoBusqueda] = useState('');
+
+  // Añadir estados para la selección múltiple de fotos
+  const [fotosSeleccionadas, setFotosSeleccionadas] = useState([]);
+  const [modoSeleccion, setModoSeleccion] = useState(false);
 
   // Configuración de axios con token de autorización
   const axiosWithAuth = axios.create({
@@ -84,7 +100,12 @@ const Rutas = () => {
     } catch (error) {
       console.error("Error al obtener las rutas:", error);
       setError(error.message);
-      toast.error("Error al cargar las rutas");
+      toast.error("Error al cargar las rutas", {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast",
+        theme: "colored"
+      });
     } finally {
       setLoading(false);
     }
@@ -97,6 +118,7 @@ const Rutas = () => {
       setCargandoFotos(prev => ({...prev, [idRuta]: true}));
       
       let fotosArray = [];
+      let fotosCompletasArray = [];
       let intentoExitoso = false;
       
       // INTENTO 1: Endpoint fotos
@@ -111,18 +133,28 @@ const Rutas = () => {
         
         if (response.data && response.data.fotos) {
           if (Array.isArray(response.data.fotos)) {
+            // Si es un array de strings (solo URLs)
             if (typeof response.data.fotos[0] === 'string') {
               fotosArray = response.data.fotos;
+              // No tenemos IDs en este caso, solo URLs
+              fotosCompletasArray = response.data.fotos.map(url => ({ foto: url }));
               intentoExitoso = true;
-            } else if (response.data.fotos[0] && response.data.fotos[0].foto) {
+            } 
+            // Si es un array de objetos con propiedad foto
+            else if (response.data.fotos[0] && response.data.fotos[0].foto) {
               fotosArray = response.data.fotos.map(item => item.foto);
+              fotosCompletasArray = response.data.fotos;
               intentoExitoso = true;
-            } else if (Array.isArray(response.data.fotos[0])) {
+            } 
+            // Si es un array anidado
+            else if (Array.isArray(response.data.fotos[0])) {
               response.data.fotos[0].forEach(item => {
                 if (item && typeof item === 'object' && item.foto) {
                   fotosArray.push(item.foto);
+                  fotosCompletasArray.push(item);
                 } else if (typeof item === 'string') {
                   fotosArray.push(item);
+                  fotosCompletasArray.push({ foto: item });
                 }
               });
               intentoExitoso = fotosArray.length > 0;
@@ -145,14 +177,18 @@ const Rutas = () => {
             if (Array.isArray(response.data.fotos)) {
               if (typeof response.data.fotos[0] === 'string') {
                 fotosArray = response.data.fotos;
+                fotosCompletasArray = response.data.fotos.map(url => ({ foto: url }));
               } else if (response.data.fotos[0] && response.data.fotos[0].foto) {
                 fotosArray = response.data.fotos.map(item => item.foto);
+                fotosCompletasArray = response.data.fotos;
               } else if (Array.isArray(response.data.fotos[0])) {
                 response.data.fotos[0].forEach(item => {
                   if (item && typeof item === 'object' && item.foto) {
                     fotosArray.push(item.foto);
+                    fotosCompletasArray.push(item);
                   } else if (typeof item === 'string') {
                     fotosArray.push(item);
+                    fotosCompletasArray.push({ foto: item });
                   }
                 });
               }
@@ -172,6 +208,7 @@ const Rutas = () => {
           if (rutaResponse.data && rutaResponse.data.fotos) {
             if (Array.isArray(rutaResponse.data.fotos)) {
               fotosArray = rutaResponse.data.fotos;
+              fotosCompletasArray = rutaResponse.data.fotos.map(url => ({ foto: url }));
             }
           }
         } catch (error) {
@@ -189,10 +226,12 @@ const Rutas = () => {
         }));
         
         setImagenesPreview(fotosArray);
+        setFotosCompletas(fotosCompletasArray);
       } else {
         console.log(`No se encontraron fotos para la ruta ${idRuta}`);
         setRutasConFotos(prev => ({...prev, [idRuta]: []}));
         setImagenesPreview([]);
+        setFotosCompletas([]);
       }
       
       setCargandoFotos(prev => ({...prev, [idRuta]: false}));
@@ -202,6 +241,7 @@ const Rutas = () => {
       setCargandoFotos(prev => ({...prev, [idRuta]: false}));
       setRutasConFotos(prev => ({...prev, [idRuta]: []}));
       setImagenesPreview([]);
+      setFotosCompletas([]);
       return false;
     }
   };
@@ -246,7 +286,12 @@ const Rutas = () => {
       return error.message || "Error de conexión";
     }
     
-    const { data } = error.response;
+    const { data, status } = error.response;
+    
+    // Simplificar mensajes de error específicos
+    if (status === 403 && data.message && data.message.includes("Token inválido")) {
+      return "Token inválido";
+    }
     
     if (data.message) {
       return data.message;
@@ -295,13 +340,308 @@ const Rutas = () => {
       );
       
       console.log('Respuesta de subida:', response.data);
-      toast.success('Imágenes subidas correctamente');
+      toast.success('Imágenes subidas correctamente', {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast",
+        theme: "colored"
+      });
+      
+      // Recargar la página para mostrar las nuevas imágenes
+      fetchRutas();
+      
       return true;
     } catch (error) {
       console.error('Error al subir imágenes:', error);
-      toast.error('Error al subir imágenes: ' + extractErrorMessage(error));
+      toast.error('Error al subir imágenes: ' + extractErrorMessage(error), {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast",
+        theme: "colored"
+      });
       return false;
     }
+  };
+
+  // Función modificada para mostrar el modal de confirmación de eliminación de varias fotos
+  const confirmarEliminarFotos = (fotosIds) => {
+    if (fotosIds.length === 1) {
+      // Si solo hay una foto, usar la función existente
+      const index = fotosCompletas.findIndex(foto => foto.id === fotosIds[0]);
+      confirmarEliminarFoto(fotosIds[0], index);
+    } else {
+      // Para múltiples fotos
+      setConfirmacionEliminar({
+        mostrar: true,
+        tipo: 'fotos',
+        id: fotosIds,
+        nombre: `${fotosIds.length} fotos seleccionadas`,
+        mensaje: '¿Está seguro que desea eliminar estas fotos? Esta acción no se puede deshacer.'
+      });
+    }
+  };
+
+  // Función para eliminar múltiples fotos
+  const eliminarFotosConfirmadas = async (idsArray) => {
+    try {
+      setEliminandoFoto(true);
+      setConfirmacionEliminar({ ...confirmacionEliminar, mostrar: false });
+      
+      // Eliminar cada foto de manera secuencial
+      for (const idFoto of idsArray) {
+        await axiosWithAuth.delete(`http://localhost:10101/rutas/foto/${idFoto}`);
+        
+        // Actualizar el estado de las fotos
+        setFotosCompletas(prevFotos => prevFotos.filter(foto => foto.id !== idFoto));
+      }
+      
+      // Actualizar las vistas previas
+      setImagenesPreview(prevPreview => {
+        // Crear un nuevo array de vistas previas excluyendo las eliminadas
+        const indexesToRemove = [];
+        fotosCompletas.forEach((foto, index) => {
+          if (idsArray.includes(foto.id)) {
+            indexesToRemove.push(index);
+          }
+        });
+        
+        return prevPreview.filter((_, i) => !indexesToRemove.includes(i));
+      });
+      
+      // Mostrar mensaje de éxito con el toast
+      if (idsArray.length === 1) {
+        toast.success('Foto eliminada correctamente', {
+          position: "top-right",
+          autoClose: 3000,
+          containerId: "rutas-toast",
+          theme: "colored"
+        });
+      } else {
+        toast.success(`${idsArray.length} fotos eliminadas correctamente`, {
+          position: "top-right",
+          autoClose: 3000,
+          containerId: "rutas-toast",
+          theme: "colored"
+        });
+      }
+      
+      // Reiniciar la selección
+      setFotosSeleccionadas([]);
+      setModoSeleccion(false);
+      
+      // Cerrar el modal si está abierto
+      if (modalOpen) {
+        setModalOpen(false);
+      }
+      
+      // Recargar la página para actualizar la lista de rutas
+      fetchRutas();
+      
+    } catch (error) {
+      console.error('Error al eliminar fotos:', error);
+      toast.error('Error al eliminar fotos: ' + extractErrorMessage(error), {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast",
+        theme: "colored"
+      });
+    } finally {
+      setEliminandoFoto(false);
+    }
+  };
+
+  // Modificar el componente de confirmación para manejar eliminación múltiple
+  const ConfirmacionEliminarModal = () => {
+    if (!confirmacionEliminar.mostrar) return null;
+    
+    const esRuta = confirmacionEliminar.tipo === 'ruta';
+    const esFoto = confirmacionEliminar.tipo === 'foto';
+    const sonFotos = confirmacionEliminar.tipo === 'fotos';
+    
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-[#1e293b] rounded-lg w-full max-w-md mx-auto shadow-xl overflow-hidden">
+          <div className="p-6">
+            <h2 className="text-xl font-bold text-white mb-4">Confirmar Eliminación</h2>
+            
+            <div className="flex items-start gap-4 mb-6">
+              <div className="bg-red-600 rounded-full p-2 text-white shrink-0">
+                <XCircle size={24} />
+              </div>
+              
+              <div>
+                <h3 className="font-semibold text-white">{confirmacionEliminar.nombre}</h3>
+                <p className="text-rose-400 mt-2">Será eliminado permanentemente</p>
+              </div>
+            </div>
+            
+            <div className="border-l-4 border-amber-400 pl-3 py-2 bg-amber-900 bg-opacity-30 mb-6">
+              <p className="text-white text-sm">
+                ¿Está seguro que desea eliminar {
+                  esRuta ? 'esta ruta' : 
+                  esFoto ? 'esta foto' : 
+                  sonFotos ? 'estas fotos seleccionadas' : 
+                  'este elemento'
+                }? Esta acción no se puede deshacer.
+              </p>
+            </div>
+            
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setConfirmacionEliminar({ ...confirmacionEliminar, mostrar: false })}
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+              >
+                Cancelar
+              </button>
+              
+              <button
+                onClick={() => {
+                  if (esRuta) {
+                    eliminarRutaConfirmada(confirmacionEliminar.id);
+                  } else if (esFoto) {
+                    eliminarFotoConfirmada(confirmacionEliminar.id);
+                  } else if (sonFotos) {
+                    eliminarFotosConfirmadas(confirmacionEliminar.id);
+                  }
+                }}
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded transition-colors flex items-center gap-2"
+              >
+                <Trash size={16} />
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Función para mostrar el modal de confirmación de eliminación de ruta
+  const confirmarEliminarRuta = (ruta) => {
+    const rutaId = ruta.idRuta || ruta.id;
+    setConfirmacionEliminar({
+      mostrar: true,
+      tipo: 'ruta',
+      id: rutaId,
+      nombre: ruta.nombreRuta || 'Ruta sin nombre',
+      mensaje: '¿Está seguro que desea eliminar esta ruta? Esta acción no se puede deshacer.'
+    });
+  };
+
+  // Función para mostrar el modal de confirmación de eliminación de foto
+  const confirmarEliminarFoto = (idFoto, index) => {
+    setConfirmacionEliminar({
+      mostrar: true,
+      tipo: 'foto',
+      id: idFoto,
+      nombre: `Foto #${index + 1}`,
+      mensaje: '¿Está seguro que desea eliminar esta foto? Esta acción no se puede deshacer.'
+    });
+  };
+
+  // Función para eliminar una ruta después de la confirmación
+  const eliminarRutaConfirmada = async (rutaId) => {
+    try {
+      setConfirmacionEliminar({ ...confirmacionEliminar, mostrar: false });
+      
+      await axiosWithAuth.delete(`http://localhost:10101/rutas/${rutaId}`);
+      toast.success('Ruta eliminada correctamente', {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast",
+        theme: "colored"
+      });
+      
+      // Refrescar la lista
+      fetchRutas();
+      
+      // Cerrar la vista de detalles si está abierta
+      if (isDetailView) {
+        closeDetailView();
+      }
+    } catch (error) {
+      console.error("Error al eliminar la ruta:", error);
+      toast.error(error.response?.data?.message || 'Error al eliminar la ruta', {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast",
+        theme: "colored"
+      });
+    }
+  };
+
+  // Modificar el componente de confirmación para manejar eliminación múltiple
+  const eliminarFotoConfirmada = async (idFoto) => {
+    try {
+      setEliminandoFoto(true);
+      setConfirmacionEliminar({ ...confirmacionEliminar, mostrar: false });
+      
+      // Llamar al endpoint para eliminar la foto
+      const response = await axiosWithAuth.delete(`http://localhost:10101/rutas/foto/${idFoto}`);
+      
+      console.log('Respuesta de eliminación de foto:', response.data);
+      
+      // Actualizar el estado de las fotos
+      setFotosCompletas(prevFotos => prevFotos.filter(foto => foto.id !== idFoto));
+      setImagenesPreview(prevPreview => {
+        // Encontrar el índice de la foto a eliminar en fotosCompletas
+        const indexToRemove = fotosCompletas.findIndex(foto => foto.id === idFoto);
+        // Eliminar la misma posición en imagenesPreview
+        if (indexToRemove >= 0) {
+          return prevPreview.filter((_, i) => i !== indexToRemove);
+        }
+        return prevPreview;
+      });
+      
+      // Cerrar el modal si está abierto
+      if (modalOpen) {
+        setModalOpen(false);
+      }
+      
+      // Mostrar mensaje de éxito
+      toast.success('Foto eliminada correctamente', {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast",
+        theme: "colored"
+      });
+      
+      // Recargar la página para mostrar los cambios
+      fetchRutas();
+      
+    } catch (error) {
+      console.error('Error al eliminar foto:', error);
+      toast.error('Error al eliminar foto: ' + extractErrorMessage(error), {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast",
+        theme: "colored"
+      });
+    } finally {
+      setEliminandoFoto(false);
+    }
+  };
+
+  // Nueva función para eliminar una foto por su ID (actualizada)
+  const handleDeleteFoto = (idFoto, index) => {
+    if (!idFoto || isNaN(idFoto)) {
+      toast.error('ID de foto inválido', {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast",
+        theme: "colored"
+      });
+      return;
+    }
+
+    // Mostrar el modal de confirmación de eliminación
+    confirmarEliminarFoto(idFoto, index);
+  };
+
+  // Función para eliminar una ruta (actualizada)
+  const handleDeleteRuta = (ruta) => {
+    // Mostrar el modal de confirmación de eliminación
+    confirmarEliminarRuta(ruta);
   };
 
   // Fix the function to open the modal for editing
@@ -325,6 +665,10 @@ const Rutas = () => {
         precio: ruta.precio || '0' // Asegurar que siempre haya un valor
       });
       
+      // Limpiar las fotos actuales antes de cargar nuevas
+      setImagenesPreview([]);
+      setFotosCompletas([]);
+      
       // Cargar las imágenes existentes si hay un ID de ruta
       if (rutaId) {
         fetchRutaImages(rutaId);
@@ -346,6 +690,7 @@ const Rutas = () => {
         precio: ''
       });
       setImagenesPreview([]);
+      setFotosCompletas([]);
       setImagenes([]);
       setIsEditing(false);
     }
@@ -435,11 +780,21 @@ const Rutas = () => {
             throw new Error('El nombre de la ruta ya existe. Por favor, elija otro nombre.');
           }
           
+          // Simplificar mensaje para errores de token
+          if (fetchResponse.status === 403 && errorData.message && errorData.message.includes('Token inválido')) {
+            throw new Error('Token inválido');
+          }
+          
           throw new Error(`Error ${fetchResponse.status}: ${JSON.stringify(errorData)}`);
         }
         
         console.log('Route successfully updated');
-        toast.success('Ruta actualizada correctamente');
+        toast.success('Ruta actualizada correctamente', {
+          position: "top-right",
+          autoClose: 3000,
+          containerId: "rutas-toast",
+          theme: "colored"
+        });
       } else {
         // CREATING A NEW ROUTE
         const rutaData = {
@@ -460,24 +815,36 @@ const Rutas = () => {
         console.log('Create response:', response.data);
         rutaId = response.data.id || response.data.idRuta;
         
-        toast.success('Ruta creada correctamente');
+        toast.success('Ruta creada correctamente', {
+          position: "top-right",
+          autoClose: 3000,
+          containerId: "rutas-toast",
+          theme: "colored"
+        });
       }
       
       // Handle image uploads if needed
       if (imagenes.length > 0 && rutaId) {
         await uploadImages(rutaId);
+      } else {
+        // Si no hay imágenes nuevas, igual refrescamos la lista
+        fetchRutas();
       }
       
       // Reset form and close modal
       setModalOpen(false);
       resetForm();
-      fetchRutas(); // Reload routes to see the changes
     } catch (error) {
       console.error("Error al guardar la ruta:", error);
       
       let errorMessage = error.message || "Error al procesar la solicitud";
       
-      toast.error(errorMessage);
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast",
+        theme: "colored"
+      });
       setAlert({
         show: true,
         message: errorMessage,
@@ -502,29 +869,9 @@ const Rutas = () => {
     });
     setImagenes([]);
     setImagenesPreview([]);
+    setFotosCompletas([]);
     setIsEditing(false);
     setAlert({ show: false, message: '', type: '' });
-  };
-
-  // Función para eliminar una ruta
-  const handleDeleteRuta = async (rutaId) => {
-    if (!window.confirm('¿Está seguro de que desea eliminar esta ruta?')) {
-      return;
-    }
-    
-    try {
-      console.log(`Deleting route with ID: ${rutaId}`);
-      await axiosWithAuth.delete(`http://localhost:10101/rutas/${rutaId}`);
-      toast.success('Ruta eliminada correctamente');
-      fetchRutas(); // Refrescar la lista
-      
-      if (isDetailView) {
-        closeDetailView();
-      }
-    } catch (error) {
-      console.error("Error al eliminar la ruta:", error);
-      toast.error(error.response?.data?.message || 'Error al eliminar la ruta');
-    }
   };
 
   // Función para manejar cambios en las imágenes
@@ -638,6 +985,7 @@ const Rutas = () => {
     setIsDetailView(false);
     setActiveRoute(null);
     setImagenesPreview([]);
+    setFotosCompletas([]);
   };
 
   // Actualizar la función para abrir el detalle y asegurar que cargue todas las fotos
@@ -650,6 +998,7 @@ const Rutas = () => {
     
     // Limpiar previsualizaciones existentes
     setImagenesPreview([]);
+    setFotosCompletas([]);
     
     // Intentamos obtener todas las fotos y mostramos mensaje según resultado
     const fotosCargadas = await obtenerFotosRuta(rutaId);
@@ -673,12 +1022,6 @@ const Rutas = () => {
     if (newIndex >= 0 && newIndex < imagenesPreview.length) {
       setLightboxIndex(newIndex);
     }
-  };
-
-  // Eliminamos la función de formateo de precio que está causando problemas
-  // y la reemplazamos por una que simplemente devuelve el valor tal cual
-  const mostrarPrecio = (precio) => {
-    return `$ ${precio}`;
   };
 
   // Modificar la función de búsqueda para incluir precio y dificultad
@@ -709,9 +1052,66 @@ const Rutas = () => {
     setRutasFiltradas(resultado);
   };
 
+  // Toggle para seleccionar una foto
+  const toggleSeleccionFoto = (fotoId) => {
+    setFotosSeleccionadas(prev => {
+      if (prev.includes(fotoId)) {
+        return prev.filter(id => id !== fotoId);
+      } else {
+        return [...prev, fotoId];
+      }
+    });
+  };
+
+  // Iniciar modo selección
+  const iniciarModoSeleccion = () => {
+    setModoSeleccion(true);
+    setFotosSeleccionadas([]);
+  };
+
+  // Cancelar modo selección
+  const cancelarModoSeleccion = () => {
+    setModoSeleccion(false);
+    setFotosSeleccionadas([]);
+  };
+
+  // Nueva función para manejar la eliminación de múltiples fotos
+  const handleDeleteMultiplePhotos = () => {
+    if (fotosSeleccionadas.length === 0) {
+      toast.info('No hay fotos seleccionadas para eliminar', {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast",
+        theme: "colored"
+      });
+      return;
+    }
+    
+    confirmarEliminarFotos(fotosSeleccionadas);
+  };
+
   return (
     <DashboardLayout>
       <div className="p-6">
+        {/* Modal de confirmación de eliminación */}
+        <ConfirmacionEliminarModal />
+        
+        {/* Contenedor de Toast para mantener las alertas en esta página */}
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+          limit={3}
+          containerId="rutas-toast"
+        />
+        
         {/* Header with Title and Create Button */}
         <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
@@ -848,8 +1248,10 @@ const Rutas = () => {
         {/* Error State */}
         {error && !loading && (
           <div className="bg-red-900 bg-opacity-30 text-red-300 p-4 rounded-lg">
-            <p className="font-semibold">Error al cargar las rutas</p>
-            <p>{error}</p>
+            <p className="font-semibold">
+              {error.includes("Error 403") ? "Token inválido" : "Error al cargar las rutas"}
+            </p>
+            <p>{error.includes("Error 403") ? "Por favor, inicie sesión nuevamente" : error}</p>
             <button 
               onClick={fetchRutas}
               className="mt-2 px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded"
@@ -898,7 +1300,7 @@ const Rutas = () => {
                         <Pencil size={16} />
                       </button>
                       <button
-                        onClick={() => handleDeleteRuta(ruta.idRuta || ruta.id)}
+                        onClick={() => handleDeleteRuta(ruta)}
                         className="p-2 bg-rose-800 bg-opacity-80 hover:bg-rose-700 text-white rounded-full"
                         title="Eliminar ruta"
                       >
@@ -1073,7 +1475,7 @@ const Rutas = () => {
                 
                 <div className="flex justify-end gap-3 pt-4 border-t border-teal-800">
                   <button
-                    onClick={() => handleDeleteRuta(activeRoute.idRuta || activeRoute.id)}
+                    onClick={() => handleDeleteRuta(activeRoute)}
                     className="px-4 py-2 bg-rose-500 bg-opacity-80 hover:bg-opacity-100 rounded-lg text-white flex items-center gap-2 transition-colors"
                   >
                     <Trash size={16} />
@@ -1144,7 +1546,9 @@ const Rutas = () => {
                 
                 {alert.show && alert.type === 'error' && (
                   <div className="mb-4 p-3 bg-red-900 bg-opacity-50 rounded">
-                    <p className="text-white text-sm">{alert.message}</p>
+                    <p className="text-white text-sm">
+                      {alert.message.includes("Error 403") ? "Token inválido" : alert.message}
+                    </p>
                   </div>
                 )}
                 
@@ -1265,29 +1669,113 @@ const Rutas = () => {
                       multiple
                     />
                     
-                    {/* Display image previews with remove option */}
+                    <div className="text-xs text-teal-300 mt-1">
+                      Puedes seleccionar múltiples imágenes a la vez
+                    </div>
+                    
+                    {/* Display image previews with remove option and delete button for existing photos */}
                     {imagenesPreview.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {imagenesPreview.map((preview, index) => (
-                          <div key={index} className="relative">
-                            <img
-                              src={preview}
-                              alt={`Vista previa ${index + 1}`}
-                              className="h-24 w-24 object-cover rounded"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => removeImage(index)}
-                              className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 transform translate-x-1/2 -translate-y-1/2"
-                              title="Eliminar imagen"
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                              </svg>
-                            </button>
+                      <div className="space-y-2">
+                        {/* Barra de herramientas para selección de fotos */}
+                        {fotosCompletas.length > 0 && (
+                          <div className="flex justify-between items-center mb-2">
+                            <div>
+                              {!modoSeleccion ? (
+                                <button
+                                  type="button"
+                                  onClick={iniciarModoSeleccion}
+                                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm flex items-center gap-1"
+                                >
+                                  <Check size={14} />
+                                  Seleccionar fotos
+                                </button>
+                              ) : (
+                                <div className="flex gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={cancelarModoSeleccion}
+                                    className="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm"
+                                  >
+                                    Cancelar
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={handleDeleteMultiplePhotos}
+                                    className="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded text-sm flex items-center gap-1"
+                                    disabled={fotosSeleccionadas.length === 0}
+                                  >
+                                    <Trash size={14} />
+                                    Eliminar ({fotosSeleccionadas.length})
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                            {fotosCompletas.length > 0 && (
+                              <span className="text-sm text-gray-300">
+                                {fotosCompletas.length} fotos
+                              </span>
+                            )}
                           </div>
-                        ))}
+                        )}
+                        
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {imagenesPreview.map((preview, index) => {
+                            // Determinar si la imagen es una nueva subida o una existente
+                            const esFotoExistente = index < fotosCompletas.length;
+                            const fotoInfo = esFotoExistente ? fotosCompletas[index] : null;
+                            const tieneId = fotoInfo && fotoInfo.id;
+                            const estaSeleccionada = tieneId && fotosSeleccionadas.includes(fotoInfo.id);
+                            
+                            return (
+                              <div 
+                                key={index} 
+                                className={`relative ${estaSeleccionada ? 'ring-2 ring-blue-500' : ''}`}
+                              >
+                                <img
+                                  src={preview}
+                                  alt={`Vista previa ${index + 1}`}
+                                  className="h-24 w-24 object-cover rounded"
+                                />
+                                
+                                {/* Para imágenes nuevas: Botón para quitar de la lista de subida */}
+                                {!esFotoExistente && (
+                                  <button
+                                    type="button"
+                                    onClick={() => removeImage(index - fotosCompletas.length)}
+                                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 transform translate-x-1/2 -translate-y-1/2"
+                                    title="Quitar imagen"
+                                  >
+                                    <X size={14} />
+                                  </button>
+                                )}
+                                
+                                {/* Para fotos existentes: Botón para seleccionar o eliminar */}
+                                {esFotoExistente && tieneId && (
+                                  modoSeleccion ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleSeleccionFoto(fotoInfo.id)}
+                                      className={`absolute top-0 right-0 ${estaSeleccionada ? 'bg-blue-500' : 'bg-gray-600'} text-white rounded-full p-1 transform translate-x-1/2 -translate-y-1/2`}
+                                      title={estaSeleccionada ? "Deseleccionar foto" : "Seleccionar foto"}
+                                    >
+                                      <Check size={14} />
+                                    </button>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteFoto(fotoInfo.id, index)}
+                                      disabled={eliminandoFoto}
+                                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 transform translate-x-1/2 -translate-y-1/2"
+                                      title="Eliminar foto permanentemente"
+                                    >
+                                      <Trash size={14} />
+                                    </button>
+                                  )
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     )}
                   </div>
