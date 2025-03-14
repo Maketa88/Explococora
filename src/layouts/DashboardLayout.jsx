@@ -448,7 +448,7 @@ const DashboardLayout = ({ children }) => {
             }`}
           >
             <Settings className="w-5 h-5" />
-            {!collapsed && <span>Settings</span>}
+            {!collapsed && <span>Configuración</span>}
           </Link>
         </div>
       </div>
