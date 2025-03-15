@@ -105,7 +105,7 @@
     "descripcion": "Una caminata combinada que incluye el Mirador de Camino, el Mirador de Palmas y la Peña de la Virgen.",
     "dificultad": "Desafiante",
     "valoracion": 99,
-    "distancia": 2.5,
+    "distancia": 10,
     "tipoActividad": "Cabalgata y Caminata",
     "estado": "Activa"
   },
@@ -115,7 +115,7 @@
     "descripcion": "La caminata más completa y desafiante, que incluye todos los miradores y la posibilidad de avistar cóndores.",
     "dificultad": "Desafiante",
     "valoracion": 99,
-    "distancia": 8,
+    "distancia": 15,
     "tipoActividad": "Cabalgata y Caminata",
     "estado": "Activa"
   }

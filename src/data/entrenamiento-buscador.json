@@ -429,7 +429,15 @@
         "abuelo",
         "abuela",
         "abuelos",
-        "abuelas"
+        "abuelas",
+        "60 años",
+        "50 años",
+        "55 años",
+        "mal estado fisico",
+        "estado fisico malo",
+        "no estoy en buena forma",
+        "estado fisico malo",
+        "estado fisico regular"
       ],
       "filtros": {
         "dificultad": "Facil",
@@ -562,6 +570,37 @@
         "nombre_contiene": "Mirador"
       },
       "explicacion": "Cuando el usuario hace una búsqueda combinada de dificultad, duración y vistas, se deben aplicar todos estos filtros."
+    },
+    {
+      "texto": "quiero una ruta de 4 horas y 30 minutos",
+      "variaciones": [
+        "busco una ruta de cuatro horas y media",
+        "270 minutos",
+        "270 min",
+        "4 horas y 30 min",
+        "4 horas y 30 minutos",
+        "4 horas y media",
+        "cuatro horas y media",
+        "cuatro horas y 30 minutos",
+        "4:30 horas",
+        "4.5 horas",
+        "4 horas 30 minutos",
+        "4h30m",
+        "ruta larga",
+        "ruta completa",
+        "ruta más larga",
+        "la ruta más completa",
+        "quiero ver todo",
+        "ruta que incluya todo",
+        "ruta con todos los miradores",
+        "5 horas",
+        "cinco horas",
+        "mas dificil"
+      ],
+      "filtros": {
+        "duracion": "4 Horas y 30 Min"
+      },
+      "explicacion": "Cuando el usuario busca rutas de 4 horas y 30 minutos o menciona querer ver todo, se deben mostrar solo las rutas con duración '4 Horas y 30 Min'."
     }
   ],
   "recomendaciones": [
@@ -632,6 +671,10 @@
     {
       "condicion": "valoracion>95",
       "mensaje": "Esta es una de nuestras rutas mejor valoradas por los visitantes. ¡Prepárate para vivir una experiencia inolvidable!"
+    },
+    {
+      "condicion": "duracion=4 Horas y 30 Min",
+      "mensaje": "Esta es nuestra ruta más completa y extensa. Requiere excelente condición física y preparación. Asegúrate de llevar suficiente agua, alimentos, protección solar y ropa adecuada. Se recomienda iniciar temprano en la mañana."
     }
   ],
   "instrucciones_procesamiento": {
