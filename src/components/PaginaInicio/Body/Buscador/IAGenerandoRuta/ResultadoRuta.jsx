@@ -2,12 +2,12 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import rutasDataOriginal from "../../../../../data/rutas.json";
-import { obtenerFotosRuta, obtenerRutas } from '../../../../../services/rutasService';
+import { obtenerFotosRuta } from '../../../../../services/rutasService';
 
-// Asignar IDs a las rutas del archivo JSON (se usará como fallback)
-const rutasDataFallback = rutasDataOriginal.map((ruta, index) => ({
+// Asignar IDs a las rutas del archivo JSON
+const rutasData = rutasDataOriginal.map((ruta, index) => ({
   ...ruta,
-  idRuta: index + 1
+  idRuta: index + 1 // Asignar IDs secuenciales comenzando desde 1
 }));
 
 // Imágenes de respaldo por dificultad (se usarán si no hay fotos disponibles de la API)
@@ -172,34 +172,13 @@ const puntosDeInteresPorTipo = {
 
 export const ResultadoRuta = ({ resultadoIA, consulta }) => {
   // Estado para las rutas
-  const [rutasData, setRutasData] = useState(rutasDataFallback); // Inicializamos con el fallback
   const [rutaPrincipal, setRutaPrincipal] = useState(null);
   const [rutasComplementarias, setRutasComplementarias] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [rutasConFotos, setRutasConFotos] = useState({});
+  // Usamos cargandoFotos para seguimiento interno, aunque no se use en la renderización
   const [cargandoFotos, setCargandoFotos] = useState({});
   const { t } = useTranslation();
-
-  // Cargar rutas de la API
-  useEffect(() => {
-    const cargarRutas = async () => {
-      try {
-        const rutasFromApi = await obtenerRutas();
-        if (rutasFromApi && rutasFromApi.length > 0) {
-          const rutasConId = rutasFromApi.map((ruta, index) => ({
-            ...ruta,
-            idRuta: ruta.idRuta || index + 1
-          }));
-          setRutasData(rutasConId);
-        }
-      } catch (error) {
-        console.error('Error al obtener rutas de la API:', error);
-        // Ya tenemos el fallback cargado, no necesitamos hacer nada más
-      }
-    };
-
-    cargarRutas();
-  }, []);
 
   // Función para obtener las fotos de una ruta específica
   const obtenerFotosParaRuta = async (idRuta) => {
