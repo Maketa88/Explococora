@@ -1,8 +1,8 @@
-import axios from "axios";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import rutasDataOriginal from "../../../../../data/rutas.json";
+import { obtenerFotosRuta } from '../../../../../services/rutasService';
 
 // Asignar IDs a las rutas del archivo JSON
 const rutasData = rutasDataOriginal.map((ruta, index) => ({
@@ -181,65 +181,20 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
   const { t } = useTranslation();
 
   // Función para obtener las fotos de una ruta específica
-  const obtenerFotosRuta = async (idRuta) => {
+  const obtenerFotosParaRuta = async (idRuta) => {
     try {
-      // Verificar que el ID sea válido antes de hacer la petición
-      if (!idRuta || isNaN(idRuta)) {
-        console.warn("ID de ruta no válido:", idRuta);
-        setCargandoFotos(prev => ({...prev, [idRuta]: false}));
-        return;
-      }
+      setCargandoFotos(prev => ({...prev, [idRuta]: true}));
+      const fotos = await obtenerFotosRuta(idRuta);
       
-      console.log(`Obteniendo fotos para la ruta ${idRuta}...`);
-      const response = await axios.get(`http://localhost:10101/rutas/fotos-publicas/${idRuta}`);
-      console.log(`Respuesta de la API para ruta ${idRuta}:`, response.data);
-      
-      let fotosArray = [];
-      
-      // Intentar extraer las fotos de diferentes estructuras posibles
-      if (response.data && response.data.fotos) {
-        const fotos = response.data.fotos;
-        
-        // Caso 1: Array de strings (URLs directas)
-        if (Array.isArray(fotos) && fotos.length > 0 && typeof fotos[0] === 'string') {
-          fotosArray = fotos;
-          console.log(`Encontradas ${fotosArray.length} fotos (formato: array de strings)`);
-        } 
-        // Caso 2: Array de objetos con propiedad foto
-        else if (Array.isArray(fotos) && fotos.length > 0 && fotos[0] && typeof fotos[0] === 'object' && fotos[0].foto) {
-          fotosArray = fotos.map(item => item.foto);
-          console.log(`Encontradas ${fotosArray.length} fotos (formato: array de objetos)`);
-        } 
-        // Caso 3: Array anidado
-        else if (Array.isArray(fotos) && fotos.length > 0 && Array.isArray(fotos[0])) {
-          const primerElemento = fotos[0];
-          
-          primerElemento.forEach(item => {
-            if (item && typeof item === 'object' && item.foto && typeof item.foto === 'string') {
-              fotosArray.push(item.foto);
-            } else if (typeof item === 'string') {
-              fotosArray.push(item);
-            }
-          });
-          
-          console.log(`Encontradas ${fotosArray.length} fotos (formato: array anidado)`);
-        }
-      }
-      
-      // Si encontramos fotos, actualizar el estado
-      if (fotosArray.length > 0) {
-        console.log(`Guardando ${fotosArray.length} fotos para la ruta ${idRuta}:`, fotosArray);
+      if (fotos.length > 0) {
         setRutasConFotos(prevState => ({
           ...prevState,
-          [idRuta]: fotosArray
+          [idRuta]: fotos
         }));
-      } else {
-        console.log(`No se encontraron fotos para la ruta ${idRuta}`);
       }
-      
-      setCargandoFotos(prev => ({...prev, [idRuta]: false}));
     } catch (error) {
       console.error(`Error al obtener fotos para la ruta ${idRuta}:`, error);
+    } finally {
       setCargandoFotos(prev => ({...prev, [idRuta]: false}));
     }
   };
@@ -343,14 +298,12 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
       
       // Obtener fotos para la ruta principal y las complementarias
       if (rutaPrincipal && rutaPrincipal.idRuta) {
-        setCargandoFotos(prev => ({...prev, [rutaPrincipal.idRuta]: true}));
-        obtenerFotosRuta(rutaPrincipal.idRuta);
+        obtenerFotosParaRuta(rutaPrincipal.idRuta);
       }
       
       rutasComplementarias.forEach(ruta => {
         if (ruta && ruta.idRuta) {
-          setCargandoFotos(prev => ({...prev, [ruta.idRuta]: true}));
-          obtenerFotosRuta(ruta.idRuta);
+          obtenerFotosParaRuta(ruta.idRuta);
         }
       });
       
@@ -373,14 +326,12 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
       
       // Obtener fotos para la ruta principal y las complementarias
       if (rutaPrincipal && rutaPrincipal.idRuta) {
-        setCargandoFotos(prev => ({...prev, [rutaPrincipal.idRuta]: true}));
-        obtenerFotosRuta(rutaPrincipal.idRuta);
+        obtenerFotosParaRuta(rutaPrincipal.idRuta);
       }
       
       rutasComplementarias.forEach(ruta => {
         if (ruta && ruta.idRuta) {
-          setCargandoFotos(prev => ({...prev, [ruta.idRuta]: true}));
-          obtenerFotosRuta(ruta.idRuta);
+          obtenerFotosParaRuta(ruta.idRuta);
         }
       });
       
