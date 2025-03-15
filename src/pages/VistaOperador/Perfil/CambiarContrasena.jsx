@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../../layouts/DashboardLayout";
-import { AlertCircle, CheckCircle, X, ArrowLeft, Eye, EyeOff, Lock } from "lucide-react";
+import { CheckCircle, ArrowLeft, Eye, EyeOff, Lock, Shield, Key } from "lucide-react";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CambiarContrasena = () => {
   const [formData, setFormData] = useState({
@@ -16,12 +18,8 @@ const CambiarContrasena = () => {
     nueva: false,
     confirmar: false
   });
-  const [error, setError] = useState(null);
-  const [darkMode, setDarkMode] = useState(true);
-  const [alert, setAlert] = useState({ show: false, message: "", type: "" });
   const [submitting, setSubmitting] = useState(false);
   const [cambiosRealizados, setCambiosRealizados] = useState(false);
-  const [contrasenaOriginal, setContrasenaOriginal] = useState("");
   const [requisitosContrasena, setRequisitosContrasena] = useState({
     longitud: false,
     mayuscula: false,
@@ -193,211 +191,221 @@ const CambiarContrasena = () => {
   };
 
   const showAlert = (message, type) => {
-    setAlert({ show: true, message, type });
-    
     if (type === "success") {
-      setTimeout(() => {
-        setAlert({ show: false, message: "", type: "" });
-      }, 3000);
+      toast.success(message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+      });
+    } else {
+      toast.error(message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+      });
     }
-  };
-
-  const closeAlert = () => {
-    setAlert({ show: false, message: "", type: "" });
-  };
-
-  // Componente de Alerta
-  const AlertComponent = () => {
-    if (!alert.show) return null;
-    
-    const bgColor = alert.type === "success" ? "bg-green-500" : "bg-red-500";
-    const Icon = alert.type === "success" ? CheckCircle : AlertCircle;
-    
-    return (
-      <div className={`${bgColor} text-white p-4 rounded-lg mb-4 flex items-start`}>
-        <Icon className="w-5 h-5 mr-2 mt-0.5" />
-        <div className="flex-1">{alert.message}</div>
-        <button onClick={closeAlert} className="text-white">
-          <X className="w-5 h-5" />
-        </button>
-      </div>
-    );
   };
 
   return (
     <DashboardLayout>
-      <div className="p-6">
-        <div className={`${darkMode ? 'bg-[#1e293b]' : 'bg-gray-100'} rounded-lg p-8 shadow-lg max-w-5xl mx-auto`}>
-          <div className="flex items-center mb-8">
-            <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center mr-4">
-              <Lock className="w-8 h-8 text-white" />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
+      <div className="p-3 sm:p-4 md:p-6">
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg max-w-4xl mx-auto relative overflow-hidden border border-emerald-100 mb-4">
+          {/* Header verde */}
+          <div className="absolute top-0 left-0 w-full h-16 sm:h-20 md:h-24 bg-emerald-700 rounded-t-xl sm:rounded-t-2xl"></div>
+          
+          {/* Contenido principal */}
+          <div className="relative z-10">
+            {/* Encabezado con icono */}
+            <div className="flex items-center justify-center mb-4 sm:mb-6 md:mb-8">
+              <div className="relative">
+                <div className="absolute -inset-1 bg-emerald-500 rounded-full opacity-30 blur"></div>
+                <div className="relative w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-emerald-600 rounded-full flex items-center justify-center">
+                  <Lock className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white" />
+                </div>
+              </div>
             </div>
-            <h2 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-              Cambiar Contraseña
-            </h2>
+
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-emerald-700 text-center mb-1 sm:mb-2">Cambiar Contraseña</h2>
+            <p className="text-emerald-600 text-center text-sm sm:text-base mb-4 sm:mb-6 md:mb-8">Actualiza tu contraseña de forma segura</p>
+
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+              {/* Campos de entrada */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                <div className="bg-emerald-50 rounded-lg p-3 sm:p-4 md:p-6 border border-emerald-100">
+                  <label className="block text-sm font-medium mb-1 sm:mb-2 text-gray-700">
+                    Cédula
+                  </label>
+                  <input
+                    type="text"
+                    name="cedula"
+                    value={formData.cedula}
+                    onChange={handleInputChange}
+                    className="w-full p-2 sm:p-3 rounded-lg bg-white border border-emerald-200 text-gray-900 text-sm sm:text-base placeholder-gray-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                    required
+                  />
+                </div>
+
+                <div className="bg-emerald-50 rounded-lg p-3 sm:p-4 md:p-6 border border-emerald-100">
+                  <label className="block text-sm font-medium mb-1 sm:mb-2 text-gray-700">
+                    Contraseña Actual
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword.actual ? "text" : "password"}
+                      name="contrasenaActual"
+                      value={formData.contrasenaActual}
+                      onChange={handleInputChange}
+                      className="w-full p-2 sm:p-3 rounded-lg bg-white border border-emerald-200 text-gray-900 text-sm sm:text-base placeholder-gray-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 pr-10"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePasswordVisibility('actual')}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-emerald-600 hover:text-emerald-800 transition-colors"
+                    >
+                      {showPassword.actual ? <Eye className="w-4 h-4 sm:w-5 sm:h-5" /> : <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                <div className="bg-emerald-50 rounded-lg p-3 sm:p-4 md:p-6 border border-emerald-100">
+                  <label className="block text-sm font-medium mb-1 sm:mb-2 text-gray-700">
+                    Nueva Contraseña
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword.nueva ? "text" : "password"}
+                      name="nuevaContrasena"
+                      value={formData.nuevaContrasena}
+                      onChange={handleInputChange}
+                      className="w-full p-2 sm:p-3 rounded-lg bg-white border border-emerald-200 text-gray-900 text-sm sm:text-base placeholder-gray-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 pr-10"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePasswordVisibility('nueva')}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-emerald-600 hover:text-emerald-800 transition-colors"
+                    >
+                      {showPassword.nueva ? <Eye className="w-4 h-4 sm:w-5 sm:h-5" /> : <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-emerald-50 rounded-lg p-3 sm:p-4 md:p-6 border border-emerald-100">
+                  <label className="block text-sm font-medium mb-1 sm:mb-2 text-gray-700">
+                    Confirmar Contraseña
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword.confirmar ? "text" : "password"}
+                      name="confirmarContrasena"
+                      value={formData.confirmarContrasena}
+                      onChange={handleInputChange}
+                      className="w-full p-2 sm:p-3 rounded-lg bg-white border border-emerald-200 text-gray-900 text-sm sm:text-base placeholder-gray-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 pr-10"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePasswordVisibility('confirmar')}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-emerald-600 hover:text-emerald-800 transition-colors"
+                    >
+                      {showPassword.confirmar ? <Eye className="w-4 h-4 sm:w-5 sm:h-5" /> : <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Requisitos de contraseña */}
+              <div className="bg-emerald-50 rounded-lg p-3 sm:p-4 md:p-6 border border-emerald-100">
+                <div className="flex items-center gap-2 mb-2 sm:mb-4">
+                  <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
+                  <h3 className="text-xs sm:text-sm font-medium text-emerald-700">
+                    Requisitos de la contraseña
+                  </h3>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                  <div className={`flex items-center gap-1 sm:gap-2 ${requisitosContrasena.longitud ? 'text-emerald-600' : 'text-gray-500'}`}>
+                    <CheckCircle className={`w-3 h-3 sm:w-4 sm:h-4 ${requisitosContrasena.longitud ? 'opacity-100' : 'opacity-50'}`} />
+                    <span className="text-xs sm:text-sm">8 caracteres</span>
+                  </div>
+                  <div className={`flex items-center gap-1 sm:gap-2 ${requisitosContrasena.mayuscula ? 'text-emerald-600' : 'text-gray-500'}`}>
+                    <CheckCircle className={`w-3 h-3 sm:w-4 sm:h-4 ${requisitosContrasena.mayuscula ? 'opacity-100' : 'opacity-50'}`} />
+                    <span className="text-xs sm:text-sm">Al menos una mayúscula</span>
+                  </div>
+                  <div className={`flex items-center gap-1 sm:gap-2 ${requisitosContrasena.minuscula ? 'text-emerald-600' : 'text-gray-500'}`}>
+                    <CheckCircle className={`w-3 h-3 sm:w-4 sm:h-4 ${requisitosContrasena.minuscula ? 'opacity-100' : 'opacity-50'}`} />
+                    <span className="text-xs sm:text-sm">Al menos una minúscula</span>
+                  </div>
+                  <div className={`flex items-center gap-1 sm:gap-2 ${requisitosContrasena.numero ? 'text-emerald-600' : 'text-gray-500'}`}>
+                    <CheckCircle className={`w-3 h-3 sm:w-4 sm:h-4 ${requisitosContrasena.numero ? 'opacity-100' : 'opacity-50'}`} />
+                    <span className="text-xs sm:text-sm">Al menos un número</span>
+                  </div>
+                  <div className={`flex items-center gap-1 sm:gap-2 ${requisitosContrasena.especial ? 'text-emerald-600' : 'text-gray-500'} col-span-1 sm:col-span-2`}>
+                    <CheckCircle className={`w-3 h-3 sm:w-4 sm:h-4 ${requisitosContrasena.especial ? 'opacity-100' : 'opacity-50'}`} />
+                    <span className="text-xs sm:text-sm">Al menos un carácter especial (!@#$%^&*)</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Botones de acción */}
+              <div className="flex flex-col-reverse sm:flex-row justify-between sm:justify-end gap-3 sm:gap-4 mt-4 sm:mt-6 md:mt-8">
+                <button
+                  type="button"
+                  onClick={() => navigate("/VistaOperador/perfil")}
+                  className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 flex items-center justify-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors text-sm sm:text-base"
+                >
+                  <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="font-medium">Volver</span>
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting || !cambiosRealizados || !Object.values(requisitosContrasena).every(Boolean)}
+                  className={`w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 flex items-center justify-center gap-2 rounded-lg transition-colors text-white text-sm sm:text-base ${
+                    cambiosRealizados && Object.values(requisitosContrasena).every(Boolean)
+                      ? 'bg-emerald-600 hover:bg-emerald-700'
+                      : 'bg-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  {submitting ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4 sm:h-5 sm:w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span className="font-medium">Procesando...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Key className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span className="font-medium">Cambiar Contraseña</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
-          
-          <AlertComponent />
-          
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Cédula
-                </label>
-                <input
-                  type="text"
-                  name="cedula"
-                  value={formData.cedula}
-                  onChange={handleInputChange}
-                  className={`w-full p-3 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Contraseña Actual
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword.actual ? "text" : "password"}
-                    name="contrasenaActual"
-                    value={formData.contrasenaActual}
-                    onChange={handleInputChange}
-                    className={`w-full p-3 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'} pr-10`}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => togglePasswordVisibility('actual')}
-                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
-                  >
-                    {showPassword.actual ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Nueva Contraseña
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword.nueva ? "text" : "password"}
-                    name="nuevaContrasena"
-                    value={formData.nuevaContrasena}
-                    onChange={handleInputChange}
-                    className={`w-full p-3 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'} pr-10`}
-                    required
-                    maxLength={8}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => togglePasswordVisibility('nueva')}
-                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
-                  >
-                    {showPassword.nueva ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Confirmar Contraseña
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword.confirmar ? "text" : "password"}
-                    name="confirmarContrasena"
-                    value={formData.confirmarContrasena}
-                    onChange={handleInputChange}
-                    className={`w-full p-3 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'} pr-10`}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => togglePasswordVisibility('confirmar')}
-                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
-                  >
-                    {showPassword.confirmar ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Requisitos de contraseña */}
-            <div className={`mt-8 p-4 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-              <h3 className={`text-sm font-medium mb-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Requisitos de la contraseña:
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <p className={`flex items-center ${requisitosContrasena.longitud ? 'text-green-500' : 'text-red-500'}`}>
-                  <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.longitud ? 'opacity-100' : 'opacity-50'}`} />
-                  8 caracteres
-                </p>
-                <p className={`flex items-center ${requisitosContrasena.mayuscula ? 'text-green-500' : 'text-red-500'}`}>
-                  <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.mayuscula ? 'opacity-100' : 'opacity-50'}`} />
-                  Al menos una mayúscula
-                </p>
-                <p className={`flex items-center ${requisitosContrasena.minuscula ? 'text-green-500' : 'text-red-500'}`}>
-                  <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.minuscula ? 'opacity-100' : 'opacity-50'}`} />
-                  Al menos una minúscula
-                </p>
-                <p className={`flex items-center ${requisitosContrasena.numero ? 'text-green-500' : 'text-red-500'}`}>
-                  <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.numero ? 'opacity-100' : 'opacity-50'}`} />
-                  Al menos un número
-                </p>
-                <p className={`flex items-center ${requisitosContrasena.especial ? 'text-green-500' : 'text-red-500'}`}>
-                  <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.especial ? 'opacity-100' : 'opacity-50'}`} />
-                  Al menos un carácter especial (!@#$%^&*)
-                </p>
-              </div>
-            </div>
-
-            {/* Botones de acción */}
-            <div className="flex justify-end mt-8 space-x-4">
-              <button
-                type="button"
-                onClick={() => navigate("/VistaOperador/perfil")}
-                className="py-2 px-6 bg-gray-700 hover:bg-gray-600 text-white rounded-lg flex items-center gap-2"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                Cancelar
-              </button>
-              
-              <button
-                type="submit"
-                disabled={submitting || !cambiosRealizados || !Object.values(requisitosContrasena).every(Boolean)}
-                className={`py-2 px-6 ${
-                  cambiosRealizados && Object.values(requisitosContrasena).every(Boolean)
-                    ? 'bg-blue-600 hover:bg-blue-700'
-                    : 'bg-gray-500'
-                } text-white rounded-lg flex items-center gap-2 ${
-                  (submitting || !cambiosRealizados || !Object.values(requisitosContrasena).every(Boolean))
-                    ? 'opacity-70 cursor-not-allowed'
-                    : ''
-                }`}
-              >
-                {submitting ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Guardando...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="w-5 h-5" />
-                    Cambiar Contraseña
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
         </div>
       </div>
     </DashboardLayout>

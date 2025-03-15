@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../../layouts/DashboardLayout";
-import { AlertCircle, CheckCircle, X, ArrowLeft, Pencil } from "lucide-react";
+import { Pencil, ArrowLeft, CheckCircle } from "lucide-react";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ActualizarPerfil = () => {
   // Inicializamos con objetos vacíos para esperar los datos reales
@@ -17,11 +19,9 @@ const ActualizarPerfil = () => {
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [darkMode] = useState(true);
   const [foto, setFoto] = useState(null);
   const [fotoPreview, setFotoPreview] = useState(null);
-  const [fotoActual, setFotoActual] = useState(localStorage.getItem('fotoPerfilURL') || null);
-  const [alert, setAlert] = useState({ show: false, message: "", type: "" });
+  const [fotoActual, setFotoActual] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [reload, setReload] = useState(0);
   const navigate = useNavigate();
@@ -37,51 +37,33 @@ const ActualizarPerfil = () => {
 
   // Función para obtener iniciales para el avatar
   const obtenerIniciales = () => {
-    const primerNombre = operador.primerNombre || "";
-    const primerApellido = operador.primerApellido || "";
-    
-    const inicialNombre = primerNombre ? primerNombre.charAt(0) : "";
-    const inicialApellido = primerApellido ? primerApellido.charAt(0) : "";
-    
-    return (inicialNombre + inicialApellido).toUpperCase() || "OP";
+    if (!operador.primerNombre) return "U";
+    return operador.primerNombre.charAt(0).toUpperCase();
   };
 
   // Función para mostrar alertas
   const showAlert = (message, type) => {
-    setAlert({
-      show: true,
-      message,
-      type
-    });
-    
-    // Ocultar la alerta después de 5 segundos
-    setTimeout(() => {
-      setAlert(prev => ({ ...prev, show: false }));
-    }, 5000);
-  };
-
-  // Componente de alerta
-  const AlertComponent = () => {
-    if (!alert.show) return null;
-    
-    return (
-      <div className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg flex items-center gap-3 z-50 ${
-        alert.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
-      }`}>
-        {alert.type === 'success' ? (
-          <CheckCircle className="w-5 h-5" />
-        ) : (
-          <AlertCircle className="w-5 h-5" />
-        )}
-        <span>{alert.message}</span>
-        <button 
-          onClick={() => setAlert(prev => ({ ...prev, show: false }))}
-          className="ml-2 text-white hover:text-gray-200"
-        >
-          <X className="w-4 h-4" />
-        </button>
-      </div>
-    );
+    if (type === "success") {
+      toast.success(message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+      });
+    } else {
+      toast.error(message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+      });
+    }
   };
 
   const obtenerDatosOperador = async () => {
@@ -549,16 +531,16 @@ const ActualizarPerfil = () => {
   if (loading) {
     return (
       <DashboardLayout>
-        <div className={`${darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-800'} rounded-lg p-6 shadow-lg text-center`}>
+        <div className="bg-white rounded-lg p-6 shadow-lg text-center">
           <div className="animate-pulse">
             <div className="flex justify-center">
-              <div className="rounded-full bg-gray-700 h-32 w-32 mb-4"></div>
+              <div className="rounded-full bg-emerald-200 h-32 w-32 mb-4"></div>
             </div>
-            <div className="h-4 bg-gray-700 rounded w-3/4 mx-auto mb-2"></div>
-            <div className="h-4 bg-gray-700 rounded w-1/2 mx-auto mb-2"></div>
-            <div className="h-4 bg-gray-700 rounded w-2/3 mx-auto"></div>
+            <div className="h-4 bg-emerald-100 rounded w-3/4 mx-auto mb-2"></div>
+            <div className="h-4 bg-emerald-100 rounded w-1/2 mx-auto mb-2"></div>
+            <div className="h-4 bg-emerald-100 rounded w-2/3 mx-auto"></div>
           </div>
-          <p className="mt-4">Cargando datos del perfil...</p>
+          <p className="mt-4 text-emerald-700">Cargando datos del perfil...</p>
         </div>
       </DashboardLayout>
     );
@@ -567,7 +549,7 @@ const ActualizarPerfil = () => {
   if (error) {
     return (
       <DashboardLayout>
-        <div className={`${darkMode ? 'bg-[#1e293b]' : 'bg-gray-100'} rounded-lg p-6 shadow-lg text-center text-red-500`}>
+        <div className="bg-white rounded-lg p-6 shadow-lg text-center text-red-500">
           <p className="text-xl font-semibold mb-2">Error</p>
           <p>{error}</p>
           <button 
@@ -575,13 +557,13 @@ const ActualizarPerfil = () => {
               setError(null);
               setReload(prev => prev + 1);
             }} 
-            className="mt-4 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            className="mt-4 py-2 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
           >
             Reintentar
           </button>
           <button 
             onClick={() => navigate("/VistaOperador/perfil")} 
-            className="mt-4 ml-4 py-2 px-4 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+            className="mt-4 ml-4 py-2 px-4 bg-gray-400 hover:bg-gray-500 text-white rounded-lg transition-colors"
           >
             Volver al Perfil
           </button>
@@ -592,191 +574,222 @@ const ActualizarPerfil = () => {
 
   return (
     <DashboardLayout>
-      <div className={`${darkMode ? 'bg-[#1e293b]' : 'bg-gray-100'} rounded-lg p-6 shadow-lg`}>
-        <h2 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-          Actualizar Información
-        </h2>
-        
-        <AlertComponent />
-        
-        {loading ? (
-          <div className="animate-pulse">
-            <div className="flex justify-center">
-              <div className="rounded-full bg-gray-700 h-32 w-32 mb-4"></div>
-            </div>
-            <div className="h-4 bg-gray-700 rounded w-3/4 mx-auto mb-2"></div>
-            <div className="h-4 bg-gray-700 rounded w-1/2 mx-auto mb-2"></div>
-            <div className="h-4 bg-gray-700 rounded w-2/3 mx-auto"></div>
-            <p className="mt-4 text-center">Cargando datos del perfil...</p>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Sección de foto de perfil */}
-            <div className="flex flex-col items-center mb-6">
-              <div className="relative">
-                <div className="w-32 h-32 rounded-full overflow-hidden mb-4 border-4 border-blue-500 bg-[#0D8ABC] flex items-center justify-center text-white text-5xl font-bold">
-                  {fotoPreview ? (
-                    <img
-                      src={fotoPreview}
-                      alt="Vista previa"
-                      className="h-full w-full object-cover"
-                      key={fotoPreview}
-                    />
-                  ) : fotoActual ? (
-                    <img
-                      src={fotoActual}
-                      alt="Foto actual"
-                      className="h-full w-full object-cover"
-                      key={fotoActual}
-                    />
-                  ) : (
-                    obtenerIniciales()
-                  )}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
+      <div className="p-3 sm:p-4 md:p-6">
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg max-w-5xl mx-auto relative overflow-hidden border border-emerald-100 mb-4">
+          {/* Header verde */}
+          <div className="absolute top-0 left-0 w-full h-16 sm:h-20 bg-emerald-600 rounded-t-xl sm:rounded-t-2xl"></div>
+          
+          {/* Contenido principal */}
+          <div className="relative z-10 pt-0">
+            <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 mt-0 text-white text-center sm:text-left">
+              Actualizar Información
+            </h2>
+            
+            <div className="p-3 sm:p-5 mb-4 sm:mb-6">
+              {loading ? (
+                <div className="animate-pulse">
+                  <div className="flex justify-center">
+                    <div className="rounded-full bg-emerald-200 h-24 w-24 sm:h-32 sm:w-32 mb-4"></div>
+                  </div>
+                  <div className="h-3 sm:h-4 bg-emerald-100 rounded w-3/4 mx-auto mb-2"></div>
+                  <div className="h-3 sm:h-4 bg-emerald-100 rounded w-1/2 mx-auto mb-2"></div>
+                  <div className="h-3 sm:h-4 bg-emerald-100 rounded w-2/3 mx-auto"></div>
+                  <p className="mt-4 text-center text-emerald-700 text-sm sm:text-base">Cargando datos del perfil...</p>
                 </div>
-                <label 
-                  htmlFor="foto" 
-                  className="absolute bottom-4 right-0 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full cursor-pointer"
-                >
-                  <Pencil className="w-4 h-4" />
-                  <input 
-                    type="file" 
-                    id="foto" 
-                    name="foto" 
-                    accept="image/*" 
-                    onChange={handleFileChange} 
-                    className="hidden" 
-                  />
-                </label>
-              </div>
-              <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                Haga clic en el ícono de lápiz para cambiar la foto
-              </p>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                  {/* Sección de foto de perfil */}
+                  <div className="flex flex-col items-center mb-4 sm:mb-6 mt-6 sm:mt-8">
+                    <div className="relative">
+                      <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden mb-3 sm:mb-4 border-4 border-emerald-500 bg-emerald-600 flex items-center justify-center text-white text-3xl sm:text-5xl font-bold">
+                        {fotoPreview ? (
+                          <img
+                            src={fotoPreview}
+                            alt="Vista previa"
+                            className="h-full w-full object-cover"
+                            key={fotoPreview}
+                          />
+                        ) : fotoActual ? (
+                          <img
+                            src={fotoActual}
+                            alt="Foto actual"
+                            className="h-full w-full object-cover"
+                            key={fotoActual}
+                          />
+                        ) : (
+                          obtenerIniciales()
+                        )}
+                      </div>
+                      <label 
+                        htmlFor="foto" 
+                        className="absolute bottom-3 sm:bottom-4 right-0 p-1.5 sm:p-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full cursor-pointer shadow-md"
+                      >
+                        <Pencil className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <input 
+                          type="file" 
+                          id="foto" 
+                          name="foto" 
+                          accept="image/*" 
+                          onChange={handleFileChange} 
+                          className="hidden" 
+                        />
+                      </label>
+                    </div>
+                    <p className="text-sm text-gray-500 mt-1">Haz clic en el ícono de lápiz para cambiar tu foto</p>
+                  </div>
+                  
+                  {/* Campos del formulario */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                    {/* Primer Nombre */}
+                    <div>
+                      <label htmlFor="primerNombre" className="block text-sm font-medium text-gray-700 mb-1">
+                        Primer Nombre *
+                      </label>
+                      <input
+                        type="text"
+                        id="primerNombre"
+                        name="primerNombre"
+                        value={operador.primerNombre}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-3 py-2 sm:px-4 sm:py-2.5 bg-emerald-50 border border-emerald-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm sm:text-base shadow-sm hover:bg-emerald-100/50 transition-colors"
+                      />
+                    </div>
+
+                    {/* Segundo Nombre */}
+                    <div>
+                      <label htmlFor="segundoNombre" className="block text-sm font-medium text-gray-700 mb-1">
+                        Segundo Nombre
+                      </label>
+                      <input
+                        type="text"
+                        id="segundoNombre"
+                        name="segundoNombre"
+                        value={operador.segundoNombre}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 sm:px-4 sm:py-2.5 bg-emerald-50 border border-emerald-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm sm:text-base shadow-sm hover:bg-emerald-100/50 transition-colors"
+                      />
+                    </div>
+
+                    {/* Primer Apellido */}
+                    <div>
+                      <label htmlFor="primerApellido" className="block text-sm font-medium text-gray-700 mb-1">
+                        Primer Apellido *
+                      </label>
+                      <input
+                        type="text"
+                        id="primerApellido"
+                        name="primerApellido"
+                        value={operador.primerApellido}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-3 py-2 sm:px-4 sm:py-2.5 bg-emerald-50 border border-emerald-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm sm:text-base shadow-sm hover:bg-emerald-100/50 transition-colors"
+                      />
+                    </div>
+
+                    {/* Segundo Apellido */}
+                    <div>
+                      <label htmlFor="segundoApellido" className="block text-sm font-medium text-gray-700 mb-1">
+                        Segundo Apellido
+                      </label>
+                      <input
+                        type="text"
+                        id="segundoApellido"
+                        name="segundoApellido"
+                        value={operador.segundoApellido}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 sm:px-4 sm:py-2.5 bg-emerald-50 border border-emerald-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm sm:text-base shadow-sm hover:bg-emerald-100/50 transition-colors"
+                      />
+                    </div>
+
+                    {/* Correo Electrónico */}
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                        Correo Electrónico (No modificable) *
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={operador.email}
+                        readOnly
+                        required
+                        className="w-full px-3 py-2 sm:px-4 sm:py-2.5 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 text-sm sm:text-base cursor-not-allowed"
+                      />
+                    </div>
+
+                    {/* Número de Celular */}
+                    <div>
+                      <label htmlFor="numeroCelular" className="block text-sm font-medium text-gray-700 mb-1">
+                        Número de Celular
+                      </label>
+                      <input
+                        type="tel"
+                        id="numeroCelular"
+                        name="numeroCelular"
+                        value={operador.numeroCelular}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 sm:px-4 sm:py-2.5 bg-emerald-50 border border-emerald-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm sm:text-base shadow-sm hover:bg-emerald-100/50 transition-colors"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Botones de acción */}
+                  <div className="flex flex-col-reverse sm:flex-row justify-between mt-6 gap-3 sm:gap-4">
+                    <button
+                      type="button"
+                      onClick={() => navigate("/VistaOperador/perfil")}
+                      className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-2.5 flex items-center justify-center gap-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm sm:text-base"
+                    >
+                      <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                      Volver al Perfil
+                    </button>
+                    
+                    <button
+                      type="submit"
+                      disabled={submitting || !cambiosRealizados}
+                      className={`w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-2.5 rounded-lg transition-colors ${
+                        cambiosRealizados
+                          ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                          : "bg-gray-400 text-white cursor-not-allowed"
+                      } text-sm sm:text-base flex items-center justify-center gap-2`}
+                    >
+                      <span>
+                        {submitting ? (
+                          <>
+                            <svg className="animate-spin h-4 w-4 sm:h-5 sm:w-5 text-white inline mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>Procesando...</span>
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                            <span>Guardar Cambios</span>
+                          </>
+                        )}
+                      </span>
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
-            
-            {/* Campos de información personal */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Primer Nombre
-                </label>
-                <input
-                  type="text"
-                  name="primerNombre"
-                  value={operador.primerNombre || ""}
-                  onChange={handleInputChange}
-                  className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
-                  required
-                  placeholder="Ingrese su primer nombre"
-                />
-              </div>
-              
-              <div>
-                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Segundo Nombre
-                </label>
-                <input
-                  type="text"
-                  name="segundoNombre"
-                  value={operador.segundoNombre || ""}
-                  onChange={handleInputChange}
-                  className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
-                  placeholder="Ingrese su segundo nombre (opcional)"
-                />
-              </div>
-              
-              <div>
-                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Primer Apellido
-                </label>
-                <input
-                  type="text"
-                  name="primerApellido"
-                  value={operador.primerApellido || ""}
-                  onChange={handleInputChange}
-                  className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
-                  required
-                  placeholder="Ingrese su primer apellido"
-                />
-              </div>
-              
-              <div>
-                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Segundo Apellido
-                </label>
-                <input
-                  type="text"
-                  name="segundoApellido"
-                  value={operador.segundoApellido || ""}
-                  onChange={handleInputChange}
-                  className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
-                  placeholder="Ingrese su segundo apellido (opcional)"
-                />
-              </div>
-              
-              <div>
-                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Correo Electrónico (No modificable)
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={operador.email || ""}
-                  className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'} opacity-70 cursor-not-allowed`}
-                  disabled
-                  readOnly
-                />
-              </div>
-              
-              <div>
-                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Teléfono (Opcional)
-                </label>
-                <input
-                  type="tel"
-                  name="numeroCelular"
-                  value={operador.numeroCelular || ""}
-                  onChange={handleInputChange}
-                  className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} border ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
-                  placeholder="Ingrese su número telefónico (opcional)"
-                />
-              </div>
-            </div>
-            
-            {/* Botones de acción */}
-            <div className="flex justify-between mt-8">
-              <button
-                type="button"
-                onClick={() => navigate("/VistaOperador/perfil")}
-                className="py-2 px-6 bg-gray-700 hover:bg-gray-600 text-white rounded-lg flex items-center gap-2"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                Cancelar
-              </button>
-              
-              <button
-                type="submit"
-                disabled={submitting || !cambiosRealizados}
-                className={`py-2 px-6 ${cambiosRealizados ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-500'} text-white rounded-lg flex items-center gap-2 ${(submitting || !cambiosRealizados) ? 'opacity-70 cursor-not-allowed' : ''}`}
-              >
-                {submitting ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Guardando...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="w-5 h-5" />
-                    Guardar Cambios
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        )}
-        <p className={`text-xs mt-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'} text-center`}>
+          </div>
+        </div>
+        <p className="text-xs sm:text-sm mt-3 sm:mt-4 text-gray-500 text-center">
           * Para actualizar su perfil, debe realizar al menos un cambio en los datos.
         </p>
       </div>
