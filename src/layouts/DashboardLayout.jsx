@@ -29,7 +29,6 @@ import AlertasEstado from '../components/Alertas/AlertasEstado';
 const DashboardLayout = ({ children }) => {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
-  const [darkMode, setDarkMode] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -390,33 +389,34 @@ const DashboardLayout = ({ children }) => {
   }, []);
 
   return (
-    <div className={`flex h-screen overflow-hidden ${darkMode ? 'bg-[#0f172a]' : 'bg-white'}`}>
+    <div className="flex h-screen overflow-hidden bg-[#f0f9f4]">
       {/* Sidebar */}
       <div className={` 
         ${collapsed ? 'w-20' : 'w-64'} 
-        ${darkMode ? 'bg-[#0f172a]' : 'bg-white'} 
+        bg-white
         p-4 transition-all duration-300 flex flex-col
-        ${darkMode ? 'text-gray-400' : 'text-gray-600'}
-        border-r ${darkMode ? 'border-gray-800' : 'border-gray-200'}
+        text-gray-600
+        border-r border-emerald-100
         h-screen sticky top-0
+        shadow-sm
       `}>
         <div className="mb-8 flex flex-col items-start">
-  <div className="flex items-center">
-    {!collapsed && <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>Explococora</h1>} 
-    <button 
-      onClick={() => setCollapsed(!collapsed)}
-      className="p-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white ml-2"
-    >
-      {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-    </button>
-  </div>
-  {!collapsed && <h1 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-black'} mt-1 text-center w-40`}>Operador</h1>}
-  </div>
+          <div className="flex items-center">
+            {!collapsed && <h1 className="text-2xl font-bold text-emerald-800">Explococora</h1>} 
+            <button 
+              onClick={() => setCollapsed(!collapsed)}
+              className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white ml-2"
+            >
+              {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+            </button>
+          </div>
+          {!collapsed && <h1 className="text-lg font-bold text-emerald-700 mt-1 text-center w-40">Operador</h1>}
+        </div>
         
-        <nav className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
+        <nav className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-emerald-200 scrollbar-track-transparent">
           {sections.map((section) => (
             <div key={section} className="mb-4">
-              {!collapsed && <h2 className="text-gray-400 text-sm mb-2">{section}</h2>}
+              {!collapsed && <h2 className="text-emerald-600 text-sm mb-2">{section}</h2>}
               {menuItems
                 .filter((item) => item.section === section)
                 .map((item) => (
@@ -425,8 +425,8 @@ const DashboardLayout = ({ children }) => {
                     to={item.path}
                     className={`flex items-center gap-2 p-2 rounded-lg mb-1 ${
                       location.pathname === item.path
-                        ? "bg-blue-600 text-white"
-                        : `text-gray-400 ${!darkMode && 'hover:bg-gray-100'}`
+                        ? "bg-emerald-600 text-white"
+                        : "text-gray-600 hover:bg-emerald-50"
                     }`}
                     title={collapsed ? item.title : ""}
                   >
@@ -438,13 +438,13 @@ const DashboardLayout = ({ children }) => {
           ))}
         </nav>
 
-        <div className={`border-t ${darkMode ? 'border-gray-800' : 'border-gray-200'} pt-4 mt-4`}>
+        <div className="border-t border-emerald-100 pt-4 mt-4">
           <Link
             to="/VistaOperador/settings"
             className={`flex items-center gap-2 w-full p-2 mb-2 rounded-lg ${
               location.pathname === '/VistaOperador/settings'
-                ? "bg-blue-600 text-white"
-                : "text-gray-400"
+                ? "bg-emerald-600 text-white"
+                : "text-gray-600 hover:bg-emerald-50"
             }`}
           >
             <Settings className="w-5 h-5" />
@@ -454,9 +454,9 @@ const DashboardLayout = ({ children }) => {
       </div>
 
       {/* Main Content */}
-      <div className={`flex-1 flex flex-col overflow-hidden ${darkMode ? 'bg-[#0f172a]' : 'bg-white'}`}>
+      <div className="flex-1 flex flex-col overflow-hidden bg-[#f0f9f4]">
         {/* Top Navigation */}
-        <div className={`${darkMode ? 'bg-[#0f172a]' : 'bg-white'} sticky top-0 z-10`}>
+        <div className="bg-white sticky top-0 z-10 shadow-sm">
           <div className="flex items-center justify-between p-4">
             <div className="flex-1 max-w-xl">
               <form onSubmit={handleSearch} className="flex items-center">
@@ -465,13 +465,11 @@ const DashboardLayout = ({ children }) => {
                   placeholder="Buscar..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className={`w-full px-4 py-2 rounded-lg ${
-                    darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-900'
-                  }`}
+                  className="w-full px-4 py-2 rounded-lg bg-emerald-50 text-gray-900 border border-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
                 <button 
                   type="submit"
-                  className={`p-2 rounded-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
+                  className="p-2 rounded-lg text-emerald-600 hover:bg-emerald-50"
                 >
                   <Search className="w-5 h-5" />
                 </button>
@@ -487,19 +485,13 @@ const DashboardLayout = ({ children }) => {
                   esPropio={true}
                 />
               </div>
-              <button 
-                onClick={() => setDarkMode(!darkMode)}
-                className={`p-2 rounded-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
-              >
-                {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              </button>
-              <button className={`p-2 rounded-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              <button className="p-2 rounded-lg text-emerald-600 hover:bg-emerald-50">
                 <Bell className="w-5 h-5" />
               </button>
               <div className="relative">
                 <button 
                   onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                  className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden cursor-pointer"
+                  className="w-10 h-10 rounded-full bg-emerald-100 overflow-hidden cursor-pointer"
                 >
                   {fotoPerfil ? (
                     <img 
@@ -508,7 +500,7 @@ const DashboardLayout = ({ children }) => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                    <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white">
                       {nombreUsuario ? nombreUsuario.charAt(0) : "U"}
                     </div>
                   )}
@@ -517,13 +509,13 @@ const DashboardLayout = ({ children }) => {
                 {/* Menú desplegable de perfil */}
                 {profileMenuOpen && (
                   <div 
-                    className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 
-                    ${darkMode ? 'bg-gray-800' : 'bg-white'} 
-                    ring-1 ring-black ring-opacity-5 z-50`}
+                    className="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 
+                    bg-white
+                    ring-1 ring-black ring-opacity-5 z-50"
                   >
                     <Link 
                       to="/VistaOperador/perfil" 
-                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} flex items-center gap-2`}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 flex items-center gap-2"
                       onClick={() => setProfileMenuOpen(false)}
                     >
                       <User className="w-4 h-4" />
@@ -531,7 +523,7 @@ const DashboardLayout = ({ children }) => {
                     </Link>
                     <Link 
                       to="/VistaOperador/perfil/actualizar" 
-                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} flex items-center gap-2`}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 flex items-center gap-2"
                       onClick={() => setProfileMenuOpen(false)}
                     >
                       <Edit className="w-4 h-4" />
@@ -539,7 +531,7 @@ const DashboardLayout = ({ children }) => {
                     </Link>
                     <Link 
                       to="/VistaOperador/perfil/cambiar-contrasena" 
-                      className={`block px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} flex items-center gap-2`}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 flex items-center gap-2"
                       onClick={() => setProfileMenuOpen(false)}
                     >
                       <Key className="w-4 h-4" />
@@ -550,7 +542,7 @@ const DashboardLayout = ({ children }) => {
                         setProfileMenuOpen(false);
                         handleLogout();
                       }}
-                      className={`block w-full text-left px-4 py-2 text-sm ${darkMode ? 'text-red-400 hover:bg-gray-700' : 'text-red-600 hover:bg-gray-100'} flex items-center gap-2`}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
                     >
                       <LogOut className="w-4 h-4" />
                       Cerrar Sesión
@@ -563,19 +555,19 @@ const DashboardLayout = ({ children }) => {
         </div>
 
         {/* Content and Footer Container */}
-        <div className={`flex-1 flex flex-col overflow-auto ${darkMode ? 'bg-[#0f172a]' : 'bg-white'}`}>
+        <div className="flex-1 flex flex-col overflow-auto bg-[#f0f9f4]">
           {/* Page Content */}
-          <div className="flex-1 p-4">
+          <div className="flex-1 p-4 pb-8">
             {children}
           </div>
 
           {/* Footer */}
-          <div className={`p-4 ${darkMode ? 'bg-[#0f172a] text-gray-400' : 'bg-white text-gray-600'} sticky bottom-0`}>
+          <div className="p-4 bg-white text-gray-600 sticky bottom-0 border-t border-emerald-100 z-30">
             <div className="flex justify-between items-center text-sm">
               <span>© 2025 ExploCocora. Todos los derechos reservados.</span>
               <div className="flex gap-6">
-                <a href="#" className="hover:text-blue-600">Privacy Policy</a>
-                <a href="#" className="hover:text-blue-600">Terms of Service</a>
+                <a href="#" className="hover:text-emerald-600">Privacy Policy</a>
+                <a href="#" className="hover:text-emerald-600">Terms of Service</a>
               </div>
             </div>
           </div>

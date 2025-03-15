@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import DashboardLayout from '../../../layouts/DashboardLayout';
 import axios from 'axios';
 import { Pencil, Plus, Trash, Mountain, X, Filter, RefreshCw, Eye, ChevronLeft, ChevronRight, Search, XCircle, Check } from 'lucide-react';
@@ -1115,8 +1115,8 @@ const Rutas = () => {
         {/* Header with Title and Create Button */}
         <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Rutas Disponibles</h1>
-            <p className="text-teal-300">Gestiona las rutas de turismo ecológico</p>
+            <h1 className="text-3xl font-bold text-emerald-700 mb-2">Rutas Disponibles</h1>
+            <p className="text-emerald-600">Gestiona las rutas de turismo ecológico</p>
           </div>
           
           <div className="mt-4 md:mt-0 flex flex-wrap gap-2">
@@ -1127,14 +1127,14 @@ const Rutas = () => {
                 placeholder="Buscar rutas..."
                 value={terminoBusqueda}
                 onChange={handleBusqueda}
-                className="pl-10 pr-4 py-2 w-full rounded-lg bg-teal-800 bg-opacity-40 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="pl-10 pr-4 py-2 w-full rounded-lg bg-white shadow-sm border border-emerald-200 text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
               />
-              <Search className="absolute left-3 top-2.5 text-teal-500" size={18} />
+              <Search className="absolute left-3 top-2.5 text-emerald-500" size={18} />
             </div>
             
             <button
               onClick={() => setMostrarFiltros(!mostrarFiltros)}
-              className="flex items-center gap-2 px-4 py-2 bg-teal-800 hover:bg-teal-700 text-white rounded transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-emerald-200 hover:bg-emerald-50 text-emerald-700 rounded shadow-sm transition-colors"
             >
               <Filter size={18} />
               Filtros
@@ -1142,7 +1142,7 @@ const Rutas = () => {
             
             <button
               onClick={fetchRutas}
-              className="flex items-center gap-2 px-4 py-2 bg-teal-800 hover:bg-teal-700 text-white rounded transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-emerald-200 hover:bg-emerald-50 text-emerald-700 rounded shadow-sm transition-colors"
               title="Recargar rutas"
             >
               <RefreshCw size={18} />
@@ -1150,7 +1150,7 @@ const Rutas = () => {
             
             <button
               onClick={() => handleOpenModal()}
-              className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded shadow-sm transition-colors"
             >
               <Plus size={18} />
               Nueva Ruta
@@ -1160,16 +1160,16 @@ const Rutas = () => {
         
         {/* Filter Panel */}
         {mostrarFiltros && (
-          <div className="mb-6 p-4 bg-teal-800 bg-opacity-30 rounded-lg">
-            <h2 className="text-xl font-semibold text-white mb-4">Filtrar Rutas</h2>
+          <div className="mb-6 p-4 bg-white rounded-lg shadow-sm border border-emerald-100">
+            <h2 className="text-xl font-semibold text-emerald-700 mb-4">Filtrar Rutas</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-teal-300 text-sm mb-1">Dificultad</label>
+                <label className="block text-emerald-600 text-sm mb-1">Dificultad</label>
                 <select
                   value={filtros.dificultad}
                   onChange={(e) => setFiltros({ ...filtros, dificultad: e.target.value })}
-                  className="w-full p-2 bg-teal-800 text-white rounded border border-teal-600"
+                  className="w-full p-2 bg-white text-gray-700 rounded border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 >
                   <option value="">Todas</option>
                   <option value="Facil">Fácil</option>
@@ -1179,11 +1179,11 @@ const Rutas = () => {
               </div>
               
               <div>
-                <label className="block text-teal-300 text-sm mb-1">Duración</label>
+                <label className="block text-emerald-600 text-sm mb-1">Duración</label>
                 <select
                   value={filtros.duracion}
                   onChange={(e) => setFiltros({ ...filtros, duracion: e.target.value })}
-                  className="w-full p-2 bg-teal-800 text-white rounded border border-teal-600"
+                  className="w-full p-2 bg-white text-gray-700 rounded border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 >
                   <option value="">Todas</option>
                   <option value="corta">Corta (hasta 2h)</option>
@@ -1193,11 +1193,11 @@ const Rutas = () => {
               </div>
               
               <div>
-                <label className="block text-teal-300 text-sm mb-1">Tipo</label>
+                <label className="block text-emerald-600 text-sm mb-1">Tipo</label>
                 <select
                   value={filtros.tipo}
                   onChange={(e) => setFiltros({ ...filtros, tipo: e.target.value })}
-                  className="w-full p-2 bg-teal-800 text-white rounded border border-teal-600"
+                  className="w-full p-2 bg-white text-gray-700 rounded border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 >
                   <option value="">Todos</option>
                   <option value="Cabalgata">Cabalgata</option>
@@ -1207,11 +1207,11 @@ const Rutas = () => {
               </div>
               
               <div>
-                <label className="block text-teal-300 text-sm mb-1">Estado</label>
+                <label className="block text-emerald-600 text-sm mb-1">Estado</label>
                 <select
                   value={filtros.estado}
                   onChange={(e) => setFiltros({ ...filtros, estado: e.target.value })}
-                  className="w-full p-2 bg-teal-800 text-white rounded border border-teal-600"
+                  className="w-full p-2 bg-white text-gray-700 rounded border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 >
                   <option value="">Todos</option>
                   <option value="Activa">Activa</option>
@@ -1223,13 +1223,13 @@ const Rutas = () => {
             <div className="mt-4 flex justify-end gap-2">
               <button
                 onClick={limpiarFiltros}
-                className="px-4 py-2 bg-teal-700 text-white rounded hover:bg-teal-600"
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded border border-gray-200 hover:bg-gray-200 transition-colors"
               >
                 Limpiar
               </button>
               <button
                 onClick={aplicarFiltros}
-                className="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-400"
+                className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition-colors shadow-sm"
               >
                 Aplicar
               </button>
@@ -1240,21 +1240,21 @@ const Rutas = () => {
         {/* Loading State */}
         {loading && (
           <div className="text-center py-10">
-            <div className="animate-spin w-16 h-16 border-4 border-teal-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-teal-300">Cargando rutas...</p>
+            <div className="animate-spin w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-emerald-600">Cargando rutas...</p>
           </div>
         )}
         
         {/* Error State */}
         {error && !loading && (
-          <div className="bg-red-900 bg-opacity-30 text-red-300 p-4 rounded-lg">
+          <div className="bg-red-50 text-red-700 p-4 rounded-lg border border-red-200 shadow-sm">
             <p className="font-semibold">
               {error.includes("Error 403") ? "Token inválido" : "Error al cargar las rutas"}
             </p>
             <p>{error.includes("Error 403") ? "Por favor, inicie sesión nuevamente" : error}</p>
             <button 
               onClick={fetchRutas}
-              className="mt-2 px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded"
+              className="mt-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded shadow-sm transition-colors"
             >
               Reintentar
             </button>
@@ -1268,12 +1268,12 @@ const Rutas = () => {
               {rutasFiltradas.map((ruta) => (
                 <div 
                   key={ruta.idRuta || ruta.id} 
-                  className="bg-teal-900 bg-opacity-50 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-teal-900/30 transition-all"
+                  className="bg-white bg-gradient-to-br from-emerald-50 to-white rounded-lg overflow-hidden shadow-sm hover:shadow-md border border-emerald-100 transition-all duration-300"
                 >
-                  <div className="h-48 bg-teal-950 relative">
+                  <div className="h-48 bg-emerald-100 relative">
                     {cargandoFotos[ruta.idRuta] ? (
-                      <div className="flex justify-center items-center h-full bg-teal-950">
-                        <div className="animate-spin w-8 h-8 border-2 border-teal-300 border-t-transparent rounded-full"></div>
+                      <div className="flex justify-center items-center h-full bg-emerald-50">
+                        <div className="animate-spin w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full"></div>
                       </div>
                     ) : rutasConFotos[ruta.idRuta] && rutasConFotos[ruta.idRuta].length > 0 ? (
                       <img
@@ -1286,22 +1286,22 @@ const Rutas = () => {
                         }}
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-6xl">{getRouteTypeIcon(ruta.tipo)}</span>
+                      <div className="w-full h-full flex items-center justify-center bg-emerald-50">
+                        <span className="text-6xl text-emerald-400">{getRouteTypeIcon(ruta.tipo)}</span>
                       </div>
                     )}
                     
                     <div className="absolute top-2 right-2 flex gap-1">
                       <button
                         onClick={() => handleOpenModal(ruta)}
-                        className="p-2 bg-teal-800 bg-opacity-80 hover:bg-teal-700 text-white rounded-full"
+                        className="p-2 bg-white bg-opacity-90 hover:bg-emerald-50 text-emerald-600 rounded-full shadow-sm transition-colors"
                         title="Editar ruta"
                       >
                         <Pencil size={16} />
                       </button>
                       <button
                         onClick={() => handleDeleteRuta(ruta)}
-                        className="p-2 bg-rose-800 bg-opacity-80 hover:bg-rose-700 text-white rounded-full"
+                        className="p-2 bg-white bg-opacity-90 hover:bg-red-50 text-red-600 rounded-full shadow-sm transition-colors"
                         title="Eliminar ruta"
                       >
                         <Trash size={16} />
@@ -1309,47 +1309,47 @@ const Rutas = () => {
                     </div>
                     
                     <div className="absolute bottom-2 left-2 flex gap-1">
-                      <span className={`${getDifficultyColor(ruta.dificultad)} text-white text-xs px-2 py-1 rounded-full`}>
+                      <span className={`${getDifficultyColor(ruta.dificultad)} text-white text-xs px-2 py-1 rounded-full shadow-sm`}>
                         {ruta.dificultad}
                       </span>
-                      <span className={`${ruta.estado === 'Activa' ? 'bg-green-600' : 'bg-red-600'} text-white text-xs px-2 py-1 rounded-full`}>
+                      <span className={`${ruta.estado === 'Activa' ? 'bg-green-500' : 'bg-red-500'} text-white text-xs px-2 py-1 rounded-full shadow-sm`}>
                         {ruta.estado}
                       </span>
                     </div>
                   </div>
                   
                   <div className="p-4">
-                    <h3 className="text-lg font-bold text-white truncate">{ruta.nombreRuta}</h3>
+                    <h3 className="text-lg font-bold text-emerald-800 truncate">{ruta.nombreRuta}</h3>
                     
-                    <div className="mt-2 grid grid-cols-2 gap-2 text-sm text-teal-300">
+                    <div className="mt-2 grid grid-cols-2 gap-2 text-sm text-gray-700">
                       <div>
-                        <span className="block text-xs text-teal-400">Duración</span>
+                        <span className="block text-xs text-emerald-600">Duración</span>
                         <span>{ruta.duracion}</span>
                       </div>
                       <div>
-                        <span className="block text-xs text-teal-400">Tipo</span>
+                        <span className="block text-xs text-emerald-600">Tipo</span>
                         <span>{ruta.tipo}</span>
                       </div>
                       <div>
-                        <span className="block text-xs text-teal-400">Distancia</span>
+                        <span className="block text-xs text-emerald-600">Distancia</span>
                         <span>{ruta.distancia} km</span>
                       </div>
                       <div>
-                        <span className="block text-xs text-teal-400">Capacidad</span>
+                        <span className="block text-xs text-emerald-600">Capacidad</span>
                         <span>{ruta.capacidadMaxima} personas</span>
                       </div>
                     </div>
                     
-                    <div className="mt-3 bg-teal-800 bg-opacity-50 p-2 rounded-lg text-center">
-                      <span className="block text-xs text-teal-300">Precio</span>
-                      <span className="text-white font-semibold">$ {ruta.precio}</span>
+                    <div className="mt-3 bg-emerald-50 p-2 rounded-lg text-center border border-emerald-100 shadow-sm">
+                      <span className="block text-xs text-emerald-600">Precio</span>
+                      <span className="text-emerald-700 font-semibold">$ {ruta.precio}</span>
                     </div>
                     
-                    <p className="mt-3 text-sm text-gray-300 line-clamp-2">{ruta.descripcion}</p>
+                    <p className="mt-3 text-sm text-gray-600 line-clamp-2">{ruta.descripcion}</p>
                     
                     <button 
                       onClick={() => openDetailView(ruta)}
-                      className="w-full mt-4 px-4 py-2 bg-teal-700 hover:bg-teal-600 text-white rounded flex items-center justify-center gap-2"
+                      className="w-full mt-4 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded flex items-center justify-center gap-2"
                     >
                       <Eye size={16} />
                       Ver detalles
@@ -1360,10 +1360,10 @@ const Rutas = () => {
             </div>
           ) : !loading && !error ? (
             <div className="text-center py-16">
-              <p className="text-teal-300 text-xl mb-4">No hay rutas disponibles con los filtros seleccionados</p>
+              <p className="text-emerald-300 text-xl mb-4">No hay rutas disponibles con los filtros seleccionados</p>
               <button 
                 onClick={limpiarFiltros}
-                className="px-4 py-2 bg-teal-700 hover:bg-teal-600 rounded text-white"
+                className="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 rounded text-white"
               >
                 Limpiar filtros
               </button>
@@ -1374,12 +1374,12 @@ const Rutas = () => {
         {/* Detail View */}
         {isDetailView && activeRoute && (
           <div className="fixed inset-0 bg-black bg-opacity-80 z-30 flex items-center justify-center p-4">
-            <div className="bg-teal-900 rounded-lg w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
+            <div className="bg-emerald-900 rounded-lg w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
               <div className="relative">
-                <div className="h-64 md:h-80 overflow-hidden bg-teal-950">
+                <div className="h-64 md:h-80 overflow-hidden bg-emerald-950">
                   {cargandoFotos[activeRoute.idRuta || activeRoute.id] ? (
                     <div className="flex justify-center items-center h-full">
-                      <div className="animate-spin w-8 h-8 border-2 border-teal-300 border-t-transparent rounded-full"></div>
+                      <div className="animate-spin w-8 h-8 border-2 border-emerald-300 border-t-transparent rounded-full"></div>
                     </div>
                   ) : (rutasConFotos[activeRoute.idRuta || activeRoute.id]?.length > 0 || imagenesPreview.length > 0) ? (
                     <div className="relative h-full">
@@ -1406,7 +1406,7 @@ const Rutas = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-teal-800 to-teal-900 flex items-center justify-center">
+                    <div className="w-full h-full bg-gradient-to-br from-emerald-800 to-emerald-900 flex items-center justify-center">
                       <span className="text-8xl">{getRouteTypeIcon(activeRoute.tipo)}</span>
                     </div>
                   )}
@@ -1426,7 +1426,7 @@ const Rutas = () => {
                     <Mountain size={16} />
                     {activeRoute.dificultad}
                   </span>
-                  <span className="bg-teal-700 text-white px-3 py-1 rounded-full">
+                  <span className="bg-emerald-700 text-white px-3 py-1 rounded-full">
                     {activeRoute.tipo}
                   </span>
                 </div>
@@ -1443,26 +1443,26 @@ const Rutas = () => {
                 <h2 className="text-3xl font-bold text-white mb-3">{activeRoute.nombreRuta}</h2>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  <div className="bg-teal-800 bg-opacity-30 p-3 rounded-lg">
-                    <p className="text-teal-300 text-sm">Duración</p>
+                  <div className="bg-emerald-800 bg-opacity-30 p-3 rounded-lg">
+                    <p className="text-emerald-300 text-sm">Duración</p>
                     <p className="text-white font-semibold">{activeRoute.duracion}</p>
                   </div>
-                  <div className="bg-teal-800 bg-opacity-30 p-3 rounded-lg">
-                    <p className="text-teal-300 text-sm">Distancia</p>
+                  <div className="bg-emerald-800 bg-opacity-30 p-3 rounded-lg">
+                    <p className="text-emerald-300 text-sm">Distancia</p>
                     <p className="text-white font-semibold">{activeRoute.distancia} km</p>
                   </div>
-                  <div className="bg-teal-800 bg-opacity-30 p-3 rounded-lg">
-                    <p className="text-teal-300 text-sm">Capacidad</p>
+                  <div className="bg-emerald-800 bg-opacity-30 p-3 rounded-lg">
+                    <p className="text-emerald-300 text-sm">Capacidad</p>
                     <p className="text-white font-semibold">{activeRoute.capacidadMaxima} personas</p>
                   </div>
-                  <div className="bg-teal-800 bg-opacity-30 p-3 rounded-lg">
-                    <p className="text-teal-300 text-sm">Tipo</p>
+                  <div className="bg-emerald-800 bg-opacity-30 p-3 rounded-lg">
+                    <p className="text-emerald-300 text-sm">Tipo</p>
                     <p className="text-white font-semibold">{activeRoute.tipo}</p>
                   </div>
                 </div>
                 
-                <div className="mb-6 bg-teal-700 bg-opacity-30 p-4 rounded-lg text-center">
-                  <p className="text-teal-300 text-sm mb-1">Precio por persona</p>
+                <div className="mb-6 bg-emerald-700 bg-opacity-30 p-4 rounded-lg text-center">
+                  <p className="text-emerald-300 text-sm mb-1">Precio por persona</p>
                   <p className="text-white text-2xl font-bold">$ {activeRoute.precio}</p>
                 </div>
                 
@@ -1473,7 +1473,7 @@ const Rutas = () => {
                   </p>
                 </div>
                 
-                <div className="flex justify-end gap-3 pt-4 border-t border-teal-800">
+                <div className="flex justify-end gap-3 pt-4 border-t border-emerald-800">
                   <button
                     onClick={() => handleDeleteRuta(activeRoute)}
                     className="px-4 py-2 bg-rose-500 bg-opacity-80 hover:bg-opacity-100 rounded-lg text-white flex items-center gap-2 transition-colors"
@@ -1486,7 +1486,7 @@ const Rutas = () => {
                       closeDetailView();
                       handleOpenModal(activeRoute);
                     }}
-                    className="px-4 py-2 bg-teal-500 bg-opacity-80 hover:bg-opacity-100 rounded-lg text-white flex items-center gap-2 transition-colors"
+                    className="px-4 py-2 bg-emerald-500 bg-opacity-80 hover:bg-opacity-100 rounded-lg text-white flex items-center gap-2 transition-colors"
                   >
                     <Pencil size={16} />
                     Editar
@@ -1538,7 +1538,7 @@ const Rutas = () => {
         {/* Create/Edit Modal */}
         {modalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-start justify-center p-4 z-40">
-            <div className="bg-teal-900 rounded-lg w-full max-w-md mx-auto mt-20">
+            <div className="bg-emerald-900 rounded-lg w-full max-w-md mx-auto mt-20">
               <div className="p-6">
                 <h2 className="text-xl font-bold text-white mb-4">
                   {isEditing ? 'Modificar Ruta' : 'Nueva Ruta'}
@@ -1558,7 +1558,7 @@ const Rutas = () => {
                     placeholder="Nombre de la ruta"
                     value={rutaActual.nombreRuta}
                     onChange={handleRouteNameChange}
-                    className={`w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400 ${
+                    className={`w-full p-2 rounded bg-emerald-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400 ${
                       checkRouteNameExists(rutaActual.nombreRuta) ? 'border-2 border-red-500' : ''
                     }`}
                     required
@@ -1568,7 +1568,7 @@ const Rutas = () => {
                     placeholder="Descripción"
                     value={rutaActual.descripcion}
                     onChange={(e) => setRutaActual({ ...rutaActual, descripcion: e.target.value })}
-                    className="w-full p-2 rounded bg-teal-800 text-white h-32 resize-none focus:outline-none focus:ring-2 focus:ring-teal-400"
+                    className="w-full p-2 rounded bg-emerald-800 text-white h-32 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-400"
                     required
                   />
                   
@@ -1578,7 +1578,7 @@ const Rutas = () => {
                       placeholder="Duración (ej: 2 horas)"
                       value={rutaActual.duracion}
                       onChange={(e) => setRutaActual({ ...rutaActual, duracion: e.target.value })}
-                      className="w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                      className="w-full p-2 rounded bg-emerald-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
                       required
                     />
                     <input
@@ -1586,7 +1586,7 @@ const Rutas = () => {
                       placeholder="Distancia en km"
                       value={rutaActual.distancia}
                       onChange={(e) => setRutaActual({ ...rutaActual, distancia: e.target.value })}
-                      className="w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                      className="w-full p-2 rounded bg-emerald-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
                       step="0.1"
                       min="0.1"
                       required
@@ -1599,7 +1599,7 @@ const Rutas = () => {
                       placeholder="Capacidad máxima"
                       value={rutaActual.capacidadMaxima}
                       onChange={(e) => setRutaActual({ ...rutaActual, capacidadMaxima: e.target.value })}
-                      className="w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                      className="w-full p-2 rounded bg-emerald-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
                       min="1"
                       required
                     />
@@ -1607,7 +1607,7 @@ const Rutas = () => {
                     <select
                       value={rutaActual.dificultad}
                       onChange={(e) => setRutaActual({ ...rutaActual, dificultad: e.target.value })}
-                      className="w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                      className="w-full p-2 rounded bg-emerald-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
                       required
                     >
                       <option value="">Nivel de dificultad</option>
@@ -1618,7 +1618,7 @@ const Rutas = () => {
                   </div>
                   
                   <div className="grid grid-cols-1 gap-2">
-                    <label className="block text-teal-300 text-sm">Precio (COP)</label>
+                    <label className="block text-emerald-300 text-sm">Precio (COP)</label>
                     <div className="relative">
                       <span className="absolute left-2 top-2 text-white">$</span>
                       <input
@@ -1630,7 +1630,7 @@ const Rutas = () => {
                           const value = e.target.value.replace(/\D/g, '');
                           setRutaActual({ ...rutaActual, precio: value });
                         }}
-                        className="w-full p-2 pl-6 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                        className="w-full p-2 pl-6 rounded bg-emerald-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
                         required
                       />
                     </div>
@@ -1639,7 +1639,7 @@ const Rutas = () => {
                   <select
                     value={rutaActual.tipo}
                     onChange={(e) => setRutaActual({ ...rutaActual, tipo: e.target.value })}
-                    className="w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                    className="w-full p-2 rounded bg-emerald-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
                     required
                   >
                     <option value="">Tipo de ruta</option>
@@ -1651,7 +1651,7 @@ const Rutas = () => {
                   <select
                     value={rutaActual.estado}
                     onChange={(e) => setRutaActual({ ...rutaActual, estado: e.target.value })}
-                    className="w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                    className="w-full p-2 rounded bg-emerald-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
                     required
                   >
                     <option value="">Seleccione el estado</option>
@@ -1660,16 +1660,16 @@ const Rutas = () => {
                   </select>
                   
                   <div className="space-y-2">
-                    <label className="block text-teal-300 text-sm">Imágenes de la ruta (opcional)</label>
+                    <label className="block text-emerald-300 text-sm">Imágenes de la ruta (opcional)</label>
                     <input
                       type="file"
                       onChange={handleImageChange}
-                      className="w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                      className="w-full p-2 rounded bg-emerald-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
                       accept="image/*"
                       multiple
                     />
                     
-                    <div className="text-xs text-teal-300 mt-1">
+                    <div className="text-xs text-emerald-300 mt-1">
                       Puedes seleccionar múltiples imágenes a la vez
                     </div>
                     
@@ -1780,17 +1780,17 @@ const Rutas = () => {
                     )}
                   </div>
                   
-                  <div className="flex justify-end gap-2 pt-4 border-t border-teal-800">
+                  <div className="flex justify-end gap-2 pt-4 border-t border-emerald-800">
                     <button
                       type="button"
                       onClick={() => setModalOpen(false)}
-                      className="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded transition-colors"
+                      className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded transition-colors"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded transition-colors"
+                      className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded transition-colors"
                     >
                       {isEditing ? 'Actualizar' : 'Crear'}
                     </button>

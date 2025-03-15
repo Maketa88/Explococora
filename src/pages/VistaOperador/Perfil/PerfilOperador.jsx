@@ -1,39 +1,46 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../../layouts/DashboardLayout";
+import { User, Mail, Phone, Edit, Key, Shield, Clock } from "lucide-react";
 
 const PerfilOperador = () => {
-  const [operador, setOperador] = useState(null);
+  const [operadorData, setOperadorData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [darkMode, setDarkMode] = useState(true);
   const [fotoPerfil, setFotoPerfil] = useState(localStorage.getItem('fotoPerfilURL') || null);
+  const [telefono, setTelefono] = useState(""); // Estado específico para el teléfono
   const navigate = useNavigate();
 
-  // Función para obtener iniciales para el avatar
-  const obtenerIniciales = (operadorData) => {
-    if (!operadorData) return "OP";
-    
-    const primerNombre = operadorData.primerNombre || "";
-    const primerApellido = operadorData.primerApellido || "";
-    
-    const inicialNombre = primerNombre ? primerNombre.charAt(0) : "";
-    const inicialApellido = primerApellido ? primerApellido.charAt(0) : "";
-    
-    return (inicialNombre + inicialApellido).toUpperCase() || "OP";
+  const obtenerIniciales = (data) => {
+    if (!data.primerNombre) return "U";
+    return data.primerNombre.charAt(0).toUpperCase();
   };
 
-  // Función para construir nombre completo
-  const construirNombreCompleto = (operadorData) => {
-    if (!operadorData) return "Operador";
-    
-    const primerNombre = operadorData.primerNombre || "";
-    const segundoNombre = operadorData.segundoNombre || "";
-    const primerApellido = operadorData.primerApellido || "";
-    const segundoApellido = operadorData.segundoApellido || "";
-    
-    return `${primerNombre} ${segundoNombre} ${primerApellido} ${segundoApellido}`.trim();
+  // Función específica para obtener el teléfono del operador
+  const obtenerTelefonoOperador = async (idOperador) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      
+      console.log("Obteniendo teléfono para operador ID:", idOperador);
+      
+      // Llamada directa a la tabla de teléfono usando el ID del operador
+      const response = await axios.get(`http://localhost:10101/telefono/operador/${idOperador}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      console.log("Respuesta de teléfono:", response.data);
+      
+      if (response.data && response.data.length > 0) {
+        // Si se encuentra un número, actualizar el estado
+        setTelefono(response.data[0].numeroCelular || response.data[0].numero_celular);
+      }
+    } catch (error) {
+      console.error("Error al obtener teléfono:", error);
+    }
   };
 
   useEffect(() => {
@@ -93,10 +100,24 @@ const PerfilOperador = () => {
             datosOperador.primerApellido = datosOperador.primerApellido || datosOperador.primer_apellido || "";
             datosOperador.segundoApellido = datosOperador.segundoApellido || datosOperador.segundo_apellido || "";
             datosOperador.email = datosOperador.email || "";
-            datosOperador.numeroCelular = datosOperador.numeroCelular || datosOperador.numero_celular || "";
+            
+            // Intentar obtener el número de teléfono de varias propiedades posibles
+            const numeroTelefono = 
+              datosOperador.numeroCelular || 
+              datosOperador.numero_celular || 
+              datosOperador.telefono || 
+              datosOperador.numeroTelefono;
+              
+            if (numeroTelefono) {
+              setTelefono(numeroTelefono);
+            } else if (datosOperador.id || datosOperador.idOperadorTuristico) {
+              // Si no encontramos el teléfono, pero tenemos el ID del operador, buscamos su teléfono específicamente
+              const operadorId = datosOperador.id || datosOperador.idOperadorTuristico;
+              await obtenerTelefonoOperador(operadorId);
+            }
             
             // Guardar los datos del operador
-            setOperador(datosOperador);
+            setOperadorData(datosOperador);
             
             // Verificar si hay una foto
             if (datosOperador.foto) {
@@ -160,7 +181,6 @@ const PerfilOperador = () => {
     };
   }, []);
 
-  // Añadir este useEffect para manejar la actualización de fotos
   useEffect(() => {
     // Cargar foto inicial desde localStorage
     const fotoGuardada = localStorage.getItem('fotoPerfilURL');
@@ -226,21 +246,54 @@ const PerfilOperador = () => {
   // Llamar a esta función en el useEffect inicial
   useEffect(() => {
     cargarFotoPerfil();
+    
+    // También intentar obtener el teléfono directamente
+    const obtenerTelefonoDirecto = async () => {
+      try {
+        const cedula = localStorage.getItem("cedula");
+        const token = localStorage.getItem("token");
+        
+        if (!cedula || !token) return;
+        
+        // Llamada a un nuevo endpoint específico para teléfono usando la cédula
+        const response = await axios.get(`http://localhost:10101/telefono/operador-cedula/${cedula}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        
+        console.log("Respuesta de teléfono directa:", response.data);
+        
+        if (response.data && response.data.length > 0) {
+          // Si se encuentra un número, actualizar el estado
+          setTelefono(response.data[0].numeroCelular || response.data[0].numero_celular);
+        }
+      } catch (error) {
+        console.error("Error al obtener teléfono directo:", error);
+      }
+    };
+    
+    obtenerTelefonoDirecto();
   }, []);
 
   if (loading) {
     return (
       <DashboardLayout>
-        <div className={`${darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-800'} rounded-lg p-6 shadow-lg text-center`}>
-          <div className="animate-pulse">
-            <div className="flex justify-center">
-              <div className="rounded-full bg-gray-700 h-32 w-32 mb-4"></div>
+        <div className="flex justify-center items-center min-h-[75vh] px-3 sm:px-6">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden">
+            <div className="h-32 sm:h-40 bg-gradient-to-r from-emerald-500 to-emerald-700 animate-pulse relative">
+              <div className="absolute -bottom-10 sm:-bottom-12 left-5 sm:left-10 w-20 sm:w-24 h-20 sm:h-24 rounded-full bg-emerald-300 animate-pulse"></div>
             </div>
-            <div className="h-4 bg-gray-700 rounded w-3/4 mx-auto mb-2"></div>
-            <div className="h-4 bg-gray-700 rounded w-1/2 mx-auto mb-2"></div>
-            <div className="h-4 bg-gray-700 rounded w-2/3 mx-auto"></div>
+            <div className="p-6 sm:p-10 pt-12 sm:pt-16">
+              <div className="ml-20 sm:ml-28 h-5 sm:h-6 bg-emerald-100 rounded-full w-32 sm:w-48 mb-2 sm:mb-4 animate-pulse"></div>
+              <div className="ml-20 sm:ml-28 h-3 sm:h-4 bg-emerald-50 rounded-full w-24 sm:w-32 mb-8 sm:mb-10 animate-pulse"></div>
+              
+              <div className="grid grid-cols-1 gap-4 sm:gap-6 w-full">
+                <div className="h-40 sm:h-52 bg-emerald-50 rounded-2xl animate-pulse"></div>
+                <div className="h-40 sm:h-52 bg-emerald-50 rounded-2xl animate-pulse"></div>
+              </div>
+            </div>
           </div>
-          <p className="mt-4">Cargando perfil...</p>
         </div>
       </DashboardLayout>
     );
@@ -249,163 +302,288 @@ const PerfilOperador = () => {
   if (error) {
     return (
       <DashboardLayout>
-        <div className={`${darkMode ? 'bg-[#1e293b]' : 'bg-gray-100'} rounded-lg p-6 shadow-lg text-center text-red-500`}>
-          <p className="text-xl font-semibold mb-2">Error al cargar el perfil</p>
-          <p>{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="mt-4 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-          >
-            Reintentar
-          </button>
+        <div className="flex justify-center items-center min-h-[75vh] px-3 sm:px-6">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 sm:p-10 text-center max-w-2xl">
+            <div className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 relative">
+              <div className="absolute inset-0 bg-red-100 rounded-full animate-ping opacity-25"></div>
+              <div className="relative w-full h-full bg-red-100 rounded-full flex items-center justify-center">
+                <span className="text-red-500 text-2xl sm:text-4xl">!</span>
+              </div>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2 sm:mb-4">Error al cargar el perfil</h2>
+            <p className="text-red-500 mb-6 sm:mb-8 px-4 sm:px-6 text-sm sm:text-base">{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="px-6 sm:px-8 py-2 sm:py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-emerald-200/50 text-sm sm:text-base"
+            >
+              Reintentar
+            </button>
+          </div>
         </div>
       </DashboardLayout>
     );
   }
 
   // Si no hay datos, mostrar un mensaje
-  if (!operador) {
+  if (!operadorData) {
     return (
       <DashboardLayout>
-        <div className={`${darkMode ? 'bg-[#1e293b] text-white' : 'bg-gray-100 text-gray-800'} rounded-lg p-6 shadow-lg text-center`}>
-          No se encontraron datos del operador.
+        <div className="flex justify-center items-center min-h-[75vh] px-3 sm:px-6">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 sm:p-10 text-center max-w-2xl">
+            <div className="w-16 h-16 sm:w-24 sm:h-24 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+              <User size={30} className="text-emerald-300 sm:w-12 sm:h-12" />
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1 sm:mb-2">Información no disponible</h2>
+            <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">No se encontraron datos del operador.</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="px-6 sm:px-8 py-2 sm:py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-emerald-200/50 text-sm sm:text-base"
+            >
+              Reintentar
+            </button>
+          </div>
         </div>
       </DashboardLayout>
     );
   }
   
-  // Verificamos si operador es un array o un objeto
-  const operadorData = Array.isArray(operador) ? operador[0] : operador;
-  
-  console.log("Datos del operador para renderizar:", operadorData);
-  console.log("Número de teléfono:", operadorData.numeroCelular);
-  
-  // Mostrar los datos tal como vienen de la base de datos
   return (
     <DashboardLayout>
-      <div className={`${darkMode ? 'bg-[#1e293b]' : 'bg-gray-100'} rounded-lg p-6 shadow-lg`}>
-        <h2 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Perfil del Operador</h2>
-        
-    
-        <div className="flex flex-col md:flex-row gap-8">
-          {/* Columna izquierda con foto */}
-          <div className="flex flex-col items-center">
-            <div className="w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-blue-500 bg-[#0D8ABC] flex items-center justify-center text-white text-6xl font-bold">
-              {fotoPerfil ? (
-                <img
-                  src={fotoPerfil}
-                  alt="Perfil del operador"
-                  className="h-full w-full object-cover"
-                  key={fotoPerfil}
-                />
-              ) : (
-                obtenerIniciales(operadorData)
-              )}
+      <div className="p-3 sm:p-4 md:p-6">
+        {/* Card principal con diseño innovador */}
+        <div className="bg-gradient-to-br from-white to-emerald-50 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
+          {/* Header con estilo moderno */}
+          <div className="bg-emerald-600 p-4 sm:p-6 text-white relative overflow-hidden">
+            {/* Elementos decorativos */}
+            <div className="absolute top-0 left-0 w-full h-full">
+              <div className="absolute top-10 right-20 sm:right-40 w-20 sm:w-40 h-20 sm:h-40 rounded-full bg-emerald-500 opacity-20 blur-xl"></div>
+              <div className="absolute bottom-0 right-10 sm:right-20 w-30 sm:w-60 h-30 sm:h-60 rounded-full bg-emerald-400 opacity-10 blur-2xl"></div>
+              <div className="absolute top-5 left-1/2 w-10 sm:w-20 h-10 sm:h-20 rounded-full bg-emerald-300 opacity-20 blur-md"></div>
+            </div>
+            
+            {/* Título con estilo */}
+            <div className="relative">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-1">Mi Perfil</h1>
             </div>
           </div>
-          
-          {/* Columna derecha con información */}
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>PRIMER NOMBRE</h3>
-              <p className={`font-medium text-lg ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                {operadorData.primerNombre || "No disponible"}
-              </p>
-            </div>
-            
-            <div>
-              <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>SEGUNDO NOMBRE</h3>
-              <p className={`font-medium text-lg ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                {operadorData.segundoNombre || "No disponible"}
-              </p>
-            </div>
-            
-            <div>
-              <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>PRIMER APELLIDO</h3>
-              <p className={`font-medium text-lg ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                {operadorData.primerApellido || "No disponible"}
-              </p>
-            </div>
-            
-            <div>
-              <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>SEGUNDO APELLIDO</h3>
-              <p className={`font-medium text-lg ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                {operadorData.segundoApellido || "No disponible"}
-              </p>
-            </div>
-            
-            <div>
-              <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>CÉDULA</h3>
-              <p className={`font-medium text-lg ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                {operadorData.cedula || "No disponible"}
-              </p>
-            </div>
-            
-            <div>
-              <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>CORREO ELECTRÓNICO</h3>
-              <p className={`font-medium text-lg ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                {operadorData.email || "No disponible"}
-              </p>
-            </div>
-            
-            <div>
-              <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>TELÉFONO</h3>
-              <p className={`font-medium text-lg ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                {operadorData.numeroCelular || operadorData.numero_celular || operadorData.telefono || "No disponible"}
-              </p>
+
+          {/* Contenido del perfil */}
+          <div className="p-4 sm:p-6">
+            <div className="flex flex-col lg:flex-row lg:items-start gap-4 sm:gap-6 lg:gap-8">
+              {/* Columna izquierda: Foto y datos básicos */}
+              <div className="w-full lg:w-1/3">
+                {/* Tarjeta de perfil con efectos visuales */}
+                <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg mb-4 sm:mb-6 transform hover:scale-[1.01] transition-all duration-300">
+                  {/* Foto de perfil con efecto glowing */}
+                  <div className="text-center mb-4 sm:mb-6">
+                    <div className="relative mx-auto w-24 h-24 sm:w-32 sm:h-32 group">
+                      <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-full opacity-70 blur group-hover:opacity-100 transition duration-300"></div>
+                      <div className="relative rounded-full overflow-hidden border-4 border-white">
+                        {fotoPerfil ? (
+                          <img
+                            src={fotoPerfil}
+                            alt="Perfil del operador"
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-3xl sm:text-5xl font-bold">
+                            {obtenerIniciales(operadorData)}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Nombre y cargo con espaciado mejorado */}
+                    <div className="mt-3 sm:mt-4">
+                      <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-emerald-700 to-emerald-500 bg-clip-text text-transparent">
+                        {operadorData.primerNombre} {operadorData.primerApellido}
+                      </h2>
+                      <div className="flex items-center justify-center mt-1">
+                        <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs sm:text-sm font-medium">
+                          Operador Turístico
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Datos de contacto con iconos y mejores espaciados */}
+                  <div className="space-y-2 sm:space-y-3 mt-3 sm:mt-4">
+                    <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-emerald-100/70 rounded-lg sm:rounded-xl shadow-sm hover:bg-emerald-100 hover:shadow-md border border-emerald-200/50 transition-all duration-300">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                        <Mail size={16} className="sm:w-5 sm:h-5" />
+                      </div>
+                      <div className="flex-1 overflow-hidden">
+                        <p className="text-xs text-emerald-700 font-medium">Correo Electrónico</p>
+                        <p className="text-gray-700 text-xs sm:text-sm truncate">{operadorData.email || "No disponible"}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-emerald-100/70 rounded-lg sm:rounded-xl shadow-sm hover:bg-emerald-100 hover:shadow-md border border-emerald-200/50 transition-all duration-300">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                        <Phone size={16} className="sm:w-5 sm:h-5" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-emerald-700 font-medium">Teléfono</p>
+                        <p className="text-gray-700 text-xs sm:text-sm">{telefono || operadorData.numeroCelular || "No disponible"}</p>
+                      </div>
+                    </div>
+                    
+                    {/* Cédula del operador */}
+                    <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-emerald-100/70 rounded-lg sm:rounded-xl shadow-sm hover:bg-emerald-100 hover:shadow-md border border-emerald-200/50 transition-all duration-300">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                        <User size={16} className="sm:w-5 sm:h-5" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-emerald-700 font-medium">Cédula</p>
+                        <p className="text-gray-700 text-xs sm:text-sm">{localStorage.getItem("cedula") || operadorData.cedula || "No disponible"}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Botones con diseño mejorado */}
+                  <div className="mt-4 sm:mt-6 space-y-2 sm:space-y-3">
+                    <button 
+                      onClick={() => navigate("/VistaOperador/perfil/actualizar")}
+                      className="w-full py-2 sm:py-3 px-3 sm:px-4 bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-lg sm:rounded-xl text-white font-medium flex items-center justify-center gap-1 sm:gap-2 hover:from-emerald-700 hover:to-emerald-600 transition-all duration-300 shadow-lg shadow-emerald-200/50 text-sm"
+                    >
+                      <Edit size={16} className="sm:w-5 sm:h-5" />
+                      Editar información
+                    </button>
+                    <button 
+                      onClick={() => navigate("/VistaOperador/perfil/cambiar-contrasena")}
+                      className="w-full py-2 sm:py-3 px-3 sm:px-4 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-lg sm:rounded-xl text-white font-medium flex items-center justify-center gap-1 sm:gap-2 hover:from-emerald-600 hover:to-emerald-500 transition-all duration-300 shadow-lg shadow-emerald-200/50 text-sm"
+                    >
+                      <Key size={16} className="sm:w-5 sm:h-5" />
+                      Cambiar contraseña
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Columna derecha: Información detallada */}
+              <div className="w-full lg:w-2/3 space-y-4 sm:space-y-6">
+                {/* Tarjeta de información personal */}
+                <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-center mb-3 sm:mb-5">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mr-2 sm:mr-3">
+                      <User size={16} className="sm:w-5 sm:h-5" />
+                    </div>
+                    <h3 className="text-lg sm:text-xl font-bold text-emerald-700">
+                      Información Personal
+                    </h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5">
+                    <div className="group">
+                      <h4 className="text-xs sm:text-sm font-medium text-emerald-600 mb-1 group-hover:text-emerald-700 transition-colors">Primer Nombre</h4>
+                      <div className="p-2 sm:p-4 bg-emerald-100/70 rounded-lg sm:rounded-xl shadow-sm group-hover:bg-emerald-100 group-hover:shadow-md border border-emerald-200/50 transition-all duration-300">
+                        <p className="text-gray-700 text-sm">{operadorData.primerNombre || "No disponible"}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="group">
+                      <h4 className="text-xs sm:text-sm font-medium text-emerald-600 mb-1 group-hover:text-emerald-700 transition-colors">Segundo Nombre</h4>
+                      <div className="p-2 sm:p-4 bg-emerald-100/70 rounded-lg sm:rounded-xl shadow-sm group-hover:bg-emerald-100 group-hover:shadow-md border border-emerald-200/50 transition-all duration-300">
+                        <p className="text-gray-700 text-sm">{operadorData.segundoNombre || "No disponible"}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="group">
+                      <h4 className="text-xs sm:text-sm font-medium text-emerald-600 mb-1 group-hover:text-emerald-700 transition-colors">Primer Apellido</h4>
+                      <div className="p-2 sm:p-4 bg-emerald-100/70 rounded-lg sm:rounded-xl shadow-sm group-hover:bg-emerald-100 group-hover:shadow-md border border-emerald-200/50 transition-all duration-300">
+                        <p className="text-gray-700 text-sm">{operadorData.primerApellido || "No disponible"}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="group">
+                      <h4 className="text-xs sm:text-sm font-medium text-emerald-600 mb-1 group-hover:text-emerald-700 transition-colors">Segundo Apellido</h4>
+                      <div className="p-2 sm:p-4 bg-emerald-100/70 rounded-lg sm:rounded-xl shadow-sm group-hover:bg-emerald-100 group-hover:shadow-md border border-emerald-200/50 transition-all duration-300">
+                        <p className="text-gray-700 text-sm">{operadorData.segundoApellido || "No disponible"}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Tarjeta de seguridad de cuenta */}
+                <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-center mb-3 sm:mb-5">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mr-2 sm:mr-3">
+                      <Shield size={16} className="sm:w-5 sm:h-5" />
+                    </div>
+                    <h3 className="text-lg sm:text-xl font-bold text-emerald-700">
+                      Seguridad de Cuenta
+                    </h3>
+                  </div>
+                  
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="bg-emerald-50 rounded-lg sm:rounded-xl p-3 sm:p-5 relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 w-12 h-12 sm:w-16 sm:h-16 -mr-4 sm:-mr-6 -mt-4 sm:-mt-6 bg-emerald-100 rounded-full opacity-0 group-hover:opacity-80 transition-opacity duration-300"></div>
+                      <div className="flex items-center gap-2 sm:gap-3 relative z-10">
+                        <Mail size={16} className="sm:w-5 sm:h-5 text-emerald-600" />
+                        <div>
+                          <h4 className="font-medium text-gray-800 text-sm">Correo electrónico</h4>
+                          <p className="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">{operadorData.email || "No disponible"}</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-emerald-50 rounded-lg sm:rounded-xl p-3 sm:p-5 relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 w-12 h-12 sm:w-16 sm:h-16 -mr-4 sm:-mr-6 -mt-4 sm:-mt-6 bg-emerald-100 rounded-full opacity-0 group-hover:opacity-80 transition-opacity duration-300"></div>
+                      <div className="flex items-center gap-2 sm:gap-3 relative z-10">
+                        <Key size={16} className="sm:w-5 sm:h-5 text-emerald-600" />
+                        <div>
+                          <h4 className="font-medium text-gray-800 text-sm">Contraseña</h4>
+                          <p className="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">••••••••••</p>
+                        </div>
+                      </div>
+                      <div className="ml-7 sm:ml-9 pl-2 sm:pl-3 mt-2 sm:mt-3 border-l-2 border-emerald-200">
+                        <button 
+                          onClick={() => navigate("/VistaOperador/perfil/cambiar-contrasena")}
+                          className="text-xs sm:text-sm text-emerald-600 hover:text-emerald-700 transition-colors"
+                        >
+                          Cambiar contraseña
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Nueva sección: Información de la cuenta */}
+                <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-center mb-3 sm:mb-5">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mr-2 sm:mr-3">
+                      <Clock size={16} className="sm:w-5 sm:h-5" />
+                    </div>
+                    <h3 className="text-lg sm:text-xl font-bold text-emerald-700">
+                      Actividad de la Cuenta
+                    </h3>
+                  </div>
+                  
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="bg-emerald-50 rounded-lg sm:rounded-xl p-3 sm:p-5">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium text-gray-800 text-sm">Última actualización</h4>
+                          <p className="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">{new Date().toLocaleDateString()}</p>
+                        </div>
+                        <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-emerald-500"></div>
+                      </div>
+                    </div>
+                    
+                    <div className="text-center mt-2 sm:mt-4">
+                      <button 
+                        onClick={() => navigate("/VistaOperador/perfil/actualizar")}
+                        className="text-xs sm:text-sm text-emerald-600 hover:text-emerald-700 transition-colors inline-flex items-center"
+                      >
+                        <Edit size={14} className="sm:w-4 sm:h-4 mr-1" />
+                        Actualizar información
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        
-        {/* Botones de acción */}
-        <div className="mt-8 flex flex-wrap gap-4 justify-start">
-          <button 
-            onClick={() => navigate("/VistaOperador/perfil/actualizar")}
-            className="py-2 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
-          >
-            Editar información
-          </button>
-          <button 
-            onClick={() => navigate("/VistaOperador/perfil/cambiar-contrasena")}
-            className="py-2 px-6 bg-gray-700 hover:bg-gray-600 text-white rounded-lg"
-          >
-            Cambiar contraseña
-          </button>
-        </div>
-        
-        {/* Sección de estadísticas */}
-        <div className="mt-10">
-          <h3 className={`text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Estadísticas</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-lg bg-blue-900/50">
-              <h4 className="text-sm uppercase mb-1 text-blue-300">Rutas creadas</h4>
-              <p className="text-2xl font-bold text-white">24</p>
-            </div>
-            
-            <div className="p-4 rounded-lg bg-green-900/50">
-              <h4 className="text-sm uppercase mb-1 text-green-300">Guías asignados</h4>
-              <p className="text-2xl font-bold text-white">8</p>
-            </div>
-            
-            <div className="p-4 rounded-lg bg-purple-900/50">
-              <h4 className="text-sm uppercase mb-1 text-purple-300">Clientes registrados</h4>
-              <p className="text-2xl font-bold text-white">156</p>
-            </div>
-          </div>
-        </div>
-        
-        {/* Botón para volver al Dashboard */}
-        <div className="mt-8 flex justify-center">
-          <button 
-            onClick={() => navigate("/VistaOperador")}
-            className={`py-2 px-6 rounded-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-300 hover:bg-gray-400'} ${darkMode ? 'text-white' : 'text-gray-800'} font-medium transition-colors duration-200 flex items-center gap-2`}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
-            </svg>
-            Volver al Dashboard
-          </button>
         </div>
       </div>
     </DashboardLayout>
