@@ -1,14 +1,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import rutasDataOriginal from "../../../../../data/rutas.json";
-import { obtenerFotosRuta } from '../../../../../services/rutasService';
-
-// Asignar IDs a las rutas del archivo JSON
-const rutasData = rutasDataOriginal.map((ruta, index) => ({
-  ...ruta,
-  idRuta: index + 1 // Asignar IDs secuenciales comenzando desde 1
-}));
+import { obtenerFotosRuta, obtenerRutas } from '../../../../../services/rutasService';
 
 // Imágenes de respaldo por dificultad (se usarán si no hay fotos disponibles de la API)
 const imagenesRespaldoPorDificultad = {
@@ -176,6 +169,7 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
   const [rutasComplementarias, setRutasComplementarias] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [rutasConFotos, setRutasConFotos] = useState({});
+  const [rutasData, setRutasData] = useState([]);
   // Usamos cargandoFotos para seguimiento interno, aunque no se use en la renderización
   const [cargandoFotos, setCargandoFotos] = useState({});
   const { t } = useTranslation();
@@ -199,10 +193,29 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
     }
   };
 
+  // Efecto para cargar las rutas desde la API
   useEffect(() => {
-    // Log para verificar que las rutas tienen IDs asignados
-    console.log("Rutas con IDs asignados:", rutasData);
-    
+    const cargarRutas = async () => {
+      try {
+        const rutasResponse = await obtenerRutas();
+        // Asignar IDs a las rutas si no los tienen
+        const rutasConIds = rutasResponse.map((ruta, index) => ({
+          ...ruta,
+          idRuta: ruta.idRuta || index + 1
+        }));
+        setRutasData(rutasConIds);
+      } catch (error) {
+        console.error('Error al cargar las rutas:', error);
+        // Podrías mostrar un mensaje de error al usuario aquí
+      }
+    };
+
+    cargarRutas();
+  }, []);
+
+  useEffect(() => {
+    if (rutasData.length === 0) return;
+
     // Filtrar rutas según los resultados de la IA
     if (resultadoIA && resultadoIA.filtros) {
       const filtros = resultadoIA.filtros;
@@ -248,7 +261,7 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
       // Aplicar filtros de tipo de actividad
       if (filtros.tipo_actividad) {
         rutasFiltradas = rutasFiltradas.filter(
-          (ruta) => ruta.tipoActividad === filtros.tipo_actividad
+          (ruta) => ruta.tipo === filtros.tipo_actividad
         );
       }
 
@@ -266,7 +279,7 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
           // Verificar si alguno de los términos está en el nombre o descripción
           return terminos.some(
             (termino) =>
-              ruta.nombre.toLowerCase().includes(termino.toLowerCase()) ||
+              ruta.nombreRuta.toLowerCase().includes(termino.toLowerCase()) ||
               ruta.descripcion.toLowerCase().includes(termino.toLowerCase())
           );
         });
@@ -285,7 +298,7 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
 
       // Seleccionar rutas complementarias (diferentes a la principal)
       const rutasRestantes = rutasData.filter(
-        (ruta) => ruta.nombre !== rutaPrincipal.nombre
+        (ruta) => ruta.nombreRuta !== rutaPrincipal.nombreRuta
       );
       // Mezclar el array para obtener rutas aleatorias
       const rutasMezcladas = [...rutasRestantes].sort(
@@ -314,7 +327,7 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
       const rutaPrincipal = rutasData[rutaPrincipalIndex];
 
       const rutasRestantes = rutasData.filter(
-        (ruta) => ruta.nombre !== rutaPrincipal.nombre
+        (ruta) => ruta.nombreRuta !== rutaPrincipal.nombreRuta
       );
       const rutasMezcladas = [...rutasRestantes].sort(
         () => Math.random() - 0.5
@@ -337,7 +350,7 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
       
       setCargando(false);
     }
-  }, [resultadoIA]);
+  }, [resultadoIA, rutasData]);
 
   if (cargando) {
     return (
@@ -439,7 +452,7 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
             )}
             <img
               src={rutaPrincipal ? obtenerImagenRuta(rutaPrincipal) : ""}
-              alt={rutaPrincipal?.nombre}
+              alt={rutaPrincipal?.nombreRuta}
               className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
               onError={(e) => {
                 console.error("Error al cargar la imagen de la ruta principal:", e);
@@ -452,7 +465,7 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-6">
             <EtiquetaDificultad dificultad={rutaPrincipal.dificultad} />
             <h2 className="text-2xl md:text-3xl font-bold text-white mt-2">
-              {rutaPrincipal?.nombre}
+              {rutaPrincipal?.nombreRuta}
             </h2>
             <div className="flex flex-wrap gap-3 mt-2 text-white">
               <Caracteristica
@@ -467,7 +480,7 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
               />
               <Caracteristica
                 icono={<IconoActividad />}
-                texto={rutaPrincipal?.tipoActividad}
+                texto={rutaPrincipal?.tipo}
               />
             </div>
           </div>
@@ -563,7 +576,7 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {rutasComplementarias.map((ruta, index) => (
             <motion.div
-              key={ruta.nombre}
+              key={ruta.nombreRuta}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 + index * 0.1 }}
@@ -577,10 +590,10 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
                 )}
                 <img
                   src={obtenerImagenRuta(ruta)}
-                  alt={ruta.nombre}
+                  alt={ruta.nombreRuta}
                   className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   onError={(e) => {
-                    console.error(`Error al cargar la imagen de la ruta complementaria ${ruta.nombre}:`, e);
+                    console.error(`Error al cargar la imagen de la ruta complementaria ${ruta.nombreRuta}:`, e);
                     e.target.src = imagenesRespaldoPorDificultad[ruta.dificultad];
                   }}
                 />
@@ -588,7 +601,7 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
               <div className="p-4 flex-grow">
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="text-lg font-semibold text-gray-800">
-                    {ruta.nombre}
+                    {ruta.nombreRuta}
                   </h4>
                   <EtiquetaDificultad dificultad={ruta.dificultad} />
                 </div>
