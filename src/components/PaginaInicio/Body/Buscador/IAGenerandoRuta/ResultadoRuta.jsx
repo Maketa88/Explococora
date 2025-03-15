@@ -1,10 +1,17 @@
+import axios from "axios";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import rutasData from "../../../../../data/rutas.json";
+import rutasDataOriginal from "../../../../../data/rutas.json";
 
-// Imágenes para las rutas (simuladas)
-const imagenesPorDificultad = {
+// Asignar IDs a las rutas del archivo JSON
+const rutasData = rutasDataOriginal.map((ruta, index) => ({
+  ...ruta,
+  idRuta: index + 1 // Asignar IDs secuenciales comenzando desde 1
+}));
+
+// Imágenes de respaldo por dificultad (se usarán si no hay fotos disponibles de la API)
+const imagenesRespaldoPorDificultad = {
   Facil:
     "https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=1470&auto=format&fit=crop",
   Moderada:
@@ -168,9 +175,79 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
   const [rutaPrincipal, setRutaPrincipal] = useState(null);
   const [rutasComplementarias, setRutasComplementarias] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [rutasConFotos, setRutasConFotos] = useState({});
+  // Usamos cargandoFotos para seguimiento interno, aunque no se use en la renderización
+  const [cargandoFotos, setCargandoFotos] = useState({});
   const { t } = useTranslation();
 
+  // Función para obtener las fotos de una ruta específica
+  const obtenerFotosRuta = async (idRuta) => {
+    try {
+      // Verificar que el ID sea válido antes de hacer la petición
+      if (!idRuta || isNaN(idRuta)) {
+        console.warn("ID de ruta no válido:", idRuta);
+        setCargandoFotos(prev => ({...prev, [idRuta]: false}));
+        return;
+      }
+      
+      console.log(`Obteniendo fotos para la ruta ${idRuta}...`);
+      const response = await axios.get(`http://localhost:10101/rutas/fotos-publicas/${idRuta}`);
+      console.log(`Respuesta de la API para ruta ${idRuta}:`, response.data);
+      
+      let fotosArray = [];
+      
+      // Intentar extraer las fotos de diferentes estructuras posibles
+      if (response.data && response.data.fotos) {
+        const fotos = response.data.fotos;
+        
+        // Caso 1: Array de strings (URLs directas)
+        if (Array.isArray(fotos) && fotos.length > 0 && typeof fotos[0] === 'string') {
+          fotosArray = fotos;
+          console.log(`Encontradas ${fotosArray.length} fotos (formato: array de strings)`);
+        } 
+        // Caso 2: Array de objetos con propiedad foto
+        else if (Array.isArray(fotos) && fotos.length > 0 && fotos[0] && typeof fotos[0] === 'object' && fotos[0].foto) {
+          fotosArray = fotos.map(item => item.foto);
+          console.log(`Encontradas ${fotosArray.length} fotos (formato: array de objetos)`);
+        } 
+        // Caso 3: Array anidado
+        else if (Array.isArray(fotos) && fotos.length > 0 && Array.isArray(fotos[0])) {
+          const primerElemento = fotos[0];
+          
+          primerElemento.forEach(item => {
+            if (item && typeof item === 'object' && item.foto && typeof item.foto === 'string') {
+              fotosArray.push(item.foto);
+            } else if (typeof item === 'string') {
+              fotosArray.push(item);
+            }
+          });
+          
+          console.log(`Encontradas ${fotosArray.length} fotos (formato: array anidado)`);
+        }
+      }
+      
+      // Si encontramos fotos, actualizar el estado
+      if (fotosArray.length > 0) {
+        console.log(`Guardando ${fotosArray.length} fotos para la ruta ${idRuta}:`, fotosArray);
+        setRutasConFotos(prevState => ({
+          ...prevState,
+          [idRuta]: fotosArray
+        }));
+      } else {
+        console.log(`No se encontraron fotos para la ruta ${idRuta}`);
+      }
+      
+      setCargandoFotos(prev => ({...prev, [idRuta]: false}));
+    } catch (error) {
+      console.error(`Error al obtener fotos para la ruta ${idRuta}:`, error);
+      setCargandoFotos(prev => ({...prev, [idRuta]: false}));
+    }
+  };
+
   useEffect(() => {
+    // Log para verificar que las rutas tienen IDs asignados
+    console.log("Rutas con IDs asignados:", rutasData);
+    
     // Filtrar rutas según los resultados de la IA
     if (resultadoIA && resultadoIA.filtros) {
       const filtros = resultadoIA.filtros;
@@ -263,6 +340,20 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
 
       setRutaPrincipal(rutaPrincipal);
       setRutasComplementarias(rutasComplementarias);
+      
+      // Obtener fotos para la ruta principal y las complementarias
+      if (rutaPrincipal && rutaPrincipal.idRuta) {
+        setCargandoFotos(prev => ({...prev, [rutaPrincipal.idRuta]: true}));
+        obtenerFotosRuta(rutaPrincipal.idRuta);
+      }
+      
+      rutasComplementarias.forEach(ruta => {
+        if (ruta && ruta.idRuta) {
+          setCargandoFotos(prev => ({...prev, [ruta.idRuta]: true}));
+          obtenerFotosRuta(ruta.idRuta);
+        }
+      });
+      
       setCargando(false);
     } else {
       // Si no hay resultados de IA, seleccionar rutas aleatorias
@@ -279,6 +370,20 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
 
       setRutaPrincipal(rutaPrincipal);
       setRutasComplementarias(rutasComplementarias);
+      
+      // Obtener fotos para la ruta principal y las complementarias
+      if (rutaPrincipal && rutaPrincipal.idRuta) {
+        setCargandoFotos(prev => ({...prev, [rutaPrincipal.idRuta]: true}));
+        obtenerFotosRuta(rutaPrincipal.idRuta);
+      }
+      
+      rutasComplementarias.forEach(ruta => {
+        if (ruta && ruta.idRuta) {
+          setCargandoFotos(prev => ({...prev, [ruta.idRuta]: true}));
+          obtenerFotosRuta(ruta.idRuta);
+        }
+      });
+      
       setCargando(false);
     }
   }, [resultadoIA]);
@@ -292,7 +397,33 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
   }
 
   // Obtener puntos de interés según la dificultad de la ruta principal
-  const puntosDeInteres = puntosDeInteresPorTipo[rutaPrincipal.dificultad];
+  const puntosDeInteres = puntosDeInteresPorTipo[rutaPrincipal?.dificultad];
+
+  // Función para obtener la imagen de una ruta
+  const obtenerImagenRuta = (ruta) => {
+    // Verificar si la ruta tiene un ID válido
+    if (!ruta || !ruta.idRuta) {
+      console.log("Ruta sin ID válido, usando imagen de respaldo");
+      return imagenesRespaldoPorDificultad[ruta?.dificultad || "Moderada"];
+    }
+    
+    // Si estamos cargando las fotos para esta ruta, mostrar un placeholder o la imagen de respaldo
+    if (cargandoFotos[ruta.idRuta]) {
+      console.log(`Cargando fotos para ruta ${ruta.idRuta}, usando imagen de respaldo temporalmente`);
+      return imagenesRespaldoPorDificultad[ruta.dificultad];
+    }
+    
+    // Si tenemos fotos para esta ruta, mostrar la primera
+    if (rutasConFotos[ruta.idRuta] && rutasConFotos[ruta.idRuta].length > 0) {
+      const imagenUrl = rutasConFotos[ruta.idRuta][0];
+      console.log(`Usando imagen real de API para ruta ${ruta.idRuta}: ${imagenUrl}`);
+      return imagenUrl;
+    }
+    
+    // Si no hay fotos disponibles, mostrar la imagen de respaldo
+    console.log(`No hay fotos disponibles para ruta ${ruta.idRuta}, usando imagen de respaldo`);
+    return imagenesRespaldoPorDificultad[ruta.dificultad];
+  };
 
   return (
     <div className="w-full max-w-6xl mx-auto p-4">
@@ -349,11 +480,20 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
       >
         <div className="relative">
           {/* Imagen de fondo */}
-          <div className="h-64 md:h-80 overflow-hidden">
+          <div className="h-64 md:h-80 overflow-hidden relative">
+            {rutaPrincipal && cargandoFotos[rutaPrincipal.idRuta] && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-50 z-10">
+                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-teal-500"></div>
+              </div>
+            )}
             <img
-              src={imagenesPorDificultad[rutaPrincipal.dificultad]}
-              alt={rutaPrincipal.nombre}
+              src={rutaPrincipal ? obtenerImagenRuta(rutaPrincipal) : ""}
+              alt={rutaPrincipal?.nombre}
               className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+              onError={(e) => {
+                console.error("Error al cargar la imagen de la ruta principal:", e);
+                e.target.src = imagenesRespaldoPorDificultad[rutaPrincipal?.dificultad || "Moderada"];
+              }}
             />
           </div>
 
@@ -361,22 +501,22 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-6">
             <EtiquetaDificultad dificultad={rutaPrincipal.dificultad} />
             <h2 className="text-2xl md:text-3xl font-bold text-white mt-2">
-              {rutaPrincipal.nombre}
+              {rutaPrincipal?.nombre}
             </h2>
             <div className="flex flex-wrap gap-3 mt-2 text-white">
               <Caracteristica
                 icono={<IconoReloj />}
-                texto={rutaPrincipal.duracion}
+                texto={rutaPrincipal?.duracion}
                 destacado
               />
               <Caracteristica
                 icono={<IconoDistancia />}
-                texto={`${rutaPrincipal.distancia} km`}
+                texto={`${rutaPrincipal?.distancia} km`}
                 destacado
               />
               <Caracteristica
                 icono={<IconoActividad />}
-                texto={rutaPrincipal.tipoActividad}
+                texto={rutaPrincipal?.tipoActividad}
               />
             </div>
           </div>
@@ -388,7 +528,7 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
             <h3 className="text-xl font-semibold text-gray-800 mb-2">
               {t("descripcion", "Descripción")}
             </h3>
-            <p className="text-gray-700">{rutaPrincipal.descripcion}</p>
+            <p className="text-gray-700">{rutaPrincipal?.descripcion}</p>
           </div>
 
           <div className="mb-6">
@@ -425,9 +565,9 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
                   "recomendacionCalzado",
                   "Usa calzado cómodo y adecuado para"
                 )}{" "}
-                {rutaPrincipal.dificultad === "Facil"
+                {rutaPrincipal?.dificultad === "Facil"
                   ? t("terrenoPlano", "terreno plano")
-                  : rutaPrincipal.dificultad === "Moderada"
+                  : rutaPrincipal?.dificultad === "Moderada"
                   ? t("terrenoIrregular", "terreno irregular")
                   : t("terrenoEscarpado", "terreno escarpado")}
               </li>
@@ -440,7 +580,7 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
               </li>
               <li className="flex items-start">
                 <span className="text-teal-500 mr-2">✓</span>
-                {rutaPrincipal.dificultad === "Desafiante"
+                {rutaPrincipal?.dificultad === "Desafiante"
                   ? t(
                       "recomendacionDesafiante",
                       "Recomendable ir acompañado y con experiencia previa"
@@ -478,11 +618,20 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
               transition={{ delay: 0.6 + index * 0.1 }}
               className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 flex flex-col h-full"
             >
-              <div className="h-40 overflow-hidden">
+              <div className="h-40 overflow-hidden relative">
+                {cargandoFotos[ruta.idRuta] && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-50 z-10">
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>
+                  </div>
+                )}
                 <img
-                  src={imagenesPorDificultad[ruta.dificultad]}
+                  src={obtenerImagenRuta(ruta)}
                   alt={ruta.nombre}
                   className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                  onError={(e) => {
+                    console.error(`Error al cargar la imagen de la ruta complementaria ${ruta.nombre}:`, e);
+                    e.target.src = imagenesRespaldoPorDificultad[ruta.dificultad];
+                  }}
                 />
               </div>
               <div className="p-4 flex-grow">

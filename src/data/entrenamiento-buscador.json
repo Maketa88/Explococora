@@ -49,7 +49,8 @@
         "caminata moderada",
         "ni muy fácil ni muy difícil",
         "medio",
-        "nivel intermedio"
+        "nivel intermedio",
+        "moderada"
       ],
       "filtros": {
         "dificultad": "Moderada"
@@ -86,7 +87,8 @@
         "corta",
         "muy corta",
         "corto",
-        "muy corto"
+        "muy corto",
+        "planchon"
       ],
       "filtros": {
         "duracion": "30 Min"
