@@ -480,11 +480,15 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
             <p className="text-gray-700">{rutaPrincipal?.descripcion}</p>
           </div>
 
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold text-gray-800 mb-3">
-              {t("puntosInteres", "Lo que verás en esta ruta")}
+          <div className="mb-8 bg-gradient-to-br from-teal-50 via-white to-teal-50 p-8 rounded-3xl shadow-xl border border-teal-200 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-teal-400/20 to-teal-200/10 rounded-bl-full -mr-10 -mt-10 z-0"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-teal-400/20 to-teal-200/10 rounded-tr-full -ml-8 -mb-8 z-0"></div>
+            <h3 className="text-2xl font-bold text-center mb-8 relative z-10">
+              <span className="bg-gradient-to-r from-teal-700 to-teal-500 bg-clip-text text-transparent px-4">
+                {t("puntosInteres", "Lo que verás en esta ruta")}
+              </span>
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 relative z-10">
               {puntosDeInteres.map((punto, index) => (
                 <PuntoInteres
                   key={index}
@@ -496,31 +500,37 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
             </div>
           </div>
 
-          <div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-4 relative inline-block after:content-[''] after:absolute after:w-full after:h-1 after:bg-gradient-to-r after:from-teal-400 after:to-teal-100 after:bottom-0 after:left-0 after:-mb-2 pb-1">
-              {t("recomendaciones", "Recomendaciones")}
+          <div className="bg-gradient-to-br from-teal-50 via-white to-teal-50 p-8 rounded-3xl shadow-xl border border-teal-200 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-teal-400/20 to-teal-200/10 rounded-bl-full -mr-10 -mt-10 z-0"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-teal-400/20 to-teal-200/10 rounded-tr-full -ml-8 -mb-8 z-0"></div>
+            <h3 className="text-2xl font-bold text-center mb-8 relative z-10">
+              <span className="bg-gradient-to-r from-teal-700 to-teal-500 bg-clip-text text-transparent px-4">
+                {t("recomendaciones", "Recomendaciones")}
+              </span>
             </h3>
-            <div className="flex flex-col space-y-3 mt-6">
+            <div className="flex flex-col space-y-4 mt-6 relative z-10">
               <motion.div 
-                whileHover={{ x: 5 }}
-                className="bg-gradient-to-r from-teal-50 to-white p-4 rounded-xl shadow-sm border border-teal-100 flex items-center"
+                whileHover={{ x: 8, scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                className="bg-gradient-to-r from-white to-teal-50 p-4 rounded-xl shadow-md border border-teal-100 flex items-center group hover:shadow-lg transition-all duration-300"
               >
-                <div className="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-full p-2 mr-4 shadow-md flex-shrink-0">
-                  <FaWater className="w-5 h-5" />
+                <div className="bg-gradient-to-br from-teal-600 to-teal-400 text-white rounded-xl p-3 mr-5 shadow-md flex-shrink-0 group-hover:shadow-lg transition-all duration-300 transform group-hover:-rotate-6">
+                  <FaWater className="w-6 h-6" />
                 </div>
-                <p className="font-medium text-teal-700">
+                <p className="font-medium text-teal-700 group-hover:text-teal-800 transition-colors duration-300">
                   {t("recomendacionAgua", "Lleva agua suficiente para mantenerte hidratado durante toda la ruta")}
                 </p>
               </motion.div>
               
               <motion.div 
-                whileHover={{ x: 5 }}
-                className="bg-gradient-to-r from-teal-50 to-white p-4 rounded-xl shadow-sm border border-teal-100 flex items-center"
+                whileHover={{ x: 8, scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                className="bg-gradient-to-r from-white to-teal-50 p-4 rounded-xl shadow-md border border-teal-100 flex items-center group hover:shadow-lg transition-all duration-300"
               >
-                <div className="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-full p-2 mr-4 shadow-md flex-shrink-0">
-                  <FaHiking className="w-5 h-5" />
+                <div className="bg-gradient-to-br from-teal-600 to-teal-400 text-white rounded-xl p-3 mr-5 shadow-md flex-shrink-0 group-hover:shadow-lg transition-all duration-300 transform group-hover:-rotate-6">
+                  <FaHiking className="w-6 h-6" />
                 </div>
-                <p className="font-medium text-teal-700">
+                <p className="font-medium text-teal-700 group-hover:text-teal-800 transition-colors duration-300">
                   {t("recomendacionCalzadoCompleta", "Usa calzado cómodo y adecuado para")} {" "}
                   {rutaPrincipal?.dificultad === "Facil"
                     ? t("terrenoPlano", "terreno plano")
@@ -531,25 +541,27 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
               </motion.div>
               
               <motion.div 
-                whileHover={{ x: 5 }}
-                className="bg-gradient-to-r from-teal-50 to-white p-4 rounded-xl shadow-sm border border-teal-100 flex items-center"
+                whileHover={{ x: 8, scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                className="bg-gradient-to-r from-white to-teal-50 p-4 rounded-xl shadow-md border border-teal-100 flex items-center group hover:shadow-lg transition-all duration-300"
               >
-                <div className="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-full p-2 mr-4 shadow-md flex-shrink-0">
-                  <FaShieldAlt className="w-5 h-5" />
+                <div className="bg-gradient-to-br from-teal-600 to-teal-400 text-white rounded-xl p-3 mr-5 shadow-md flex-shrink-0 group-hover:shadow-lg transition-all duration-300 transform group-hover:-rotate-6">
+                  <FaShieldAlt className="w-6 h-6" />
                 </div>
-                <p className="font-medium text-teal-700">
+                <p className="font-medium text-teal-700 group-hover:text-teal-800 transition-colors duration-300">
                   {t("recomendacionProteccionCompleta", "Protección solar y repelente de insectos para una experiencia confortable")}
                 </p>
               </motion.div>
               
               <motion.div 
-                whileHover={{ x: 5 }}
-                className="bg-gradient-to-r from-teal-50 to-white p-4 rounded-xl shadow-sm border border-teal-100 flex items-center"
+                whileHover={{ x: 8, scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                className="bg-gradient-to-r from-white to-teal-50 p-4 rounded-xl shadow-md border border-teal-100 flex items-center group hover:shadow-lg transition-all duration-300"
               >
-                <div className="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-full p-2 mr-4 shadow-md flex-shrink-0">
-                  <GiMountainRoad className="w-6 h-6" />
+                <div className="bg-gradient-to-br from-teal-600 to-teal-400 text-white rounded-xl p-3 mr-5 shadow-md flex-shrink-0 group-hover:shadow-lg transition-all duration-300 transform group-hover:-rotate-6">
+                  <GiMountainRoad className="w-7 h-7" />
                 </div>
-                <p className="font-medium text-teal-700">
+                <p className="font-medium text-teal-700 group-hover:text-teal-800 transition-colors duration-300">
                   {rutaPrincipal?.dificultad === "Desafiante"
                     ? t("recomendacionDesafianteCompleta", "Recomendable ir acompañado y con experiencia previa en rutas similares")
                     : t("recomendacionFacilCompleta", "Ideal para disfrutar en familia o con amigos, perfecto para todas las edades")}
