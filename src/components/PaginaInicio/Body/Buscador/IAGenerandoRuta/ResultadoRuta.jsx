@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { FaHiking, FaShieldAlt, FaWater } from 'react-icons/fa';
 import { FiCamera, FiClock, FiCoffee, FiCompass, FiMap, FiMapPin, FiUsers } from 'react-icons/fi';
+import { GiMountainRoad } from 'react-icons/gi';
 import { obtenerFotosRuta, obtenerRutas } from '../../../../../services/rutasService';
 
 // Imágenes de respaldo por dificultad (se usarán si no hay fotos disponibles de la API)
@@ -495,49 +497,65 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
           </div>
 
           <div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-3">
+            <h3 className="text-xl font-semibold text-gray-800 mb-4 relative inline-block after:content-[''] after:absolute after:w-full after:h-1 after:bg-gradient-to-r after:from-teal-400 after:to-teal-100 after:bottom-0 after:left-0 after:-mb-2 pb-1">
               {t("recomendaciones", "Recomendaciones")}
             </h3>
-            <ul className="space-y-2 text-gray-700">
-              <li className="flex items-start">
-                <span className="text-teal-500 mr-2">✓</span>
-                {t(
-                  "recomendacionAgua",
-                  "Lleva agua suficiente para toda la ruta"
-                )}
-              </li>
-              <li className="flex items-start">
-                <span className="text-teal-500 mr-2">✓</span>
-                {t(
-                  "recomendacionCalzado",
-                  "Usa calzado cómodo y adecuado para"
-                )}{" "}
-                {rutaPrincipal?.dificultad === "Facil"
-                  ? t("terrenoPlano", "terreno plano")
-                  : rutaPrincipal?.dificultad === "Moderada"
-                  ? t("terrenoIrregular", "terreno irregular")
-                  : t("terrenoEscarpado", "terreno escarpado")}
-              </li>
-              <li className="flex items-start">
-                <span className="text-teal-500 mr-2">✓</span>
-                {t(
-                  "recomendacionProteccion",
-                  "Protección solar y repelente de insectos"
-                )}
-              </li>
-              <li className="flex items-start">
-                <span className="text-teal-500 mr-2">✓</span>
-                {rutaPrincipal?.dificultad === "Desafiante"
-                  ? t(
-                      "recomendacionDesafiante",
-                      "Recomendable ir acompañado y con experiencia previa"
-                    )
-                  : t(
-                      "recomendacionFacil",
-                      "Ideal para disfrutar en familia o con amigos"
-                    )}
-              </li>
-            </ul>
+            <div className="flex flex-col space-y-3 mt-6">
+              <motion.div 
+                whileHover={{ x: 5 }}
+                className="bg-gradient-to-r from-teal-50 to-white p-4 rounded-xl shadow-sm border border-teal-100 flex items-center"
+              >
+                <div className="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-full p-2 mr-4 shadow-md flex-shrink-0">
+                  <FaWater className="w-5 h-5" />
+                </div>
+                <p className="font-medium text-teal-700">
+                  {t("recomendacionAgua", "Lleva agua suficiente para mantenerte hidratado durante toda la ruta")}
+                </p>
+              </motion.div>
+              
+              <motion.div 
+                whileHover={{ x: 5 }}
+                className="bg-gradient-to-r from-teal-50 to-white p-4 rounded-xl shadow-sm border border-teal-100 flex items-center"
+              >
+                <div className="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-full p-2 mr-4 shadow-md flex-shrink-0">
+                  <FaHiking className="w-5 h-5" />
+                </div>
+                <p className="font-medium text-teal-700">
+                  {t("recomendacionCalzadoCompleta", "Usa calzado cómodo y adecuado para")} {" "}
+                  {rutaPrincipal?.dificultad === "Facil"
+                    ? t("terrenoPlano", "terreno plano")
+                    : rutaPrincipal?.dificultad === "Moderada"
+                    ? t("terrenoIrregular", "terreno irregular")
+                    : t("terrenoEscarpado", "terreno escarpado")}
+                </p>
+              </motion.div>
+              
+              <motion.div 
+                whileHover={{ x: 5 }}
+                className="bg-gradient-to-r from-teal-50 to-white p-4 rounded-xl shadow-sm border border-teal-100 flex items-center"
+              >
+                <div className="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-full p-2 mr-4 shadow-md flex-shrink-0">
+                  <FaShieldAlt className="w-5 h-5" />
+                </div>
+                <p className="font-medium text-teal-700">
+                  {t("recomendacionProteccionCompleta", "Protección solar y repelente de insectos para una experiencia confortable")}
+                </p>
+              </motion.div>
+              
+              <motion.div 
+                whileHover={{ x: 5 }}
+                className="bg-gradient-to-r from-teal-50 to-white p-4 rounded-xl shadow-sm border border-teal-100 flex items-center"
+              >
+                <div className="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-full p-2 mr-4 shadow-md flex-shrink-0">
+                  <GiMountainRoad className="w-6 h-6" />
+                </div>
+                <p className="font-medium text-teal-700">
+                  {rutaPrincipal?.dificultad === "Desafiante"
+                    ? t("recomendacionDesafianteCompleta", "Recomendable ir acompañado y con experiencia previa en rutas similares")
+                    : t("recomendacionFacilCompleta", "Ideal para disfrutar en familia o con amigos, perfecto para todas las edades")}
+                </p>
+              </motion.div>
+            </div>
           </div>
         </div>
       </motion.div>
