@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import DashboardLayout from '../../../layouts/DashboardLayout';
 import axios from 'axios';
-import { Pencil, Plus, Trash, Mountain, X, Filter, RefreshCw, Eye, ChevronLeft, ChevronRight, Search, XCircle, Check } from 'lucide-react';
+import { Pencil, Plus, Trash, Mountain, X, Filter, RefreshCw, Eye, ChevronLeft, ChevronRight, Search, XCircle } from 'lucide-react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -34,7 +34,7 @@ const Rutas = () => {
   const [alert, setAlert] = useState({ show: false, message: '', type: '' });
   const [token] = useState(localStorage.getItem('token') || '');
   const [isDetailView, setIsDetailView] = useState(false);
-  const [eliminandoFoto, setEliminandoFoto] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   
   // Estado para confirmación de eliminación estilo Guias.jsx
   const [confirmacionEliminar, setConfirmacionEliminar] = useState({
@@ -42,7 +42,8 @@ const Rutas = () => {
     tipo: '', // 'ruta' o 'foto'
     id: null,
     nombre: '',
-    mensaje: ''
+    mensaje: '',
+    ids: [] // Para múltiples fotos
   });
   
   // Nuevos estados para manejar las fotos de las rutas en la lista
@@ -59,10 +60,6 @@ const Rutas = () => {
 
   // Añadir el estado para el término de búsqueda
   const [terminoBusqueda, setTerminoBusqueda] = useState('');
-
-  // Añadir estados para la selección múltiple de fotos
-  const [fotosSeleccionadas, setFotosSeleccionadas] = useState([]);
-  const [modoSeleccion, setModoSeleccion] = useState(false);
 
   // Configuración de axios con token de autorización
   const axiosWithAuth = axios.create({
@@ -363,133 +360,54 @@ const Rutas = () => {
     }
   };
 
-  // Función modificada para mostrar el modal de confirmación de eliminación de varias fotos
-  const confirmarEliminarFotos = (fotosIds) => {
-    if (fotosIds.length === 1) {
-      // Si solo hay una foto, usar la función existente
-      const index = fotosCompletas.findIndex(foto => foto.id === fotosIds[0]);
-      confirmarEliminarFoto(fotosIds[0], index);
-    } else {
-      // Para múltiples fotos
-      setConfirmacionEliminar({
-        mostrar: true,
-        tipo: 'fotos',
-        id: fotosIds,
-        nombre: `${fotosIds.length} fotos seleccionadas`,
-        mensaje: '¿Está seguro que desea eliminar estas fotos? Esta acción no se puede deshacer.'
-      });
-    }
+  // Función para mostrar el modal de confirmación de eliminación de foto
+  const confirmarEliminarFoto = (idFoto, index) => {
+    setConfirmacionEliminar({
+      mostrar: true,
+      tipo: 'foto',
+      id: idFoto,
+      nombre: `Foto #${index + 1}`,
+      mensaje: '¿Está seguro que desea eliminar esta foto? Esta acción no se puede deshacer.'
+    });
   };
 
-  // Función para eliminar múltiples fotos
-  const eliminarFotosConfirmadas = async (idsArray) => {
-    try {
-      setEliminandoFoto(true);
-      setConfirmacionEliminar({ ...confirmacionEliminar, mostrar: false });
-      
-      // Eliminar cada foto de manera secuencial
-      for (const idFoto of idsArray) {
-        await axiosWithAuth.delete(`http://localhost:10101/rutas/foto/${idFoto}`);
-        
-        // Actualizar el estado de las fotos
-        setFotosCompletas(prevFotos => prevFotos.filter(foto => foto.id !== idFoto));
-      }
-      
-      // Actualizar las vistas previas
-      setImagenesPreview(prevPreview => {
-        // Crear un nuevo array de vistas previas excluyendo las eliminadas
-        const indexesToRemove = [];
-        fotosCompletas.forEach((foto, index) => {
-          if (idsArray.includes(foto.id)) {
-            indexesToRemove.push(index);
-          }
-        });
-        
-        return prevPreview.filter((_, i) => !indexesToRemove.includes(i));
-      });
-      
-      // Mostrar mensaje de éxito con el toast
-      if (idsArray.length === 1) {
-        toast.success('Foto eliminada correctamente', {
-          position: "top-right",
-          autoClose: 3000,
-          containerId: "rutas-toast",
-          theme: "colored"
-        });
-      } else {
-        toast.success(`${idsArray.length} fotos eliminadas correctamente`, {
-          position: "top-right",
-          autoClose: 3000,
-          containerId: "rutas-toast",
-          theme: "colored"
-        });
-      }
-      
-      // Reiniciar la selección
-      setFotosSeleccionadas([]);
-      setModoSeleccion(false);
-      
-      // Cerrar el modal si está abierto
-      if (modalOpen) {
-        setModalOpen(false);
-      }
-      
-      // Recargar la página para actualizar la lista de rutas
-      fetchRutas();
-      
-    } catch (error) {
-      console.error('Error al eliminar fotos:', error);
-      toast.error('Error al eliminar fotos: ' + extractErrorMessage(error), {
-        position: "top-right",
-        autoClose: 3000,
-        containerId: "rutas-toast",
-        theme: "colored"
-      });
-    } finally {
-      setEliminandoFoto(false);
-    }
-  };
-
-  // Modificar el componente de confirmación para manejar eliminación múltiple
+  // Modal de confirmación de eliminación
   const ConfirmacionEliminarModal = () => {
     if (!confirmacionEliminar.mostrar) return null;
     
     const esRuta = confirmacionEliminar.tipo === 'ruta';
     const esFoto = confirmacionEliminar.tipo === 'foto';
-    const sonFotos = confirmacionEliminar.tipo === 'fotos';
     
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div className="bg-[#1e293b] rounded-lg w-full max-w-md mx-auto shadow-xl overflow-hidden">
+        <div className="bg-white rounded-lg w-full max-w-md mx-auto shadow-xl">
           <div className="p-6">
-            <h2 className="text-xl font-bold text-white mb-4">Confirmar Eliminación</h2>
+            <h2 className="text-xl font-bold text-emerald-700 mb-4">Confirmar Eliminación</h2>
             
             <div className="flex items-start gap-4 mb-6">
-              <div className="bg-red-600 rounded-full p-2 text-white shrink-0">
+              <div className="bg-red-100 rounded-full p-2 text-red-600 shrink-0">
                 <XCircle size={24} />
               </div>
               
               <div>
-                <h3 className="font-semibold text-white">{confirmacionEliminar.nombre}</h3>
-                <p className="text-rose-400 mt-2">Será eliminado permanentemente</p>
+                <h3 className="font-semibold text-gray-800">{confirmacionEliminar.nombre}</h3>
+                <p className="text-red-600 mt-2">Será eliminado permanentemente</p>
               </div>
             </div>
             
-            <div className="border-l-4 border-amber-400 pl-3 py-2 bg-amber-900 bg-opacity-30 mb-6">
-              <p className="text-white text-sm">
-                ¿Está seguro que desea eliminar {
-                  esRuta ? 'esta ruta' : 
-                  esFoto ? 'esta foto' : 
-                  sonFotos ? 'estas fotos seleccionadas' : 
-                  'este elemento'
-                }? Esta acción no se puede deshacer.
+            <div className="border-l-4 border-amber-400 pl-3 py-2 bg-amber-50 mb-6">
+              <p className="text-gray-700 text-sm">
+                {confirmacionEliminar.mensaje || "¿Está seguro que desea eliminar este elemento? Esta acción no se puede deshacer."}
               </p>
             </div>
             
             <div className="flex justify-end gap-3">
               <button
-                onClick={() => setConfirmacionEliminar({ ...confirmacionEliminar, mostrar: false })}
-                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+                onClick={() => {
+                  setConfirmacionEliminar({ mostrar: false, tipo: '', id: null, ids: [] });
+                }}
+                className="px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded transition-colors"
+                disabled={isProcessing}
               >
                 Cancelar
               </button>
@@ -500,14 +418,22 @@ const Rutas = () => {
                     eliminarRutaConfirmada(confirmacionEliminar.id);
                   } else if (esFoto) {
                     eliminarFotoConfirmada(confirmacionEliminar.id);
-                  } else if (sonFotos) {
-                    eliminarFotosConfirmadas(confirmacionEliminar.id);
                   }
                 }}
-                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded transition-colors flex items-center gap-2"
+                className="px-4 py-2 flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white rounded transition-colors"
+                disabled={isProcessing}
               >
-                <Trash size={16} />
-                Eliminar
+                {isProcessing ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                    <span>Eliminando...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash size={16} />
+                    <span>Eliminar</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -525,17 +451,6 @@ const Rutas = () => {
       id: rutaId,
       nombre: ruta.nombreRuta || 'Ruta sin nombre',
       mensaje: '¿Está seguro que desea eliminar esta ruta? Esta acción no se puede deshacer.'
-    });
-  };
-
-  // Función para mostrar el modal de confirmación de eliminación de foto
-  const confirmarEliminarFoto = (idFoto, index) => {
-    setConfirmacionEliminar({
-      mostrar: true,
-      tipo: 'foto',
-      id: idFoto,
-      nombre: `Foto #${index + 1}`,
-      mensaje: '¿Está seguro que desea eliminar esta foto? Esta acción no se puede deshacer.'
     });
   };
 
@@ -570,10 +485,10 @@ const Rutas = () => {
     }
   };
 
-  // Modificar el componente de confirmación para manejar eliminación múltiple
+  // Mantener la función para eliminar una foto después de confirmar
   const eliminarFotoConfirmada = async (idFoto) => {
     try {
-      setEliminandoFoto(true);
+      setIsProcessing(true);
       setConfirmacionEliminar({ ...confirmacionEliminar, mostrar: false });
       
       // Llamar al endpoint para eliminar la foto
@@ -581,17 +496,25 @@ const Rutas = () => {
       
       console.log('Respuesta de eliminación de foto:', response.data);
       
-      // Actualizar el estado de las fotos
-      setFotosCompletas(prevFotos => prevFotos.filter(foto => foto.id !== idFoto));
-      setImagenesPreview(prevPreview => {
-        // Encontrar el índice de la foto a eliminar en fotosCompletas
-        const indexToRemove = fotosCompletas.findIndex(foto => foto.id === idFoto);
-        // Eliminar la misma posición en imagenesPreview
-        if (indexToRemove >= 0) {
-          return prevPreview.filter((_, i) => i !== indexToRemove);
-        }
-        return prevPreview;
-      });
+      // Corregir la lógica para actualizar el estado de las fotos
+      // Primero filtramos por ID o idFoto
+      setFotosCompletas(prevFotos => 
+        prevFotos.filter(foto => 
+          (foto.id !== idFoto) && (foto.idFoto !== idFoto)
+        )
+      );
+      
+      // Encontrar el índice correcto para eliminar la vista previa
+      const indexToRemove = fotosCompletas.findIndex(foto => 
+        foto.id === idFoto || foto.idFoto === idFoto
+      );
+      
+      // Solo actualizar las previsualizaciones si encontramos la foto
+      if (indexToRemove >= 0) {
+        setImagenesPreview(prevPreview => 
+          prevPreview.filter((_, i) => i !== indexToRemove)
+        );
+      }
       
       // Cerrar el modal si está abierto
       if (modalOpen) {
@@ -618,24 +541,8 @@ const Rutas = () => {
         theme: "colored"
       });
     } finally {
-      setEliminandoFoto(false);
+      setIsProcessing(false);
     }
-  };
-
-  // Nueva función para eliminar una foto por su ID (actualizada)
-  const handleDeleteFoto = (idFoto, index) => {
-    if (!idFoto || isNaN(idFoto)) {
-      toast.error('ID de foto inválido', {
-        position: "top-right",
-        autoClose: 3000,
-        containerId: "rutas-toast",
-        theme: "colored"
-      });
-      return;
-    }
-
-    // Mostrar el modal de confirmación de eliminación
-    confirmarEliminarFoto(idFoto, index);
   };
 
   // Función para eliminar una ruta (actualizada)
@@ -1052,44 +959,6 @@ const Rutas = () => {
     setRutasFiltradas(resultado);
   };
 
-  // Toggle para seleccionar una foto
-  const toggleSeleccionFoto = (fotoId) => {
-    setFotosSeleccionadas(prev => {
-      if (prev.includes(fotoId)) {
-        return prev.filter(id => id !== fotoId);
-      } else {
-        return [...prev, fotoId];
-      }
-    });
-  };
-
-  // Iniciar modo selección
-  const iniciarModoSeleccion = () => {
-    setModoSeleccion(true);
-    setFotosSeleccionadas([]);
-  };
-
-  // Cancelar modo selección
-  const cancelarModoSeleccion = () => {
-    setModoSeleccion(false);
-    setFotosSeleccionadas([]);
-  };
-
-  // Nueva función para manejar la eliminación de múltiples fotos
-  const handleDeleteMultiplePhotos = () => {
-    if (fotosSeleccionadas.length === 0) {
-      toast.info('No hay fotos seleccionadas para eliminar', {
-        position: "top-right",
-        autoClose: 3000,
-        containerId: "rutas-toast",
-        theme: "colored"
-      });
-      return;
-    }
-    
-    confirmarEliminarFotos(fotosSeleccionadas);
-  };
-
   return (
     <DashboardLayout>
       <div className="p-6">
@@ -1389,18 +1258,36 @@ const Rutas = () => {
                           : imagenesPreview).map((foto, idx) => (
                           <div 
                             key={idx} 
-                            onClick={() => openLightbox(idx)}
-                            className="h-full min-w-[300px] cursor-pointer"
+                            className="h-full min-w-[300px] relative group cursor-pointer"
                           >
                             <img
                               src={foto}
                               alt={`${activeRoute.nombreRuta} - imagen ${idx + 1}`}
                               className="h-full w-full object-cover rounded"
+                              onClick={() => openLightbox(idx)}
                               onError={(e) => {
                                 e.target.onerror = null;
                                 e.target.src = 'https://via.placeholder.com/800x400?text=Imagen+no+disponible';
                               }}
                             />
+                            
+                            {/* Añadir el botón de eliminar sobre la imagen con efecto mejorado */}
+                            {fotosCompletas.length > 0 && (
+                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200">
+                                <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation(); // Evitar que se abra el lightbox
+                                    confirmarEliminarFoto(fotosCompletas[idx].idFoto || fotosCompletas[idx].id, idx);
+                                  }}
+                                  className="z-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition-all duration-200 hover:scale-110 shadow-lg"
+                                  title="Eliminar foto"
+                                >
+                                  <Trash size={18} />
+                                </button>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -1537,254 +1424,212 @@ const Rutas = () => {
         
         {/* Create/Edit Modal */}
         {modalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-start justify-center p-4 z-40">
-            <div className="bg-emerald-900 rounded-lg w-full max-w-md mx-auto mt-20">
+          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-start justify-center p-4 z-40">
+            <div className="bg-white rounded-lg w-full max-w-md mx-auto mt-20 shadow-xl">
               <div className="p-6">
-                <h2 className="text-xl font-bold text-white mb-4">
+                <h2 className="text-xl font-bold text-emerald-700 mb-4 flex items-center">
                   {isEditing ? 'Modificar Ruta' : 'Nueva Ruta'}
                 </h2>
                 
                 {alert.show && alert.type === 'error' && (
-                  <div className="mb-4 p-3 bg-red-900 bg-opacity-50 rounded">
-                    <p className="text-white text-sm">
+                  <div className="mb-4 p-3 bg-red-50 rounded border border-red-100">
+                    <p className="text-red-700 text-sm">
                       {alert.message.includes("Error 403") ? "Token inválido" : alert.message}
                     </p>
                   </div>
                 )}
                 
                 <form onSubmit={handleCreateOrUpdate} className="space-y-4 overflow-y-auto max-h-[60vh]">
-                  <input
-                    type="text"
-                    placeholder="Nombre de la ruta"
-                    value={rutaActual.nombreRuta}
-                    onChange={handleRouteNameChange}
-                    className={`w-full p-2 rounded bg-emerald-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400 ${
-                      checkRouteNameExists(rutaActual.nombreRuta) ? 'border-2 border-red-500' : ''
-                    }`}
-                    required
-                  />
-                  
-                  <textarea
-                    placeholder="Descripción"
-                    value={rutaActual.descripcion}
-                    onChange={(e) => setRutaActual({ ...rutaActual, descripcion: e.target.value })}
-                    className="w-full p-2 rounded bg-emerald-800 text-white h-32 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                    required
-                  />
-                  
-                  <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Nombre de la ruta</label>
                     <input
                       type="text"
-                      placeholder="Duración (ej: 2 horas)"
-                      value={rutaActual.duracion}
-                      onChange={(e) => setRutaActual({ ...rutaActual, duracion: e.target.value })}
-                      className="w-full p-2 rounded bg-emerald-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                      placeholder="Nombre de la ruta"
+                      value={rutaActual.nombreRuta}
+                      onChange={handleRouteNameChange}
+                      className={`w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400 ${
+                        checkRouteNameExists(rutaActual.nombreRuta) ? 'border-2 border-red-500' : ''
+                      }`}
                       required
                     />
-                    <input
-                      type="number"
-                      placeholder="Distancia en km"
-                      value={rutaActual.distancia}
-                      onChange={(e) => setRutaActual({ ...rutaActual, distancia: e.target.value })}
-                      className="w-full p-2 rounded bg-emerald-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                      step="0.1"
-                      min="0.1"
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Descripción</label>
+                    <textarea
+                      placeholder="Descripción detallada de la ruta"
+                      value={rutaActual.descripcion}
+                      onChange={(e) => setRutaActual({ ...rutaActual, descripcion: e.target.value })}
+                      className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 h-32 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-400"
                       required
                     />
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
-                    <input
-                      type="number"
-                      placeholder="Capacidad máxima"
-                      value={rutaActual.capacidadMaxima}
-                      onChange={(e) => setRutaActual({ ...rutaActual, capacidadMaxima: e.target.value })}
-                      className="w-full p-2 rounded bg-emerald-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                      min="1"
-                      required
-                    />
-                    
-                    <select
-                      value={rutaActual.dificultad}
-                      onChange={(e) => setRutaActual({ ...rutaActual, dificultad: e.target.value })}
-                      className="w-full p-2 rounded bg-emerald-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                      required
-                    >
-                      <option value="">Nivel de dificultad</option>
-                      <option value="Facil">Fácil</option>
-                      <option value="Moderada">Moderada</option>
-                      <option value="Desafiante">Desafiante</option>
-                    </select>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 gap-2">
-                    <label className="block text-emerald-300 text-sm">Precio (COP)</label>
-                    <div className="relative">
-                      <span className="absolute left-2 top-2 text-white">$</span>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Duración</label>
                       <input
                         type="text"
-                        placeholder="Ingrese el precio"
+                        placeholder="ej: 2 horas"
+                        value={rutaActual.duracion}
+                        onChange={(e) => setRutaActual({ ...rutaActual, duracion: e.target.value })}
+                        className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Distancia (km)</label>
+                      <input
+                        type="number"
+                        placeholder="ej: 2.5"
+                        value={rutaActual.distancia}
+                        onChange={(e) => setRutaActual({ ...rutaActual, distancia: e.target.value })}
+                        className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                        step="0.1"
+                        min="0.1"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Capacidad</label>
+                      <input
+                        type="number"
+                        placeholder="ej: 20"
+                        value={rutaActual.capacidadMaxima}
+                        onChange={(e) => setRutaActual({ ...rutaActual, capacidadMaxima: e.target.value })}
+                        className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                        min="1"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Dificultad</label>
+                      <select
+                        value={rutaActual.dificultad}
+                        onChange={(e) => setRutaActual({ ...rutaActual, dificultad: e.target.value })}
+                        className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                        required
+                      >
+                        <option value="">Seleccione</option>
+                        <option value="Facil">Fácil</option>
+                        <option value="Moderada">Moderada</option>
+                        <option value="Desafiante">Desafiante</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Precio (COP)</label>
+                    <div className="relative">
+                      <span className="absolute left-2 top-2 text-gray-600">$</span>
+                      <input
+                        type="text"
+                        placeholder="ej: 50000"
                         value={rutaActual.precio}
                         onChange={(e) => {
                           // Solo permitir dígitos
                           const value = e.target.value.replace(/\D/g, '');
                           setRutaActual({ ...rutaActual, precio: value });
                         }}
-                        className="w-full p-2 pl-6 rounded bg-emerald-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                        className="w-full p-2 pl-6 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
                         required
                       />
                     </div>
                   </div>
                   
-                  <select
-                    value={rutaActual.tipo}
-                    onChange={(e) => setRutaActual({ ...rutaActual, tipo: e.target.value })}
-                    className="w-full p-2 rounded bg-emerald-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                    required
-                  >
-                    <option value="">Tipo de ruta</option>
-                    <option value="Caminata">Caminata</option>
-                    <option value="Cabalgata">Cabalgata</option>
-                    <option value="Cabalgata y Caminata">Cabalgata y Caminata</option>
-                  </select>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Tipo de ruta</label>
+                    <select
+                      value={rutaActual.tipo}
+                      onChange={(e) => setRutaActual({ ...rutaActual, tipo: e.target.value })}
+                      className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                      required
+                    >
+                      <option value="">Seleccione</option>
+                      <option value="Caminata">Caminata</option>
+                      <option value="Cabalgata">Cabalgata</option>
+                      <option value="Cabalgata y Caminata">Cabalgata y Caminata</option>
+                    </select>
+                  </div>
                   
-                  <select
-                    value={rutaActual.estado}
-                    onChange={(e) => setRutaActual({ ...rutaActual, estado: e.target.value })}
-                    className="w-full p-2 rounded bg-emerald-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                    required
-                  >
-                    <option value="">Seleccione el estado</option>
-                    <option value="Activa">Activa</option>
-                    <option value="Inactiva">Inactiva</option>
-                  </select>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Estado</label>
+                    <select
+                      value={rutaActual.estado}
+                      onChange={(e) => setRutaActual({ ...rutaActual, estado: e.target.value })}
+                      className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                      required
+                    >
+                      <option value="">Seleccione</option>
+                      <option value="Activa">Activa</option>
+                      <option value="Inactiva">Inactiva</option>
+                    </select>
+                  </div>
                   
                   <div className="space-y-2">
-                    <label className="block text-emerald-300 text-sm">Imágenes de la ruta (opcional)</label>
+                    <label className="block text-sm text-gray-600 mb-1">Imágenes de la ruta (opcional)</label>
                     <input
                       type="file"
                       onChange={handleImageChange}
-                      className="w-full p-2 rounded bg-emerald-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                      className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
                       accept="image/*"
                       multiple
                     />
                     
-                    <div className="text-xs text-emerald-300 mt-1">
+                    <div className="text-xs text-gray-500 mt-1">
                       Puedes seleccionar múltiples imágenes a la vez
                     </div>
                     
                     {/* Display image previews with remove option and delete button for existing photos */}
                     {imagenesPreview.length > 0 && (
-                      <div className="space-y-2">
-                        {/* Barra de herramientas para selección de fotos */}
-                        {fotosCompletas.length > 0 && (
-                          <div className="flex justify-between items-center mb-2">
-                            <div>
-                              {!modoSeleccion ? (
-                                <button
-                                  type="button"
-                                  onClick={iniciarModoSeleccion}
-                                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm flex items-center gap-1"
-                                >
-                                  <Check size={14} />
-                                  Seleccionar fotos
-                                </button>
-                              ) : (
-                                <div className="flex gap-2">
+                      <div className="space-y-2 mt-3">
+                        <p className="text-sm text-gray-600">{imagenesPreview.length} imágenes</p>
+                        
+                        <div className="grid grid-cols-3 gap-2 mt-2">
+                          {imagenesPreview.map((url, idx) => (
+                            <div key={idx} className="relative group h-24 rounded overflow-hidden border border-emerald-100">
+                              <img src={url} alt={`Imagen ${idx + 1}`} className="h-full w-full object-cover" />
+                              
+                              {/* Para fotos existentes (en la base de datos) */}
+                              {idx < fotosCompletas.length ? (
+                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200">
+                                  <div className="absolute inset-0 bg-black bg-opacity-40"></div>
                                   <button
                                     type="button"
-                                    onClick={cancelarModoSeleccion}
-                                    className="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation(); // Evitar que se abra el lightbox
+                                      confirmarEliminarFoto(fotosCompletas[idx].idFoto || fotosCompletas[idx].id, idx);
+                                    }}
+                                    className="z-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 transition-all duration-200 hover:scale-110 shadow-lg"
+                                    title="Eliminar foto"
                                   >
-                                    Cancelar
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={handleDeleteMultiplePhotos}
-                                    className="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded text-sm flex items-center gap-1"
-                                    disabled={fotosSeleccionadas.length === 0}
-                                  >
-                                    <Trash size={14} />
-                                    Eliminar ({fotosSeleccionadas.length})
+                                    <Trash size={16} />
                                   </button>
                                 </div>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => removeImage(idx)}
+                                  className="absolute top-1 right-1 bg-white bg-opacity-70 text-red-600 rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-opacity-90"
+                                >
+                                  <X size={14} />
+                                </button>
                               )}
                             </div>
-                            {fotosCompletas.length > 0 && (
-                              <span className="text-sm text-gray-300">
-                                {fotosCompletas.length} fotos
-                              </span>
-                            )}
-                          </div>
-                        )}
-                        
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {imagenesPreview.map((preview, index) => {
-                            // Determinar si la imagen es una nueva subida o una existente
-                            const esFotoExistente = index < fotosCompletas.length;
-                            const fotoInfo = esFotoExistente ? fotosCompletas[index] : null;
-                            const tieneId = fotoInfo && fotoInfo.id;
-                            const estaSeleccionada = tieneId && fotosSeleccionadas.includes(fotoInfo.id);
-                            
-                            return (
-                              <div 
-                                key={index} 
-                                className={`relative ${estaSeleccionada ? 'ring-2 ring-blue-500' : ''}`}
-                              >
-                                <img
-                                  src={preview}
-                                  alt={`Vista previa ${index + 1}`}
-                                  className="h-24 w-24 object-cover rounded"
-                                />
-                                
-                                {/* Para imágenes nuevas: Botón para quitar de la lista de subida */}
-                                {!esFotoExistente && (
-                                  <button
-                                    type="button"
-                                    onClick={() => removeImage(index - fotosCompletas.length)}
-                                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 transform translate-x-1/2 -translate-y-1/2"
-                                    title="Quitar imagen"
-                                  >
-                                    <X size={14} />
-                                  </button>
-                                )}
-                                
-                                {/* Para fotos existentes: Botón para seleccionar o eliminar */}
-                                {esFotoExistente && tieneId && (
-                                  modoSeleccion ? (
-                                    <button
-                                      type="button"
-                                      onClick={() => toggleSeleccionFoto(fotoInfo.id)}
-                                      className={`absolute top-0 right-0 ${estaSeleccionada ? 'bg-blue-500' : 'bg-gray-600'} text-white rounded-full p-1 transform translate-x-1/2 -translate-y-1/2`}
-                                      title={estaSeleccionada ? "Deseleccionar foto" : "Seleccionar foto"}
-                                    >
-                                      <Check size={14} />
-                                    </button>
-                                  ) : (
-                                    <button
-                                      type="button"
-                                      onClick={() => handleDeleteFoto(fotoInfo.id, index)}
-                                      disabled={eliminandoFoto}
-                                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 transform translate-x-1/2 -translate-y-1/2"
-                                      title="Eliminar foto permanentemente"
-                                    >
-                                      <Trash size={14} />
-                                    </button>
-                                  )
-                                )}
-                              </div>
-                            );
-                          })}
+                          ))}
                         </div>
                       </div>
                     )}
                   </div>
                   
-                  <div className="flex justify-end gap-2 pt-4 border-t border-emerald-800">
+                  <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 mt-4">
                     <button
                       type="button"
                       onClick={() => setModalOpen(false)}
-                      className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded transition-colors"
+                      className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
                     >
                       Cancelar
                     </button>
