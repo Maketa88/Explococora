@@ -26,8 +26,10 @@ const getMapScript = (id, center, zoom, style, key) => `
         style: '${style}',
         authOptions: {
           authType: 'subscriptionKey',
-          subscriptionKey: '${key}'
-        }
+          subscriptionKey: '${key}',
+          
+        },
+          disableTelemetry: true
       });
       
       map.events.add('ready', function() {
