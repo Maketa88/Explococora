@@ -42,8 +42,8 @@ export const obtenerRuta = async (origen, destino, puntosIntermedio = []) => {
     }
     
     // Formatear coordenadas para la API de Azure Maps
-    const origenStr = `${origen[0]},${origen[1]}`;
-    const destinoStr = `${destino[0]},${destino[1]}`;
+    const origenStr = `${origen[1]},${origen[0]}`;
+    const destinoStr = `${destino[1]},${destino[0]}`;
     
     // Construir cadena de puntos de ruta
     let routePoints = origenStr;
@@ -58,7 +58,7 @@ export const obtenerRuta = async (origen, destino, puntosIntermedio = []) => {
       
       // Añadir los puntos válidos a la cadena
       puntosValidos.forEach(punto => {
-        routePoints += `:${punto[0]},${punto[1]}`;
+        routePoints += `:${punto[1]},${punto[0]}`;
       });
     }
     
