@@ -5,30 +5,30 @@ import guiaEstadoService from '../../services/guiaEstadoService';
 // Configuración de colores y estilos para cada estado - estilo call center como el original
 const ESTADOS_CONFIG = {
   disponible: {
-    color: '#10B981',
-    bgColor: '#D1FAE5',
-    borderColor: '#10B981',
-    buttonClass: 'bg-green-600 hover:bg-green-700',
-    alertClass: 'bg-green-50 border-green-200 text-green-800',
-    icon: <Check className="w-4 h-4" />,
+    color: '#16A34A', // verde-600
+    bgColor: '#DCFCE7', // verde-50
+    borderColor: '#22C55E', // verde-500
+    buttonClass: 'bg-green-500 hover:bg-green-600',
+    alertClass: 'bg-green-50 border-green-200 text-green-700',
+    icon: <Check className="w-4 h-4 text-green-500" />,
     label: 'Disponible'
   },
   ocupado: {
-    color: '#F59E0B',
-    bgColor: '#FEF3C7',
-    borderColor: '#F59E0B',
-    buttonClass: 'bg-yellow-600 hover:bg-yellow-700',
-    alertClass: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-    icon: <BellRing className="w-4 h-4" />,
+    color: '#D97706', // amber-600
+    bgColor: '#FEF3C7', // amber-50
+    borderColor: '#F59E0B', // amber-500
+    buttonClass: 'bg-amber-500 hover:bg-amber-600',
+    alertClass: 'bg-amber-50 border-amber-200 text-amber-700',
+    icon: <BellRing className="w-4 h-4 text-amber-500" />,
     label: 'Ocupado'
   },
   inactivo: {
-    color: '#EF4444',
-    bgColor: '#FEE2E2',
-    borderColor: '#EF4444',
-    buttonClass: 'bg-red-600 hover:bg-red-700',
-    alertClass: 'bg-red-50 border-red-200 text-red-800',
-    icon: <Ban className="w-4 h-4" />,
+    color: '#DC2626', // red-600
+    bgColor: '#FEE2E2', // red-50
+    borderColor: '#EF4444', // red-500
+    buttonClass: 'bg-red-500 hover:bg-red-600',
+    alertClass: 'bg-red-50 border-red-200 text-red-700',
+    icon: <Ban className="w-4 h-4 text-red-500" />,
     label: 'Inactivo'
   }
 };
@@ -197,9 +197,9 @@ const EstadoGuia = ({ cedula, nombre, tamanio = 'normal', onChangeEstado = null 
       <div className="relative">
         <div 
           className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center cursor-pointer ${
-            estado === 'disponible' ? 'bg-green-100 text-green-800' : 
-            estado === 'ocupado' ? 'bg-yellow-100 text-yellow-800' : 
-            'bg-red-100 text-red-800'
+            estado === 'disponible' ? 'bg-green-100 text-green-600' : 
+            estado === 'ocupado' ? 'bg-amber-100 text-amber-600' : 
+            'bg-red-100 text-red-600'
           }`}
           onClick={() => setMostrarSelector(!mostrarSelector)}
         >
@@ -208,20 +208,34 @@ const EstadoGuia = ({ cedula, nombre, tamanio = 'normal', onChangeEstado = null 
         </div>
         
         {mostrarSelector && (
-          <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10">
+          <div className="absolute right-0 mt-1 w-40 bg-white rounded-md shadow-lg z-10 border border-gray-100">
             <div className="py-1">
-              {Object.entries(ESTADOS_CONFIG).map(([estadoKey, estadoConfig]) => (
-                <button 
-                  key={estadoKey}
-                  onClick={() => cambiarEstado(estadoKey)}
-                  className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
-                  style={{ color: estadoConfig.color }}
-                  disabled={estado === estadoKey || cargando}
-                >
-                  <span className="mr-2">{estadoConfig.icon}</span>
-                  {estadoConfig.label}
-                </button>
-              ))}
+              <button 
+                onClick={() => cambiarEstado('disponible')}
+                className="block w-full text-left px-4 py-2 text-sm hover:bg-green-50 flex items-center border-b border-gray-100"
+                disabled={estado === 'disponible' || cargando}
+              >
+                <Check className="w-4 h-4 text-green-500 mr-2" />
+                <span className="text-green-600">Disponible</span>
+              </button>
+              
+              <button 
+                onClick={() => cambiarEstado('ocupado')}
+                className="block w-full text-left px-4 py-2 text-sm hover:bg-amber-50 flex items-center border-b border-gray-100"
+                disabled={estado === 'ocupado' || cargando}
+              >
+                <BellRing className="w-4 h-4 text-amber-500 mr-2" />
+                <span className="text-amber-600">Ocupado</span>
+              </button>
+              
+              <button 
+                onClick={() => cambiarEstado('inactivo')}
+                className="block w-full text-left px-4 py-2 text-sm hover:bg-red-50 flex items-center"
+                disabled={estado === 'inactivo' || cargando}
+              >
+                <Ban className="w-4 h-4 text-red-500 mr-2" />
+                <span className="text-red-600">Inactivo</span>
+              </button>
             </div>
           </div>
         )}
