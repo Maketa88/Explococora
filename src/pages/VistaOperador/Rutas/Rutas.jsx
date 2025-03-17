@@ -1143,23 +1143,6 @@ const Rutas = () => {
     }
   };
 
-  // Añadir botón para verificar respuesta del servidor para diagnóstico
-  const renderDebugButton = () => {
-    // Solo mostrar en ambiente de desarrollo
-    if (process.env.NODE_ENV !== 'production') {
-      return (
-        <button
-          onClick={verificarRespuestaServidor}
-          className="flex items-center gap-1 px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded shadow-sm transition-colors ml-2"
-          title="Verificar estructura de respuesta API"
-        >
-          Debug API
-        </button>
-      );
-    }
-    return null;
-  };
-
   return (
     <DashboardLayout>
       <div className="p-6">
@@ -1217,8 +1200,6 @@ const Rutas = () => {
             >
               <RefreshCw size={18} />
             </button>
-            
-            {renderDebugButton()}
             
             <button
               onClick={() => handleOpenModal()}
