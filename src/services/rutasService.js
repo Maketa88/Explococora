@@ -25,9 +25,7 @@ export const obtenerRutas = async () => {
   }
 };
 
-export default {
-  obtenerRutas,
-};
+
 
 export const obtenerFotosRuta = async (idRuta) => {
   try {
@@ -94,4 +92,62 @@ export const obtenerFotosRuta = async (idRuta) => {
     console.error(`Error al obtener fotos para la ruta ${idRuta}:`, error);
     return [];
   }
+};
+
+/**
+ * Obtiene las coordenadas de una ruta específica
+ * Para efectos de demostración, genera coordenadas ficticias basadas en el ID
+ * En un caso real, estas coordenadas vendrían de la API
+ * @param {number} idRuta - ID de la ruta
+ * @returns {Object} Objeto con coordenadas de inicio, fin y puntos intermedios
+ */
+export const obtenerCoordenadasRuta = async (idRuta) => {
+  try {
+    // En un caso real, harías una petición al backend:
+    // const response = await rutasApi.get(`/rutas/coordenadas/${idRuta}`);
+    // return response.data;
+    
+    // Para efectos de demostración, generamos coordenadas ficticias
+    // El backend debería devolver las coordenadas reales de las rutas
+    
+    // Base centrada en Colombia
+    const baseLatitud = 4.6 + (idRuta % 5) * 0.3;
+    const baseLongitud = -74.1 - (idRuta % 7) * 0.4;
+    
+    // Generar algunos puntos de interés ficticios
+    const puntosInteres = [];
+    const cantidadPuntos = 2 + (idRuta % 3); // 2-4 puntos por ruta
+    
+    for (let i = 0; i < cantidadPuntos; i++) {
+      // Generar punto entre el inicio y fin
+      const factor = (i + 1) / (cantidadPuntos + 1);
+      puntosInteres.push({
+        nombre: `Punto de interés ${i + 1}`,
+        coordenadas: [
+          baseLongitud + (factor * 0.5),
+          baseLatitud + (factor * 0.3)
+        ]
+      });
+    }
+    
+    return {
+      inicio: [baseLongitud, baseLatitud],
+      fin: [baseLongitud + 0.5, baseLatitud + 0.3],
+      puntosInteres: puntosInteres
+    };
+  } catch (error) {
+    console.error(`Error al obtener coordenadas para la ruta ${idRuta}:`, error);
+    // Retornar coordenadas por defecto en caso de error
+    return {
+      inicio: [-74.1, 4.6], // Bogotá
+      fin: [-75.6, 6.2],    // Medellín
+      puntosInteres: []
+    };
+  }
+};
+
+export default {
+  obtenerRutas,
+  obtenerFotosRuta,
+  obtenerCoordenadasRuta
 };
