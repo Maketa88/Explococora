@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Check, BellRing, Ban, X } from 'lucide-react';
 
-// Configuración de estilos para cada estado
+// Configuración de estilos para cada estado - actualizado con los mismos colores de los menús
 const ESTADOS_CONFIG = {
   disponible: {
-    icon: <Check className="w-5 h-5" />,
-    alertClass: 'bg-blue-50 border-blue-200 text-blue-800',
+    icon: <Check className="w-5 h-5 text-green-500" />,
+    alertClass: 'bg-green-50 border-green-200 text-green-700',
     label: 'Disponible'
   },
   ocupado: {
-    icon: <BellRing className="w-5 h-5" />,
-    alertClass: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+    icon: <BellRing className="w-5 h-5 text-amber-500" />,
+    alertClass: 'bg-amber-50 border-amber-200 text-amber-700',
     label: 'Ocupado'
   },
   inactivo: {
-    icon: <Ban className="w-5 h-5" />,
-    alertClass: 'bg-red-50 border-red-200 text-red-800',
+    icon: <Ban className="w-5 h-5 text-red-500" />,
+    alertClass: 'bg-red-50 border-red-200 text-red-700',
     label: 'Inactivo'
   }
 };

@@ -455,28 +455,31 @@ const DashboardLayout = ({ children }) => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden bg-[#f0f9f4]">
-        {/* Top Navigation */}
+        {/* Top Navigation - Mejorado para responsividad */}
         <div className="bg-white sticky top-0 z-10 shadow-sm">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex-1 max-w-xl">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4">
+            {/* Barra de búsqueda adaptativa */}
+            <div className="w-full sm:flex-1 sm:max-w-xl mb-3 sm:mb-0">
               <form onSubmit={handleSearch} className="flex items-center">
                 <input
                   type="text"
                   placeholder="Buscar..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg bg-emerald-50 text-gray-900 border border-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 sm:px-4 py-2 rounded-lg bg-emerald-50 text-gray-900 border border-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm sm:text-base"
                 />
                 <button 
                   type="submit"
                   className="p-2 rounded-lg text-emerald-600 hover:bg-emerald-50"
                 >
-                  <Search className="w-5 h-5" />
+                  <Search className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </form>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="mr-4">
+            
+            {/* Controles de usuario - adaptados para móvil */}
+            <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end">
+              <div className="flex-1 sm:flex-none sm:mr-4">
                 <SelectorEstado 
                   estadoActual={operadorEstado}
                   onCambioEstado={actualizarEstadoHeader}
@@ -485,13 +488,15 @@ const DashboardLayout = ({ children }) => {
                   esPropio={true}
                 />
               </div>
-              <button className="p-2 rounded-lg text-emerald-600 hover:bg-emerald-50">
-                <Bell className="w-5 h-5" />
+              
+              <button className="p-1.5 sm:p-2 rounded-lg text-emerald-600 hover:bg-emerald-50">
+                <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
+              
               <div className="relative">
                 <button 
                   onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                  className="w-10 h-10 rounded-full bg-emerald-100 overflow-hidden cursor-pointer"
+                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-100 overflow-hidden cursor-pointer"
                 >
                   {fotoPerfil ? (
                     <img 
@@ -500,13 +505,13 @@ const DashboardLayout = ({ children }) => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white">
                       {nombreUsuario ? nombreUsuario.charAt(0) : "U"}
                     </div>
                   )}
                 </button>
                 
-                {/* Menú desplegable de perfil */}
+                {/* Menú desplegable de perfil - adaptado para móvil */}
                 {profileMenuOpen && (
                   <div 
                     className="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 

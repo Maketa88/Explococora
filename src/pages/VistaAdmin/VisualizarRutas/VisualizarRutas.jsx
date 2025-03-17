@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import DashboardLayoutAdmin from '../../../layouts/DashboardLayoutAdmin';
 import axios from 'axios';
 import { Pencil, Plus, Trash, Mountain, X, Filter, RefreshCw, Eye, ChevronLeft, ChevronRight, Search } from 'lucide-react';
@@ -30,7 +30,7 @@ const VisualizarRutas = () => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [alert, setAlert] = useState({ show: false, message: '', type: '' });
-  const [token, setToken] = useState(localStorage.getItem('token') || '');
+  const token = localStorage.getItem('token') || '';
   const [isDetailView, setIsDetailView] = useState(false);
   
   // Nuevos estados para manejar las fotos de las rutas en la lista
@@ -682,12 +682,6 @@ const VisualizarRutas = () => {
     }
   };
 
-  // Eliminamos la función de formateo de precio que está causando problemas
-  // y la reemplazamos por una que simplemente devuelve el valor tal cual
-  const mostrarPrecio = (precio) => {
-    return `$ ${precio}`;
-  };
-
   // Modificar la función de búsqueda para incluir precio y dificultad
   const handleBusqueda = (e) => {
     const termino = e.target.value.toLowerCase();
@@ -873,12 +867,12 @@ const VisualizarRutas = () => {
               {rutasFiltradas.map((ruta) => (
                 <div 
                   key={ruta.idRuta || ruta.id} 
-                  className="bg-teal-900 bg-opacity-50 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-teal-900/30 transition-all"
+                  className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md border border-gray-100 transition-all duration-300"
                 >
-                  <div className="h-48 bg-teal-950 relative">
+                  <div className="h-48 bg-gray-100 relative">
                     {cargandoFotos[ruta.idRuta] ? (
-                      <div className="flex justify-center items-center h-full bg-teal-950">
-                        <div className="animate-spin w-8 h-8 border-2 border-teal-300 border-t-transparent rounded-full"></div>
+                      <div className="flex justify-center items-center h-full bg-gray-50">
+                        <div className="animate-spin w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full"></div>
                       </div>
                     ) : rutasConFotos[ruta.idRuta] && rutasConFotos[ruta.idRuta].length > 0 ? (
                       <img
@@ -891,22 +885,22 @@ const VisualizarRutas = () => {
                         }}
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-6xl">{getRouteTypeIcon(ruta.tipo)}</span>
+                      <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                        <span className="text-6xl text-teal-400">{getRouteTypeIcon(ruta.tipo)}</span>
                       </div>
                     )}
                     
                     <div className="absolute top-2 right-2 flex gap-1">
                       <button
                         onClick={() => handleOpenModal(ruta)}
-                        className="p-2 bg-teal-800 bg-opacity-80 hover:bg-teal-700 text-white rounded-full"
+                        className="p-2 bg-gray-700 bg-opacity-80 hover:bg-gray-600 text-white rounded-full"
                         title="Editar ruta"
                       >
                         <Pencil size={16} />
                       </button>
                       <button
                         onClick={() => handleDeleteRuta(ruta.idRuta || ruta.id)}
-                        className="p-2 bg-rose-800 bg-opacity-80 hover:bg-rose-700 text-white rounded-full"
+                        className="p-2 bg-gray-700 bg-opacity-80 hover:bg-gray-600 text-white rounded-full"
                         title="Eliminar ruta"
                       >
                         <Trash size={16} />
@@ -917,44 +911,44 @@ const VisualizarRutas = () => {
                       <span className={`${getDifficultyColor(ruta.dificultad)} text-white text-xs px-2 py-1 rounded-full`}>
                         {ruta.dificultad}
                       </span>
-                      <span className={`${ruta.estado === 'Activa' ? 'bg-green-600' : 'bg-red-600'} text-white text-xs px-2 py-1 rounded-full`}>
+                      <span className={`${ruta.estado === 'Activa' ? 'bg-gray-600' : 'bg-gray-500'} text-white text-xs px-2 py-1 rounded-full`}>
                         {ruta.estado}
                       </span>
                     </div>
                   </div>
                   
                   <div className="p-4">
-                    <h3 className="text-lg font-bold text-white truncate">{ruta.nombreRuta}</h3>
+                    <h3 className="text-lg font-bold text-gray-800 truncate">{ruta.nombreRuta}</h3>
                     
-                    <div className="mt-2 grid grid-cols-2 gap-2 text-sm text-teal-300">
+                    <div className="mt-2 grid grid-cols-2 gap-2 text-sm text-gray-600">
                       <div>
-                        <span className="block text-xs text-teal-400">Duración</span>
+                        <span className="block text-xs text-gray-500 font-medium">Duración</span>
                         <span>{ruta.duracion}</span>
                       </div>
                       <div>
-                        <span className="block text-xs text-teal-400">Tipo</span>
+                        <span className="block text-xs text-gray-500 font-medium">Tipo</span>
                         <span>{ruta.tipo}</span>
                       </div>
                       <div>
-                        <span className="block text-xs text-teal-400">Distancia</span>
+                        <span className="block text-xs text-gray-500 font-medium">Distancia</span>
                         <span>{ruta.distancia} km</span>
                       </div>
                       <div>
-                        <span className="block text-xs text-teal-400">Capacidad</span>
+                        <span className="block text-xs text-gray-500 font-medium">Capacidad</span>
                         <span>{ruta.capacidadMaxima} personas</span>
                       </div>
                     </div>
                     
-                    <div className="mt-3 bg-teal-800 bg-opacity-50 p-2 rounded-lg text-center">
-                      <span className="block text-xs text-teal-300">Precio</span>
-                      <span className="text-white font-semibold">$ {ruta.precio}</span>
+                    <div className="mt-3 bg-gray-100 p-2 rounded-lg text-center">
+                      <span className="block text-xs text-gray-600">Precio</span>
+                      <span className="text-teal-700 font-semibold">$ {ruta.precio}</span>
                     </div>
                     
-                    <p className="mt-3 text-sm text-gray-300 line-clamp-2">{ruta.descripcion}</p>
+                    <p className="mt-3 text-sm text-gray-600 line-clamp-2">{ruta.descripcion || 'Sin descripción disponible'}</p>
                     
                     <button 
                       onClick={() => openDetailView(ruta)}
-                      className="w-full mt-4 px-4 py-2 bg-teal-700 hover:bg-teal-600 text-white rounded flex items-center justify-center gap-2"
+                      className="w-full mt-4 px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded flex items-center justify-center gap-2"
                     >
                       <Eye size={16} />
                       Ver detalles
@@ -979,9 +973,9 @@ const VisualizarRutas = () => {
         {/* Detail View */}
         {isDetailView && activeRoute && (
           <div className="fixed inset-0 bg-black bg-opacity-80 z-30 flex items-center justify-center p-4">
-            <div className="bg-teal-900 rounded-lg w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
+            <div className="bg-white rounded-lg w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
               <div className="relative">
-                <div className="h-64 md:h-80 overflow-hidden bg-teal-950">
+                <div className="h-64 md:h-80 overflow-hidden bg-gray-100">
                   {cargandoFotos[activeRoute.idRuta || activeRoute.id] ? (
                     <div className="flex justify-center items-center h-full">
                       <div className="animate-spin w-8 h-8 border-2 border-teal-300 border-t-transparent rounded-full"></div>
@@ -1011,7 +1005,7 @@ const VisualizarRutas = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-teal-800 to-teal-900 flex items-center justify-center">
+                    <div className="w-full h-full bg-gray-50 flex items-center justify-center">
                       <span className="text-8xl">{getRouteTypeIcon(activeRoute.tipo)}</span>
                     </div>
                   )}
@@ -1045,40 +1039,40 @@ const VisualizarRutas = () => {
               </div>
               
               <div className="p-6 flex-grow overflow-y-auto">
-                <h2 className="text-3xl font-bold text-white mb-3">{activeRoute.nombreRuta}</h2>
+                <h2 className="text-3xl font-bold text-gray-800 mb-3">{activeRoute.nombreRuta}</h2>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  <div className="bg-teal-800 bg-opacity-30 p-3 rounded-lg">
-                    <p className="text-teal-300 text-sm">Duración</p>
-                    <p className="text-white font-semibold">{activeRoute.duracion}</p>
+                  <div className="bg-gray-100 p-3 rounded-lg">
+                    <p className="text-gray-600 text-sm">Duración</p>
+                    <p className="text-gray-800 font-semibold">{activeRoute.duracion}</p>
                   </div>
-                  <div className="bg-teal-800 bg-opacity-30 p-3 rounded-lg">
-                    <p className="text-teal-300 text-sm">Distancia</p>
-                    <p className="text-white font-semibold">{activeRoute.distancia} km</p>
+                  <div className="bg-gray-100 p-3 rounded-lg">
+                    <p className="text-gray-600 text-sm">Distancia</p>
+                    <p className="text-gray-800 font-semibold">{activeRoute.distancia} km</p>
                   </div>
-                  <div className="bg-teal-800 bg-opacity-30 p-3 rounded-lg">
-                    <p className="text-teal-300 text-sm">Capacidad</p>
-                    <p className="text-white font-semibold">{activeRoute.capacidadMaxima} personas</p>
+                  <div className="bg-gray-100 p-3 rounded-lg">
+                    <p className="text-gray-600 text-sm">Capacidad</p>
+                    <p className="text-gray-800 font-semibold">{activeRoute.capacidadMaxima} personas</p>
                   </div>
-                  <div className="bg-teal-800 bg-opacity-30 p-3 rounded-lg">
-                    <p className="text-teal-300 text-sm">Tipo</p>
-                    <p className="text-white font-semibold">{activeRoute.tipo}</p>
+                  <div className="bg-gray-100 p-3 rounded-lg">
+                    <p className="text-gray-600 text-sm">Tipo</p>
+                    <p className="text-gray-800 font-semibold">{activeRoute.tipo}</p>
                   </div>
                 </div>
                 
-                <div className="mb-6 bg-teal-700 bg-opacity-30 p-4 rounded-lg text-center">
-                  <p className="text-teal-300 text-sm mb-1">Precio por persona</p>
-                  <p className="text-white text-2xl font-bold">$ {activeRoute.precio}</p>
+                <div className="mb-6 bg-gray-100 p-4 rounded-lg text-center">
+                  <p className="text-gray-600 text-sm mb-1">Precio por persona</p>
+                  <p className="text-gray-800 text-2xl font-bold">$ {activeRoute.precio}</p>
                 </div>
                 
                 <div className="mb-6">
-                  <h3 className="text-xl font-semibold text-white mb-2">Descripción</h3>
-                  <p className="text-gray-300 leading-relaxed whitespace-pre-line">
+                  <h3 className="text-xl font-semibold text-gray-700 mb-2">Descripción</h3>
+                  <p className="text-gray-600 leading-relaxed whitespace-pre-line">
                     {activeRoute.descripcion}
                   </p>
                 </div>
                 
-                <div className="flex justify-end gap-3 pt-4 border-t border-teal-800">
+                <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
                   <button
                     onClick={() => handleDeleteRuta(activeRoute.idRuta || activeRoute.id)}
                     className="px-4 py-2 bg-rose-500 bg-opacity-80 hover:bg-opacity-100 rounded-lg text-white flex items-center gap-2 transition-colors"
@@ -1143,15 +1137,15 @@ const VisualizarRutas = () => {
         {/* Create/Edit Modal */}
         {modalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-start justify-center p-4 z-40">
-            <div className="bg-teal-900 rounded-lg w-full max-w-md mx-auto mt-20">
+            <div className="bg-white rounded-lg w-full max-w-md mx-auto mt-20">
               <div className="p-6">
-                <h2 className="text-xl font-bold text-white mb-4">
+                <h2 className="text-xl font-bold text-gray-800 mb-4">
                   {isEditing ? 'Modificar Ruta' : 'Nueva Ruta'}
                 </h2>
                 
                 {alert.show && alert.type === 'error' && (
-                  <div className="mb-4 p-3 bg-red-900 bg-opacity-50 rounded">
-                    <p className="text-white text-sm">{alert.message}</p>
+                  <div className="mb-4 p-3 bg-red-100 rounded">
+                    <p className="text-red-700 text-sm">{alert.message}</p>
                   </div>
                 )}
                 
@@ -1161,7 +1155,7 @@ const VisualizarRutas = () => {
                     placeholder="Nombre de la ruta"
                     value={rutaActual.nombreRuta}
                     onChange={handleRouteNameChange}
-                    className={`w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400 ${
+                    className={`w-full p-2 rounded bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400 ${
                       checkRouteNameExists(rutaActual.nombreRuta) ? 'border-2 border-red-500' : ''
                     }`}
                     required
@@ -1171,7 +1165,7 @@ const VisualizarRutas = () => {
                     placeholder="Descripción"
                     value={rutaActual.descripcion}
                     onChange={(e) => setRutaActual({ ...rutaActual, descripcion: e.target.value })}
-                    className="w-full p-2 rounded bg-teal-800 text-white h-32 resize-none focus:outline-none focus:ring-2 focus:ring-teal-400"
+                    className="w-full p-2 rounded bg-gray-100 text-gray-800 h-32 resize-none focus:outline-none focus:ring-2 focus:ring-teal-400"
                     required
                   />
                   
@@ -1181,7 +1175,7 @@ const VisualizarRutas = () => {
                       placeholder="Duración (ej: 2 horas)"
                       value={rutaActual.duracion}
                       onChange={(e) => setRutaActual({ ...rutaActual, duracion: e.target.value })}
-                      className="w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                      className="w-full p-2 rounded bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400"
                       required
                     />
                     <input
@@ -1189,7 +1183,7 @@ const VisualizarRutas = () => {
                       placeholder="Distancia en km"
                       value={rutaActual.distancia}
                       onChange={(e) => setRutaActual({ ...rutaActual, distancia: e.target.value })}
-                      className="w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                      className="w-full p-2 rounded bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400"
                       step="0.1"
                       min="0.1"
                       required
@@ -1202,7 +1196,7 @@ const VisualizarRutas = () => {
                       placeholder="Capacidad máxima"
                       value={rutaActual.capacidadMaxima}
                       onChange={(e) => setRutaActual({ ...rutaActual, capacidadMaxima: e.target.value })}
-                      className="w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                      className="w-full p-2 rounded bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400"
                       min="1"
                       required
                     />
@@ -1210,7 +1204,7 @@ const VisualizarRutas = () => {
                     <select
                       value={rutaActual.dificultad}
                       onChange={(e) => setRutaActual({ ...rutaActual, dificultad: e.target.value })}
-                      className="w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                      className="w-full p-2 rounded bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400"
                       required
                     >
                       <option value="">Nivel de dificultad</option>
@@ -1221,9 +1215,9 @@ const VisualizarRutas = () => {
                   </div>
                   
                   <div className="grid grid-cols-1 gap-2">
-                    <label className="block text-teal-300 text-sm">Precio (COP)</label>
+                    <label className="block text-gray-600 text-sm">Precio (COP)</label>
                     <div className="relative">
-                      <span className="absolute left-2 top-2 text-white">$</span>
+                      <span className="absolute left-2 top-2 text-gray-600">$</span>
                       <input
                         type="text"
                         placeholder="Ingrese el precio"
@@ -1233,7 +1227,7 @@ const VisualizarRutas = () => {
                           const value = e.target.value.replace(/\D/g, '');
                           setRutaActual({ ...rutaActual, precio: value });
                         }}
-                        className="w-full p-2 pl-6 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                        className="w-full p-2 pl-6 rounded bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400"
                         required
                       />
                     </div>
@@ -1242,7 +1236,7 @@ const VisualizarRutas = () => {
                   <select
                     value={rutaActual.tipo}
                     onChange={(e) => setRutaActual({ ...rutaActual, tipo: e.target.value })}
-                    className="w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                    className="w-full p-2 rounded bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400"
                     required
                   >
                     <option value="">Tipo de ruta</option>
@@ -1254,7 +1248,7 @@ const VisualizarRutas = () => {
                   <select
                     value={rutaActual.estado}
                     onChange={(e) => setRutaActual({ ...rutaActual, estado: e.target.value })}
-                    className="w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                    className="w-full p-2 rounded bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400"
                     required
                   >
                     <option value="">Seleccione el estado</option>
@@ -1263,11 +1257,11 @@ const VisualizarRutas = () => {
                   </select>
                   
                   <div className="space-y-2">
-                    <label className="block text-teal-300 text-sm">Imágenes de la ruta (opcional)</label>
+                    <label className="block text-gray-600 text-sm">Imágenes de la ruta (opcional)</label>
                     <input
                       type="file"
                       onChange={handleImageChange}
-                      className="w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                      className="w-full p-2 rounded bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400"
                       accept="image/*"
                       multiple
                     />
@@ -1299,11 +1293,11 @@ const VisualizarRutas = () => {
                     )}
                   </div>
                   
-                  <div className="flex justify-end gap-2 pt-4 border-t border-teal-800">
+                  <div className="flex justify-end gap-2 pt-4 border-t border-gray-200">
                     <button
                       type="button"
                       onClick={() => setModalOpen(false)}
-                      className="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded transition-colors"
+                      className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded transition-colors"
                     >
                       Cancelar
                     </button>

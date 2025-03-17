@@ -959,6 +959,63 @@ const Rutas = () => {
     setRutasFiltradas(resultado);
   };
 
+  // Primero añadir un efecto para controlar la visibilidad del footer
+  useEffect(() => {
+    // Ocultar el footer cuando el modal de detalles está abierto
+    const footer = document.querySelector('footer');
+    const dashboardFooter = document.querySelector('.sticky.bottom-0.border-t.border-emerald-100');
+    const estadoIndicator = document.querySelector('.fixed.bottom-4.right-4.z-50');
+    const toastContainer = document.getElementById('rutas-toast');
+    
+    if (footer) {
+      if (isDetailView) {
+        footer.style.display = 'none';
+      } else {
+        footer.style.display = '';
+      }
+    }
+    
+    if (dashboardFooter) {
+      if (isDetailView) {
+        dashboardFooter.style.display = 'none';
+      } else {
+        dashboardFooter.style.display = '';
+      }
+    }
+    
+    if (estadoIndicator) {
+      if (isDetailView) {
+        estadoIndicator.style.display = 'none';
+      } else {
+        estadoIndicator.style.display = '';
+      }
+    }
+    
+    if (toastContainer) {
+      if (isDetailView) {
+        toastContainer.style.display = 'none';
+      } else {
+        toastContainer.style.display = '';
+      }
+    }
+    
+    // Limpieza al desmontar
+    return () => {
+      if (footer) {
+        footer.style.display = '';
+      }
+      if (dashboardFooter) {
+        dashboardFooter.style.display = '';
+      }
+      if (estadoIndicator) {
+        estadoIndicator.style.display = '';
+      }
+      if (toastContainer) {
+        toastContainer.style.display = '';
+      }
+    };
+  }, [isDetailView]);
+
   return (
     <DashboardLayout>
       <div className="p-6">
@@ -1242,13 +1299,13 @@ const Rutas = () => {
         
         {/* Detail View */}
         {isDetailView && activeRoute && (
-          <div className="fixed inset-0 bg-black bg-opacity-80 z-30 flex items-center justify-center p-4">
-            <div className="bg-emerald-900 rounded-lg w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
+          <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-30 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
               <div className="relative">
-                <div className="h-64 md:h-80 overflow-hidden bg-emerald-950">
+                <div className="h-64 md:h-80 overflow-hidden bg-emerald-50">
                   {cargandoFotos[activeRoute.idRuta || activeRoute.id] ? (
                     <div className="flex justify-center items-center h-full">
-                      <div className="animate-spin w-8 h-8 border-2 border-emerald-300 border-t-transparent rounded-full"></div>
+                      <div className="animate-spin w-8 h-8 border-2 border-emerald-400 border-t-transparent rounded-full"></div>
                     </div>
                   ) : (rutasConFotos[activeRoute.idRuta || activeRoute.id]?.length > 0 || imagenesPreview.length > 0) ? (
                     <div className="relative h-full">
@@ -1270,31 +1327,13 @@ const Rutas = () => {
                                 e.target.src = 'https://via.placeholder.com/800x400?text=Imagen+no+disponible';
                               }}
                             />
-                            
-                            {/* Añadir el botón de eliminar sobre la imagen con efecto mejorado */}
-                            {fotosCompletas.length > 0 && (
-                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200">
-                                <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation(); // Evitar que se abra el lightbox
-                                    confirmarEliminarFoto(fotosCompletas[idx].idFoto || fotosCompletas[idx].id, idx);
-                                  }}
-                                  className="z-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition-all duration-200 hover:scale-110 shadow-lg"
-                                  title="Eliminar foto"
-                                >
-                                  <Trash size={18} />
-                                </button>
-                              </div>
-                            )}
                           </div>
                         ))}
                       </div>
                     </div>
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-emerald-800 to-emerald-900 flex items-center justify-center">
-                      <span className="text-8xl">{getRouteTypeIcon(activeRoute.tipo)}</span>
+                    <div className="w-full h-full bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center">
+                      <span className="text-8xl text-emerald-300">{getRouteTypeIcon(activeRoute.tipo)}</span>
                     </div>
                   )}
                 </div>
@@ -1302,68 +1341,68 @@ const Rutas = () => {
                 {/* Close button */}
                 <button
                   onClick={closeDetailView}
-                  className="absolute top-4 right-4 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
+                  className="absolute top-4 right-4 bg-white bg-opacity-80 text-emerald-700 p-2 rounded-full hover:bg-opacity-100 transition-all shadow-md"
                 >
                   <X size={20} />
                 </button>
                 
                 {/* Route type and difficulty */}
                 <div className="absolute bottom-4 left-4 flex gap-2">
-                  <span className={`${getDifficultyColor(activeRoute.dificultad)} px-3 py-1 rounded-full flex items-center gap-1.5 text-white`}>
+                  <span className={`${getDifficultyColor(activeRoute.dificultad)} px-3 py-1 rounded-full flex items-center gap-1.5 text-white shadow-sm`}>
                     <Mountain size={16} />
                     {activeRoute.dificultad}
                   </span>
-                  <span className="bg-emerald-700 text-white px-3 py-1 rounded-full">
+                  <span className="bg-emerald-500 text-white px-3 py-1 rounded-full shadow-sm">
                     {activeRoute.tipo}
                   </span>
                 </div>
                 
                 {/* Status badge */}
                 <div className="absolute bottom-4 right-4">
-                  <span className={`${activeRoute.estado === 'Activa' ? 'bg-green-500' : 'bg-red-500'} text-white px-3 py-1 rounded-full`}>
+                  <span className={`${activeRoute.estado === 'Activa' ? 'bg-green-500' : 'bg-red-500'} text-white px-3 py-1 rounded-full shadow-sm`}>
                     {activeRoute.estado}
                   </span>
                 </div>
               </div>
               
-              <div className="p-6 flex-grow overflow-y-auto">
-                <h2 className="text-3xl font-bold text-white mb-3">{activeRoute.nombreRuta}</h2>
+              <div className="p-6 flex-grow overflow-y-auto bg-white">
+                <h2 className="text-3xl font-bold text-emerald-700 mb-3">{activeRoute.nombreRuta}</h2>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  <div className="bg-emerald-800 bg-opacity-30 p-3 rounded-lg">
-                    <p className="text-emerald-300 text-sm">Duración</p>
-                    <p className="text-white font-semibold">{activeRoute.duracion}</p>
+                  <div className="bg-emerald-50 p-3 rounded-lg">
+                    <p className="text-emerald-600 text-sm">Duración</p>
+                    <p className="text-emerald-800 font-semibold">{activeRoute.duracion}</p>
                   </div>
-                  <div className="bg-emerald-800 bg-opacity-30 p-3 rounded-lg">
-                    <p className="text-emerald-300 text-sm">Distancia</p>
-                    <p className="text-white font-semibold">{activeRoute.distancia} km</p>
+                  <div className="bg-emerald-50 p-3 rounded-lg">
+                    <p className="text-emerald-600 text-sm">Distancia</p>
+                    <p className="text-emerald-800 font-semibold">{activeRoute.distancia} km</p>
                   </div>
-                  <div className="bg-emerald-800 bg-opacity-30 p-3 rounded-lg">
-                    <p className="text-emerald-300 text-sm">Capacidad</p>
-                    <p className="text-white font-semibold">{activeRoute.capacidadMaxima} personas</p>
+                  <div className="bg-emerald-50 p-3 rounded-lg">
+                    <p className="text-emerald-600 text-sm">Capacidad</p>
+                    <p className="text-emerald-800 font-semibold">{activeRoute.capacidadMaxima} personas</p>
                   </div>
-                  <div className="bg-emerald-800 bg-opacity-30 p-3 rounded-lg">
-                    <p className="text-emerald-300 text-sm">Tipo</p>
-                    <p className="text-white font-semibold">{activeRoute.tipo}</p>
+                  <div className="bg-emerald-50 p-3 rounded-lg">
+                    <p className="text-emerald-600 text-sm">Tipo</p>
+                    <p className="text-emerald-800 font-semibold">{activeRoute.tipo}</p>
                   </div>
                 </div>
                 
-                <div className="mb-6 bg-emerald-700 bg-opacity-30 p-4 rounded-lg text-center">
-                  <p className="text-emerald-300 text-sm mb-1">Precio por persona</p>
-                  <p className="text-white text-2xl font-bold">$ {activeRoute.precio}</p>
+                <div className="mb-6 bg-emerald-100 p-4 rounded-lg text-center">
+                  <p className="text-emerald-600 text-sm mb-1">Precio por persona</p>
+                  <p className="text-emerald-800 text-2xl font-bold">$ {activeRoute.precio}</p>
                 </div>
                 
                 <div className="mb-6">
-                  <h3 className="text-xl font-semibold text-white mb-2">Descripción</h3>
-                  <p className="text-gray-300 leading-relaxed whitespace-pre-line">
+                  <h3 className="text-xl font-semibold text-emerald-700 mb-2">Descripción</h3>
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-line">
                     {activeRoute.descripcion}
                   </p>
                 </div>
                 
-                <div className="flex justify-end gap-3 pt-4 border-t border-emerald-800">
+                <div className="flex justify-end gap-3 pt-4 border-t border-emerald-100">
                   <button
                     onClick={() => handleDeleteRuta(activeRoute)}
-                    className="px-4 py-2 bg-rose-500 bg-opacity-80 hover:bg-opacity-100 rounded-lg text-white flex items-center gap-2 transition-colors"
+                    className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white flex items-center gap-2 transition-colors shadow-sm"
                   >
                     <Trash size={16} />
                     Eliminar
@@ -1373,7 +1412,7 @@ const Rutas = () => {
                       closeDetailView();
                       handleOpenModal(activeRoute);
                     }}
-                    className="px-4 py-2 bg-emerald-500 bg-opacity-80 hover:bg-opacity-100 rounded-lg text-white flex items-center gap-2 transition-colors"
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-white flex items-center gap-2 transition-colors shadow-sm"
                   >
                     <Pencil size={16} />
                     Editar
@@ -1386,37 +1425,39 @@ const Rutas = () => {
         
         {/* Lightbox Modal */}
         {lightboxOpen && (
-          <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm z-50 flex items-center justify-center">
             <div className="absolute inset-0 flex items-center justify-center">
               <img 
                 src={imagenesPreview[lightboxIndex]} 
                 alt="Vista ampliada"
-                className="max-h-[90vh] max-w-[90vw] object-contain"
+                className="max-h-[90vh] max-w-[90vw] object-contain rounded shadow-2xl"
               />
             </div>
             
             <button
               onClick={() => setLightboxOpen(false)}
-              className="absolute top-4 right-4 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
+              className="absolute top-4 right-4 bg-white bg-opacity-80 text-emerald-700 p-2 rounded-full hover:bg-opacity-100 transition-all shadow-md"
             >
               <X size={24} />
             </button>
             
             <button
               onClick={() => navigateLightbox(-1)}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 text-emerald-700 p-3 rounded-full hover:bg-opacity-100 transition-all shadow-md"
+              disabled={lightboxIndex === 0}
             >
               <ChevronLeft size={24} />
             </button>
             
             <button
               onClick={() => navigateLightbox(1)}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 text-emerald-700 p-3 rounded-full hover:bg-opacity-100 transition-all shadow-md"
+              disabled={lightboxIndex === imagenesPreview.length - 1}
             >
               <ChevronRight size={24} />
             </button>
             
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-4 py-2 rounded-full">
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-80 text-emerald-800 px-4 py-2 rounded-full shadow-md">
               {lightboxIndex + 1} de {imagenesPreview.length}
             </div>
           </div>
@@ -1582,47 +1623,6 @@ const Rutas = () => {
                     <div className="text-xs text-gray-500 mt-1">
                       Puedes seleccionar múltiples imágenes a la vez
                     </div>
-                    
-                    {/* Display image previews with remove option and delete button for existing photos */}
-                    {imagenesPreview.length > 0 && (
-                      <div className="space-y-2 mt-3">
-                        <p className="text-sm text-gray-600">{imagenesPreview.length} imágenes</p>
-                        
-                        <div className="grid grid-cols-3 gap-2 mt-2">
-                          {imagenesPreview.map((url, idx) => (
-                            <div key={idx} className="relative group h-24 rounded overflow-hidden border border-emerald-100">
-                              <img src={url} alt={`Imagen ${idx + 1}`} className="h-full w-full object-cover" />
-                              
-                              {/* Para fotos existentes (en la base de datos) */}
-                              {idx < fotosCompletas.length ? (
-                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200">
-                                  <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation(); // Evitar que se abra el lightbox
-                                      confirmarEliminarFoto(fotosCompletas[idx].idFoto || fotosCompletas[idx].id, idx);
-                                    }}
-                                    className="z-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 transition-all duration-200 hover:scale-110 shadow-lg"
-                                    title="Eliminar foto"
-                                  >
-                                    <Trash size={16} />
-                                  </button>
-                                </div>
-                              ) : (
-                                <button
-                                  type="button"
-                                  onClick={() => removeImage(idx)}
-                                  className="absolute top-1 right-1 bg-white bg-opacity-70 text-red-600 rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-opacity-90"
-                                >
-                                  <X size={14} />
-                                </button>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
                   
                   <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 mt-4">

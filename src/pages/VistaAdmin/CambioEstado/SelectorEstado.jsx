@@ -86,7 +86,7 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
 
   const cambiarEstado = async (nuevoEstado) => {
     try {
-      let url = 'http://localhost:10101/usuarios/cambiar-estado';
+      const url = 'http://localhost:10101/usuarios/cambiar-estado';
       let data = { nuevoEstado };
       
       // Si es admin cambiando su propio estado
@@ -96,9 +96,9 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
       // Si es admin cambiando el estado de otro usuario
       else if (esAdmin && !esPropio) {
         if (cedula) {
-          url = `http://localhost:10101/usuarios/cambiar-estado/cedula/${cedula}`;
+          data.cedula = cedula;
         } else if (id) {
-          url = `http://localhost:10101/usuarios/cambiar-estado/id/${id}`;
+          data.id = id;
         } else {
           throw new Error("Se requiere cédula o ID para cambiar el estado");
         }
@@ -108,9 +108,8 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
         if (!cedula) {
           throw new Error("Se requiere cédula para cambiar el estado");
         }
-        data.cedula = cedula; // Guía y operador usan cédula
+        data.cedula = cedula;
       }
-      
       
       const response = await axios.patch(url, data, {
         headers: {
