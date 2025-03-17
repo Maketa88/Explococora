@@ -173,23 +173,23 @@ const EliminarCuentaGuia = () => {
   return (
     <DashboardLayoutGuia>
       <div className="p-6">
-        <div className="bg-teal-900 rounded-lg p-8 shadow-lg max-w-3xl mx-auto">
+        <div className="bg-white rounded-lg p-8 shadow-lg max-w-3xl mx-auto border border-emerald-100">
           <div className="flex items-center mb-8">
             <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center mr-4">
               <Trash2 className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-3xl font-bold text-white">
+            <h2 className="text-3xl font-bold text-emerald-800">
               Eliminar Cuenta
             </h2>
           </div>
           
           <AlertComponent />
           
-          <div className="mb-6 text-white">
+          <div className="mb-6 text-gray-700">
             <p className="text-lg">
               Esta acción eliminará permanentemente su cuenta y todos los datos asociados.
             </p>
-            <ul className="list-disc pl-5 mt-2 text-white opacity-90">
+            <ul className="list-disc pl-5 mt-2 text-gray-600 opacity-90">
               <li>Perderá acceso a todos sus datos y configuraciones personales</li>
               <li>No podrá recuperar su cuenta después de eliminarla</li>
               <li>Las rutas asignadas deberán ser reasignadas a otro guía</li>
@@ -199,7 +199,7 @@ const EliminarCuentaGuia = () => {
           <form onSubmit={handleSubmit}>
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium mb-2 text-white">
+                <label className="block text-sm font-medium mb-2 text-gray-700">
                   Cédula
                 </label>
                 <input
@@ -207,13 +207,13 @@ const EliminarCuentaGuia = () => {
                   name="cedula"
                   value={formData.cedula}
                   onChange={handleInputChange}
-                  className="w-full p-3 rounded-lg bg-teal-800 text-white border border-teal-600"
+                  className="w-full p-3 rounded-lg bg-emerald-50 text-gray-900 border border-emerald-100"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-2 text-white">
+                <label className="block text-sm font-medium mb-2 text-gray-700">
                   Contraseña
                 </label>
                 <div className="relative">
@@ -222,13 +222,13 @@ const EliminarCuentaGuia = () => {
                     name="contrasena"
                     value={formData.contrasena}
                     onChange={handleInputChange}
-                    className="w-full p-3 rounded-lg bg-teal-800 text-white border border-teal-600"
+                    className="w-full p-3 rounded-lg bg-emerald-50 text-gray-900 border border-emerald-100"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-teal-300 hover:text-white"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-emerald-600 hover:text-emerald-800"
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
@@ -236,10 +236,10 @@ const EliminarCuentaGuia = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-2 text-white">
+                <label className="block text-sm font-medium mb-2 text-gray-700">
                   Confirmar eliminación
                 </label>
-                <p className="text-sm mb-2 text-white opacity-80">
+                <p className="text-sm mb-2 text-gray-600 opacity-80">
                   Para confirmar, escriba "eliminar mi cuenta" en el campo a continuación
                 </p>
                 <input
@@ -247,7 +247,7 @@ const EliminarCuentaGuia = () => {
                   name="confirmacion"
                   value={formData.confirmacion}
                   onChange={handleInputChange}
-                  className="w-full p-3 rounded-lg bg-teal-800 text-white border border-teal-600"
+                  className="w-full p-3 rounded-lg bg-emerald-50 text-gray-900 border border-emerald-100"
                   required
                   placeholder="eliminar mi cuenta"
                 />
@@ -259,7 +259,7 @@ const EliminarCuentaGuia = () => {
               <button
                 type="button"
                 onClick={() => navigate("/VistaGuia/PerfilGuia")}
-                className="py-2 px-6 bg-teal-700 hover:bg-teal-600 text-white rounded-lg flex items-center gap-2"
+                className="py-2 px-6 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg flex items-center gap-2"
               >
                 <ArrowLeft className="w-5 h-5" />
                 Cancelar
@@ -271,7 +271,7 @@ const EliminarCuentaGuia = () => {
                 className={`py-2 px-6 ${
                   confirmacionValida && formData.contrasena && formData.cedula
                     ? 'bg-red-600 hover:bg-red-700'
-                    : 'bg-teal-500'
+                    : 'bg-gray-500'
                 } text-white rounded-lg flex items-center gap-2 ${
                   (submitting || !confirmacionValida || !formData.contrasena || !formData.cedula)
                     ? 'opacity-70 cursor-not-allowed'
@@ -296,7 +296,7 @@ const EliminarCuentaGuia = () => {
             </div>
             
             {countdown !== null && (
-              <div className="mt-4 text-center text-white">
+              <div className="mt-4 text-center text-gray-700">
                 Redirigiendo en {countdown} segundos...
               </div>
             )}
