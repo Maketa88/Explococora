@@ -305,7 +305,7 @@ const Rutas = () => {
     return "Error desconocido al procesar la solicitud";
   };
 
-  // También necesitamos actualizar la función uploadImages para asegurarnos de que funcione correctamente
+  // Mejora en la función uploadImages
   const uploadImages = async (rutaId) => {
     try {
       console.log(`Subiendo ${imagenes.length} imágenes para la ruta ${rutaId}`);
@@ -337,6 +337,24 @@ const Rutas = () => {
       );
       
       console.log('Respuesta de subida:', response.data);
+      
+      // Mejorar manejo después de subir
+      if (response.data && response.data.fotos) {
+        // Actualizar los estados locales con las nuevas fotos
+        const nuevasFotos = Array.isArray(response.data.fotos) ? response.data.fotos : [response.data.fotos];
+        
+        console.log('Nuevas fotos subidas:', nuevasFotos);
+        
+        // Actualizar el estado de rutasConFotos con las nuevas fotos
+        setRutasConFotos(prev => {
+          const fotosPrevias = prev[rutaId] || [];
+          return {
+            ...prev,
+            [rutaId]: [...fotosPrevias, ...nuevasFotos]
+          };
+        });
+      }
+      
       toast.success('Imágenes subidas correctamente', {
         position: "top-right",
         autoClose: 3000,
@@ -344,8 +362,8 @@ const Rutas = () => {
         theme: "colored"
       });
       
-      // Recargar la página para mostrar las nuevas imágenes
-      fetchRutas();
+      // Recargar explícitamente las fotos para esta ruta específica en lugar de todas las rutas
+      await obtenerFotosRuta(rutaId);
       
       return true;
     } catch (error) {
@@ -485,35 +503,81 @@ const Rutas = () => {
     }
   };
 
-  // Mantener la función para eliminar una foto después de confirmar
+  // Mejorar la función para eliminar fotos
   const eliminarFotoConfirmada = async (idFoto) => {
     try {
       setIsProcessing(true);
       setConfirmacionEliminar({ ...confirmacionEliminar, mostrar: false });
+      
+      console.log('Intentando eliminar foto con ID:', idFoto);
+      
+      // Guardar referencia a la ruta actual antes de eliminar
+      const rutaId = activeRoute ? (activeRoute.idRuta || activeRoute.id) : null;
       
       // Llamar al endpoint para eliminar la foto
       const response = await axiosWithAuth.delete(`http://localhost:10101/rutas/foto/${idFoto}`);
       
       console.log('Respuesta de eliminación de foto:', response.data);
       
-      // Corregir la lógica para actualizar el estado de las fotos
-      // Primero filtramos por ID o idFoto
-      setFotosCompletas(prevFotos => 
-        prevFotos.filter(foto => 
-          (foto.id !== idFoto) && (foto.idFoto !== idFoto)
-        )
-      );
-      
-      // Encontrar el índice correcto para eliminar la vista previa
-      const indexToRemove = fotosCompletas.findIndex(foto => 
-        foto.id === idFoto || foto.idFoto === idFoto
-      );
-      
-      // Solo actualizar las previsualizaciones si encontramos la foto
-      if (indexToRemove >= 0) {
-        setImagenesPreview(prevPreview => 
-          prevPreview.filter((_, i) => i !== indexToRemove)
-        );
+      // Actualizar estados locales después de eliminar
+      if (rutaId) {
+        console.log(`Actualizando fotos para la ruta ${rutaId} después de eliminar`);
+        
+        // Actualizar fotosCompletas filtrando por ID
+        setFotosCompletas(prevFotos => {
+          const fotosActualizadas = prevFotos.filter(foto => {
+            // Comparar como string para evitar problemas de tipo
+            const fotoId = foto.id?.toString() || foto.idFoto?.toString();
+            return fotoId !== idFoto.toString();
+          });
+          console.log('Fotos completas actualizadas:', fotosActualizadas);
+          return fotosActualizadas;
+        });
+        
+        // Actualizar rutasConFotos para esta ruta específica
+        setRutasConFotos(prev => {
+          if (!prev[rutaId]) return prev;
+          
+          // Encontrar el índice de la foto a eliminar
+          const fotosActuales = prev[rutaId];
+          // Asumimos que la posición en el array es la misma que en fotosCompletas
+          const indexToRemove = fotosCompletas.findIndex(foto => {
+            const fotoId = foto.id?.toString() || foto.idFoto?.toString();
+            return fotoId === idFoto.toString();
+          });
+          
+          if (indexToRemove === -1) return prev;
+          
+          const nuevasFotos = [
+            ...fotosActuales.slice(0, indexToRemove),
+            ...fotosActuales.slice(indexToRemove + 1)
+          ];
+          
+          console.log('Fotos de ruta actualizadas:', nuevasFotos);
+          
+          return {
+            ...prev,
+            [rutaId]: nuevasFotos
+          };
+        });
+        
+        // Actualizar imagenesPreview
+        setImagenesPreview(prevPreview => {
+          const indexToRemove = fotosCompletas.findIndex(foto => {
+            const fotoId = foto.id?.toString() || foto.idFoto?.toString();
+            return fotoId === idFoto.toString();
+          });
+          
+          if (indexToRemove === -1) return prevPreview;
+          
+          return [
+            ...prevPreview.slice(0, indexToRemove),
+            ...prevPreview.slice(indexToRemove + 1)
+          ];
+        });
+        
+        // Recargar fotos específicamente para esta ruta
+        await obtenerFotosRuta(rutaId);
       }
       
       // Cerrar el modal si está abierto
@@ -529,9 +593,6 @@ const Rutas = () => {
         theme: "colored"
       });
       
-      // Recargar la página para mostrar los cambios
-      fetchRutas();
-      
     } catch (error) {
       console.error('Error al eliminar foto:', error);
       toast.error('Error al eliminar foto: ' + extractErrorMessage(error), {
@@ -543,6 +604,15 @@ const Rutas = () => {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  // Añadir esta función para depurar IDs de fotos
+  const debugPhotoInfo = (foto) => {
+    console.log('Información de foto:', {
+      id: foto.id,
+      idFoto: foto.idFoto,
+      url: foto.foto
+    });
   };
 
   // Función para eliminar una ruta (actualizada)
@@ -793,8 +863,15 @@ const Rutas = () => {
 
   // Función para eliminar una imagen de la vista previa
   const removeImage = (index) => {
-    setImagenesPreview(prev => prev.filter((_, i) => i !== index));
-    setImagenes(prev => prev.filter((_, i) => i !== index));
+    // Si es una imagen existente con ID, confirmar eliminación
+    if (fotosCompletas[index] && (fotosCompletas[index].id || fotosCompletas[index].idFoto)) {
+      const idFoto = fotosCompletas[index].id || fotosCompletas[index].idFoto;
+      confirmarEliminarFoto(idFoto, index);
+    } else {
+      // Si es una imagen nueva que aún no se ha subido, simplemente eliminarla del estado
+      setImagenesPreview(prev => prev.filter((_, i) => i !== index));
+      setImagenes(prev => prev.filter((_, i) => i !== index));
+    }
   };
 
   // Función para verificar si el nombre de la ruta ya existe
@@ -1015,6 +1092,56 @@ const Rutas = () => {
       }
     };
   }, [isDetailView]);
+
+  // Añadir esta función al componente
+  const verificarRespuestaServidor = async () => {
+    try {
+      // Prueba obtener una ruta específica para verificar la estructura
+      const rutaId = rutas.length > 0 ? (rutas[0].idRuta || rutas[0].id) : null;
+      
+      if (!rutaId) {
+        console.error('No hay rutas disponibles para verificar');
+        return;
+      }
+      
+      console.log(`Verificando estructura de datos para la ruta ${rutaId}...`);
+      
+      // Probar los diferentes endpoints
+      const respuestaRuta = await axios.get(`http://localhost:10101/rutas/${rutaId}`);
+      console.log('Estructura de respuesta de ruta individual:', respuestaRuta.data);
+      
+      const respuestaFotos = await axios.get(`http://localhost:10101/rutas/fotos/${rutaId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      console.log('Estructura de respuesta de fotos:', respuestaFotos.data);
+      
+      // Mostrar resultados detallados en consola
+      console.log('=== ANÁLISIS DE ESTRUCTURA DE RESPUESTA ===');
+      
+      if (respuestaFotos.data) {
+        console.log('Tipo de respuesta fotos:', typeof respuestaFotos.data);
+        if (respuestaFotos.data.fotos) {
+          console.log('Tipo de fotos:', typeof respuestaFotos.data.fotos);
+          console.log('Es array:', Array.isArray(respuestaFotos.data.fotos));
+          
+          if (Array.isArray(respuestaFotos.data.fotos) && respuestaFotos.data.fotos.length > 0) {
+            console.log('Primer elemento:', respuestaFotos.data.fotos[0]);
+            console.log('Tipo del primer elemento:', typeof respuestaFotos.data.fotos[0]);
+          }
+        }
+      }
+      
+      toast.info('Verificación de estructura completada. Revisa la consola', {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast"
+      });
+    } catch (error) {
+      console.error('Error al verificar estructura:', error);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -1318,7 +1445,7 @@ const Rutas = () => {
                             className="h-full min-w-[300px] relative group cursor-pointer"
                           >
                             <img
-                              src={foto}
+                              src={typeof foto === 'string' ? foto : foto.foto}
                               alt={`${activeRoute.nombreRuta} - imagen ${idx + 1}`}
                               className="h-full w-full object-cover rounded"
                               onClick={() => openLightbox(idx)}
@@ -1327,6 +1454,29 @@ const Rutas = () => {
                                 e.target.src = 'https://via.placeholder.com/800x400?text=Imagen+no+disponible';
                               }}
                             />
+                            
+                            {/* Botón para eliminar foto */}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // Determinar el ID de la foto para eliminar
+                                let idFoto;
+                                if (fotosCompletas[idx]) {
+                                  // Imprimir info para depurar
+                                  debugPhotoInfo(fotosCompletas[idx]);
+                                  idFoto = fotosCompletas[idx].id || fotosCompletas[idx].idFoto;
+                                }
+                                if (idFoto) {
+                                  confirmarEliminarFoto(idFoto, idx);
+                                } else {
+                                  console.error('No se pudo determinar el ID de la foto a eliminar');
+                                  toast.error('No se pudo identificar esta imagen para eliminar');
+                                }
+                              }}
+                              className="absolute top-2 right-2 bg-white bg-opacity-80 p-1.5 rounded-full text-red-600 hover:bg-red-100 transition-all opacity-0 group-hover:opacity-100"
+                            >
+                              <Trash size={16} />
+                            </button>
                           </div>
                         ))}
                       </div>
@@ -1387,7 +1537,7 @@ const Rutas = () => {
                   </div>
                 </div>
                 
-                <div className="mb-6 bg-emerald-100 p-4 rounded-lg text-center">
+                <div className="mb-6 bg-emerald-100 p-4 rounded-lg text-center border border-emerald-100 shadow-sm">
                   <p className="text-emerald-600 text-sm mb-1">Precio por persona</p>
                   <p className="text-emerald-800 text-2xl font-bold">$ {activeRoute.precio}</p>
                 </div>
@@ -1623,6 +1773,32 @@ const Rutas = () => {
                     <div className="text-xs text-gray-500 mt-1">
                       Puedes seleccionar múltiples imágenes a la vez
                     </div>
+                    
+                    {/* Mostrar imágenes actuales */}
+                    {imagenesPreview.length > 0 && (
+                      <div className="mt-4">
+                        <p className="text-sm text-gray-600 mb-2">Imágenes actuales:</p>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {imagenesPreview.map((imagen, index) => (
+                            <div key={index} className="relative group">
+                              <img
+                                src={typeof imagen === 'string' ? imagen : URL.createObjectURL(imagen)}
+                                alt={`Vista previa ${index + 1}`}
+                                className="w-full h-24 object-cover rounded border border-emerald-200"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeImage(index)}
+                                className="absolute top-1 right-1 bg-white bg-opacity-80 text-red-500 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                title="Eliminar imagen"
+                              >
+                                <Trash size={16} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 mt-4">

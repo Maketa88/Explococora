@@ -366,8 +366,8 @@ const ActualizarDatosGuia = () => {
     const nombreCompleto = `${formData.primerNombre} ${formData.segundoNombre} ${formData.primerApellido} ${formData.segundoApellido}`.trim();
 
     return (
-      <div className="bg-teal-900 rounded-lg p-6 shadow-lg">
-        <h2 className="text-2xl font-bold mb-6 text-white">Actualizar Información Personal</h2>
+      <div className="bg-white rounded-lg p-6 shadow-lg border border-emerald-100">
+        <h2 className="text-2xl font-bold mb-6 text-emerald-800">Actualizar Información Personal</h2>
         
         {error && (
           <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
@@ -379,7 +379,7 @@ const ActualizarDatosGuia = () => {
           {/* Sección para foto de perfil */}
           <div className="flex flex-col items-center mb-8">
             <div className="relative">
-              <div className="w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-teal-500">
+              <div className="w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-emerald-500">
                 {previewFoto ? (
                   <img
                     src={previewFoto}
@@ -387,11 +387,11 @@ const ActualizarDatosGuia = () => {
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = 'https://ui-avatars.com/api/?name=User&background=0D9488&color=fff';
+                      e.target.src = 'https://ui-avatars.com/api/?name=User&background=059669&color=fff';
                     }}
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-teal-700 text-white">
+                  <div className="w-full h-full flex items-center justify-center bg-emerald-600 text-white">
                     <User size={64} />
                   </div>
                 )}
@@ -400,7 +400,7 @@ const ActualizarDatosGuia = () => {
               <button
                 type="button"
                 onClick={handleSelectFoto}
-                className="absolute bottom-2 right-0 p-2 rounded-full bg-teal-600 hover:bg-teal-700 text-white shadow-lg"
+                className="absolute bottom-2 right-0 p-2 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg"
               >
                 <Edit size={20} />
               </button>
@@ -414,14 +414,14 @@ const ActualizarDatosGuia = () => {
               className="hidden"
             />
             
-            <p className="text-sm mt-2 text-white">
+            <p className="text-sm mt-2 text-gray-600">
               Haz clic en el icono para cambiar tu foto
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block mb-2 text-sm font-medium text-white">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Primer Nombre *
               </label>
               <input
@@ -430,12 +430,12 @@ const ActualizarDatosGuia = () => {
                 value={formData.primerNombre}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg border bg-teal-800 border-teal-600 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-4 py-2 rounded-lg border border-emerald-100 bg-emerald-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             
             <div>
-              <label className="block mb-2 text-sm font-medium text-white">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Segundo Nombre
               </label>
               <input
@@ -443,12 +443,12 @@ const ActualizarDatosGuia = () => {
                 name="segundoNombre"
                 value={formData.segundoNombre}
                 onChange={handleChange}
-                className="w-full px-4 py-2 rounded-lg border bg-teal-800 border-teal-600 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-4 py-2 rounded-lg border border-emerald-100 bg-emerald-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             
             <div>
-              <label className="block mb-2 text-sm font-medium text-white">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Primer Apellido *
               </label>
               <input
@@ -457,12 +457,12 @@ const ActualizarDatosGuia = () => {
                 value={formData.primerApellido}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg border bg-teal-800 border-teal-600 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-4 py-2 rounded-lg border border-emerald-100 bg-emerald-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             
             <div>
-              <label className="block mb-2 text-sm font-medium text-white">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Segundo Apellido
               </label>
               <input
@@ -470,13 +470,13 @@ const ActualizarDatosGuia = () => {
                 name="segundoApellido"
                 value={formData.segundoApellido}
                 onChange={handleChange}
-                className="w-full px-4 py-2 rounded-lg border bg-teal-800 border-teal-600 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-4 py-2 rounded-lg border border-emerald-100 bg-emerald-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             
             <div>
-              <label className="block mb-2 text-sm font-medium text-white">
-                Correo Electrónico *
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                Correo electrónico *
               </label>
               <input
                 type="email"
@@ -484,12 +484,12 @@ const ActualizarDatosGuia = () => {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg border bg-teal-800 border-teal-600 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-4 py-2 rounded-lg border border-emerald-100 bg-emerald-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             
             <div>
-              <label className="block mb-2 text-sm font-medium text-white">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Teléfono *
               </label>
               <input
@@ -498,12 +498,12 @@ const ActualizarDatosGuia = () => {
                 value={formData.telefono}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg border bg-teal-800 border-teal-600 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-4 py-2 rounded-lg border border-emerald-100 bg-emerald-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             
             <div className="md:col-span-2">
-              <label className="block mb-2 text-sm font-medium text-white">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Descripción
               </label>
               <textarea
@@ -511,7 +511,7 @@ const ActualizarDatosGuia = () => {
                 value={formData.descripcion}
                 onChange={handleChange}
                 rows="4"
-                className="w-full px-4 py-2 rounded-lg border bg-teal-800 border-teal-600 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-4 py-2 rounded-lg border border-emerald-100 bg-emerald-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 placeholder="Escribe una breve descripción sobre ti, tu experiencia y habilidades como guía..."
               ></textarea>
             </div>
@@ -521,7 +521,7 @@ const ActualizarDatosGuia = () => {
             <button
               type="submit"
               disabled={updating}
-              className={`py-2 px-6 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-medium transition-colors duration-200 flex items-center gap-2 ${updating ? 'opacity-70 cursor-not-allowed' : ''}`}
+              className={`py-2 px-6 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-colors duration-200 flex items-center gap-2 ${updating ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
               {updating ? (
                 <>
@@ -539,7 +539,7 @@ const ActualizarDatosGuia = () => {
             <button
               type="button"
               onClick={() => navigate("/VistaGuia/PerfilGuia")}
-              className="py-2 px-6 rounded-lg bg-teal-700 hover:bg-teal-600 text-white font-medium transition-colors duration-200"
+              className="py-2 px-6 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-colors duration-200"
             >
               Cancelar
             </button>
