@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import MapaAzure from './MapaAzure';
 
 /**
@@ -7,43 +7,22 @@ import MapaAzure from './MapaAzure';
 export const DemoMapa = () => {
   // Estados
   const [mapaListo, setMapaListo] = useState(false);
-  const [error, setError] = useState(null);
   
   // Coordenadas para centrar el mapa en Colombia
   const centro = [-74.297, 4.711]; // Bogotá, Colombia
   
   // Manejador para cuando el mapa esté listo
-  const handleMapaListo = (mapa) => {
-    console.log('¡Mapa listo!', mapa);
+  const handleMapaListo = (iframe) => {
+    console.log('¡Mapa listo!', iframe);
     setMapaListo(true);
     
-    try {
-      // Ejemplo: añadir un marcador simple
-      const marcador = new window.atlas.HtmlMarker({
-        position: centro,
-        color: '#007bff',
-        text: 'A'
-      });
-      
-      mapa.markers.add(marcador);
-      
-      // Agregar un evento de clic al mapa
-      mapa.events.add('click', (e) => {
-        console.log('Clic en el mapa en:', e.position);
-        
-        // Crear un marcador en la posición del clic
-        const nuevoMarcador = new window.atlas.HtmlMarker({
-          position: e.position,
-          color: '#FF5722',
-          text: '+'
-        });
-        
-        mapa.markers.add(nuevoMarcador);
-      });
-    } catch (err) {
-      console.error('Error al añadir marcador:', err);
-      setError(err.message);
-    }
+    // La nueva implementación usa iframe, así que no podemos manipular directamente el mapa
+    // Los marcadores y clicks se manejarían en el iframe interno
+  };
+  
+  // Manejador para errores del mapa
+  const handleMapaError = (error) => {
+    console.error('Error en el mapa:', error);
   };
 
   return (
@@ -67,13 +46,6 @@ export const DemoMapa = () => {
               {mapaListo ? 'Mapa inicializado' : 'Inicializando mapa...'}
             </span>
           </div>
-          
-          {/* Mostrar error si existe */}
-          {error && (
-            <div className="mt-2 p-2 bg-red-100 rounded text-red-700 text-sm">
-              {error}
-            </div>
-          )}
         </div>
         
         <div className="p-4">
@@ -84,6 +56,7 @@ export const DemoMapa = () => {
             estilo="road"
             mostrarControles={true}
             onMapaListo={handleMapaListo}
+            onError={handleMapaError}
             className="rounded-lg"
           />
         </div>
@@ -93,7 +66,7 @@ export const DemoMapa = () => {
             Este es un componente de demostración para verificar que la integración con Azure Maps funcione correctamente.
           </p>
           <p className="text-sm text-gray-500 mt-1">
-            <strong>Tip:</strong> Haz clic en el mapa para añadir marcadores.
+            <strong>Tip:</strong> Esta versión usa un iframe aislado para mayor compatibilidad.
           </p>
         </div>
       </div>

@@ -1,107 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AZURE_MAPS_CONFIG } from '../config/azureMapConfig';
 import { CircularProgress } from '../utils/CircularProgress';
 
-// Generar un ID único para el mapa, consistente durante la sesión
-const MAPA_ID = `mapa-azure-${Date.now()}`;
-
-// Código JavaScript puro para inicializar el mapa
-// Este script se inyectará en el documento
-const getMapScript = (id, center, zoom, style, key) => `
-(function() {
-  // Esperar a que el DOM esté completamente cargado
-  function inicializarMapa() {
-    try {
-      console.log('Inicializando mapa con ID:', '${id}');
-      var mapContainer = document.getElementById('${id}');
-      
-      if (!mapContainer) {
-        console.error('No se encontró el contenedor del mapa');
-        return;
-      }
-      
-      var map = new atlas.Map('${id}', {
-        center: [${center[0]}, ${center[1]}],
-        zoom: ${zoom},
-        style: '${style}',
-        authOptions: {
-          authType: 'subscriptionKey',
-          subscriptionKey: '${key}',
-          
-        },
-          disableTelemetry: true
-      });
-      
-      map.events.add('ready', function() {
-        console.log('El mapa se ha inicializado correctamente');
-        
-        // Agregar controles básicos
-        map.controls.add(new atlas.control.ZoomControl(), {
-          position: 'bottom-right'
-        });
-        
-        // Notificar que el mapa está listo (enviando evento personalizado)
-        var evento = new CustomEvent('mapaListo', { detail: { mapaId: '${id}' } });
-        document.dispatchEvent(evento);
-      });
-      
-      map.events.add('error', function(e) {
-        console.error('Error en el mapa:', e.error);
-        var evento = new CustomEvent('mapaError', { 
-          detail: { 
-            error: e.error.message || 'Error desconocido del mapa', 
-            mapaId: '${id}' 
-          } 
-        });
-        document.dispatchEvent(evento);
-      });
-      
-      // Guardar la referencia global
-      window.azureMapa = map;
-    } catch (err) {
-      console.error('Error al inicializar mapa:', err);
-      var evento = new CustomEvent('mapaError', { 
-        detail: { 
-          error: err.message || 'Error desconocido', 
-          mapaId: '${id}' 
-        } 
-      });
-      document.dispatchEvent(evento);
-    }
-  }
-  
-  // Ejecutar cuando el SDK esté cargado
-  if (window.atlas) {
-    inicializarMapa();
-  } else {
-    console.log('Esperando a que el SDK esté disponible...');
-    var checkInterval = setInterval(function() {
-      if (window.atlas) {
-        clearInterval(checkInterval);
-        inicializarMapa();
-      }
-    }, 100);
-    
-    // Establecer un tiempo límite de 10 segundos
-    setTimeout(function() {
-      clearInterval(checkInterval);
-      if (!window.atlas) {
-        console.error('Tiempo de espera agotado esperando al SDK de Azure Maps');
-        var evento = new CustomEvent('mapaError', { 
-          detail: { 
-            error: 'Tiempo de espera agotado esperando al SDK de Azure Maps', 
-            mapaId: '${id}' 
-          } 
-        });
-        document.dispatchEvent(evento);
-      }
-    }, 10000);
-  }
-})();
-`;
-
 /**
- * Componente del mapa con enfoque alternativo para evitar problemas de React
+ * Componente del mapa usando iframe para aislar totalmente el mapa y evitar
+ * conflictos con el resto de la aplicación
  */
 const MapaAzure = ({
   altura = '500px',
@@ -109,141 +12,208 @@ const MapaAzure = ({
   zoom = AZURE_MAPS_CONFIG.defaultOptions.zoom,
   estilo = 'road',
   className = '',
-  onMapaListo = () => {}
+  onMapaListo = () => {},
+  onError = () => {}
 }) => {
   // Estados
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
+  const [iframeId] = useState(`azure-map-iframe-${Math.random().toString(36).substr(2, 9)}`);
   
-  // Efecto para cargar el SDK y configurar el mapa
-  useEffect(() => {
-    // Paso 1: Cargar el CSS si no está cargado
-    if (!document.querySelector('link[href*="atlas.min.css"]')) {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = 'https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css';
-      document.head.appendChild(link);
-    }
-    
-    // Paso 2: Cargar el script de Azure Maps si no está cargado
-    const cargarScript = () => {
-      return new Promise((resolve, reject) => {
-        if (window.atlas) {
-          resolve();
-          return;
-        }
-        
-        const script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.src = 'https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js';
-        script.async = true;
-        
-        script.onload = () => {
-          console.log('SDK de Azure Maps cargado correctamente');
-          resolve();
-        };
-        
-        script.onerror = () => {
-          reject(new Error('No se pudo cargar el SDK de Azure Maps'));
-        };
-        
-        document.body.appendChild(script);
-      });
-    };
-    
-    // Paso 3: Configurar escuchadores de eventos para la comunicación
-    const escuchadorListo = (e) => {
-      if (e.detail.mapaId === MAPA_ID) {
-        console.log('Mapa listo recibido:', e.detail);
-        setCargando(false);
-        if (onMapaListo && window.azureMapa) {
-          onMapaListo(window.azureMapa);
-        }
-      }
-    };
-    
-    const escuchadorError = (e) => {
-      if (e.detail.mapaId === MAPA_ID) {
-        console.error('Error en el mapa recibido:', e.detail);
-        setError(e.detail.error);
-        setCargando(false);
-      }
-    };
-    
-    document.addEventListener('mapaListo', escuchadorListo);
-    document.addEventListener('mapaError', escuchadorError);
-    
-    // Paso 4: Cargar el SDK y luego inicializar el mapa con el script inyectado
-    cargarScript()
-      .then(() => {
-        // Generar script de inicialización personalizado
-        const scriptMapa = document.createElement('script');
-        scriptMapa.textContent = getMapScript(
-          MAPA_ID, 
-          centro, 
-          zoom, 
-          estilo, 
-          AZURE_MAPS_CONFIG.subscriptionKey
-        );
-        
-        // Añadir al documento para que se ejecute
-        document.body.appendChild(scriptMapa);
-        
-        // Limpiar script después de ejecutarse
-        setTimeout(() => {
-          if (document.body.contains(scriptMapa)) {
-            document.body.removeChild(scriptMapa);
+  const iframeRef = useRef(null);
+  
+  // Contenido HTML para el iframe
+  const getIframeContent = () => {
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Azure Maps</title>
+        <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css" />
+        <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
+        <style>
+          html, body { 
+            height: 100%; 
+            margin: 0; 
+            padding: 0; 
+            overflow: hidden;
           }
-        }, 1000);
-      })
-      .catch(err => {
-        console.error('Error al cargar recursos:', err);
-        setError(err.message || 'Error al cargar los recursos del mapa');
-        setCargando(false);
-      });
-    
-    // Limpieza al desmontar
-    return () => {
-      document.removeEventListener('mapaListo', escuchadorListo);
-      document.removeEventListener('mapaError', escuchadorError);
+          #mapContainer { 
+            width: 100%; 
+            height: 100%; 
+            border-radius: 12px;
+          }
+        </style>
+      </head>
+      <body>
+        <div id="mapContainer"></div>
+        <script>
+          function initMap() {
+            try {
+              var map = new atlas.Map('mapContainer', {
+                center: [${centro[0]}, ${centro[1]}],
+                zoom: ${zoom},
+                style: '${estilo}',
+                authOptions: {
+                  authType: 'subscriptionKey',
+                  subscriptionKey: '${AZURE_MAPS_CONFIG.subscriptionKey}'
+                },
+                disableTelemetry: true
+              });
+              
+              map.events.add('ready', function() {
+                console.log('Mapa listo dentro del iframe');
+                
+                // Agregar controles básicos
+                map.controls.add(new atlas.control.ZoomControl(), {
+                  position: 'bottom-right'
+                });
+                
+                // Notificar al padre que el mapa está listo
+                window.parent.postMessage({
+                  type: 'MAPA_LISTO',
+                  id: '${iframeId}'
+                }, '*');
+                
+                // Guardar referencia
+                window.azureMap = map;
+              });
+              
+              map.events.add('error', function(e) {
+                console.error('Error en el mapa:', e.error);
+                window.parent.postMessage({
+                  type: 'MAPA_ERROR',
+                  id: '${iframeId}',
+                  error: e.error.message || 'Error desconocido del mapa'
+                }, '*');
+              });
+            } catch (err) {
+              console.error('Error al inicializar mapa:', err);
+              window.parent.postMessage({
+                type: 'MAPA_ERROR',
+                id: '${iframeId}',
+                error: err.message || 'Error desconocido'
+              }, '*');
+            }
+          }
+          
+          document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initMap,500);
+          });
+        </script>
+      </body>
+      </html>
+    `;
+  };
+  
+  // Efecto para configurar el iframe y la comunicación
+  useEffect(() => {
+    // Crear manejadores de mensajes para comunicarse con el iframe
+    const handleIframeMessage = (event) => {
+      // Validar origen del mensaje por seguridad si es necesario
       
-      // Limpiar el mapa si existe
-      if (window.azureMapa) {
-        try {
-          window.azureMapa.dispose();
-          window.azureMapa = null;
-        } catch (e) {
-          console.warn('Error al limpiar el mapa:', e);
+      const message = event.data;
+      
+      if (message && message.id === iframeId) {
+        if (message.type === 'MAPA_LISTO') {
+          console.log('Recibido mensaje de mapa listo');
+          setCargando(false);
+          
+          // Notificar que el mapa está listo
+          if (onMapaListo) {
+            // Esperar un momento para asegurar que el mapa esté completamente inicializado
+            setTimeout(() => {
+              if (iframeRef.current) {
+                onMapaListo(iframeRef.current);
+              }
+            }, 200);
+          }
+        } else if (message.type === 'MAPA_ERROR') {
+          console.error('Error en mapa recibido del iframe:', message.error);
+          setError(message.error);
+          setCargando(false);
+          
+          // Notificar el error al componente padre
+          if (onError) {
+            onError(message.error);
+          }
         }
       }
     };
-  }, [centro, zoom, estilo, onMapaListo]);
+    
+    // Agregar listener para mensajes del iframe
+    window.addEventListener('message', handleIframeMessage);
+    
+    // Inicializar el contenido del iframe después de montado
+    const initIframe = () => {
+      if (iframeRef.current) {
+        const iframe = iframeRef.current;
+        const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+        
+        // Establecer el contenido del iframe
+        iframeDocument.open();
+        iframeDocument.write(getIframeContent());
+        iframeDocument.close();
+      }
+    };
+    
+    // Inicializar con un pequeño retraso para asegurar que el iframe esté montado
+    const timeoutId = setTimeout(initIframe, 100);
+    
+    // Verificar que el header esté siempre visible
+    const asegurarHeaderVisible = () => {
+      const header = document.querySelector('header');
+      if (header) {
+        header.style.zIndex = '50';
+        header.style.position = 'relative';
+      }
+    };
+    
+    // Aplicar inmediatamente y programar verificaciones
+    asegurarHeaderVisible();
+    const timer1 = setTimeout(asegurarHeaderVisible, 1000);
+    const timer2 = setTimeout(asegurarHeaderVisible, 5000);
+    
+    // Limpieza
+    return () => {
+      window.removeEventListener('message', handleIframeMessage);
+      clearTimeout(timeoutId);
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, [iframeId, onMapaListo, onError]);
   
   return (
     <div className={`relative ${className}`}>
-      {/* Contenedor del mapa con ID */}
-      <div 
-        id={MAPA_ID}
+      {/* Iframe para el mapa */}
+      <iframe 
+        ref={iframeRef}
+        id={iframeId}
         style={{
           width: '100%',
           height: altura,
+          border: 'none',
           borderRadius: '12px',
           overflow: 'hidden',
           boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
         }}
+        title="Azure Maps"
+        sandbox="allow-scripts allow-same-origin"
         className="mapa-azure-container"
       />
       
       {/* Indicador de carga */}
       {cargando && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-50 z-10">
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-50 z-10 rounded-xl">
           <CircularProgress tamaño="lg" color="teal" />
         </div>
       )}
       
       {/* Mostrar error si existe */}
       {error && (
-        <div className="absolute inset-0 flex items-center justify-center bg-red-100 bg-opacity-50 z-10">
+        <div className="absolute inset-0 flex items-center justify-center bg-red-100 bg-opacity-50 z-10 rounded-xl">
           <div className="bg-white p-4 rounded-lg shadow-lg max-w-md text-center">
             <h3 className="text-red-600 font-bold text-lg mb-2">Error al cargar el mapa</h3>
             <p className="text-gray-700">{error}</p>
