@@ -49,7 +49,7 @@ const CrearGuia = ({ onClose, onGuiaCreated }) => {
     
     return (
       <div className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg flex items-center gap-3 z-50 ${
-        alert.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+        alert.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'
       }`}>
         {alert.type === 'success' ? (
           <CheckCircle className="w-5 h-5" />
@@ -115,8 +115,8 @@ const CrearGuia = ({ onClose, onGuiaCreated }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-800 rounded-lg p-8 w-full max-w-2xl max-h-screen overflow-y-auto">
-        <h2 className="text-xl font-bold text-white mb-6 border-b border-gray-700 pb-2">
+      <div className="bg-white rounded-lg p-8 w-full max-w-2xl max-h-screen overflow-y-auto">
+        <h2 className="text-xl font-bold text-gray-800 mb-6 border-b border-gray-200 pb-2">
           Crear Nuevo Guía
         </h2>
         
@@ -133,7 +133,7 @@ const CrearGuia = ({ onClose, onGuiaCreated }) => {
         
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="mb-4">
-            <label htmlFor="cedula" className="block text-gray-300 text-sm font-medium mb-1">
+            <label htmlFor="cedula" className="block text-gray-700 text-sm font-medium mb-1">
               Cédula <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -146,14 +146,14 @@ const CrearGuia = ({ onClose, onGuiaCreated }) => {
                 placeholder="Ingrese la cédula"
                 value={formData.cedula}
                 onChange={handleChange}
-                className="w-full pl-10 pr-3 py-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pl-10 pr-3 py-2 bg-gray-50 text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 required
               />
             </div>
           </div>
           
           <div className="mb-4">
-            <label htmlFor="primerNombre" className="block text-gray-300 text-sm font-medium mb-1">
+            <label htmlFor="primerNombre" className="block text-gray-700 text-sm font-medium mb-1">
               Primer Nombre <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -166,14 +166,14 @@ const CrearGuia = ({ onClose, onGuiaCreated }) => {
                 placeholder="Ingrese el primer nombre"
                 value={formData.primerNombre}
                 onChange={handleChange}
-                className="w-full pl-10 pr-3 py-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pl-10 pr-3 py-2 bg-gray-50 text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 required
               />
             </div>
           </div>
           
           <div className="mb-4">
-            <label htmlFor="segundoNombre" className="block text-gray-300 text-sm font-medium mb-1">
+            <label htmlFor="segundoNombre" className="block text-gray-700 text-sm font-medium mb-1">
               Segundo Nombre
             </label>
             <div className="relative">
@@ -186,13 +186,13 @@ const CrearGuia = ({ onClose, onGuiaCreated }) => {
                 placeholder="Ingrese el segundo nombre"
                 value={formData.segundoNombre}
                 onChange={handleChange}
-                className="w-full pl-10 pr-3 py-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pl-10 pr-3 py-2 bg-gray-50 text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
           </div>
           
           <div className="mb-4">
-            <label htmlFor="primerApellido" className="block text-gray-300 text-sm font-medium mb-1">
+            <label htmlFor="primerApellido" className="block text-gray-700 text-sm font-medium mb-1">
               Primer Apellido <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -205,14 +205,14 @@ const CrearGuia = ({ onClose, onGuiaCreated }) => {
                 placeholder="Ingrese el primer apellido"
                 value={formData.primerApellido}
                 onChange={handleChange}
-                className="w-full pl-10 pr-3 py-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pl-10 pr-3 py-2 bg-gray-50 text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 required
               />
             </div>
           </div>
           
           <div className="mb-4">
-            <label htmlFor="segundoApellido" className="block text-gray-300 text-sm font-medium mb-1">
+            <label htmlFor="segundoApellido" className="block text-gray-700 text-sm font-medium mb-1">
               Segundo Apellido
             </label>
             <div className="relative">
@@ -225,13 +225,13 @@ const CrearGuia = ({ onClose, onGuiaCreated }) => {
                 placeholder="Ingrese el segundo apellido"
                 value={formData.segundoApellido}
                 onChange={handleChange}
-                className="w-full pl-10 pr-3 py-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pl-10 pr-3 py-2 bg-gray-50 text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
           </div>
           
           <div className="mb-4">
-            <label htmlFor="email" className="block text-gray-300 text-sm font-medium mb-1">
+            <label htmlFor="email" className="block text-gray-700 text-sm font-medium mb-1">
               Email <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -244,14 +244,14 @@ const CrearGuia = ({ onClose, onGuiaCreated }) => {
                 placeholder="ejemplo.guia@explococora.com"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full pl-10 pr-3 py-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pl-10 pr-3 py-2 bg-gray-50 text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 required
               />
             </div>
           </div>
           
           <div className="mb-4">
-            <label htmlFor="contrasenia" className="block text-gray-300 text-sm font-medium mb-1">
+            <label htmlFor="contrasenia" className="block text-gray-700 text-sm font-medium mb-1">
               Contraseña <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -264,24 +264,24 @@ const CrearGuia = ({ onClose, onGuiaCreated }) => {
                 placeholder="Ingrese la contraseña"
                 value={formData.contrasenia}
                 onChange={handleChange}
-                className="w-full pl-10 pr-3 py-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pl-10 pr-3 py-2 bg-gray-50 text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 required
               />
             </div>
           </div>
           
-          <div className="col-span-2 flex justify-end space-x-3 mt-4 pt-4 border-t border-gray-700">
+          <div className="col-span-2 flex justify-end space-x-3 mt-4 pt-4 border-t border-gray-200">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded transition-colors duration-300"
+              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded transition-colors duration-300"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className={`px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded flex items-center gap-2 transition-colors duration-300 ${submitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+              className={`px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded flex items-center gap-2 transition-colors duration-300 ${submitting ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
               {submitting ? (
                 <>

@@ -95,15 +95,15 @@ const EliminarGuia = ({ guia, onClose, onDeleteSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-2xl border border-gray-700 transform transition-all">
-        <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-700 pb-2">Confirmar Eliminación</h2>
-        <div className="flex items-center gap-4 mb-6 p-4 bg-gray-900/50 rounded-lg">
+    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-2xl border border-gray-200 transform transition-all">
+        <h2 className="text-xl font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2">Confirmar Eliminación</h2>
+        <div className="flex items-center gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
           <div className="relative">
             <img 
               src={guia.foto || placeholderImage} 
               alt={`${guia.primerNombre} ${guia.primerApellido}`} 
-              className="w-20 h-20 rounded-full object-cover border-2 border-red-500 shadow-lg"
+              className="w-20 h-20 rounded-full object-cover border-2 border-emerald-500 shadow-lg"
             />
             <div className="absolute -top-1 -right-1 bg-red-600 w-6 h-6 rounded-full flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-4 h-4 text-white">
@@ -112,23 +112,23 @@ const EliminarGuia = ({ guia, onClose, onDeleteSuccess }) => {
             </div>
           </div>
           <div>
-            <p className="text-white font-bold text-lg">{guia.primerNombre} {guia.primerApellido}</p>
-            <p className="text-gray-400 text-sm">Cédula: {guia.cedula}</p>
-            <div className="mt-1 inline-block px-2 py-1 bg-red-900/30 text-red-400 text-xs rounded-full">
+            <p className="text-gray-800 font-bold text-lg">{guia.primerNombre} {guia.primerApellido}</p>
+            <p className="text-gray-600 text-sm">Cédula: {guia.cedula}</p>
+            <div className="mt-1 inline-block px-2 py-1 bg-red-100 text-red-600 text-xs rounded-full">
               Será eliminado permanentemente
             </div>
           </div>
         </div>
-        <p className="text-gray-300 mb-6 bg-yellow-800/20 border-l-4 border-yellow-600 pl-3 py-2 italic">
+        <p className="text-gray-700 mb-6 bg-yellow-50 border-l-4 border-yellow-400 pl-3 py-2 italic">
           ¿Está seguro que desea eliminar este guía? Esta acción no se puede deshacer.
         </p>
         
         {countdownActive && (
-          <div className="mb-6 bg-red-900/20 border border-red-600 rounded-lg p-4 text-center">
-            <p className="text-white mb-2">Eliminando en <span className="font-bold text-2xl text-red-500">{countdown}</span> segundos</p>
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+            <p className="text-gray-800 mb-2">Eliminando en <span className="font-bold text-2xl text-red-500">{countdown}</span> segundos</p>
             <button 
               onClick={cancelCountdown}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
+              className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium"
             >
               Cancelar eliminación
             </button>
@@ -138,21 +138,21 @@ const EliminarGuia = ({ guia, onClose, onDeleteSuccess }) => {
         <div className="flex justify-end space-x-3">
           <button
             onClick={onClose}
-            className="bg-gray-700 hover:bg-gray-600 text-white font-medium py-2.5 px-5 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 transform hover:-translate-y-0.5"
+            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2.5 px-5 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300"
             disabled={isDeleting || countdownActive}
           >
             Cancelar
           </button>
           <button
             onClick={handleActualDelete}
-            className="bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2.5 px-5 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 transform hover:-translate-y-0.5"
+            className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2.5 px-5 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-400"
             disabled={isDeleting || countdownActive}
           >
             Eliminar sin conteo
           </button>
           <button
             onClick={handleDelete}
-            className="bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white font-bold py-2.5 px-5 rounded-lg transition-all duration-300 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-red-500 transform hover:-translate-y-0.5 shadow-lg"
+            className="bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-5 rounded-lg transition-all duration-300 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-red-500"
             disabled={isDeleting || countdownActive}
           >
             {isDeleting ? (

@@ -1,5 +1,5 @@
 import React from "react";
-import Explo from "../../../assets/Images/logo.webp";
+import Explo from "../../../assets/Images/logoBlanco.webp";
 
 export const Logo = () => {
   return (

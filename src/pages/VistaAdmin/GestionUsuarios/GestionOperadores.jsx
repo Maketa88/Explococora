@@ -532,13 +532,13 @@ const Operadores = () => {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-        <div className={`relative w-full max-w-4xl ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} rounded-lg shadow-xl max-h-[90vh] overflow-y-auto`}>
+        <div className="relative w-full max-w-4xl bg-white text-gray-800 rounded-lg shadow-xl max-h-[90vh] overflow-y-auto">
           {/* Cabecera del modal */}
-          <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex justify-between items-center p-4 bg-emerald-600 text-white">
             <h2 className="text-xl font-bold">Perfil completo del operador</h2>
             <button 
               onClick={onClose}
-              className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+              className="text-white hover:text-gray-200"
             >
               <X className="w-6 h-6" />
             </button>
@@ -546,17 +546,9 @@ const Operadores = () => {
           
           {/* Contenido del modal */}
           <div className="p-6">
-            {/* Cabecera con foto y detalles principales */}
-            <div className="flex flex-col md:flex-row gap-6 mb-8">
+            <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-shrink-0">
-                <div 
-                  className="w-40 h-40 rounded-full overflow-hidden border-4 border-blue-500 mx-auto cursor-pointer"
-                  onClick={() => handleMostrarImagenAmpliada(
-                    operador.foto
-                      ? (operador.foto.startsWith('http') ? operador.foto : `http://localhost:10101/uploads/images/${operador.foto}`)
-                      : `https://ui-avatars.com/api/?name=${operador.primerNombre ? operador.primerNombre.charAt(0) : ''}${operador.primerApellido ? operador.primerApellido.charAt(0) : ''}&background=0D8ABC&color=fff&size=128`
-                  )}
-                >
+                <div className="w-36 h-36 rounded-full overflow-hidden border-4 border-emerald-500 mx-auto">
                   <img
                     src={
                       operador.foto
@@ -571,76 +563,116 @@ const Operadores = () => {
                     }}
                   />
                 </div>
-                <div className="mt-3 text-center">
-                  <div 
-                    className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
-                      operador.estado === 'disponible' ? 'bg-green-100 text-green-800' : 
-                      operador.estado === 'ocupado' ? 'bg-yellow-100 text-yellow-800' : 
-                      'bg-red-100 text-red-800'
-                    }`}
-                  >
-                    {operador.estado === 'disponible' ? 'Disponible' : 
-                     operador.estado === 'ocupado' ? 'Ocupado' : 
-                     'Inactivo'}
+                
+                <div className="mt-4 text-center">
+                  <div className="inline-block px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium">
+                    Disponible
                   </div>
                 </div>
               </div>
               
               <div className="flex-grow">
-                <h1 className="text-2xl font-bold mb-1">{construirNombreCompleto(operador)}</h1>
-                <p className={`text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-4`}>
+                <h1 className="text-2xl font-bold mb-1 text-gray-800">{construirNombreCompleto(operador)}</h1>
+                <p className="text-gray-600 mb-6">
                   {operador.especialidad || 'Operador Turístico General'}
-                  {operador.calificacion && (
-                    <span className="ml-2 inline-flex items-center text-yellow-500">
-                      <Star className="w-4 h-4 fill-current" />
-                      <span className="text-sm ml-1">{operador.calificacion}</span>
-                    </span>
-                  )}
                 </p>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="flex items-center">
-                    <CreditCard className="w-5 h-5 mr-3 text-blue-500" />
-                    <span><strong>Cédula:</strong> {operador.cedula || 'No disponible'}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 w-8 h-8 mr-2">
+                      <div className="w-8 h-8 flex items-center justify-center text-emerald-600">
+                        <span className="text-lg">#</span>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-sm">Cédula:</p>
+                      <p className="text-gray-800">{operador.cedula || 'No disponible'}</p>
+                    </div>
                   </div>
-                  <div className="flex items-center">
-                    <Mail className="w-5 h-5 mr-3 text-blue-500" />
-                    <span><strong>Email:</strong> {operador.email || 'No disponible'}</span>
+                  
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 w-8 h-8 mr-2">
+                      <div className="w-8 h-8 flex items-center justify-center text-emerald-600">
+                        <Mail className="w-5 h-5" />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-sm">Email:</p>
+                      <p className="text-gray-800">{operador.email || 'No disponible'}</p>
+                    </div>
                   </div>
-                  <div className="flex items-center">
-                    <Phone className="w-5 h-5 mr-3 text-green-500" />
-                    <span><strong>Teléfono:</strong> {operador.telefono || operador.numeroCelular || operador.numero_celular || 'No disponible'}</span>
+                  
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 w-8 h-8 mr-2">
+                      <div className="w-8 h-8 flex items-center justify-center text-emerald-600">
+                        <Phone className="w-5 h-5" />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-sm">Teléfono:</p>
+                      <p className="text-gray-800">{operador.telefono || operador.numeroCelular || operador.numero_celular || 'No disponible'}</p>
+                    </div>
                   </div>
-                  <div className="flex items-center">
-                    <MapPin className="w-5 h-5 mr-3 text-red-500" />
-                    <span><strong>Ubicación:</strong> {operador.ubicacion || 'No especificada'}</span>
+                  
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 w-8 h-8 mr-2">
+                      <div className="w-8 h-8 flex items-center justify-center text-emerald-600">
+                        <MapPin className="w-5 h-5" />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-sm">Ubicación:</p>
+                      <p className="text-gray-800">{operador.ubicacion || 'No especificada'}</p>
+                    </div>
                   </div>
-                  <div className="flex items-center">
-                    <Calendar className="w-5 h-5 mr-3 text-blue-500" />
-                    <span><strong>Fecha de registro:</strong> {new Date(operador.fecha_registro || Date.now()).toLocaleDateString()}</span>
+                  
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 w-8 h-8 mr-2">
+                      <div className="w-8 h-8 flex items-center justify-center text-emerald-600">
+                        <Calendar className="w-5 h-5" />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-sm">Fecha de registro:</p>
+                      <p className="text-gray-800">{new Date(operador.fecha_registro || Date.now()).toLocaleDateString()}</p>
+                    </div>
                   </div>
-                  <div className="flex items-center">
-                    <Globe className="w-5 h-5 mr-3 text-purple-500" />
-                    <span><strong>Idiomas:</strong> {operador.idiomas || 'No especificados'}</span>
+                  
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 w-8 h-8 mr-2">
+                      <div className="w-8 h-8 flex items-center justify-center text-emerald-600">
+                        <Globe className="w-5 h-5" />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-sm">Idiomas:</p>
+                      <p className="text-gray-800">{operador.idiomas || 'No especificados'}</p>
+                    </div>
                   </div>
                 </div>
+                
+                {operador.descripcion && (
+                  <div className="mt-8">
+                    <h3 className="text-lg font-semibold mb-2 text-gray-800">Descripción</h3>
+                    <p className="text-gray-700 bg-green-50 p-4 rounded-lg border border-green-100">{operador.descripcion}</p>
+                  </div>
+                )}
               </div>
             </div>
             
-            {/* Botones de acción */}
             <div className="mt-8 flex justify-end gap-3">
               <button
                 onClick={() => {
                   onClose();
                   handleOpenEditarOperadorModal(operador);
                 }}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
+                className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg"
               >
                 Editar información
               </button>
               <button
                 onClick={onClose}
-                className={`px-4 py-2 rounded-md ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
+                className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg"
               >
                 Cerrar
               </button>
@@ -653,66 +685,53 @@ const Operadores = () => {
 
   return (
     <DashboardLayoutAdmin>
-      <div className={`p-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <h1 className="text-2xl font-bold">Gestión de Operadores</h1>
+      <div className="p-4">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">Gestión de Operadores</h1>
           
-          <div className="flex flex-wrap gap-2">
-            <div className="flex">
+          <div className="flex items-center gap-3 mt-4 md:mt-0">
+            <div className="relative">
               <input
                 type="text"
                 placeholder="Buscar por nombre, cédula o email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className={`px-4 py-2 rounded-l-md ${darkMode ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-800'} min-w-[400px]`}
+                className="pl-10 pr-4 py-2 rounded-lg border border-gray-200 w-64 md:w-80 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
-              <button 
-                onClick={handleSearch}
-                className={`px-3 py-2 rounded-r-md ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
-              >
-                <Search className="w-5 h-5" />
-              </button>
+              <Search className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
             </div>
             
             <button
               onClick={() => setMostrarFiltros(!mostrarFiltros)}
-              className={`px-3 py-2 rounded-md flex items-center ${darkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-purple-500 hover:bg-purple-600'} text-white`}
+              className="px-4 py-2 rounded-lg border border-gray-200 flex items-center gap-2 hover:bg-gray-50"
             >
-              <Filter className="w-5 h-5 mr-1.5" />
-              Filtros
+              <Filter className="w-5 h-5 text-emerald-600" />
+              <span className="text-gray-700">Filtros</span>
             </button>
             
             <button
               onClick={handleAddOperador}
-              className={`px-3 py-2 rounded-md flex items-center ${darkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'} text-white`}
+              className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white flex items-center gap-2"
             >
-              <UserPlus className="w-5 h-5 mr-1.5" />
-              Nuevo operador
-            </button>
-            
-            <button
-              onClick={() => window.location.reload()}
-              className={`px-3 py-2 rounded-md flex items-center ${darkMode ? 'bg-gray-600 hover:bg-gray-700' : 'bg-gray-500 hover:bg-gray-600'} text-white`}
-            >
-              <RefreshCw className="w-5 h-5 mr-1.5" />
-              Actualizar
+              <UserPlus className="w-5 h-5" />
+              <span>Nuevo operador</span>
             </button>
           </div>
         </div>
         
         {/* Panel de filtros */}
         {mostrarFiltros && (
-          <div className={`mb-6 p-4 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
+          <div className="mb-6 p-4 rounded-lg bg-white shadow-sm border border-gray-100">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <h3 className="text-sm font-medium mb-2">Estado</h3>
+                <h3 className="text-sm font-medium mb-2 text-gray-700">Estado</h3>
                 <div className="flex space-x-2">
                   <button
                     onClick={() => setFiltroEstado('todos')}
                     className={`px-3 py-1 text-sm rounded-md ${
                       filtroEstado === 'todos' 
-                        ? (darkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white') 
-                        : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-800')
+                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
+                        : 'bg-gray-100 text-gray-700 border border-gray-200'
                     }`}
                   >
                     Todos
@@ -721,8 +740,8 @@ const Operadores = () => {
                     onClick={() => setFiltroEstado('disponible')}
                     className={`px-3 py-1 text-sm rounded-md ${
                       filtroEstado === 'disponible' 
-                        ? (darkMode ? 'bg-green-600 text-white' : 'bg-green-500 text-white') 
-                        : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-800')
+                        ? 'bg-green-100 text-green-800 border border-green-200' 
+                        : 'bg-gray-100 text-gray-700 border border-gray-200'
                     }`}
                   >
                     Disponible
@@ -731,8 +750,8 @@ const Operadores = () => {
                     onClick={() => setFiltroEstado('ocupado')}
                     className={`px-3 py-1 text-sm rounded-md ${
                       filtroEstado === 'ocupado' 
-                        ? (darkMode ? 'bg-yellow-600 text-white' : 'bg-yellow-500 text-white') 
-                        : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-800')
+                        ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' 
+                        : 'bg-gray-100 text-gray-700 border border-gray-200'
                     }`}
                   >
                     Ocupado
@@ -741,8 +760,8 @@ const Operadores = () => {
                     onClick={() => setFiltroEstado('inactivo')}
                     className={`px-3 py-1 text-sm rounded-md ${
                       filtroEstado === 'inactivo' 
-                        ? (darkMode ? 'bg-red-600 text-white' : 'bg-red-500 text-white') 
-                        : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-800')
+                        ? 'bg-red-100 text-red-800 border border-red-200' 
+                        : 'bg-gray-100 text-gray-700 border border-gray-200'
                     }`}
                   >
                     Inactivo
@@ -751,14 +770,14 @@ const Operadores = () => {
               </div>
               
               <div>
-                <h3 className="text-sm font-medium mb-2">Ordenar por</h3>
+                <h3 className="text-sm font-medium mb-2 text-gray-700">Ordenar por</h3>
                 <div className="flex space-x-2">
                   <button
                     onClick={() => setOrdenarPor('nombre')}
                     className={`px-3 py-1 text-sm rounded-md ${
                       ordenarPor === 'nombre' 
-                        ? (darkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white') 
-                        : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-800')
+                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
+                        : 'bg-gray-100 text-gray-700 border border-gray-200'
                     }`}
                   >
                     Nombre
@@ -767,8 +786,8 @@ const Operadores = () => {
                     onClick={() => setOrdenarPor('fecha')}
                     className={`px-3 py-1 text-sm rounded-md ${
                       ordenarPor === 'fecha' 
-                        ? (darkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white') 
-                        : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-800')
+                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
+                        : 'bg-gray-100 text-gray-700 border border-gray-200'
                     }`}
                   >
                     Más recientes
@@ -783,9 +802,7 @@ const Operadores = () => {
                     setFiltroEstado('todos');
                     setOrdenarPor('nombre');
                   }}
-                  className={`px-3 py-1 text-sm rounded-md ${
-                    darkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
-                  }`}
+                  className="px-3 py-1 text-sm rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200"
                 >
                   Limpiar filtros
                 </button>
@@ -796,51 +813,51 @@ const Operadores = () => {
 
         {/* Tarjetas de estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className={`p-4 rounded-lg ${darkMode ? 'bg-blue-900' : 'bg-blue-50'} flex items-center justify-between`}>
+          <div className="p-4 rounded-lg bg-emerald-50 border-l-4 border-emerald-500 flex items-center justify-between">
             <div>
-              <p className={`text-sm ${darkMode ? 'text-blue-300' : 'text-blue-600'}`}>Total de Operadores</p>
-              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-blue-700'}`}>
+              <p className="text-sm text-emerald-700">Total de Operadores</p>
+              <p className="text-2xl font-bold text-emerald-800">
                 {operadoresCompletos.length}
               </p>
             </div>
-            <div className={`p-3 rounded-full ${darkMode ? 'bg-blue-800' : 'bg-blue-100'}`}>
-              <UserPlus className={`w-6 h-6 ${darkMode ? 'text-blue-300' : 'text-blue-600'}`} />
+            <div className="p-3 rounded-full bg-emerald-100">
+              <UserPlus className="w-6 h-6 text-emerald-500" />
             </div>
           </div>
           
-          <div className={`p-4 rounded-lg ${darkMode ? 'bg-green-900' : 'bg-green-50'} flex items-center justify-between`}>
+          <div className="p-4 rounded-lg bg-green-50 border-l-4 border-green-500 flex items-center justify-between">
             <div>
-              <p className={`text-sm ${darkMode ? 'text-green-300' : 'text-green-600'}`}>Operadores Disponibles</p>
-              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-green-700'}`}>
+              <p className="text-sm text-green-700">Operadores Disponibles</p>
+              <p className="text-2xl font-bold text-green-800">
                 {operadoresCompletos.filter(o => o.estado === 'disponible').length}
               </p>
             </div>
-            <div className={`p-3 rounded-full ${darkMode ? 'bg-green-800' : 'bg-green-100'}`}>
-              <CheckCircle className={`w-6 h-6 ${darkMode ? 'text-green-300' : 'text-green-600'}`} />
+            <div className="p-3 rounded-full bg-green-100">
+              <CheckCircle className="w-6 h-6 text-green-500" />
             </div>
           </div>
 
-          <div className={`p-4 rounded-lg ${darkMode ? 'bg-yellow-900' : 'bg-yellow-50'} flex items-center justify-between`}>
+          <div className="p-4 rounded-lg bg-yellow-50 border-l-4 border-yellow-500 flex items-center justify-between">
             <div>
-              <p className={`text-sm ${darkMode ? 'text-yellow-300' : 'text-yellow-600'}`}>Operadores Ocupados</p>
-              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-yellow-700'}`}>
+              <p className="text-sm text-yellow-700">Operadores Ocupados</p>
+              <p className="text-2xl font-bold text-yellow-800">
                 {operadoresCompletos.filter(o => o.estado === 'ocupado').length}
               </p>
             </div>
-            <div className={`p-3 rounded-full ${darkMode ? 'bg-yellow-800' : 'bg-yellow-100'}`}>
-              <Briefcase className={`w-6 h-6 ${darkMode ? 'text-yellow-300' : 'text-yellow-600'}`} />
+            <div className="p-3 rounded-full bg-yellow-100">
+              <Briefcase className="w-6 h-6 text-yellow-500" />
             </div>
           </div>
 
-          <div className={`p-4 rounded-lg ${darkMode ? 'bg-red-900' : 'bg-red-50'} flex items-center justify-between`}>
+          <div className="p-4 rounded-lg bg-red-50 border-l-4 border-red-500 flex items-center justify-between">
             <div>
-              <p className={`text-sm ${darkMode ? 'text-red-300' : 'text-red-600'}`}>Operadores Inactivos</p>
-              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-red-700'}`}>
+              <p className="text-sm text-red-700">Operadores Inactivos</p>
+              <p className="text-2xl font-bold text-red-800">
                 {operadoresCompletos.filter(o => o.estado === 'inactivo').length}
               </p>
             </div>
-            <div className={`p-3 rounded-full ${darkMode ? 'bg-red-800' : 'bg-red-100'}`}>
-              <XCircle className={`w-6 h-6 ${darkMode ? 'text-red-300' : 'text-red-600'}`} />
+            <div className="p-3 rounded-full bg-red-100">
+              <XCircle className="w-6 h-6 text-red-500" />
             </div>
           </div>
         </div>
@@ -848,62 +865,79 @@ const Operadores = () => {
         {/* Lista de operadores */}
         {loading ? (
           <div className="flex justify-center items-center p-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
           </div>
         ) : error ? (
-          <div className={`p-6 rounded-lg text-center ${darkMode ? 'bg-red-900/30 text-red-300' : 'bg-red-100 text-red-800'}`}>
+          <div className="p-6 rounded-lg text-center bg-red-50 text-red-800 border border-red-200">
             <p className="text-lg font-medium mb-2">Error al cargar operadores</p>
             <p className="mb-4">{error}</p>
             <button 
               onClick={() => window.location.reload()} 
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+              className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg"
             >
               Reintentar
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {operadoresFiltrados().length > 0 ? (
               operadoresFiltrados().map((operador) => (
                 <div 
                   key={operador.id || operador.cedula} 
-                  className={`rounded-lg shadow-lg overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'} relative`}
+                  className="rounded-lg shadow-sm overflow-hidden bg-white border border-gray-100 relative cursor-pointer"
+                  onClick={() => handleOpenDetallesModal(operador)}
                 >
                   {/* Cabecera con imagen */}
                   <div 
-                    className="h-36 relative bg-cover bg-center bg-no-repeat"
+                    className="h-28 relative bg-cover bg-center bg-no-repeat"
                     style={{
                       backgroundImage: `url(${logoExplococora})`,
-                      backgroundSize: '200px',
+                      backgroundSize: '150px',
                       backgroundPosition: 'center',
-                      backgroundColor: darkMode ? '#1e3a8a' : '#3b82f6',
+                      backgroundColor: '#10b981', // emerald-500
                       backgroundBlendMode: 'soft-light',
                       opacity: '0.9'
                     }}
                   >
-                    <BotonesAccion operador={operador} />
+                    {/* Botones de acción */}
+                    <div className="absolute top-2 left-2 flex space-x-2">
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEliminarOperadorModal(operador);
+                        }}
+                        className="p-2 bg-white hover:bg-red-50 text-red-500 rounded-full shadow-sm"
+                        title="Eliminar operador"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                      
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEditarOperadorModal(operador);
+                        }}
+                        className="p-2 bg-white hover:bg-emerald-50 text-emerald-500 rounded-full shadow-sm"
+                        title="Actualizar información"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                    </div>
                     
                     {/* Foto de perfil */}
-                    <div className="absolute -bottom-14 left-1/2 transform -translate-x-1/2">
-                      <div 
-                        className="w-28 h-28 rounded-full bg-white p-1 shadow-lg overflow-hidden cursor-pointer"
-                        onClick={() => handleMostrarImagenAmpliada(
-                          operador.foto
-                            ? (operador.foto.startsWith('http') ? operador.foto : `http://localhost:10101/uploads/images/${operador.foto}`)
-                            : `https://ui-avatars.com/api/?name=${operador.primerNombre ? operador.primerNombre.charAt(0) : ''}${operador.primerApellido ? operador.primerApellido.charAt(0) : ''}&background=0D8ABC&color=fff&size=128`
-                        )}
-                      >
+                    <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2">
+                      <div className="w-20 h-20 rounded-full bg-white p-1 shadow-sm overflow-hidden">
                         <img
                           src={
                             operador.foto
                               ? (operador.foto.startsWith('http') ? operador.foto : `http://localhost:10101/uploads/images/${operador.foto}`)
-                              : `https://ui-avatars.com/api/?name=${operador.primerNombre ? operador.primerNombre.charAt(0) : ''}${operador.primerApellido ? operador.primerApellido.charAt(0) : ''}&background=0D8ABC&color=fff&size=128`
+                              : "https://i.pinimg.com/736x/8d/37/31/8d3731a57b8209114c08488eeb0b6a64.jpg"
                           }
                           alt={`Foto de ${operador.primerNombre || ''} ${operador.primerApellido || ''}`}
                           className="w-full h-full object-cover rounded-full"
                           onError={(e) => {
                             e.target.onerror = null;
-                            e.target.src = `https://ui-avatars.com/api/?name=${operador.primerNombre ? operador.primerNombre.charAt(0) : ''}${operador.primerApellido ? operador.primerApellido.charAt(0) : ''}&background=0D8ABC&color=fff&size=128`;
+                            e.target.src = "https://i.pinimg.com/736x/8d/37/31/8d3731a57b8209114c08488eeb0b6a64.jpg";
                           }}
                         />
                       </div>
@@ -911,63 +945,69 @@ const Operadores = () => {
                     
                     {/* Insignia de estado */}
                     <div className="absolute top-2 right-2">
-                      <EstadoOperador 
-                        cedula={operador.cedula} 
-                        nombre={construirNombreCompleto(operador)}
-                        tamanio="normal" 
-                        onChangeEstado={(nuevoEstado) => {
-                          // Actualizar el estado en la base de datos
-                          actualizarEstadoOperador(operador, nuevoEstado);
-                        }}
-                      />
+                      <div className={`px-3 py-1 rounded-full text-xs font-medium flex items-center ${
+                        operador.estado === 'disponible' ? 'bg-green-100 text-green-800' : 
+                        operador.estado === 'ocupado' ? 'bg-yellow-100 text-yellow-800' : 
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {operador.estado === 'disponible' ? (
+                          <>
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Disponible
+                          </>
+                        ) : operador.estado === 'ocupado' ? (
+                          <>
+                            <Clock className="w-3 h-3 mr-1" />
+                            Ocupado
+                          </>
+                        ) : (
+                          <>
+                            <XCircle className="w-3 h-3 mr-1" />
+                            Inactivo
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                   
                   {/* Información del operador */}
-                  <div className="pt-16 px-6 pb-6">
-                    <div className="text-center mb-4">
-                      <h3 className="text-xl font-bold flex items-center justify-center">
+                  <div className="pt-12 px-4 pb-4">
+                    <div className="text-center mb-3">
+                      <h3 className="text-lg font-bold text-gray-800 truncate">
                         {construirNombreCompleto(operador)}
-                        {operador.calificacion && (
-                          <div className="ml-2 flex items-center text-yellow-500">
-                            <Star className="w-4 h-4 fill-current" />
-                            <span className="text-sm ml-1">{operador.calificacion}</span>
-                          </div>
-                        )}
                       </h3>
-                      <p className={`text-sm mt-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      <p className="text-xs text-emerald-600">
                         {operador.especialidad || 'Operador Turístico General'}
                       </p>
                     </div>
                     
-                    <div className="space-y-3 mb-6">
+                    <div className="space-y-2 text-sm">
                       <div className="flex items-center">
-                        <Mail className="w-4 h-4 mr-3 text-blue-500" />
-                        <span className="text-sm truncate">{operador.email}</span>
+                        <Mail className="w-4 h-4 mr-2 text-emerald-500 flex-shrink-0" />
+                        <span className="text-gray-600 truncate">{operador.email}</span>
                       </div>
                       <div className="flex items-center">
-                        <Phone className="w-4 h-4 mr-3 text-green-500" />
-                        <span className="text-sm">{operador.telefono || operador.numeroCelular || operador.numero_celular || 'No disponible'}</span>
+                        <Phone className="w-4 h-4 mr-2 text-emerald-500 flex-shrink-0" />
+                        <span className="text-gray-600 truncate">{operador.telefono || operador.numeroCelular || operador.numero_celular || 'No disponible'}</span>
                       </div>
                       <div className="flex items-center">
-                        <MapPin className="w-4 h-4 mr-3 text-red-500" />
-                        <span className="text-sm">{operador.ubicacion || 'No especificada'}</span>
+                        <MapPin className="w-4 h-4 mr-2 text-emerald-500 flex-shrink-0" />
+                        <span className="text-gray-600 truncate">{operador.ubicacion || 'No especificada'}</span>
                       </div>
                       <div className="flex items-center">
-                        <Calendar className="w-4 h-4 mr-3 text-blue-500" />
-                        <span className="text-sm">Desde {new Date(operador.fecha_registro || Date.now()).toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <CreditCard className="w-4 h-4 mr-3 text-purple-500" />
-                        <span className="text-sm">{operador.cedula || 'No disponible'}</span>
+                        <Calendar className="w-4 h-4 mr-2 text-emerald-500 flex-shrink-0" />
+                        <span className="text-gray-600 truncate">Desde {new Date(operador.fecha_registro || Date.now()).toLocaleDateString()}</span>
                       </div>
                     </div>
                     
                     {/* Botones de acción */}
-                    <div className="flex justify-center gap-2 mt-4">
+                    <div className="flex justify-center gap-2 mt-3">
                       <button 
-                        onClick={() => handleOpenDetallesModal(operador)}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium flex-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDetallesModal(operador);
+                        }}
+                        className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md text-xs font-medium flex-1"
                       >
                         Ver detalles
                       </button>
@@ -988,9 +1028,9 @@ const Operadores = () => {
                 </div>
               ))
             ) : (
-              <div className={`col-span-3 text-center py-12 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              <div className="col-span-4 text-center py-12 text-gray-600">
                 <div className="flex flex-col items-center">
-                  <XCircle className="w-16 h-16 mb-4 opacity-30" />
+                  <XCircle className="w-16 h-16 mb-4 text-gray-300" />
                   <h3 className="text-xl font-semibold mb-2">No se encontraron operadores</h3>
                   <p className="mb-6">No hay operadores que coincidan con los criterios de búsqueda.</p>
                   <div className="flex space-x-4">
@@ -999,13 +1039,13 @@ const Operadores = () => {
                         setSearchTerm('');
                         setFiltroEstado('todos');
                       }}
-                      className={`px-4 py-2 rounded-md ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+                      className="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700"
                     >
                       Limpiar filtros
                     </button>
                     <button 
                       onClick={handleAddOperador}
-                      className={`px-4 py-2 rounded-md ${darkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'} text-white`}
+                      className="px-4 py-2 rounded-md bg-emerald-500 hover:bg-emerald-600 text-white"
                     >
                       Añadir nuevo operador
                     </button>
@@ -1016,7 +1056,7 @@ const Operadores = () => {
           </div>
         )}
       </div>
-
+      
       {/* Modal para crear operador */}
       {showCrearOperadorModal && (
         <CrearOperador 

@@ -217,21 +217,21 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-800 rounded-lg p-8 w-full max-w-2xl max-h-screen overflow-y-auto">
+      <div className="bg-white rounded-lg p-8 w-full max-w-2xl max-h-screen overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-white">
+          <h2 className="text-xl font-bold text-gray-800">
             Actualizar Información del Guía
           </h2>
           <button 
             onClick={onClose}
-            className="text-gray-400 hover:text-white focus:outline-none"
+            className="text-gray-500 hover:text-gray-700 focus:outline-none"
           >
             <X size={24} />
           </button>
         </div>
         
         {error && (
-          <div className="mb-6 p-4 bg-red-900/30 text-red-300 rounded-lg">
+          <div className="mb-6 p-4 bg-red-100 text-red-700 rounded-lg">
             {error}
           </div>
         )}
@@ -240,7 +240,7 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
           {/* Sección para foto de perfil */}
           <div className="flex flex-col items-center mb-8">
             <div className="relative">
-              <div className="w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-blue-500">
+              <div className="w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-emerald-500">
                 {previewFoto ? (
                   <img
                     src={previewFoto}
@@ -248,11 +248,11 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = `https://ui-avatars.com/api/?name=${formData.primerNombre}+${formData.primerApellido}&background=0D8ABC&color=fff`;
+                      e.target.src = `https://ui-avatars.com/api/?name=${formData.primerNombre}+${formData.primerApellido}&background=10B981&color=fff`;
                     }}
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-blue-700 text-white">
+                  <div className="w-full h-full flex items-center justify-center bg-emerald-600 text-white">
                     <User size={64} />
                   </div>
                 )}
@@ -261,7 +261,7 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
               <button
                 type="button"
                 onClick={handleSelectFoto}
-                className="absolute bottom-2 right-0 p-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
+                className="absolute bottom-2 right-0 p-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg"
               >
                 <Edit size={20} />
               </button>
@@ -275,14 +275,14 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
               className="hidden"
             />
             
-            <p className="text-sm mt-2 text-gray-300">
+            <p className="text-sm mt-2 text-gray-600">
               Haz clic en el icono para cambiar la foto
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-300">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Primer Nombre *
               </label>
               <input
@@ -291,12 +291,12 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
                 value={formData.primerNombre}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg border bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-300">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Segundo Nombre
               </label>
               <input
@@ -304,12 +304,12 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
                 name="segundoNombre"
                 value={formData.segundoNombre}
                 onChange={handleChange}
-                className="w-full px-4 py-2 rounded-lg border bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-300">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Primer Apellido *
               </label>
               <input
@@ -318,12 +318,12 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
                 value={formData.primerApellido}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg border bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-300">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Segundo Apellido
               </label>
               <input
@@ -331,12 +331,12 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
                 name="segundoApellido"
                 value={formData.segundoApellido}
                 onChange={handleChange}
-                className="w-full px-4 py-2 rounded-lg border bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-300">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Correo Electrónico *
               </label>
               <input
@@ -345,12 +345,12 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg border bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-300">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Teléfono *
               </label>
               <input
@@ -359,12 +359,12 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
                 value={formData.telefono}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg border bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             
             <div className="md:col-span-2">
-              <label className="block mb-2 text-sm font-medium text-gray-300">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Descripción
               </label>
               <textarea
@@ -372,7 +372,7 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
                 value={formData.descripcion}
                 onChange={handleChange}
                 rows="4"
-                className="w-full px-4 py-2 rounded-lg border bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 placeholder="Escribe una breve descripción sobre el guía, su experiencia y habilidades..."
               ></textarea>
             </div>
@@ -382,7 +382,7 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
             <button
               type="submit"
               disabled={updating}
-              className={`py-2 px-6 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors duration-200 flex items-center gap-2 ${updating ? 'opacity-70 cursor-not-allowed' : ''}`}
+              className={`py-2 px-6 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-colors duration-200 flex items-center gap-2 ${updating ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
               {updating ? (
                 <>
@@ -400,7 +400,7 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
             <button
               type="button"
               onClick={onClose}
-              className="py-2 px-6 rounded-lg bg-gray-600 hover:bg-gray-700 text-white font-medium transition-colors duration-200"
+              className="py-2 px-6 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium transition-colors duration-200"
             >
               Cancelar
             </button>
