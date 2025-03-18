@@ -471,13 +471,14 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
             </div>
           </div>
         </div>
-        {/* Nuevo componente de Mapa de Azure */}
+        {/* Nuevo componente de Mapa de Azure 
 {rutaPrincipal && (
   <MapaRutaIntegracion 
     rutaPrincipal={rutaPrincipal} 
     altura="400px" 
   />
 )}
+  */}
 
         {/* Contenido detallado */}
         <div className="p-6">
