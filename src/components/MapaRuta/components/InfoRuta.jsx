@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 /**
  * Componente para mostrar información detallada de una ruta

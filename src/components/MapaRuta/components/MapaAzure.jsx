@@ -66,7 +66,6 @@ const MapaAzure = ({
           #mapContainer { 
             width: 100%; 
             height: 100%; 
-            border-radius: 12px;
           }
         </style>
       </head>
@@ -205,7 +204,6 @@ const MapaAzure = ({
             width: '100%',
             height: altura,
             border: 'none',
-            borderRadius: '12px',
             overflow: 'hidden',
             boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
           }}
@@ -218,15 +216,15 @@ const MapaAzure = ({
       
       {/* Indicador de carga */}
       {(cargando || !apiKey) && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-50 z-10 rounded-xl">
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-50 z-10">
           <CircularProgress tamaño="lg" color="teal" />
         </div>
       )}
       
       {/* Mostrar error si existe */}
       {error && (
-        <div className="absolute inset-0 flex items-center justify-center bg-red-100 bg-opacity-50 z-10 rounded-xl">
-          <div className="bg-white p-4 rounded-lg shadow-lg max-w-md text-center">
+        <div className="absolute inset-0 flex items-center justify-center bg-red-100 bg-opacity-50 z-10">
+          <div className="bg-white p-4 shadow-lg max-w-md text-center">
             <h3 className="text-red-600 font-bold text-lg mb-2">Error al cargar el mapa</h3>
             <p className="text-gray-700">{error}</p>
           </div>

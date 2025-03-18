@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { LINE_OPTIONS, MARKER_OPTIONS } from '../config/azureMapConfig';
 import MapaAzure from './MapaAzure';
 
@@ -73,7 +73,7 @@ const VistaRutaSimple = ({
   };
 
   return (
-    <div className={`rounded-xl overflow-hidden shadow-lg ${className}`}>
+    <div className={`overflow-hidden shadow-lg ${className}`}>
       <MapaAzure
         altura={altura}
         marcadores={marcadores}

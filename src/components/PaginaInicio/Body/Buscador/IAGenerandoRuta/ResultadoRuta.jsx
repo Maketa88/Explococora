@@ -1,10 +1,21 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FaHiking, FaShieldAlt, FaWater } from 'react-icons/fa';
-import { FiCamera, FiClock, FiCoffee, FiCompass, FiMap, FiMapPin, FiUsers } from 'react-icons/fi';
-import { GiMountainRoad } from 'react-icons/gi';
-import { obtenerFotosRuta, obtenerRutas } from '../../../../../services/rutasService';
+import { FaHiking, FaShieldAlt, FaWater } from "react-icons/fa";
+import {
+  FiCamera,
+  FiClock,
+  FiCoffee,
+  FiCompass,
+  FiMap,
+  FiMapPin,
+  FiUsers,
+} from "react-icons/fi";
+import { GiMountainRoad } from "react-icons/gi";
+import {
+  obtenerFotosRuta,
+  obtenerRutas,
+} from "../../../../../services/rutasService";
 import MapaRutaIntegracion from "../../../../MapaRuta/components/MapaRutaIntegracion";
 
 // Imágenes de respaldo por dificultad (se usarán si no hay fotos disponibles de la API)
@@ -25,9 +36,9 @@ const IconoActividad = () => <FiUsers className="h-5 w-5" />;
 // Iconos para puntos de interés según el índice
 const iconosPuntosInteres = [
   <FiCompass key="compass" className="w-5 h-5" />, // Mirador/Vista
-  <FiCoffee key="coffee" className="w-5 h-5" />,  // Zona de descanso
-  <FiMap key="map" className="w-5 h-5" />,     // Sendero
-  <FiCamera key="camera" className="w-5 h-5" />   // Área fotográfica
+  <FiCoffee key="coffee" className="w-5 h-5" />, // Zona de descanso
+  <FiMap key="map" className="w-5 h-5" />, // Sendero
+  <FiCamera key="camera" className="w-5 h-5" />, // Área fotográfica
 ];
 
 // Componente para mostrar el color de dificultad
@@ -72,7 +83,7 @@ const PuntoInteres = ({ nombre, descripcion, index }) => (
       {iconosPuntosInteres[index]}
     </motion.div>
     <div className="flex-grow">
-      <motion.h4 
+      <motion.h4
         className="font-semibold text-gray-800 text-lg mb-1.5 relative inline-block"
         whileHover={{ x: 5 }}
       >
@@ -163,19 +174,19 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
   // Función para obtener las fotos de una ruta específica
   const obtenerFotosParaRuta = async (idRuta) => {
     try {
-      setCargandoFotos(prev => ({...prev, [idRuta]: true}));
+      setCargandoFotos((prev) => ({ ...prev, [idRuta]: true }));
       const fotos = await obtenerFotosRuta(idRuta);
-      
+
       if (fotos.length > 0) {
-        setRutasConFotos(prevState => ({
+        setRutasConFotos((prevState) => ({
           ...prevState,
-          [idRuta]: fotos
+          [idRuta]: fotos,
         }));
       }
     } catch (error) {
       console.error(`Error al obtener fotos para la ruta ${idRuta}:`, error);
     } finally {
-      setCargandoFotos(prev => ({...prev, [idRuta]: false}));
+      setCargandoFotos((prev) => ({ ...prev, [idRuta]: false }));
     }
   };
 
@@ -187,11 +198,11 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
         // Asignar IDs a las rutas si no los tienen
         const rutasConIds = rutasResponse.map((ruta, index) => ({
           ...ruta,
-          idRuta: ruta.idRuta || index + 1
+          idRuta: ruta.idRuta || index + 1,
         }));
         setRutasData(rutasConIds);
       } catch (error) {
-        console.error('Error al cargar las rutas:', error);
+        console.error("Error al cargar las rutas:", error);
         // Podrías mostrar un mensaje de error al usuario aquí
       }
     };
@@ -294,18 +305,18 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
 
       setRutaPrincipal(rutaPrincipal);
       setRutasComplementarias(rutasComplementarias);
-      
+
       // Obtener fotos para la ruta principal y las complementarias
       if (rutaPrincipal && rutaPrincipal.idRuta) {
         obtenerFotosParaRuta(rutaPrincipal.idRuta);
       }
-      
-      rutasComplementarias.forEach(ruta => {
+
+      rutasComplementarias.forEach((ruta) => {
         if (ruta && ruta.idRuta) {
           obtenerFotosParaRuta(ruta.idRuta);
         }
       });
-      
+
       setCargando(false);
     } else {
       // Si no hay resultados de IA, seleccionar rutas aleatorias
@@ -322,18 +333,18 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
 
       setRutaPrincipal(rutaPrincipal);
       setRutasComplementarias(rutasComplementarias);
-      
+
       // Obtener fotos para la ruta principal y las complementarias
       if (rutaPrincipal && rutaPrincipal.idRuta) {
         obtenerFotosParaRuta(rutaPrincipal.idRuta);
       }
-      
-      rutasComplementarias.forEach(ruta => {
+
+      rutasComplementarias.forEach((ruta) => {
         if (ruta && ruta.idRuta) {
           obtenerFotosParaRuta(ruta.idRuta);
         }
       });
-      
+
       setCargando(false);
     }
   }, [resultadoIA, rutasData]);
@@ -356,22 +367,28 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
       console.log("Ruta sin ID válido, usando imagen de respaldo");
       return imagenesRespaldoPorDificultad[ruta?.dificultad || "Moderada"];
     }
-    
+
     // Si estamos cargando las fotos para esta ruta, mostrar un placeholder o la imagen de respaldo
     if (cargandoFotos[ruta.idRuta]) {
-      console.log(`Cargando fotos para ruta ${ruta.idRuta}, usando imagen de respaldo temporalmente`);
+      console.log(
+        `Cargando fotos para ruta ${ruta.idRuta}, usando imagen de respaldo temporalmente`
+      );
       return imagenesRespaldoPorDificultad[ruta.dificultad];
     }
-    
+
     // Si tenemos fotos para esta ruta, mostrar la primera
     if (rutasConFotos[ruta.idRuta] && rutasConFotos[ruta.idRuta].length > 0) {
       const imagenUrl = rutasConFotos[ruta.idRuta][0];
-      console.log(`Usando imagen real de API para ruta ${ruta.idRuta}: ${imagenUrl}`);
+      console.log(
+        `Usando imagen real de API para ruta ${ruta.idRuta}: ${imagenUrl}`
+      );
       return imagenUrl;
     }
-    
+
     // Si no hay fotos disponibles, mostrar la imagen de respaldo
-    console.log(`No hay fotos disponibles para ruta ${ruta.idRuta}, usando imagen de respaldo`);
+    console.log(
+      `No hay fotos disponibles para ruta ${ruta.idRuta}, usando imagen de respaldo`
+    );
     return imagenesRespaldoPorDificultad[ruta.dificultad];
   };
 
@@ -441,8 +458,14 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
               alt={rutaPrincipal?.nombreRuta}
               className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
               onError={(e) => {
-                console.error("Error al cargar la imagen de la ruta principal:", e);
-                e.target.src = imagenesRespaldoPorDificultad[rutaPrincipal?.dificultad || "Moderada"];
+                console.error(
+                  "Error al cargar la imagen de la ruta principal:",
+                  e
+                );
+                e.target.src =
+                  imagenesRespaldoPorDificultad[
+                    rutaPrincipal?.dificultad || "Moderada"
+                  ];
               }}
             />
           </div>
@@ -471,27 +494,22 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
             </div>
           </div>
         </div>
-        {/* Nuevo componente de Mapa de Azure 
-{rutaPrincipal && (
-  <MapaRutaIntegracion 
-    rutaPrincipal={rutaPrincipal} 
-    altura="400px" 
-  />
-)}
-  */}
+        {/* Nuevo componente de Mapa de Azure*/}
+        {rutaPrincipal && (
+          <MapaRutaIntegracion rutaPrincipal={rutaPrincipal} altura="400px" />
+        )}
 
         {/* Contenido detallado */}
-        <div className="p-6">
-          <div className="mb-6">
+        <div className="">
+          <div className="mb-6 p-4">
             <h3 className="text-xl font-semibold text-gray-800 mb-2">
               {t("descripcion", "Descripción")}
             </h3>
             <p className="text-gray-700">{rutaPrincipal?.descripcion}</p>
           </div>
 
-          <div className="mb-8 bg-gradient-to-br from-teal-50 via-white to-teal-50 p-8 rounded-3xl shadow-xl border border-teal-200 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-teal-400/20 to-teal-200/10 rounded-bl-full -mr-10 -mt-10 z-0"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-teal-400/20 to-teal-200/10 rounded-tr-full -ml-8 -mb-8 z-0"></div>
+          <div className="bg-gradient-to-br from-teal-50 via-white to-teal-50 p-8 shadow-xl  relative overflow-hidden">
+
             <h3 className="text-2xl font-bold text-center mb-8 relative z-10">
               <span className="bg-gradient-to-r from-teal-700 to-teal-500 bg-clip-text text-transparent px-4">
                 {t("puntosInteres", "Lo que verás en esta ruta")}
@@ -509,16 +527,15 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-teal-50 via-white to-teal-50 p-8 rounded-3xl shadow-xl border border-teal-200 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-teal-400/20 to-teal-200/10 rounded-bl-full -mr-10 -mt-10 z-0"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-teal-400/20 to-teal-200/10 rounded-tr-full -ml-8 -mb-8 z-0"></div>
+          <div className="bg-gradient-to-br from-teal-50 via-white to-teal-50 p-8 shadow-xl  relative overflow-hidden">
+           
             <h3 className="text-2xl font-bold text-center mb-8 relative z-10">
               <span className="bg-gradient-to-r from-teal-700 to-teal-500 bg-clip-text text-transparent px-4">
                 {t("recomendaciones", "Recomendaciones")}
               </span>
             </h3>
             <div className="flex flex-col space-y-4 mt-6 relative z-10">
-              <motion.div 
+              <motion.div
                 whileHover={{ x: 8, scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 300 }}
                 className="bg-gradient-to-r from-white to-teal-50 p-4 rounded-xl shadow-md border border-teal-100 flex items-center group hover:shadow-lg transition-all duration-300"
@@ -527,11 +544,14 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
                   <FaWater className="w-6 h-6" />
                 </div>
                 <p className="font-medium text-teal-700 group-hover:text-teal-800 transition-colors duration-300">
-                  {t("recomendacionAgua", "Lleva agua suficiente para mantenerte hidratado durante toda la ruta")}
+                  {t(
+                    "recomendacionAgua",
+                    "Lleva agua suficiente para mantenerte hidratado durante toda la ruta"
+                  )}
                 </p>
               </motion.div>
-              
-              <motion.div 
+
+              <motion.div
                 whileHover={{ x: 8, scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 300 }}
                 className="bg-gradient-to-r from-white to-teal-50 p-4 rounded-xl shadow-md border border-teal-100 flex items-center group hover:shadow-lg transition-all duration-300"
@@ -540,7 +560,10 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
                   <FaHiking className="w-6 h-6" />
                 </div>
                 <p className="font-medium text-teal-700 group-hover:text-teal-800 transition-colors duration-300">
-                  {t("recomendacionCalzadoCompleta", "Usa calzado cómodo y adecuado para")} {" "}
+                  {t(
+                    "recomendacionCalzadoCompleta",
+                    "Usa calzado cómodo y adecuado para"
+                  )}{" "}
                   {rutaPrincipal?.dificultad === "Facil"
                     ? t("terrenoPlano", "terreno plano")
                     : rutaPrincipal?.dificultad === "Moderada"
@@ -548,8 +571,8 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
                     : t("terrenoEscarpado", "terreno escarpado")}
                 </p>
               </motion.div>
-              
-              <motion.div 
+
+              <motion.div
                 whileHover={{ x: 8, scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 300 }}
                 className="bg-gradient-to-r from-white to-teal-50 p-4 rounded-xl shadow-md border border-teal-100 flex items-center group hover:shadow-lg transition-all duration-300"
@@ -558,11 +581,14 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
                   <FaShieldAlt className="w-6 h-6" />
                 </div>
                 <p className="font-medium text-teal-700 group-hover:text-teal-800 transition-colors duration-300">
-                  {t("recomendacionProteccionCompleta", "Protección solar y repelente de insectos para una experiencia confortable")}
+                  {t(
+                    "recomendacionProteccionCompleta",
+                    "Protección solar y repelente de insectos para una experiencia confortable"
+                  )}
                 </p>
               </motion.div>
-              
-              <motion.div 
+
+              <motion.div
                 whileHover={{ x: 8, scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 300 }}
                 className="bg-gradient-to-r from-white to-teal-50 p-4 rounded-xl shadow-md border border-teal-100 flex items-center group hover:shadow-lg transition-all duration-300"
@@ -572,8 +598,14 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
                 </div>
                 <p className="font-medium text-teal-700 group-hover:text-teal-800 transition-colors duration-300">
                   {rutaPrincipal?.dificultad === "Desafiante"
-                    ? t("recomendacionDesafianteCompleta", "Recomendable ir acompañado y con experiencia previa en rutas similares")
-                    : t("recomendacionFacilCompleta", "Ideal para disfrutar en familia o con amigos, perfecto para todas las edades")}
+                    ? t(
+                        "recomendacionDesafianteCompleta",
+                        "Recomendable ir acompañado y con experiencia previa en rutas similares"
+                      )
+                    : t(
+                        "recomendacionFacilCompleta",
+                        "Ideal para disfrutar en familia o con amigos, perfecto para todas las edades"
+                      )}
                 </p>
               </motion.div>
             </div>
@@ -615,8 +647,12 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
                   alt={ruta.nombreRuta}
                   className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   onError={(e) => {
-                    console.error(`Error al cargar la imagen de la ruta complementaria ${ruta.nombreRuta}:`, e);
-                    e.target.src = imagenesRespaldoPorDificultad[ruta.dificultad];
+                    console.error(
+                      `Error al cargar la imagen de la ruta complementaria ${ruta.nombreRuta}:`,
+                      e
+                    );
+                    e.target.src =
+                      imagenesRespaldoPorDificultad[ruta.dificultad];
                   }}
                 />
               </div>
@@ -648,5 +684,3 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
     </div>
   );
 };
-
-

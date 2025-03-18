@@ -139,7 +139,7 @@ const VistaMapaRuta = ({
   };
 
   return (
-    <div className={`bg-white rounded-xl shadow-lg overflow-hidden ${className}`}>
+    <div className={`bg-white  shadow-lg overflow-hidden ${className}`}>
       {/* Encabezado con información de la ruta */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
