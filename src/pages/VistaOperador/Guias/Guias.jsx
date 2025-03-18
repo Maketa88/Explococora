@@ -687,57 +687,7 @@ const Guias = () => {
           </div>
         )}
         
-        {/* Tarjetas de estadísticas */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
-          <div className="p-3 md:p-4 rounded-lg bg-emerald-100 border-l-4 border-emerald-500 flex items-center justify-between shadow-sm">
-            <div>
-              <p className="text-xs sm:text-sm text-emerald-700">Total de Guías</p>
-              <p className="text-lg sm:text-2xl font-bold text-gray-800">
-                {contadores.total}
-              </p>
-            </div>
-            <div className="p-2 sm:p-3 rounded-full bg-emerald-200">
-              <UserPlus className="w-4 h-4 sm:w-6 sm:h-6 text-emerald-700" />
-            </div>
-          </div>
-          
-          <div className="p-3 md:p-4 rounded-lg bg-green-50 border-l-4 border-green-500 flex items-center justify-between shadow-sm">
-            <div>
-              <p className="text-xs sm:text-sm text-green-700">Guías Disponibles</p>
-              <p className="text-lg sm:text-2xl font-bold text-gray-800">
-                {contadores.disponibles}
-              </p>
-            </div>
-            <div className="p-2 sm:p-3 rounded-full bg-green-100">
-              <CheckCircle className="w-4 h-4 sm:w-6 sm:h-6 text-green-600" />
-            </div>
-          </div>
-          
-          <div className="p-3 md:p-4 rounded-lg bg-amber-50 border-l-4 border-amber-500 flex items-center justify-between shadow-sm">
-            <div>
-              <p className="text-xs sm:text-sm text-amber-700">Guías Ocupados</p>
-              <p className="text-lg sm:text-2xl font-bold text-gray-800">
-                {contadores.ocupados}
-              </p>
-            </div>
-            <div className="p-2 sm:p-3 rounded-full bg-amber-100">
-              <Clock className="w-4 h-4 sm:w-6 sm:h-6 text-amber-500" />
-            </div>
-          </div>
-          
-          <div className="p-3 md:p-4 rounded-lg bg-red-50 border-l-4 border-red-500 flex items-center justify-between shadow-sm">
-            <div>
-              <p className="text-xs sm:text-sm text-red-700">Guías Inactivos</p>
-              <p className="text-lg sm:text-2xl font-bold text-gray-800">
-                {contadores.inactivos}
-              </p>
-            </div>
-            <div className="p-2 sm:p-3 rounded-full bg-red-100">
-              <XCircle className="w-4 h-4 sm:w-6 sm:h-6 text-red-500" />
-            </div>
-          </div>
-        </div>
-
+        
         {/* Lista de guías - sin efectos de zoom */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
           {loading ? (
