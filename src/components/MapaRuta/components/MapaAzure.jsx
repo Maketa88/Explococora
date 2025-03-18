@@ -24,7 +24,7 @@ const MapaAzure = ({
   
   // Contenido HTML para el iframe
   const getIframeContent = () => {
-    return `
+    const htmlContent = `
       <!DOCTYPE html>
       <html>
       <head>
@@ -100,12 +100,15 @@ const MapaAzure = ({
           }
           
           document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(initMap,500);
+            setTimeout(initMap, 500);
           });
         </script>
       </body>
       </html>
     `;
+    
+    // Convertir el HTML a un Data URL que podamos usar como src del iframe
+    return `data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`;
   };
   
   // Efecto para configurar el iframe y la comunicación
@@ -146,22 +149,6 @@ const MapaAzure = ({
     // Agregar listener para mensajes del iframe
     window.addEventListener('message', handleIframeMessage);
     
-    // Inicializar el contenido del iframe después de montado
-    const initIframe = () => {
-      if (iframeRef.current) {
-        const iframe = iframeRef.current;
-        const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-        
-        // Establecer el contenido del iframe
-        iframeDocument.open();
-        iframeDocument.write(getIframeContent());
-        iframeDocument.close();
-      }
-    };
-    
-    // Inicializar con un pequeño retraso para asegurar que el iframe esté montado
-    const timeoutId = setTimeout(initIframe, 100);
-    
     // Verificar que el header esté siempre visible
     const asegurarHeaderVisible = () => {
       const header = document.querySelector('header');
@@ -179,7 +166,6 @@ const MapaAzure = ({
     // Limpieza
     return () => {
       window.removeEventListener('message', handleIframeMessage);
-      clearTimeout(timeoutId);
       clearTimeout(timer1);
       clearTimeout(timer2);
     };
@@ -201,6 +187,7 @@ const MapaAzure = ({
         }}
         title="Azure Maps"
         sandbox="allow-scripts allow-same-origin"
+        src={getIframeContent()}
         className="mapa-azure-container"
       />
       
