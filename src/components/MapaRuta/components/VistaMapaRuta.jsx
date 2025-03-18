@@ -144,7 +144,7 @@ const VistaMapaRuta = ({
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="px-6 py-4 border-b border-gray-200"
+        className="px-4 py-2 border-b border-gray-200"
       >
         <h2 className="text-2xl font-bold text-teal-700">{nombreRuta}</h2>
         {descripcion && (
@@ -153,7 +153,7 @@ const VistaMapaRuta = ({
       </motion.div>
 
       {/* Contenedor del mapa */}
-      <div className="relative">
+      <div className="relative p-4">
         <MapaAzure
           altura={altura}
           marcadores={marcadores}
