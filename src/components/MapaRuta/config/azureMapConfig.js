@@ -5,24 +5,45 @@
 // 1. Crear una cuenta de Azure (puedes usar la cuenta gratuita de estudiante)
 // 2. Crear un recurso de Azure Maps en el portal de Azure
 // 3. Obtener la clave de suscripción desde la sección "Autenticación" del recurso
-// 4. Reemplazar 'YOUR_AZURE_MAPS_KEY' con tu clave en este archivo
+// 4. La clave ahora se obtiene desde el backend para mayor seguridad
 
-// Definir la clave una sola vez para evitar inconsistencias
-const AZURE_MAPS_KEY = '4s8ztrQPOZ31reLiCWyRYpbQkD4lKlRlKJic348l5gXuUh3UPlZ8JQQJ99BCACYeBjFs5mg0AAAgAZMP2azq';
+import axios from 'axios';
+
+// URL base para el backend
+const API_URL = "http://localhost:10101";
+
+// Variable para almacenar la clave API (cache)
+let AZURE_MAPS_KEY = null;
+
+// Función asíncrona para obtener la clave API desde el backend
+export const getAzureMapsKey = async () => {
+  // Si ya tenemos la clave en caché, la devolvemos
+  if (AZURE_MAPS_KEY) return AZURE_MAPS_KEY;
+  
+  try {
+    console.log('Solicitando clave API de Azure Maps al backend...');
+    const response = await axios.get(`${API_URL}/api/azure-maps/token`);
+    
+    if (response.data && response.data.success && response.data.token) {
+      AZURE_MAPS_KEY = response.data.token;
+      console.log('Clave API recibida correctamente');
+      return AZURE_MAPS_KEY;
+    } else {
+      console.error('Respuesta inválida del backend:', response.data);
+      return '';
+    }
+  } catch (error) {
+    console.error('Error al obtener clave API de Azure Maps:', error);
+    return '';
+  }
+};
 
 export const AZURE_MAPS_CONFIG = {
-  // La clave de suscripción a Azure Maps
-  subscriptionKey: AZURE_MAPS_KEY,
-  
   // Opciones por defecto para el mapa
   defaultOptions: {
     center: [-75.25, 4.57], // Centro por defecto en Colombia
     zoom: 7,
     language: 'es-ES',
-    authOptions: {
-      authType: 'subscriptionKey',
-      subscriptionKey: AZURE_MAPS_KEY
-    },
     style: 'road' // Opciones: road, grayscale_light, dark, satellite, satellite_road_labels
   }
 };

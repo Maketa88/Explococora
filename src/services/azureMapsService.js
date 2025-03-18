@@ -1,17 +1,31 @@
 import axios from 'axios';
-import { AZURE_MAPS_CONFIG } from '../components/MapaRuta/config/azureMapConfig';
+import { getAzureMapsKey } from '../components/MapaRuta/config/azureMapConfig';
 
 // URL base para las peticiones a Azure Maps
 const AZURE_MAPS_BASE_URL = 'https://atlas.microsoft.com/';
 
-// Crear una instancia de axios configurada para Azure Maps
-const azureMapsApi = axios.create({
-  baseURL: AZURE_MAPS_BASE_URL,
-  params: {
-    'subscription-key': AZURE_MAPS_CONFIG.subscriptionKey,
-    'api-version': '1.0'
+// Función para crear un cliente axios con la clave API
+const getAzureMapsClient = async () => {
+  try {
+    const subscriptionKey = await getAzureMapsKey();
+    
+    if (!subscriptionKey) {
+      console.error('No se pudo obtener la clave API para Azure Maps');
+      throw new Error('No se pudo obtener la clave API');
+    }
+    
+    return axios.create({
+      baseURL: AZURE_MAPS_BASE_URL,
+      params: {
+        'subscription-key': subscriptionKey,
+        'api-version': '1.0'
+      }
+    });
+  } catch (error) {
+    console.error('Error al crear cliente para Azure Maps:', error);
+    throw error;
   }
-});
+};
 
 /**
  * Obtiene una ruta entre dos puntos
@@ -40,6 +54,9 @@ export const obtenerRuta = async (origen, destino, puntosIntermedio = []) => {
         ]
       };
     }
+    
+    // Obtener cliente con la clave API
+    const azureMapsClient = await getAzureMapsClient();
     
     // Formatear coordenadas para la API de Azure Maps
     const origenStr = `${origen[1]},${origen[0]}`;
@@ -79,7 +96,7 @@ export const obtenerRuta = async (origen, destino, puntosIntermedio = []) => {
     };
     
     // Realizar la petición a la API
-    const response = await azureMapsApi.get('/route/directions/json', { params });
+    const response = await azureMapsClient.get('/route/directions/json', { params });
     
     return response.data;
   } catch (error) {
@@ -109,6 +126,7 @@ export const obtenerRuta = async (origen, destino, puntosIntermedio = []) => {
  */
 export const obtenerInformacionPunto = async (coordenadas) => {
   try {
+    const azureMapsClient = await getAzureMapsClient();
     const coordenadasStr = `${coordenadas[0]},${coordenadas[1]}`;
     
     const params = {
@@ -119,7 +137,7 @@ export const obtenerInformacionPunto = async (coordenadas) => {
       returnAddressDetails: true
     };
     
-    const response = await azureMapsApi.get('/search/address/reverse/json', { params });
+    const response = await azureMapsClient.get('/search/address/reverse/json', { params });
     
     return response.data;
   } catch (error) {
@@ -137,6 +155,8 @@ export const obtenerInformacionPunto = async (coordenadas) => {
  */
 export const buscarLugares = async (consulta, centro = null, radio = 10000) => {
   try {
+    const azureMapsClient = await getAzureMapsClient();
+    
     const params = {
       query: consulta,
       limit: 10,
@@ -152,7 +172,7 @@ export const buscarLugares = async (consulta, centro = null, radio = 10000) => {
       params.radius = radio;
     }
     
-    const response = await azureMapsApi.get('/search/fuzzy/json', { params });
+    const response = await azureMapsClient.get('/search/fuzzy/json', { params });
     
     return response.data;
   } catch (error) {

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AZURE_MAPS_CONFIG } from '../config/azureMapConfig';
+import { AZURE_MAPS_CONFIG, getAzureMapsKey } from '../config/azureMapConfig';
 import { CircularProgress } from '../utils/CircularProgress';
 
 /**
@@ -19,11 +19,34 @@ const MapaAzure = ({
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [iframeId] = useState(`azure-map-iframe-${Math.random().toString(36).substr(2, 9)}`);
+  const [apiKey, setApiKey] = useState(null);
   
   const iframeRef = useRef(null);
   
+  // Efecto para obtener la clave API
+  useEffect(() => {
+    const fetchApiKey = async () => {
+      try {
+        const key = await getAzureMapsKey();
+        if (!key) {
+          throw new Error('No se pudo obtener la clave API de Azure Maps');
+        }
+        setApiKey(key);
+      } catch (err) {
+        console.error('Error al obtener la clave API:', err);
+        setError('No se pudo obtener la configuración del mapa');
+      }
+    };
+    
+    fetchApiKey();
+  }, []);
+  
   // Contenido HTML para el iframe
   const getIframeContent = () => {
+    if (!apiKey) {
+      return `data:text/html;charset=utf-8,${encodeURIComponent('<html><body>Cargando configuración...</body></html>')}`;
+    }
+    
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -58,7 +81,7 @@ const MapaAzure = ({
                 style: '${estilo}',
                 authOptions: {
                   authType: 'subscriptionKey',
-                  subscriptionKey: '${AZURE_MAPS_CONFIG.subscriptionKey}'
+                  subscriptionKey: '${apiKey}'
                 },
                 disableTelemetry: true
               });
@@ -173,26 +196,28 @@ const MapaAzure = ({
   
   return (
     <div className={`relative ${className}`}>
-      {/* Iframe para el mapa */}
-      <iframe 
-        ref={iframeRef}
-        id={iframeId}
-        style={{
-          width: '100%',
-          height: altura,
-          border: 'none',
-          borderRadius: '12px',
-          overflow: 'hidden',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-        }}
-        title="Azure Maps"
-        sandbox="allow-scripts allow-same-origin"
-        src={getIframeContent()}
-        className="mapa-azure-container"
-      />
+      {/* Iframe para el mapa - solo renderizar cuando tengamos la clave API */}
+      {apiKey ? (
+        <iframe 
+          ref={iframeRef}
+          id={iframeId}
+          style={{
+            width: '100%',
+            height: altura,
+            border: 'none',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+          }}
+          title="Azure Maps"
+          sandbox="allow-scripts allow-same-origin"
+          src={getIframeContent()}
+          className="mapa-azure-container"
+        />
+      ) : null}
       
       {/* Indicador de carga */}
-      {cargando && (
+      {(cargando || !apiKey) && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-50 z-10 rounded-xl">
           <CircularProgress tamaño="lg" color="teal" />
         </div>
