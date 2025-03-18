@@ -1,22 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import DashboardLayout from '../../../layouts/DashboardLayout';
-import { Mail, Phone, MapPin, Calendar, CheckCircle, Clock, XCircle, Search, Filter, UserPlus, Star, CreditCard, Trash2, Edit, Globe, Languages, X, AlertCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Calendar, CheckCircle, Clock, XCircle, Search, Filter, UserPlus, Star, CreditCard, Trash2, Edit, Languages, X, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import logoExplococora from '../../../assets/Images/logo.webp';
 import EstadoGuia from '../../../components/Guias/EstadoGuia';
-import guiaEstadoService from '../../../services/guiaEstadoService';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2';
 
 const Guias = () => {
   const navigate = useNavigate();
-  const [guias, setGuias] = useState([]);
   const [guiasCompletos, setGuiasCompletos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [darkMode] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('todos'); // todos, disponible, ocupado, inactivo
   const [ordenarPor, setOrdenarPor] = useState('nombre'); // nombre, fecha, experiencia
@@ -49,10 +45,6 @@ const Guias = () => {
     descripcion: ''
   });
   const [updating, setUpdating] = useState(false);
-  const [updateError, setUpdateError] = useState('');
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [successGuiaName, setSuccessGuiaName] = useState('');
   const [alert, setAlert] = useState({ show: false, message: "", type: "" });
 
   // Función para redirigir a la página de nuevo guía
@@ -87,7 +79,7 @@ const Guias = () => {
       });
       
       return response.data?.data?.estado || 'disponible';
-    } catch (errorEstado) {
+    } catch (_) {
       // Sin mensajes de error en consola
       return 'disponible';
     }
@@ -288,14 +280,11 @@ const Guias = () => {
   // Función para cargar guías desde el servidor
   const cargarGuias = async () => {
     setLoading(true);
-    setError(null);
     try {
       const token = localStorage.getItem('token');
       
       if (!token) {
         console.error("No hay token de autenticación");
-        setError("No hay token de autenticación. Por favor, inicie sesión nuevamente.");
-        toast.error("Error de autenticación. Por favor inicie sesión nuevamente.");
         setLoading(false);
         return;
       }
@@ -333,8 +322,6 @@ const Guias = () => {
       
       if (!encontrado) {
         console.error("No se pudo conectar con ningún endpoint");
-        setError("No se pudieron obtener los guías. Por favor, intente más tarde.");
-        toast.error("No se pudieron cargar los guías. Por favor intente más tarde.");
         setLoading(false);
         return;
       }
@@ -362,7 +349,7 @@ const Guias = () => {
                 telefono: obtenerTelefono(perfilCompleto)
               };
             }
-          } catch (errorPerfil) {
+          } catch (_) {
             // Silenciar error
           }
           
@@ -383,26 +370,13 @@ const Guias = () => {
       
       const guiasConEstado = await Promise.all(guiasCompletosPromises);
       
-      setGuias(guiasData);
       setGuiasCompletos(guiasConEstado);
       actualizarContadores(guiasConEstado);
       setLoading(false);
     } catch (err) {
       console.error("Error al cargar guías:", err);
-      setError("Error al cargar los guías: " + err.message);
-      toast.error("Error al cargar los guías: " + (err.message || "Error desconocido"));
       setLoading(false);
     }
-  };
-
-  // Función simplificada para cerrar modales y recargar datos
-  const cerrarModalYActualizar = () => {
-    // Cerrar todos los modales explícitamente
-    setShowEditarModal(false);
-    setShowDetallesModal(false);
-    
-    // Volver a cargar los datos sin recargar toda la página
-    cargarGuias();
   };
 
   // Función para mostrar alertas
@@ -485,18 +459,7 @@ const Guias = () => {
       if (error.response) {
         // El servidor respondió con un código de error
         if (error.response.status === 403) {
-          // Problema de permisos - Mostrar un mensaje más específico
-          showAlert('No tienes permiso para actualizar este guía. Solo usuarios con rol "guía" o "admin" pueden realizar esta acción.', 'error');
-          
-          // Mostrar información del token para depuración
-          try {
-            const token = localStorage.getItem('token');
-            const tokenData = token ? JSON.parse(atob(token.split('.')[1])) : null;
-            console.log('Información del token:', tokenData);
-            console.log('Rol del usuario actual:', tokenData?.rol || 'No disponible');
-          } catch (e) {
-            console.error('Error al decodificar token:', e);
-          }
+          showAlert('Error de permisos al actualizar el guía. Contacta al administrador.', 'error');
         } else if (error.response.status === 401) {
           showAlert('Sesión expirada. Los cambios no se guardaron.', 'error');
         } else if (error.response.status === 400) {
@@ -575,58 +538,6 @@ const Guias = () => {
         </button>
       </div>
     );
-  };
-
-  // Función para eliminar un guía
-  const handleDeleteGuia = async (guiaId, guiaNombre) => {
-    try {
-      // Confirmar eliminación con SweetAlert2
-      const result = await Swal.fire({
-        title: '¿Estás seguro?',
-        text: `¿Deseas eliminar al guía ${guiaNombre}?`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#10b981',
-        cancelButtonColor: '#ef4444',
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar'
-      });
-      
-      if (result.isConfirmed) {
-        // Mostrar estado de carga
-        setIsDeleting(true);
-        
-        // Realizar la eliminación
-        await axios.delete(`http://localhost:10101/guia/eliminar/${guiaId}`);
-        
-        // Mostrar alerta de éxito con el mensaje específico
-        showAlert(`¡GUÍA ELIMINADO EXITOSAMENTE! ${guiaNombre} ha sido eliminado del sistema.`, "success");
-        
-        // Actualizar la lista de guías
-        setTimeout(() => {
-          cargarGuias();
-          setIsDeleting(false);
-        }, 1000);
-      }
-    } catch (error) {
-      console.error('Error al eliminar guía:', error);
-      setIsDeleting(false);
-      
-      // Manejar diferentes tipos de errores
-      if (error.response) {
-        const status = error.response.status;
-        
-        if (status === 404) {
-          showAlert("El guía que intentas eliminar no existe o ya fue eliminado.", "error");
-        } else if (status === 401 || status === 403) {
-          showAlert("No tienes permisos para eliminar este guía.", "error");
-        } else {
-          showAlert("Error al eliminar el guía. Por favor, intente nuevamente.", "error");
-        }
-      } else {
-        showAlert("Error de conexión. Verifica tu conexión a internet.", "error");
-      }
-    }
   };
 
   return (
@@ -776,57 +687,7 @@ const Guias = () => {
           </div>
         )}
         
-        {/* Tarjetas de estadísticas */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
-          <div className="p-3 md:p-4 rounded-lg bg-emerald-100 border-l-4 border-emerald-500 flex items-center justify-between shadow-sm">
-            <div>
-              <p className="text-xs sm:text-sm text-emerald-700">Total de Guías</p>
-              <p className="text-lg sm:text-2xl font-bold text-gray-800">
-                {contadores.total}
-              </p>
-            </div>
-            <div className="p-2 sm:p-3 rounded-full bg-emerald-200">
-              <UserPlus className="w-4 h-4 sm:w-6 sm:h-6 text-emerald-700" />
-            </div>
-          </div>
-          
-          <div className="p-3 md:p-4 rounded-lg bg-green-50 border-l-4 border-green-500 flex items-center justify-between shadow-sm">
-            <div>
-              <p className="text-xs sm:text-sm text-green-700">Guías Disponibles</p>
-              <p className="text-lg sm:text-2xl font-bold text-gray-800">
-                {contadores.disponibles}
-              </p>
-            </div>
-            <div className="p-2 sm:p-3 rounded-full bg-green-100">
-              <CheckCircle className="w-4 h-4 sm:w-6 sm:h-6 text-green-600" />
-            </div>
-          </div>
-          
-          <div className="p-3 md:p-4 rounded-lg bg-amber-50 border-l-4 border-amber-500 flex items-center justify-between shadow-sm">
-            <div>
-              <p className="text-xs sm:text-sm text-amber-700">Guías Ocupados</p>
-              <p className="text-lg sm:text-2xl font-bold text-gray-800">
-                {contadores.ocupados}
-              </p>
-            </div>
-            <div className="p-2 sm:p-3 rounded-full bg-amber-100">
-              <Clock className="w-4 h-4 sm:w-6 sm:h-6 text-amber-500" />
-            </div>
-          </div>
-          
-          <div className="p-3 md:p-4 rounded-lg bg-red-50 border-l-4 border-red-500 flex items-center justify-between shadow-sm">
-            <div>
-              <p className="text-xs sm:text-sm text-red-700">Guías Inactivos</p>
-              <p className="text-lg sm:text-2xl font-bold text-gray-800">
-                {contadores.inactivos}
-              </p>
-            </div>
-            <div className="p-2 sm:p-3 rounded-full bg-red-100">
-              <XCircle className="w-4 h-4 sm:w-6 sm:h-6 text-red-500" />
-            </div>
-          </div>
-        </div>
-
+        
         {/* Lista de guías - sin efectos de zoom */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
           {loading ? (
@@ -1419,7 +1280,7 @@ const Guias = () => {
 
 export default Guias;
 
-<style global="true">{`
+<style jsx="true">{`
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }

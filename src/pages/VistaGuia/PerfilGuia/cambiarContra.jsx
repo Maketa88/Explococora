@@ -225,12 +225,12 @@ const CambiarContraseña = () => {
   return (
     <DashboardLayoutGuia>
       <div className="p-6">
-        <div className="bg-teal-900 rounded-lg p-8 shadow-lg max-w-5xl mx-auto">
+        <div className="bg-white rounded-lg p-8 shadow-lg max-w-5xl mx-auto border border-emerald-100">
           <div className="flex items-center mb-8">
-            <div className="w-16 h-16 rounded-full bg-teal-600 flex items-center justify-center mr-4">
+            <div className="w-16 h-16 rounded-full bg-emerald-600 flex items-center justify-center mr-4">
               <Lock className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-3xl font-bold text-white">
+            <h2 className="text-3xl font-bold text-emerald-800">
               Cambiar Contraseña
             </h2>
           </div>
@@ -240,7 +240,7 @@ const CambiarContraseña = () => {
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <label className="block text-sm font-medium mb-2 text-white">
+                <label className="block text-sm font-medium mb-2 text-gray-700">
                   Cédula
                 </label>
                 <input
@@ -248,13 +248,13 @@ const CambiarContraseña = () => {
                   name="cedula"
                   value={formData.cedula}
                   onChange={handleInputChange}
-                  className="w-full p-3 rounded-lg bg-teal-800 text-white border border-teal-600"
+                  className="w-full p-3 rounded-lg bg-emerald-50 text-gray-900 border border-emerald-100"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-2 text-white">
+                <label className="block text-sm font-medium mb-2 text-gray-700">
                   Contraseña Actual
                 </label>
                 <div className="relative">
@@ -263,13 +263,13 @@ const CambiarContraseña = () => {
                     name="contrasenaActual"
                     value={formData.contrasenaActual}
                     onChange={handleInputChange}
-                    className="w-full p-3 rounded-lg bg-teal-800 text-white border border-teal-600"
+                    className="w-full p-3 rounded-lg bg-emerald-50 text-gray-900 border border-emerald-100"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => togglePassword("actual")}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-teal-300 hover:text-white"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-emerald-600 hover:text-emerald-800"
                   >
                     {showPassword.actual ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
@@ -277,7 +277,7 @@ const CambiarContraseña = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-2 text-white">
+                <label className="block text-sm font-medium mb-2 text-gray-700">
                   Nueva Contraseña
                 </label>
                 <div className="relative">
@@ -286,13 +286,13 @@ const CambiarContraseña = () => {
                     name="nuevaContrasena"
                     value={formData.nuevaContrasena}
                     onChange={handleInputChange}
-                    className="w-full p-3 rounded-lg bg-teal-800 text-white border border-teal-600"
+                    className="w-full p-3 rounded-lg bg-emerald-50 text-gray-900 border border-emerald-100"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => togglePassword("nueva")}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-teal-300 hover:text-white"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-emerald-600 hover:text-emerald-800"
                   >
                     {showPassword.nueva ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
@@ -300,8 +300,8 @@ const CambiarContraseña = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-2 text-white">
-                  Confirmar Nueva Contraseña
+                <label className="block text-sm font-medium mb-2 text-gray-700">
+                  Confirmar Contraseña
                 </label>
                 <div className="relative">
                   <input
@@ -309,18 +309,18 @@ const CambiarContraseña = () => {
                     name="confirmarContrasena"
                     value={formData.confirmarContrasena}
                     onChange={handleInputChange}
-                    className={`w-full p-3 rounded-lg bg-teal-800 text-white border ${
+                    className={`w-full p-3 rounded-lg bg-emerald-50 text-gray-900 border ${
                       formData.nuevaContrasena && formData.confirmarContrasena && 
                       formData.nuevaContrasena !== formData.confirmarContrasena 
                         ? 'border-red-500'
-                        : 'border-teal-600'
+                        : 'border-emerald-100'
                     }`}
                     required
                   />
                   <button
                     type="button"
                     onClick={() => togglePassword("confirmar")}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-teal-300 hover:text-white"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-emerald-600 hover:text-emerald-800"
                   >
                     {showPassword.confirmar ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
@@ -332,38 +332,37 @@ const CambiarContraseña = () => {
               </div>
             </div>
             
-            <div className="mt-8 p-4 rounded-lg bg-teal-800 border border-teal-700">
-              <h3 className="text-white text-lg font-medium mb-2">Requisitos de la contraseña</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                <p className={`flex items-center ${requisitosContrasena.longitud ? 'text-green-500' : 'text-white'}`}>
+            <div className="mt-8 p-4 rounded-lg bg-emerald-50 border border-emerald-100">
+              <h3 className="text-emerald-800 font-medium mb-3">Requisitos de seguridad:</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <p className={`flex items-center ${requisitosContrasena.longitud ? 'text-emerald-600' : 'text-gray-600'}`}>
                   <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.longitud ? 'opacity-100' : 'opacity-50'}`} />
                   Mínimo 8 caracteres
                 </p>
-                <p className={`flex items-center ${requisitosContrasena.mayuscula ? 'text-green-500' : 'text-white'}`}>
+                <p className={`flex items-center ${requisitosContrasena.mayuscula ? 'text-emerald-600' : 'text-gray-600'}`}>
                   <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.mayuscula ? 'opacity-100' : 'opacity-50'}`} />
                   Al menos una mayúscula
                 </p>
-                <p className={`flex items-center ${requisitosContrasena.minuscula ? 'text-green-500' : 'text-white'}`}>
+                <p className={`flex items-center ${requisitosContrasena.minuscula ? 'text-emerald-600' : 'text-gray-600'}`}>
                   <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.minuscula ? 'opacity-100' : 'opacity-50'}`} />
                   Al menos una minúscula
                 </p>
-                <p className={`flex items-center ${requisitosContrasena.numero ? 'text-green-500' : 'text-white'}`}>
+                <p className={`flex items-center ${requisitosContrasena.numero ? 'text-emerald-600' : 'text-gray-600'}`}>
                   <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.numero ? 'opacity-100' : 'opacity-50'}`} />
                   Al menos un número
                 </p>
-                <p className={`flex items-center ${requisitosContrasena.especial ? 'text-green-500' : 'text-white'}`}>
+                <p className={`flex items-center ${requisitosContrasena.especial ? 'text-emerald-600' : 'text-gray-600'}`}>
                   <CheckCircle className={`w-4 h-4 mr-2 ${requisitosContrasena.especial ? 'opacity-100' : 'opacity-50'}`} />
                   Al menos un carácter especial (!@#$%^&*)
                 </p>
               </div>
             </div>
 
-            {/* Botones de acción */}
             <div className="flex justify-end mt-8 space-x-4">
               <button
                 type="button"
                 onClick={() => navigate("/VistaGuia/PerfilGuia")}
-                className="py-2 px-6 bg-teal-700 hover:bg-teal-600 text-white rounded-lg flex items-center gap-2"
+                className="py-2 px-6 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg flex items-center gap-2"
               >
                 <ArrowLeft className="w-5 h-5" />
                 Cancelar
@@ -374,7 +373,7 @@ const CambiarContraseña = () => {
                 disabled={submitting || !cambiosRealizados || !Object.values(requisitosContrasena).every(Boolean)}
                 className={`py-2 px-6 ${
                   cambiosRealizados && Object.values(requisitosContrasena).every(Boolean)
-                    ? 'bg-teal-600 hover:bg-teal-700'
+                    ? 'bg-emerald-600 hover:bg-emerald-700'
                     : 'bg-gray-500'
                 } text-white rounded-lg flex items-center gap-2 ${
                   (submitting || !cambiosRealizados || !Object.values(requisitosContrasena).every(Boolean))

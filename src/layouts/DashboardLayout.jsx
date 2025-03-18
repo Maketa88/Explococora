@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
-  BarChart2, 
   FileText, 
   Users, 
   UserPlus,
   UserCheck,
-  Package,
   PackagePlus,
   PackageSearch,
   Bell,
@@ -20,7 +18,8 @@ import {
   User,
   Edit,
   Key,
-  LogOut
+  LogOut,
+  Map
 } from 'lucide-react';
 import SelectorEstado from '../pages/VistaOperador/CambioEstadoOpe/Selector_Estado_Ope';
 import axios from 'axios';
@@ -229,9 +228,9 @@ const DashboardLayout = ({ children }) => {
     },
     {
       title: "Rutas",
-      icon: <BarChart2 className="w-5 h-5" />,
+      icon: <Map className="w-5 h-5" />,
       path: "/VistaOperador/Rutas",
-      section: "Dashboard"
+      section: "Rutas"
     },
     {
       title: "Reports",
@@ -252,10 +251,10 @@ const DashboardLayout = ({ children }) => {
       section: "Guías"
     },
     {
-      title: "Products",
-      icon: <Package className="w-5 h-5" />,
+      title: "Estado de Guías",
+      icon: <UserCheck className="w-5 h-5" />,
       path: "/VistaOperador/products",
-      section: "Products"
+      section: "Guías"
     },
     {
       title: "New Product",
@@ -271,7 +270,7 @@ const DashboardLayout = ({ children }) => {
     }
   ];
 
-  const sections = ["Dashboard", "Guías", "Products"];
+  const sections = ["Dashboard", "Rutas", "Guías", "Products"];
 
   const handleSearch = (e) => {
     e.preventDefault();

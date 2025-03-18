@@ -159,28 +159,28 @@ const PerfilGuia = () => {
   const renderContenido = () => {
     if (loading) {
       return (
-        <div className={`${darkMode ? 'bg-teal-900' : 'bg-teal-50'} rounded-lg p-6 shadow-lg text-center`}>
+        <div className="bg-white rounded-lg p-6 shadow-lg text-center border border-emerald-100">
           <div className="animate-pulse">
             <div className="flex justify-center">
-              <div className="rounded-full bg-gray-700 h-32 w-32 mb-4"></div>
+              <div className="rounded-full bg-emerald-100 h-32 w-32 mb-4"></div>
             </div>
-            <div className="h-4 bg-gray-700 rounded w-3/4 mx-auto mb-2"></div>
-            <div className="h-4 bg-gray-700 rounded w-1/2 mx-auto mb-2"></div>
-            <div className="h-4 bg-gray-700 rounded w-2/3 mx-auto"></div>
+            <div className="h-4 bg-emerald-100 rounded w-3/4 mx-auto mb-2"></div>
+            <div className="h-4 bg-emerald-100 rounded w-1/2 mx-auto mb-2"></div>
+            <div className="h-4 bg-emerald-100 rounded w-2/3 mx-auto"></div>
           </div>
-          <p className="mt-4">Cargando perfil...</p>
+          <p className="mt-4 text-gray-600">Cargando perfil...</p>
         </div>
       );
     }
     
     if (error) {
       return (
-        <div className={`${darkMode ? 'bg-teal-900' : 'bg-teal-50'} rounded-lg p-6 shadow-lg text-center text-red-500`}>
-          <p className="text-xl font-semibold mb-2">Error al cargar el perfil</p>
-          <p>{error}</p>
+        <div className="bg-white rounded-lg p-6 shadow-lg text-center border border-emerald-100">
+          <p className="text-xl font-semibold mb-2 text-red-500">Error al cargar el perfil</p>
+          <p className="text-gray-700">{error}</p>
           <button 
             onClick={() => window.location.reload()} 
-            className="mt-4 py-2 px-4 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors"
+            className="mt-4 py-2 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
           >
             Reintentar
           </button>
@@ -191,8 +191,8 @@ const PerfilGuia = () => {
     // Si no hay datos, mostrar un mensaje
     if (!guia) {
       return (
-        <div className={`${darkMode ? 'bg-teal-900' : 'bg-teal-50'} rounded-lg p-6 shadow-lg text-center`}>
-          No se encontraron datos del guía.
+        <div className="bg-white rounded-lg p-6 shadow-lg text-center border border-emerald-100">
+          <p className="text-gray-700">No se encontraron datos del guía.</p>
         </div>
       );
     }
@@ -205,13 +205,13 @@ const PerfilGuia = () => {
     const { nombres, apellidos } = separarNombre(nombreCompleto);
     
     return (
-      <div className={`${darkMode ? 'bg-teal-900' : 'bg-teal-50'} rounded-lg p-6 shadow-lg`}>
-        <h2 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-teal-800'}`}>Perfil del Guía</h2>
+      <div className="bg-white rounded-lg p-6 shadow-lg border border-emerald-100">
+        <h2 className="text-2xl font-bold mb-6 text-emerald-800">Perfil del Guía</h2>
         
         <div className="flex flex-col md:flex-row gap-6">
           {/* Imagen de perfil */}
           <div className="flex flex-col items-center">
-            <div className="w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-teal-500">
+            <div className="w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-emerald-500">
               {previewFoto ? (
                 <img
                   src={previewFoto}
@@ -226,13 +226,13 @@ const PerfilGuia = () => {
                       e.target.src = storedFoto;
                     } else {
                       // Fallback a avatar generado
-                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto)}&size=200&background=0D9488&color=fff`;
+                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto)}&size=200&background=059669&color=fff`;
                     }
                   }}
                 />
               ) : (
                 <img
-                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto)}&size=200&background=0D9488&color=fff`}
+                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto)}&size=200&background=059669&color=fff`}
                   alt="Perfil del guía"
                   className="h-full w-full object-cover"
                 />
@@ -240,54 +240,54 @@ const PerfilGuia = () => {
             </div>
             <button 
               onClick={() => navigate("/VistaGuia/ActualizarGuia")}
-              className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-teal-600 hover:bg-teal-700' : 'bg-teal-500 hover:bg-teal-600'} text-white font-medium transition-colors duration-200`}>
+              className="py-2 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-colors duration-200">
               Cambiar foto
             </button>
           </div>
           
           {/* Información personal */}
           <div className="flex-1">
-            <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${darkMode ? 'text-teal-300' : 'text-teal-700'}`}>
-              <div className="bg-teal-800/70 p-3 rounded-lg shadow-md">
-                <h3 className={`text-sm uppercase mb-1 font-weight.bold ${darkMode ? 'text-white' : 'text-white'}`}>Nombre</h3>
-                <p className="text-lg text-white">{nombres}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-600">
+              <div className="bg-white p-3 rounded-lg shadow-md border border-emerald-100">
+                <h3 className="text-sm uppercase mb-1 font-weight.bold text-emerald-400">Nombre</h3>
+                <p className="text-lg font-medium text-gray-700">{nombres}</p>
               </div>
               
-              <div className="bg-teal-800/70 p-3 rounded-lg shadow-md">
-                <h3 className={`text-sm uppercase mb-1 font-weight.bold ${darkMode ? 'text-white' : 'text-white'}`}>Apellidos</h3>
-                <p className=" text-lg text-white">{apellidos}</p>
+              <div className="bg-white p-3 rounded-lg shadow-md border border-emerald-100">
+                <h3 className="text-sm uppercase mb-1 font-weight.bold text-emerald-400">Apellidos</h3>
+                <p className="text-lg font-medium text-gray-700">{apellidos}</p>
               </div>
               
-              <div className="bg-teal-800/70 p-3 rounded-lg shadow-md">
-                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-white' : 'text-white'}`}>Cédula</h3>
-                <p className=" text-lg text-white">{guiaData.cedula || "No disponible"}</p>
+              <div className="bg-white p-3 rounded-lg shadow-md border border-emerald-100">
+                <h3 className="text-sm uppercase mb-1 text-emerald-400">Cédula</h3>
+                <p className="text-lg font-medium text-gray-700">{guiaData.cedula || "No disponible"}</p>
               </div>
               
-              <div className="bg-teal-800/70 p-3 rounded-lg shadow-md">
-                <h3 className={`text-sm bold uppercase mb-1 ${darkMode ? 'text-white' : 'text-white'}`}>Correo electrónico</h3>
-                <p className=" text-lg text-white">{guiaData.email || "No disponible"}</p>
+              <div className="bg-white p-3 rounded-lg shadow-md border border-emerald-100">
+                <h3 className="text-sm bold uppercase mb-1 text-emerald-400">Correo electrónico</h3>
+                <p className="text-lg font-medium text-gray-700">{guiaData.email || "No disponible"}</p>
               </div>
               
-              <div className="bg-teal-800/70 p-3 rounded-lg shadow-md">
-                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-white' : 'text-white'}`}>Teléfono</h3>
-                <p className=" text-lg text-white">{guiaData.telefono || "No disponible"}</p>
+              <div className="bg-white p-3 rounded-lg shadow-md border border-emerald-100">
+                <h3 className="text-sm uppercase mb-1 text-emerald-400">Teléfono</h3>
+                <p className="text-lg font-medium text-gray-700">{guiaData.telefono || "No disponible"}</p>
               </div>
               
-              <div className="bg-teal-800/70 p-3 rounded-lg shadow-md">
-                <h3 className={`text-sm uppercase mb-1 ${darkMode ? 'text-white' : 'text-white'}`}>Descripción</h3>
-                <p className="text-lg text-white">{guiaData.descripcion || "No hay descripción disponible."}</p>
+              <div className="bg-white p-3 rounded-lg shadow-md border border-emerald-100">
+                <h3 className="text-sm uppercase mb-1 text-emerald-400">Descripción</h3>
+                <p className="text-lg font-medium text-gray-700">{guiaData.descripcion || "No hay descripción disponible."}</p>
               </div>
             </div>
             
             <div className="mt-6 flex flex-wrap gap-3">
               <button 
                 onClick={() => navigate("/VistaGuia/ActualizarGuia")}
-                className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-teal-600 hover:bg-teal-700' : 'bg-teal-500 hover:bg-teal-600'} text-white font-medium transition-colors duration-200`}>
+                className="py-2 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-colors duration-200">
                 Actualizar información
               </button>
               <button 
                 onClick={() => navigate("/VistaGuia/CambiarContraseña")}
-                className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-teal-700 hover:bg-teal-600' : 'bg-teal-300 hover:bg-teal-400'} ${darkMode ? 'text-white' : 'text-teal-800'} font-medium transition-colors duration-200`}
+                className="py-2 px-4 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-medium transition-colors duration-200"
               >
                 Cambiar contraseña
               </button>
@@ -296,22 +296,22 @@ const PerfilGuia = () => {
         </div>
         
         <div className="mt-6">
-          <h3 className={`text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-teal-800'}`}>Estadísticas</h3>
+          <h3 className="text-xl font-bold mb-4 text-emerald-800">Estadísticas</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-lg shadow-md bg-blue-900">
-              <h4 className="text-sm uppercase mb-1 text-blue-300">Rutas completadas</h4>
-              <p className="text-2xl font-bold text-white">127</p>
+            <div className="p-4 rounded-lg shadow-md bg-emerald-100">
+              <h4 className="text-sm uppercase mb-1 text-emerald-300">Rutas completadas</h4>
+              <p className="text-2xl font-bold text-emerald-700">127</p>
             </div>
             
-            <div className="p-4 rounded-lg shadow-md bg-green-900">
-              <h4 className="text-sm uppercase mb-1 text-green-300">Valoración media</h4>
-              <p className="text-2xl font-bold text-white">4.8/5.0</p>
+            <div className="p-4 rounded-lg shadow-md bg-emerald-100">
+              <h4 className="text-sm uppercase mb-1 text-emerald-300">Valoración media</h4>
+              <p className="text-2xl font-bold text-emerald-700">4.8/5.0</p>
             </div>
             
-            <div className="p-4 rounded-lg shadow-md bg-purple-900">
-              <h4 className="text-sm uppercase mb-1 text-purple-300">Clientes atendidos</h4>
-              <p className="text-2xl font-bold text-white">350+</p>
+            <div className="p-4 rounded-lg shadow-md bg-emerald-100">
+              <h4 className="text-sm uppercase mb-1 text-emerald-300">Clientes atendidos</h4>
+              <p className="text-2xl font-bold text-emerald-700">350+</p>
             </div>
           </div>
         </div>
@@ -395,7 +395,7 @@ const PerfilGuia = () => {
         <div className="mt-8 flex justify-center">
           <button 
             onClick={() => navigate("/VistaGuia/Dashboard")}
-            className={`py-2 px-6 rounded-lg ${darkMode ? 'bg-teal-700 hover:bg-teal-600' : 'bg-teal-300 hover:bg-teal-400'} ${darkMode ? 'text-white' : 'text-teal-800'} font-medium transition-colors duration-200 flex items-center gap-2`}
+            className="py-2 px-6 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium transition-colors duration-200 flex items-center gap-2"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />

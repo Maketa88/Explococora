@@ -85,4 +85,3 @@ export const RutasExplococora = () => {
 };
 
 export default RutasExplococora;
-

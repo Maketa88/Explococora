@@ -5,6 +5,7 @@ import { FaHiking, FaShieldAlt, FaWater } from 'react-icons/fa';
 import { FiCamera, FiClock, FiCoffee, FiCompass, FiMap, FiMapPin, FiUsers } from 'react-icons/fi';
 import { GiMountainRoad } from 'react-icons/gi';
 import { obtenerFotosRuta, obtenerRutas } from '../../../../../services/rutasService';
+import MapaRutaIntegracion from "../../../../MapaRuta/components/MapaRutaIntegracion";
 
 // Imágenes de respaldo por dificultad (se usarán si no hay fotos disponibles de la API)
 const imagenesRespaldoPorDificultad = {
@@ -470,6 +471,14 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
             </div>
           </div>
         </div>
+        {/* Nuevo componente de Mapa de Azure 
+{rutaPrincipal && (
+  <MapaRutaIntegracion 
+    rutaPrincipal={rutaPrincipal} 
+    altura="400px" 
+  />
+)}
+  */}
 
         {/* Contenido detallado */}
         <div className="p-6">
@@ -639,3 +648,5 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
     </div>
   );
 };
+
+
