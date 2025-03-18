@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import DashboardLayoutAdmin from '../../../layouts/DashboardLayoutAdmin';
+import DashboardLayout from '../../../layouts/DashboardLayout';
 import axios from 'axios';
-import { Pencil, Plus, Trash, Mountain, X, Filter, RefreshCw, Eye, ChevronLeft, ChevronRight, Search } from 'lucide-react';
-import { toast } from 'react-toastify';
+import { Pencil, Plus, Trash, Mountain, X, Filter, RefreshCw, Eye, ChevronLeft, ChevronRight, Search, XCircle } from 'lucide-react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const VisualizarRutas = () => {
+const Rutas = () => {
   const [rutas, setRutas] = useState([]);
   const [rutasFiltradas, setRutasFiltradas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,12 +27,24 @@ const VisualizarRutas = () => {
   });
   const [imagenes, setImagenes] = useState([]);
   const [imagenesPreview, setImagenesPreview] = useState([]);
+  const [fotosCompletas, setFotosCompletas] = useState([]);
   const [activeRoute, setActiveRoute] = useState(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [alert, setAlert] = useState({ show: false, message: '', type: '' });
-  const token = localStorage.getItem('token') || '';
+  const [token] = useState(localStorage.getItem('token') || '');
   const [isDetailView, setIsDetailView] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Estado para confirmación de eliminación estilo Guias.jsx
+  const [confirmacionEliminar, setConfirmacionEliminar] = useState({
+    mostrar: false,
+    tipo: '', // 'ruta' o 'foto'
+    id: null,
+    nombre: '',
+    mensaje: '',
+    ids: [] // Para múltiples fotos
+  });
   
   // Nuevos estados para manejar las fotos de las rutas en la lista
   const [rutasConFotos, setRutasConFotos] = useState({});
@@ -84,7 +97,12 @@ const VisualizarRutas = () => {
     } catch (error) {
       console.error("Error al obtener las rutas:", error);
       setError(error.message);
-      toast.error("Error al cargar las rutas");
+      toast.error("Error al cargar las rutas", {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast",
+        theme: "colored"
+      });
     } finally {
       setLoading(false);
     }
@@ -97,6 +115,7 @@ const VisualizarRutas = () => {
       setCargandoFotos(prev => ({...prev, [idRuta]: true}));
       
       let fotosArray = [];
+      let fotosCompletasArray = [];
       let intentoExitoso = false;
       
       // INTENTO 1: Endpoint fotos
@@ -111,18 +130,28 @@ const VisualizarRutas = () => {
         
         if (response.data && response.data.fotos) {
           if (Array.isArray(response.data.fotos)) {
+            // Si es un array de strings (solo URLs)
             if (typeof response.data.fotos[0] === 'string') {
               fotosArray = response.data.fotos;
+              // No tenemos IDs en este caso, solo URLs
+              fotosCompletasArray = response.data.fotos.map(url => ({ foto: url }));
               intentoExitoso = true;
-            } else if (response.data.fotos[0] && response.data.fotos[0].foto) {
+            } 
+            // Si es un array de objetos con propiedad foto
+            else if (response.data.fotos[0] && response.data.fotos[0].foto) {
               fotosArray = response.data.fotos.map(item => item.foto);
+              fotosCompletasArray = response.data.fotos;
               intentoExitoso = true;
-            } else if (Array.isArray(response.data.fotos[0])) {
+            } 
+            // Si es un array anidado
+            else if (Array.isArray(response.data.fotos[0])) {
               response.data.fotos[0].forEach(item => {
                 if (item && typeof item === 'object' && item.foto) {
                   fotosArray.push(item.foto);
+                  fotosCompletasArray.push(item);
                 } else if (typeof item === 'string') {
                   fotosArray.push(item);
+                  fotosCompletasArray.push({ foto: item });
                 }
               });
               intentoExitoso = fotosArray.length > 0;
@@ -145,14 +174,18 @@ const VisualizarRutas = () => {
             if (Array.isArray(response.data.fotos)) {
               if (typeof response.data.fotos[0] === 'string') {
                 fotosArray = response.data.fotos;
+                fotosCompletasArray = response.data.fotos.map(url => ({ foto: url }));
               } else if (response.data.fotos[0] && response.data.fotos[0].foto) {
                 fotosArray = response.data.fotos.map(item => item.foto);
+                fotosCompletasArray = response.data.fotos;
               } else if (Array.isArray(response.data.fotos[0])) {
                 response.data.fotos[0].forEach(item => {
                   if (item && typeof item === 'object' && item.foto) {
                     fotosArray.push(item.foto);
+                    fotosCompletasArray.push(item);
                   } else if (typeof item === 'string') {
                     fotosArray.push(item);
+                    fotosCompletasArray.push({ foto: item });
                   }
                 });
               }
@@ -172,6 +205,7 @@ const VisualizarRutas = () => {
           if (rutaResponse.data && rutaResponse.data.fotos) {
             if (Array.isArray(rutaResponse.data.fotos)) {
               fotosArray = rutaResponse.data.fotos;
+              fotosCompletasArray = rutaResponse.data.fotos.map(url => ({ foto: url }));
             }
           }
         } catch (error) {
@@ -189,10 +223,12 @@ const VisualizarRutas = () => {
         }));
         
         setImagenesPreview(fotosArray);
+        setFotosCompletas(fotosCompletasArray);
       } else {
         console.log(`No se encontraron fotos para la ruta ${idRuta}`);
         setRutasConFotos(prev => ({...prev, [idRuta]: []}));
         setImagenesPreview([]);
+        setFotosCompletas([]);
       }
       
       setCargandoFotos(prev => ({...prev, [idRuta]: false}));
@@ -202,6 +238,7 @@ const VisualizarRutas = () => {
       setCargandoFotos(prev => ({...prev, [idRuta]: false}));
       setRutasConFotos(prev => ({...prev, [idRuta]: []}));
       setImagenesPreview([]);
+      setFotosCompletas([]);
       return false;
     }
   };
@@ -246,7 +283,12 @@ const VisualizarRutas = () => {
       return error.message || "Error de conexión";
     }
     
-    const { data } = error.response;
+    const { data, status } = error.response;
+    
+    // Simplificar mensajes de error específicos
+    if (status === 403 && data.message && data.message.includes("Token inválido")) {
+      return "Token inválido";
+    }
     
     if (data.message) {
       return data.message;
@@ -295,13 +337,218 @@ const VisualizarRutas = () => {
       );
       
       console.log('Respuesta de subida:', response.data);
-      toast.success('Imágenes subidas correctamente');
+      toast.success('Imágenes subidas correctamente', {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast",
+        theme: "colored"
+      });
+      
+      // Recargar la página para mostrar las nuevas imágenes
+      fetchRutas();
+      
       return true;
     } catch (error) {
       console.error('Error al subir imágenes:', error);
-      toast.error('Error al subir imágenes: ' + extractErrorMessage(error));
+      toast.error('Error al subir imágenes: ' + extractErrorMessage(error), {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast",
+        theme: "colored"
+      });
       return false;
     }
+  };
+
+  // Función para mostrar el modal de confirmación de eliminación de foto
+  const confirmarEliminarFoto = (idFoto, index) => {
+    setConfirmacionEliminar({
+      mostrar: true,
+      tipo: 'foto',
+      id: idFoto,
+      nombre: `Foto #${index + 1}`,
+      mensaje: '¿Está seguro que desea eliminar esta foto? Esta acción no se puede deshacer.'
+    });
+  };
+
+  // Modal de confirmación de eliminación
+  const ConfirmacionEliminarModal = () => {
+    if (!confirmacionEliminar.mostrar) return null;
+    
+    const esRuta = confirmacionEliminar.tipo === 'ruta';
+    const esFoto = confirmacionEliminar.tipo === 'foto';
+    
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg w-full max-w-md mx-auto shadow-xl">
+          <div className="p-6">
+            <h2 className="text-xl font-bold text-emerald-700 mb-4">Confirmar Eliminación</h2>
+            
+            <div className="flex items-start gap-4 mb-6">
+              <div className="bg-red-100 rounded-full p-2 text-red-600 shrink-0">
+                <XCircle size={24} />
+              </div>
+              
+              <div>
+                <h3 className="font-semibold text-gray-800">{confirmacionEliminar.nombre}</h3>
+                <p className="text-red-600 mt-2">Será eliminado permanentemente</p>
+              </div>
+            </div>
+            
+            <div className="border-l-4 border-amber-400 pl-3 py-2 bg-amber-50 mb-6">
+              <p className="text-gray-700 text-sm">
+                {confirmacionEliminar.mensaje || "¿Está seguro que desea eliminar este elemento? Esta acción no se puede deshacer."}
+              </p>
+            </div>
+            
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setConfirmacionEliminar({ mostrar: false, tipo: '', id: null, ids: [] });
+                }}
+                className="px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded transition-colors"
+                disabled={isProcessing}
+              >
+                Cancelar
+              </button>
+              
+              <button
+                onClick={() => {
+                  if (esRuta) {
+                    eliminarRutaConfirmada(confirmacionEliminar.id);
+                  } else if (esFoto) {
+                    eliminarFotoConfirmada(confirmacionEliminar.id);
+                  }
+                }}
+                className="px-4 py-2 flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white rounded transition-colors"
+                disabled={isProcessing}
+              >
+                {isProcessing ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                    <span>Eliminando...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash size={16} />
+                    <span>Eliminar</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Función para mostrar el modal de confirmación de eliminación de ruta
+  const confirmarEliminarRuta = (ruta) => {
+    const rutaId = ruta.idRuta || ruta.id;
+    setConfirmacionEliminar({
+      mostrar: true,
+      tipo: 'ruta',
+      id: rutaId,
+      nombre: ruta.nombreRuta || 'Ruta sin nombre',
+      mensaje: '¿Está seguro que desea eliminar esta ruta? Esta acción no se puede deshacer.'
+    });
+  };
+
+  // Función para eliminar una ruta después de la confirmación
+  const eliminarRutaConfirmada = async (rutaId) => {
+    try {
+      setConfirmacionEliminar({ ...confirmacionEliminar, mostrar: false });
+      
+      await axiosWithAuth.delete(`http://localhost:10101/rutas/${rutaId}`);
+      toast.success('Ruta eliminada correctamente', {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast",
+        theme: "colored"
+      });
+      
+      // Refrescar la lista
+      fetchRutas();
+      
+      // Cerrar la vista de detalles si está abierta
+      if (isDetailView) {
+        closeDetailView();
+      }
+    } catch (error) {
+      console.error("Error al eliminar la ruta:", error);
+      toast.error(error.response?.data?.message || 'Error al eliminar la ruta', {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast",
+        theme: "colored"
+      });
+    }
+  };
+
+  // Mantener la función para eliminar una foto después de confirmar
+  const eliminarFotoConfirmada = async (idFoto) => {
+    try {
+      setIsProcessing(true);
+      setConfirmacionEliminar({ ...confirmacionEliminar, mostrar: false });
+      
+      // Llamar al endpoint para eliminar la foto
+      const response = await axiosWithAuth.delete(`http://localhost:10101/rutas/foto/${idFoto}`);
+      
+      console.log('Respuesta de eliminación de foto:', response.data);
+      
+      // Corregir la lógica para actualizar el estado de las fotos
+      // Primero filtramos por ID o idFoto
+      setFotosCompletas(prevFotos => 
+        prevFotos.filter(foto => 
+          (foto.id !== idFoto) && (foto.idFoto !== idFoto)
+        )
+      );
+      
+      // Encontrar el índice correcto para eliminar la vista previa
+      const indexToRemove = fotosCompletas.findIndex(foto => 
+        foto.id === idFoto || foto.idFoto === idFoto
+      );
+      
+      // Solo actualizar las previsualizaciones si encontramos la foto
+      if (indexToRemove >= 0) {
+        setImagenesPreview(prevPreview => 
+          prevPreview.filter((_, i) => i !== indexToRemove)
+        );
+      }
+      
+      // Cerrar el modal si está abierto
+      if (modalOpen) {
+        setModalOpen(false);
+      }
+      
+      // Mostrar mensaje de éxito
+      toast.success('Foto eliminada correctamente', {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast",
+        theme: "colored"
+      });
+      
+      // Recargar la página para mostrar los cambios
+      fetchRutas();
+      
+    } catch (error) {
+      console.error('Error al eliminar foto:', error);
+      toast.error('Error al eliminar foto: ' + extractErrorMessage(error), {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast",
+        theme: "colored"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Función para eliminar una ruta (actualizada)
+  const handleDeleteRuta = (ruta) => {
+    // Mostrar el modal de confirmación de eliminación
+    confirmarEliminarRuta(ruta);
   };
 
   // Fix the function to open the modal for editing
@@ -325,6 +572,10 @@ const VisualizarRutas = () => {
         precio: ruta.precio || '0' // Asegurar que siempre haya un valor
       });
       
+      // Limpiar las fotos actuales antes de cargar nuevas
+      setImagenesPreview([]);
+      setFotosCompletas([]);
+      
       // Cargar las imágenes existentes si hay un ID de ruta
       if (rutaId) {
         fetchRutaImages(rutaId);
@@ -346,6 +597,7 @@ const VisualizarRutas = () => {
         precio: ''
       });
       setImagenesPreview([]);
+      setFotosCompletas([]);
       setImagenes([]);
       setIsEditing(false);
     }
@@ -435,17 +687,20 @@ const VisualizarRutas = () => {
             throw new Error('El nombre de la ruta ya existe. Por favor, elija otro nombre.');
           }
           
+          // Simplificar mensaje para errores de token
+          if (fetchResponse.status === 403 && errorData.message && errorData.message.includes('Token inválido')) {
+            throw new Error('Token inválido');
+          }
+          
           throw new Error(`Error ${fetchResponse.status}: ${JSON.stringify(errorData)}`);
         }
         
         console.log('Route successfully updated');
-        toast.success('¡Ruta actualizada correctamente!', {
+        toast.success('Ruta actualizada correctamente', {
           position: "top-right",
           autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true
+          containerId: "rutas-toast",
+          theme: "colored"
         });
       } else {
         // CREATING A NEW ROUTE
@@ -467,24 +722,36 @@ const VisualizarRutas = () => {
         console.log('Create response:', response.data);
         rutaId = response.data.id || response.data.idRuta;
         
-        toast.success('Ruta creada correctamente');
+        toast.success('Ruta creada correctamente', {
+          position: "top-right",
+          autoClose: 3000,
+          containerId: "rutas-toast",
+          theme: "colored"
+        });
       }
       
       // Handle image uploads if needed
       if (imagenes.length > 0 && rutaId) {
         await uploadImages(rutaId);
+      } else {
+        // Si no hay imágenes nuevas, igual refrescamos la lista
+        fetchRutas();
       }
       
       // Reset form and close modal
       setModalOpen(false);
       resetForm();
-      fetchRutas(); // Reload routes to see the changes
     } catch (error) {
       console.error("Error al guardar la ruta:", error);
       
       let errorMessage = error.message || "Error al procesar la solicitud";
       
-      toast.error(errorMessage);
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 3000,
+        containerId: "rutas-toast",
+        theme: "colored"
+      });
       setAlert({
         show: true,
         message: errorMessage,
@@ -509,29 +776,9 @@ const VisualizarRutas = () => {
     });
     setImagenes([]);
     setImagenesPreview([]);
+    setFotosCompletas([]);
     setIsEditing(false);
     setAlert({ show: false, message: '', type: '' });
-  };
-
-  // Función para eliminar una ruta
-  const handleDeleteRuta = async (rutaId) => {
-    if (!window.confirm('¿Está seguro de que desea eliminar esta ruta?')) {
-      return;
-    }
-    
-    try {
-      console.log(`Deleting route with ID: ${rutaId}`);
-      await axiosWithAuth.delete(`http://localhost:10101/rutas/${rutaId}`);
-      toast.success('Ruta eliminada correctamente');
-      fetchRutas(); // Refrescar la lista
-      
-      if (isDetailView) {
-        closeDetailView();
-      }
-    } catch (error) {
-      console.error("Error al eliminar la ruta:", error);
-      toast.error(error.response?.data?.message || 'Error al eliminar la ruta');
-    }
   };
 
   // Función para manejar cambios en las imágenes
@@ -645,6 +892,7 @@ const VisualizarRutas = () => {
     setIsDetailView(false);
     setActiveRoute(null);
     setImagenesPreview([]);
+    setFotosCompletas([]);
   };
 
   // Actualizar la función para abrir el detalle y asegurar que cargue todas las fotos
@@ -657,6 +905,7 @@ const VisualizarRutas = () => {
     
     // Limpiar previsualizaciones existentes
     setImagenesPreview([]);
+    setFotosCompletas([]);
     
     // Intentamos obtener todas las fotos y mostramos mensaje según resultado
     const fotosCargadas = await obtenerFotosRuta(rutaId);
@@ -710,14 +959,90 @@ const VisualizarRutas = () => {
     setRutasFiltradas(resultado);
   };
 
+  // Primero añadir un efecto para controlar la visibilidad del footer
+  useEffect(() => {
+    // Ocultar el footer cuando el modal de detalles está abierto
+    const footer = document.querySelector('footer');
+    const dashboardFooter = document.querySelector('.sticky.bottom-0.border-t.border-emerald-100');
+    const estadoIndicator = document.querySelector('.fixed.bottom-4.right-4.z-50');
+    const toastContainer = document.getElementById('rutas-toast');
+    
+    if (footer) {
+      if (isDetailView) {
+        footer.style.display = 'none';
+      } else {
+        footer.style.display = '';
+      }
+    }
+    
+    if (dashboardFooter) {
+      if (isDetailView) {
+        dashboardFooter.style.display = 'none';
+      } else {
+        dashboardFooter.style.display = '';
+      }
+    }
+    
+    if (estadoIndicator) {
+      if (isDetailView) {
+        estadoIndicator.style.display = 'none';
+      } else {
+        estadoIndicator.style.display = '';
+      }
+    }
+    
+    if (toastContainer) {
+      if (isDetailView) {
+        toastContainer.style.display = 'none';
+      } else {
+        toastContainer.style.display = '';
+      }
+    }
+    
+    // Limpieza al desmontar
+    return () => {
+      if (footer) {
+        footer.style.display = '';
+      }
+      if (dashboardFooter) {
+        dashboardFooter.style.display = '';
+      }
+      if (estadoIndicator) {
+        estadoIndicator.style.display = '';
+      }
+      if (toastContainer) {
+        toastContainer.style.display = '';
+      }
+    };
+  }, [isDetailView]);
+
   return (
-    <DashboardLayoutAdmin>
+    <DashboardLayout>
       <div className="p-6">
+        {/* Modal de confirmación de eliminación */}
+        <ConfirmacionEliminarModal />
+        
+        {/* Contenedor de Toast para mantener las alertas en esta página */}
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+          limit={3}
+          containerId="rutas-toast"
+        />
+        
         {/* Header with Title and Create Button */}
         <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Rutas Disponibles</h1>
-            <p className="text-teal-300">Gestiona las rutas de turismo ecológico</p>
+            <h1 className="text-3xl font-bold text-emerald-700 mb-2">Rutas Disponibles</h1>
+            <p className="text-emerald-600">Gestiona las rutas de turismo ecológico</p>
           </div>
           
           <div className="mt-4 md:mt-0 flex flex-wrap gap-2">
@@ -728,14 +1053,14 @@ const VisualizarRutas = () => {
                 placeholder="Buscar rutas..."
                 value={terminoBusqueda}
                 onChange={handleBusqueda}
-                className="pl-10 pr-4 py-2 w-full rounded-lg bg-teal-800 bg-opacity-40 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="pl-10 pr-4 py-2 w-full rounded-lg bg-white shadow-sm border border-emerald-200 text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
               />
-              <Search className="absolute left-3 top-2.5 text-teal-500" size={18} />
+              <Search className="absolute left-3 top-2.5 text-emerald-500" size={18} />
             </div>
             
             <button
               onClick={() => setMostrarFiltros(!mostrarFiltros)}
-              className="flex items-center gap-2 px-4 py-2 bg-teal-800 hover:bg-teal-700 text-white rounded transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-emerald-200 hover:bg-emerald-50 text-emerald-700 rounded shadow-sm transition-colors"
             >
               <Filter size={18} />
               Filtros
@@ -743,7 +1068,7 @@ const VisualizarRutas = () => {
             
             <button
               onClick={fetchRutas}
-              className="flex items-center gap-2 px-4 py-2 bg-teal-800 hover:bg-teal-700 text-white rounded transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-emerald-200 hover:bg-emerald-50 text-emerald-700 rounded shadow-sm transition-colors"
               title="Recargar rutas"
             >
               <RefreshCw size={18} />
@@ -751,7 +1076,7 @@ const VisualizarRutas = () => {
             
             <button
               onClick={() => handleOpenModal()}
-              className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded shadow-sm transition-colors"
             >
               <Plus size={18} />
               Nueva Ruta
@@ -761,16 +1086,16 @@ const VisualizarRutas = () => {
         
         {/* Filter Panel */}
         {mostrarFiltros && (
-          <div className="mb-6 p-4 bg-teal-800 bg-opacity-30 rounded-lg">
-            <h2 className="text-xl font-semibold text-white mb-4">Filtrar Rutas</h2>
+          <div className="mb-6 p-4 bg-white rounded-lg shadow-sm border border-emerald-100">
+            <h2 className="text-xl font-semibold text-emerald-700 mb-4">Filtrar Rutas</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-teal-300 text-sm mb-1">Dificultad</label>
+                <label className="block text-emerald-600 text-sm mb-1">Dificultad</label>
                 <select
                   value={filtros.dificultad}
                   onChange={(e) => setFiltros({ ...filtros, dificultad: e.target.value })}
-                  className="w-full p-2 bg-teal-800 text-white rounded border border-teal-600"
+                  className="w-full p-2 bg-white text-gray-700 rounded border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 >
                   <option value="">Todas</option>
                   <option value="Facil">Fácil</option>
@@ -780,11 +1105,11 @@ const VisualizarRutas = () => {
               </div>
               
               <div>
-                <label className="block text-teal-300 text-sm mb-1">Duración</label>
+                <label className="block text-emerald-600 text-sm mb-1">Duración</label>
                 <select
                   value={filtros.duracion}
                   onChange={(e) => setFiltros({ ...filtros, duracion: e.target.value })}
-                  className="w-full p-2 bg-teal-800 text-white rounded border border-teal-600"
+                  className="w-full p-2 bg-white text-gray-700 rounded border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 >
                   <option value="">Todas</option>
                   <option value="corta">Corta (hasta 2h)</option>
@@ -794,11 +1119,11 @@ const VisualizarRutas = () => {
               </div>
               
               <div>
-                <label className="block text-teal-300 text-sm mb-1">Tipo</label>
+                <label className="block text-emerald-600 text-sm mb-1">Tipo</label>
                 <select
                   value={filtros.tipo}
                   onChange={(e) => setFiltros({ ...filtros, tipo: e.target.value })}
-                  className="w-full p-2 bg-teal-800 text-white rounded border border-teal-600"
+                  className="w-full p-2 bg-white text-gray-700 rounded border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 >
                   <option value="">Todos</option>
                   <option value="Cabalgata">Cabalgata</option>
@@ -808,11 +1133,11 @@ const VisualizarRutas = () => {
               </div>
               
               <div>
-                <label className="block text-teal-300 text-sm mb-1">Estado</label>
+                <label className="block text-emerald-600 text-sm mb-1">Estado</label>
                 <select
                   value={filtros.estado}
                   onChange={(e) => setFiltros({ ...filtros, estado: e.target.value })}
-                  className="w-full p-2 bg-teal-800 text-white rounded border border-teal-600"
+                  className="w-full p-2 bg-white text-gray-700 rounded border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 >
                   <option value="">Todos</option>
                   <option value="Activa">Activa</option>
@@ -824,13 +1149,13 @@ const VisualizarRutas = () => {
             <div className="mt-4 flex justify-end gap-2">
               <button
                 onClick={limpiarFiltros}
-                className="px-4 py-2 bg-teal-700 text-white rounded hover:bg-teal-600"
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded border border-gray-200 hover:bg-gray-200 transition-colors"
               >
                 Limpiar
               </button>
               <button
                 onClick={aplicarFiltros}
-                className="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-400"
+                className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition-colors shadow-sm"
               >
                 Aplicar
               </button>
@@ -841,19 +1166,21 @@ const VisualizarRutas = () => {
         {/* Loading State */}
         {loading && (
           <div className="text-center py-10">
-            <div className="animate-spin w-16 h-16 border-4 border-teal-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-teal-300">Cargando rutas...</p>
+            <div className="animate-spin w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-emerald-600">Cargando rutas...</p>
           </div>
         )}
         
         {/* Error State */}
         {error && !loading && (
-          <div className="bg-red-900 bg-opacity-30 text-red-300 p-4 rounded-lg">
-            <p className="font-semibold">Error al cargar las rutas</p>
-            <p>{error}</p>
+          <div className="bg-red-50 text-red-700 p-4 rounded-lg border border-red-200 shadow-sm">
+            <p className="font-semibold">
+              {error.includes("Error 403") ? "Token inválido" : "Error al cargar las rutas"}
+            </p>
+            <p>{error.includes("Error 403") ? "Por favor, inicie sesión nuevamente" : error}</p>
             <button 
               onClick={fetchRutas}
-              className="mt-2 px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded"
+              className="mt-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded shadow-sm transition-colors"
             >
               Reintentar
             </button>
@@ -867,12 +1194,12 @@ const VisualizarRutas = () => {
               {rutasFiltradas.map((ruta) => (
                 <div 
                   key={ruta.idRuta || ruta.id} 
-                  className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md border border-gray-100 transition-all duration-300"
+                  className="bg-white bg-gradient-to-br from-emerald-50 to-white rounded-lg overflow-hidden shadow-sm hover:shadow-md border border-emerald-100 transition-all duration-300"
                 >
-                  <div className="h-48 bg-gray-100 relative">
+                  <div className="h-48 bg-emerald-100 relative">
                     {cargandoFotos[ruta.idRuta] ? (
-                      <div className="flex justify-center items-center h-full bg-gray-50">
-                        <div className="animate-spin w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full"></div>
+                      <div className="flex justify-center items-center h-full bg-emerald-50">
+                        <div className="animate-spin w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full"></div>
                       </div>
                     ) : rutasConFotos[ruta.idRuta] && rutasConFotos[ruta.idRuta].length > 0 ? (
                       <img
@@ -885,22 +1212,22 @@ const VisualizarRutas = () => {
                         }}
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-50">
-                        <span className="text-6xl text-teal-400">{getRouteTypeIcon(ruta.tipo)}</span>
+                      <div className="w-full h-full flex items-center justify-center bg-emerald-50">
+                        <span className="text-6xl text-emerald-400">{getRouteTypeIcon(ruta.tipo)}</span>
                       </div>
                     )}
                     
                     <div className="absolute top-2 right-2 flex gap-1">
                       <button
                         onClick={() => handleOpenModal(ruta)}
-                        className="p-2 bg-gray-700 bg-opacity-80 hover:bg-gray-600 text-white rounded-full"
+                        className="p-2 bg-white bg-opacity-90 hover:bg-emerald-50 text-emerald-600 rounded-full shadow-sm transition-colors"
                         title="Editar ruta"
                       >
                         <Pencil size={16} />
                       </button>
                       <button
-                        onClick={() => handleDeleteRuta(ruta.idRuta || ruta.id)}
-                        className="p-2 bg-gray-700 bg-opacity-80 hover:bg-gray-600 text-white rounded-full"
+                        onClick={() => handleDeleteRuta(ruta)}
+                        className="p-2 bg-white bg-opacity-90 hover:bg-red-50 text-red-600 rounded-full shadow-sm transition-colors"
                         title="Eliminar ruta"
                       >
                         <Trash size={16} />
@@ -908,47 +1235,47 @@ const VisualizarRutas = () => {
                     </div>
                     
                     <div className="absolute bottom-2 left-2 flex gap-1">
-                      <span className={`${getDifficultyColor(ruta.dificultad)} text-white text-xs px-2 py-1 rounded-full`}>
+                      <span className={`${getDifficultyColor(ruta.dificultad)} text-white text-xs px-2 py-1 rounded-full shadow-sm`}>
                         {ruta.dificultad}
                       </span>
-                      <span className={`${ruta.estado === 'Activa' ? 'bg-gray-600' : 'bg-gray-500'} text-white text-xs px-2 py-1 rounded-full`}>
+                      <span className={`${ruta.estado === 'Activa' ? 'bg-green-500' : 'bg-red-500'} text-white text-xs px-2 py-1 rounded-full shadow-sm`}>
                         {ruta.estado}
                       </span>
                     </div>
                   </div>
                   
                   <div className="p-4">
-                    <h3 className="text-lg font-bold text-gray-800 truncate">{ruta.nombreRuta}</h3>
+                    <h3 className="text-lg font-bold text-emerald-800 truncate">{ruta.nombreRuta}</h3>
                     
-                    <div className="mt-2 grid grid-cols-2 gap-2 text-sm text-gray-600">
+                    <div className="mt-2 grid grid-cols-2 gap-2 text-sm text-gray-700">
                       <div>
-                        <span className="block text-xs text-gray-500 font-medium">Duración</span>
+                        <span className="block text-xs text-emerald-600">Duración</span>
                         <span>{ruta.duracion}</span>
                       </div>
                       <div>
-                        <span className="block text-xs text-gray-500 font-medium">Tipo</span>
+                        <span className="block text-xs text-emerald-600">Tipo</span>
                         <span>{ruta.tipo}</span>
                       </div>
                       <div>
-                        <span className="block text-xs text-gray-500 font-medium">Distancia</span>
+                        <span className="block text-xs text-emerald-600">Distancia</span>
                         <span>{ruta.distancia} km</span>
                       </div>
                       <div>
-                        <span className="block text-xs text-gray-500 font-medium">Capacidad</span>
+                        <span className="block text-xs text-emerald-600">Capacidad</span>
                         <span>{ruta.capacidadMaxima} personas</span>
                       </div>
                     </div>
                     
-                    <div className="mt-3 bg-gray-100 p-2 rounded-lg text-center">
-                      <span className="block text-xs text-gray-600">Precio</span>
-                      <span className="text-teal-700 font-semibold">$ {ruta.precio}</span>
+                    <div className="mt-3 bg-emerald-50 p-2 rounded-lg text-center border border-emerald-100 shadow-sm">
+                      <span className="block text-xs text-emerald-600">Precio</span>
+                      <span className="text-emerald-700 font-semibold">$ {ruta.precio}</span>
                     </div>
                     
-                    <p className="mt-3 text-sm text-gray-600 line-clamp-2">{ruta.descripcion || 'Sin descripción disponible'}</p>
+                    <p className="mt-3 text-sm text-gray-600 line-clamp-2">{ruta.descripcion}</p>
                     
                     <button 
                       onClick={() => openDetailView(ruta)}
-                      className="w-full mt-4 px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded flex items-center justify-center gap-2"
+                      className="w-full mt-4 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded flex items-center justify-center gap-2"
                     >
                       <Eye size={16} />
                       Ver detalles
@@ -959,10 +1286,10 @@ const VisualizarRutas = () => {
             </div>
           ) : !loading && !error ? (
             <div className="text-center py-16">
-              <p className="text-teal-300 text-xl mb-4">No hay rutas disponibles con los filtros seleccionados</p>
+              <p className="text-emerald-300 text-xl mb-4">No hay rutas disponibles con los filtros seleccionados</p>
               <button 
                 onClick={limpiarFiltros}
-                className="px-4 py-2 bg-teal-700 hover:bg-teal-600 rounded text-white"
+                className="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 rounded text-white"
               >
                 Limpiar filtros
               </button>
@@ -972,13 +1299,13 @@ const VisualizarRutas = () => {
         
         {/* Detail View */}
         {isDetailView && activeRoute && (
-          <div className="fixed inset-0 bg-black bg-opacity-80 z-30 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
+          <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-30 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
               <div className="relative">
-                <div className="h-64 md:h-80 overflow-hidden bg-gray-100">
+                <div className="h-64 md:h-80 overflow-hidden bg-emerald-50">
                   {cargandoFotos[activeRoute.idRuta || activeRoute.id] ? (
                     <div className="flex justify-center items-center h-full">
-                      <div className="animate-spin w-8 h-8 border-2 border-teal-300 border-t-transparent rounded-full"></div>
+                      <div className="animate-spin w-8 h-8 border-2 border-emerald-400 border-t-transparent rounded-full"></div>
                     </div>
                   ) : (rutasConFotos[activeRoute.idRuta || activeRoute.id]?.length > 0 || imagenesPreview.length > 0) ? (
                     <div className="relative h-full">
@@ -988,13 +1315,13 @@ const VisualizarRutas = () => {
                           : imagenesPreview).map((foto, idx) => (
                           <div 
                             key={idx} 
-                            onClick={() => openLightbox(idx)}
-                            className="h-full min-w-[300px] cursor-pointer"
+                            className="h-full min-w-[300px] relative group cursor-pointer"
                           >
                             <img
                               src={foto}
                               alt={`${activeRoute.nombreRuta} - imagen ${idx + 1}`}
                               className="h-full w-full object-cover rounded"
+                              onClick={() => openLightbox(idx)}
                               onError={(e) => {
                                 e.target.onerror = null;
                                 e.target.src = 'https://via.placeholder.com/800x400?text=Imagen+no+disponible';
@@ -1005,8 +1332,8 @@ const VisualizarRutas = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="w-full h-full bg-gray-50 flex items-center justify-center">
-                      <span className="text-8xl">{getRouteTypeIcon(activeRoute.tipo)}</span>
+                    <div className="w-full h-full bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center">
+                      <span className="text-8xl text-emerald-300">{getRouteTypeIcon(activeRoute.tipo)}</span>
                     </div>
                   )}
                 </div>
@@ -1014,68 +1341,68 @@ const VisualizarRutas = () => {
                 {/* Close button */}
                 <button
                   onClick={closeDetailView}
-                  className="absolute top-4 right-4 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
+                  className="absolute top-4 right-4 bg-white bg-opacity-80 text-emerald-700 p-2 rounded-full hover:bg-opacity-100 transition-all shadow-md"
                 >
                   <X size={20} />
                 </button>
                 
                 {/* Route type and difficulty */}
                 <div className="absolute bottom-4 left-4 flex gap-2">
-                  <span className={`${getDifficultyColor(activeRoute.dificultad)} px-3 py-1 rounded-full flex items-center gap-1.5 text-white`}>
+                  <span className={`${getDifficultyColor(activeRoute.dificultad)} px-3 py-1 rounded-full flex items-center gap-1.5 text-white shadow-sm`}>
                     <Mountain size={16} />
                     {activeRoute.dificultad}
                   </span>
-                  <span className="bg-teal-700 text-white px-3 py-1 rounded-full">
+                  <span className="bg-emerald-500 text-white px-3 py-1 rounded-full shadow-sm">
                     {activeRoute.tipo}
                   </span>
                 </div>
                 
                 {/* Status badge */}
                 <div className="absolute bottom-4 right-4">
-                  <span className={`${activeRoute.estado === 'Activa' ? 'bg-green-500' : 'bg-red-500'} text-white px-3 py-1 rounded-full`}>
+                  <span className={`${activeRoute.estado === 'Activa' ? 'bg-green-500' : 'bg-red-500'} text-white px-3 py-1 rounded-full shadow-sm`}>
                     {activeRoute.estado}
                   </span>
                 </div>
               </div>
               
-              <div className="p-6 flex-grow overflow-y-auto">
-                <h2 className="text-3xl font-bold text-gray-800 mb-3">{activeRoute.nombreRuta}</h2>
+              <div className="p-6 flex-grow overflow-y-auto bg-white">
+                <h2 className="text-3xl font-bold text-emerald-700 mb-3">{activeRoute.nombreRuta}</h2>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  <div className="bg-gray-100 p-3 rounded-lg">
-                    <p className="text-gray-600 text-sm">Duración</p>
-                    <p className="text-gray-800 font-semibold">{activeRoute.duracion}</p>
+                  <div className="bg-emerald-50 p-3 rounded-lg">
+                    <p className="text-emerald-600 text-sm">Duración</p>
+                    <p className="text-emerald-800 font-semibold">{activeRoute.duracion}</p>
                   </div>
-                  <div className="bg-gray-100 p-3 rounded-lg">
-                    <p className="text-gray-600 text-sm">Distancia</p>
-                    <p className="text-gray-800 font-semibold">{activeRoute.distancia} km</p>
+                  <div className="bg-emerald-50 p-3 rounded-lg">
+                    <p className="text-emerald-600 text-sm">Distancia</p>
+                    <p className="text-emerald-800 font-semibold">{activeRoute.distancia} km</p>
                   </div>
-                  <div className="bg-gray-100 p-3 rounded-lg">
-                    <p className="text-gray-600 text-sm">Capacidad</p>
-                    <p className="text-gray-800 font-semibold">{activeRoute.capacidadMaxima} personas</p>
+                  <div className="bg-emerald-50 p-3 rounded-lg">
+                    <p className="text-emerald-600 text-sm">Capacidad</p>
+                    <p className="text-emerald-800 font-semibold">{activeRoute.capacidadMaxima} personas</p>
                   </div>
-                  <div className="bg-gray-100 p-3 rounded-lg">
-                    <p className="text-gray-600 text-sm">Tipo</p>
-                    <p className="text-gray-800 font-semibold">{activeRoute.tipo}</p>
+                  <div className="bg-emerald-50 p-3 rounded-lg">
+                    <p className="text-emerald-600 text-sm">Tipo</p>
+                    <p className="text-emerald-800 font-semibold">{activeRoute.tipo}</p>
                   </div>
                 </div>
                 
-                <div className="mb-6 bg-gray-100 p-4 rounded-lg text-center">
-                  <p className="text-gray-600 text-sm mb-1">Precio por persona</p>
-                  <p className="text-gray-800 text-2xl font-bold">$ {activeRoute.precio}</p>
+                <div className="mb-6 bg-emerald-100 p-4 rounded-lg text-center">
+                  <p className="text-emerald-600 text-sm mb-1">Precio por persona</p>
+                  <p className="text-emerald-800 text-2xl font-bold">$ {activeRoute.precio}</p>
                 </div>
                 
                 <div className="mb-6">
-                  <h3 className="text-xl font-semibold text-gray-700 mb-2">Descripción</h3>
-                  <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                  <h3 className="text-xl font-semibold text-emerald-700 mb-2">Descripción</h3>
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-line">
                     {activeRoute.descripcion}
                   </p>
                 </div>
                 
-                <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                <div className="flex justify-end gap-3 pt-4 border-t border-emerald-100">
                   <button
-                    onClick={() => handleDeleteRuta(activeRoute.idRuta || activeRoute.id)}
-                    className="px-4 py-2 bg-rose-500 bg-opacity-80 hover:bg-opacity-100 rounded-lg text-white flex items-center gap-2 transition-colors"
+                    onClick={() => handleDeleteRuta(activeRoute)}
+                    className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white flex items-center gap-2 transition-colors shadow-sm"
                   >
                     <Trash size={16} />
                     Eliminar
@@ -1085,7 +1412,7 @@ const VisualizarRutas = () => {
                       closeDetailView();
                       handleOpenModal(activeRoute);
                     }}
-                    className="px-4 py-2 bg-teal-500 bg-opacity-80 hover:bg-opacity-100 rounded-lg text-white flex items-center gap-2 transition-colors"
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-white flex items-center gap-2 transition-colors shadow-sm"
                   >
                     <Pencil size={16} />
                     Editar
@@ -1098,37 +1425,39 @@ const VisualizarRutas = () => {
         
         {/* Lightbox Modal */}
         {lightboxOpen && (
-          <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm z-50 flex items-center justify-center">
             <div className="absolute inset-0 flex items-center justify-center">
               <img 
                 src={imagenesPreview[lightboxIndex]} 
                 alt="Vista ampliada"
-                className="max-h-[90vh] max-w-[90vw] object-contain"
+                className="max-h-[90vh] max-w-[90vw] object-contain rounded shadow-2xl"
               />
             </div>
             
             <button
               onClick={() => setLightboxOpen(false)}
-              className="absolute top-4 right-4 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
+              className="absolute top-4 right-4 bg-white bg-opacity-80 text-emerald-700 p-2 rounded-full hover:bg-opacity-100 transition-all shadow-md"
             >
               <X size={24} />
             </button>
             
             <button
               onClick={() => navigateLightbox(-1)}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 text-emerald-700 p-3 rounded-full hover:bg-opacity-100 transition-all shadow-md"
+              disabled={lightboxIndex === 0}
             >
               <ChevronLeft size={24} />
             </button>
             
             <button
               onClick={() => navigateLightbox(1)}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 text-emerald-700 p-3 rounded-full hover:bg-opacity-100 transition-all shadow-md"
+              disabled={lightboxIndex === imagenesPreview.length - 1}
             >
               <ChevronRight size={24} />
             </button>
             
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-4 py-2 rounded-full">
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-80 text-emerald-800 px-4 py-2 rounded-full shadow-md">
               {lightboxIndex + 1} de {imagenesPreview.length}
             </div>
           </div>
@@ -1136,174 +1465,177 @@ const VisualizarRutas = () => {
         
         {/* Create/Edit Modal */}
         {modalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-start justify-center p-4 z-40">
-            <div className="bg-white rounded-lg w-full max-w-md mx-auto mt-20">
+          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-start justify-center p-4 z-40">
+            <div className="bg-white rounded-lg w-full max-w-md mx-auto mt-20 shadow-xl">
               <div className="p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">
+                <h2 className="text-xl font-bold text-emerald-700 mb-4 flex items-center">
                   {isEditing ? 'Modificar Ruta' : 'Nueva Ruta'}
                 </h2>
                 
                 {alert.show && alert.type === 'error' && (
-                  <div className="mb-4 p-3 bg-red-100 rounded">
-                    <p className="text-red-700 text-sm">{alert.message}</p>
+                  <div className="mb-4 p-3 bg-red-50 rounded border border-red-100">
+                    <p className="text-red-700 text-sm">
+                      {alert.message.includes("Error 403") ? "Token inválido" : alert.message}
+                    </p>
                   </div>
                 )}
                 
                 <form onSubmit={handleCreateOrUpdate} className="space-y-4 overflow-y-auto max-h-[60vh]">
-                  <input
-                    type="text"
-                    placeholder="Nombre de la ruta"
-                    value={rutaActual.nombreRuta}
-                    onChange={handleRouteNameChange}
-                    className={`w-full p-2 rounded bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400 ${
-                      checkRouteNameExists(rutaActual.nombreRuta) ? 'border-2 border-red-500' : ''
-                    }`}
-                    required
-                  />
-                  
-                  <textarea
-                    placeholder="Descripción"
-                    value={rutaActual.descripcion}
-                    onChange={(e) => setRutaActual({ ...rutaActual, descripcion: e.target.value })}
-                    className="w-full p-2 rounded bg-gray-100 text-gray-800 h-32 resize-none focus:outline-none focus:ring-2 focus:ring-teal-400"
-                    required
-                  />
-                  
-                  <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Nombre de la ruta</label>
                     <input
                       type="text"
-                      placeholder="Duración (ej: 2 horas)"
-                      value={rutaActual.duracion}
-                      onChange={(e) => setRutaActual({ ...rutaActual, duracion: e.target.value })}
-                      className="w-full p-2 rounded bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                      placeholder="Nombre de la ruta"
+                      value={rutaActual.nombreRuta}
+                      onChange={handleRouteNameChange}
+                      className={`w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400 ${
+                        checkRouteNameExists(rutaActual.nombreRuta) ? 'border-2 border-red-500' : ''
+                      }`}
                       required
                     />
-                    <input
-                      type="number"
-                      placeholder="Distancia en km"
-                      value={rutaActual.distancia}
-                      onChange={(e) => setRutaActual({ ...rutaActual, distancia: e.target.value })}
-                      className="w-full p-2 rounded bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                      step="0.1"
-                      min="0.1"
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Descripción</label>
+                    <textarea
+                      placeholder="Descripción detallada de la ruta"
+                      value={rutaActual.descripcion}
+                      onChange={(e) => setRutaActual({ ...rutaActual, descripcion: e.target.value })}
+                      className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 h-32 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-400"
                       required
                     />
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
-                    <input
-                      type="number"
-                      placeholder="Capacidad máxima"
-                      value={rutaActual.capacidadMaxima}
-                      onChange={(e) => setRutaActual({ ...rutaActual, capacidadMaxima: e.target.value })}
-                      className="w-full p-2 rounded bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                      min="1"
-                      required
-                    />
-                    
-                    <select
-                      value={rutaActual.dificultad}
-                      onChange={(e) => setRutaActual({ ...rutaActual, dificultad: e.target.value })}
-                      className="w-full p-2 rounded bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                      required
-                    >
-                      <option value="">Nivel de dificultad</option>
-                      <option value="Facil">Fácil</option>
-                      <option value="Moderada">Moderada</option>
-                      <option value="Desafiante">Desafiante</option>
-                    </select>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Duración</label>
+                      <input
+                        type="text"
+                        placeholder="ej: 2 horas"
+                        value={rutaActual.duracion}
+                        onChange={(e) => setRutaActual({ ...rutaActual, duracion: e.target.value })}
+                        className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Distancia (km)</label>
+                      <input
+                        type="number"
+                        placeholder="ej: 2.5"
+                        value={rutaActual.distancia}
+                        onChange={(e) => setRutaActual({ ...rutaActual, distancia: e.target.value })}
+                        className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                        step="0.1"
+                        min="0.1"
+                        required
+                      />
+                    </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 gap-2">
-                    <label className="block text-gray-600 text-sm">Precio (COP)</label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Capacidad</label>
+                      <input
+                        type="number"
+                        placeholder="ej: 20"
+                        value={rutaActual.capacidadMaxima}
+                        onChange={(e) => setRutaActual({ ...rutaActual, capacidadMaxima: e.target.value })}
+                        className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                        min="1"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Dificultad</label>
+                      <select
+                        value={rutaActual.dificultad}
+                        onChange={(e) => setRutaActual({ ...rutaActual, dificultad: e.target.value })}
+                        className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                        required
+                      >
+                        <option value="">Seleccione</option>
+                        <option value="Facil">Fácil</option>
+                        <option value="Moderada">Moderada</option>
+                        <option value="Desafiante">Desafiante</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Precio (COP)</label>
                     <div className="relative">
                       <span className="absolute left-2 top-2 text-gray-600">$</span>
                       <input
                         type="text"
-                        placeholder="Ingrese el precio"
+                        placeholder="ej: 50000"
                         value={rutaActual.precio}
                         onChange={(e) => {
                           // Solo permitir dígitos
                           const value = e.target.value.replace(/\D/g, '');
                           setRutaActual({ ...rutaActual, precio: value });
                         }}
-                        className="w-full p-2 pl-6 rounded bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                        className="w-full p-2 pl-6 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
                         required
                       />
                     </div>
                   </div>
                   
-                  <select
-                    value={rutaActual.tipo}
-                    onChange={(e) => setRutaActual({ ...rutaActual, tipo: e.target.value })}
-                    className="w-full p-2 rounded bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                    required
-                  >
-                    <option value="">Tipo de ruta</option>
-                    <option value="Caminata">Caminata</option>
-                    <option value="Cabalgata">Cabalgata</option>
-                    <option value="Cabalgata y Caminata">Cabalgata y Caminata</option>
-                  </select>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Tipo de ruta</label>
+                    <select
+                      value={rutaActual.tipo}
+                      onChange={(e) => setRutaActual({ ...rutaActual, tipo: e.target.value })}
+                      className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                      required
+                    >
+                      <option value="">Seleccione</option>
+                      <option value="Caminata">Caminata</option>
+                      <option value="Cabalgata">Cabalgata</option>
+                      <option value="Cabalgata y Caminata">Cabalgata y Caminata</option>
+                    </select>
+                  </div>
                   
-                  <select
-                    value={rutaActual.estado}
-                    onChange={(e) => setRutaActual({ ...rutaActual, estado: e.target.value })}
-                    className="w-full p-2 rounded bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                    required
-                  >
-                    <option value="">Seleccione el estado</option>
-                    <option value="Activa">Activa</option>
-                    <option value="Inactiva">Inactiva</option>
-                  </select>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Estado</label>
+                    <select
+                      value={rutaActual.estado}
+                      onChange={(e) => setRutaActual({ ...rutaActual, estado: e.target.value })}
+                      className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                      required
+                    >
+                      <option value="">Seleccione</option>
+                      <option value="Activa">Activa</option>
+                      <option value="Inactiva">Inactiva</option>
+                    </select>
+                  </div>
                   
                   <div className="space-y-2">
-                    <label className="block text-gray-600 text-sm">Imágenes de la ruta (opcional)</label>
+                    <label className="block text-sm text-gray-600 mb-1">Imágenes de la ruta (opcional)</label>
                     <input
                       type="file"
                       onChange={handleImageChange}
-                      className="w-full p-2 rounded bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                      className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
                       accept="image/*"
                       multiple
                     />
                     
-                    {/* Display image previews with remove option */}
-                    {imagenesPreview.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {imagenesPreview.map((preview, index) => (
-                          <div key={index} className="relative">
-                            <img
-                              src={preview}
-                              alt={`Vista previa ${index + 1}`}
-                              className="h-24 w-24 object-cover rounded"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => removeImage(index)}
-                              className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 transform translate-x-1/2 -translate-y-1/2"
-                              title="Eliminar imagen"
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                              </svg>
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    <div className="text-xs text-gray-500 mt-1">
+                      Puedes seleccionar múltiples imágenes a la vez
+                    </div>
                   </div>
                   
-                  <div className="flex justify-end gap-2 pt-4 border-t border-gray-200">
+                  <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 mt-4">
                     <button
                       type="button"
                       onClick={() => setModalOpen(false)}
-                      className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded transition-colors"
+                      className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded transition-colors"
+                      className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded transition-colors"
                     >
                       {isEditing ? 'Actualizar' : 'Crear'}
                     </button>
@@ -1314,8 +1646,8 @@ const VisualizarRutas = () => {
           </div>
         )}
       </div>
-    </DashboardLayoutAdmin>
+    </DashboardLayout>
   );
 };
 
-export default VisualizarRutas;
+export default Rutas;

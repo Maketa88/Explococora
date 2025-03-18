@@ -11,7 +11,13 @@ import EliminarUsuario from '../../pages/VistaAdmin/PerfilAdmin/EliminarUsuario'
 import PerfilAdmin from '../../pages/VistaAdmin/PerfilAdmin/PerfilAdmin';
 import GestionGuias from '../../pages/VistaAdmin/GestionUsuarios/GestionGuias';
 import GestionOperadores from '../../pages/VistaAdmin/GestionUsuarios/GestionOperadores';
-
+import GestionPaquetes from '../../pages/VistaAdmin/GestionPaquetes/GestionPaquetes';
+import EliminarPaquetes from '../../pages/VistaAdmin/GestionPaquetes/EliminarPaquetes';
+import ActualizarPaquetes from '../../pages/VistaAdmin/GestionPaquetes/ActualizarPaquetes';
+import CrearPaquetes from '../../pages/VistaAdmin/GestionPaquetes/CrearPaquetes';
+import PagoPaquete from '../../pages/VistaAdmin/Informes/PagoPaquete';
+import Reservas from '../../pages/VistaAdmin/Informes/Reserva';
+import PagoRuta from '../../pages/VistaAdmin/Informes/PagoRuta';
 
 const RutasAdmin = () => {
   return (
@@ -28,8 +34,14 @@ const RutasAdmin = () => {
       <Route path="/EliminarUsuario" element={<EliminarUsuario />} />
       <Route path="/GestionGuias" element={<GestionGuias />} />
       <Route path="/GestionOperadores" element={<GestionOperadores />} />
-
-
+      <Route path="/GestionPaquetes" element={<GestionPaquetes />} />
+      <Route path="/EliminarPaquetes" element={<EliminarPaquetes />} />
+      <Route path="/ActualizarPaquetes" element={<ActualizarPaquetes />} />
+      <Route path="/CrearPaquetes" element={<CrearPaquetes />} />
+      <Route path="/PagoPaquete" element={<PagoPaquete />} />
+      <Route path="/Reservas" element={<Reservas />} />
+      <Route path="/PagoRuta" element={<PagoRuta />} />
+      
     </Routes>
   );
 };

@@ -233,10 +233,10 @@ const EditarOperador = ({ operador, onClose, onOperadorUpdated }) => {
   if (!dataLoaded && operador) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-gray-800 rounded-lg p-8 w-full max-w-md">
+        <div className="bg-white rounded-lg p-8 w-full max-w-md shadow-xl">
           <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            <p className="mt-4 text-white">Cargando información del operador...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+            <p className="mt-4 text-gray-700">Cargando información del operador...</p>
           </div>
         </div>
       </div>
@@ -260,28 +260,28 @@ const EditarOperador = ({ operador, onClose, onOperadorUpdated }) => {
               className="max-h-[80vh] max-w-full rounded-lg object-contain"
               onError={(e) => {
                 e.target.onerror = null;
-                e.target.src = `https://ui-avatars.com/api/?name=${formData.primerNombre}+${formData.primerApellido}&background=0D8ABC&color=fff`;
+                e.target.src = `https://ui-avatars.com/api/?name=${formData.primerNombre}+${formData.primerApellido}&background=10B981&color=fff`;
               }}
             />
           </div>
         </div>
       )}
       
-      <div className="bg-gray-800 rounded-lg p-8 w-full max-w-2xl max-h-screen overflow-y-auto">
+      <div className="bg-white rounded-lg p-8 w-full max-w-2xl max-h-screen overflow-y-auto shadow-xl">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-white">
+          <h2 className="text-xl font-bold text-gray-800">
             Actualizar Información del Operador
           </h2>
           <button 
             onClick={onClose}
-            className="text-gray-400 hover:text-white focus:outline-none"
+            className="text-gray-500 hover:text-gray-700 focus:outline-none"
           >
             <X size={24} />
           </button>
         </div>
         
         {error && (
-          <div className="mb-6 p-4 bg-red-900/30 text-red-300 rounded-lg">
+          <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-lg border border-red-200">
             {error}
           </div>
         )}
@@ -291,7 +291,7 @@ const EditarOperador = ({ operador, onClose, onOperadorUpdated }) => {
           <div className="flex flex-col items-center mb-8">
             <div className="relative">
               <div 
-                className="w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-blue-500 cursor-pointer"
+                className="w-32 h-32 rounded-full overflow-hidden mb-4 border-4 border-emerald-500 cursor-pointer"
                 onClick={handleMostrarImagenAmpliada}
               >
                 {previewFoto ? (
@@ -301,34 +301,34 @@ const EditarOperador = ({ operador, onClose, onOperadorUpdated }) => {
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = `https://ui-avatars.com/api/?name=${formData.primerNombre}+${formData.primerApellido}&background=0D8ABC&color=fff`;
+                      e.target.src = `https://ui-avatars.com/api/?name=${formData.primerNombre}+${formData.primerApellido}&background=10B981&color=fff`;
                     }}
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-blue-700 text-white">
-                    <User size={64} />
+                  <div className="w-full h-full flex items-center justify-center bg-emerald-500 text-white">
+                    <User size={48} />
                   </div>
                 )}
               </div>
             </div>
             
             {/* Nombre completo del operador */}
-            <h3 className="text-xl font-semibold text-white mt-2 mb-1">
+            <h3 className="text-xl font-semibold text-gray-800 mt-2 mb-1">
               {getNombreCompleto()}
             </h3>
-            <p className="text-sm text-gray-400 mb-4">
+            <p className="text-sm text-gray-500 mb-4">
               {formData.email}
               {formData.telefono && ` • ${formData.telefono}`}
             </p>
             
-            <p className="text-sm mt-2 text-gray-300">
+            <p className="text-sm mt-2 text-gray-500">
               Haz clic en la imagen para verla ampliada
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-300">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Cédula
               </label>
               <input
@@ -336,12 +336,12 @@ const EditarOperador = ({ operador, onClose, onOperadorUpdated }) => {
                 name="cedula"
                 value={formData.cedula}
                 disabled
-                className="w-full px-4 py-2 rounded-lg border bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 opacity-70"
+                className="w-full px-4 py-2 rounded-lg border bg-gray-100 border-gray-200 text-gray-500 focus:outline-none"
               />
             </div>
             
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-300">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Primer Nombre *
               </label>
               <input
@@ -350,12 +350,12 @@ const EditarOperador = ({ operador, onClose, onOperadorUpdated }) => {
                 value={formData.primerNombre}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg border bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-300">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Segundo Nombre
               </label>
               <input
@@ -363,12 +363,12 @@ const EditarOperador = ({ operador, onClose, onOperadorUpdated }) => {
                 name="segundoNombre"
                 value={formData.segundoNombre}
                 onChange={handleChange}
-                className="w-full px-4 py-2 rounded-lg border bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-300">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Primer Apellido *
               </label>
               <input
@@ -377,12 +377,12 @@ const EditarOperador = ({ operador, onClose, onOperadorUpdated }) => {
                 value={formData.primerApellido}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg border bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-300">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Segundo Apellido
               </label>
               <input
@@ -390,12 +390,12 @@ const EditarOperador = ({ operador, onClose, onOperadorUpdated }) => {
                 name="segundoApellido"
                 value={formData.segundoApellido}
                 onChange={handleChange}
-                className="w-full px-4 py-2 rounded-lg border bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-300">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Correo Electrónico *
               </label>
               <input
@@ -404,12 +404,12 @@ const EditarOperador = ({ operador, onClose, onOperadorUpdated }) => {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg border bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-300">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Teléfono *
               </label>
               <input
@@ -418,12 +418,12 @@ const EditarOperador = ({ operador, onClose, onOperadorUpdated }) => {
                 value={formData.telefono}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-lg border bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             
             <div className="md:col-span-2">
-              <label className="block mb-2 text-sm font-medium text-gray-300">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 Descripción
               </label>
               <textarea
@@ -431,7 +431,7 @@ const EditarOperador = ({ operador, onClose, onOperadorUpdated }) => {
                 value={formData.descripcion}
                 onChange={handleChange}
                 rows="4"
-                className="w-full px-4 py-2 rounded-lg border bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 placeholder="Escribe una breve descripción sobre el operador, su experiencia y habilidades..."
               ></textarea>
             </div>
@@ -441,7 +441,7 @@ const EditarOperador = ({ operador, onClose, onOperadorUpdated }) => {
             <button
               type="submit"
               disabled={updating}
-              className={`py-2 px-6 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors duration-200 flex items-center gap-2 ${updating ? 'opacity-70 cursor-not-allowed' : ''}`}
+              className={`py-2 px-6 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium transition-colors duration-200 flex items-center gap-2 ${updating ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
               {updating ? (
                 <>
@@ -459,7 +459,7 @@ const EditarOperador = ({ operador, onClose, onOperadorUpdated }) => {
             <button
               type="button"
               onClick={onClose}
-              className="py-2 px-6 rounded-lg bg-gray-600 hover:bg-gray-700 text-white font-medium transition-colors duration-200"
+              className="py-2 px-6 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium transition-colors duration-200"
             >
               Cancelar
             </button>

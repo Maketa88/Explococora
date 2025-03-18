@@ -9,6 +9,7 @@ import EliminarGuia from './EliminarGuia';
 import CrearGuia from './CrearGuia';
 import EditarGuia from './EditarGuia';
 import EstadoGuia from '../../../components/Guias/EstadoGuia';
+import { FaIdCard } from 'react-icons/fa';
 
 const Guias = () => {
   const navigate = useNavigate();
@@ -513,33 +514,26 @@ const Guias = () => {
     );
   };
 
-  // Componente para ver detalles completos del guía
+  // Componente para mostrar detalles completos del guía
   const DetallesGuiaModal = ({ guia, onClose }) => {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
-        <div className="relative bg-gray-900 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto text-white">
-          <div className="flex justify-between items-center p-4 border-b border-gray-700">
-            <h2 className="text-xl font-bold">Perfil completo del guía</h2>
+      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="bg-white text-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="flex justify-between items-center p-4 border-b border-gray-200">
+            <h2 className="text-xl font-bold text-gray-800">Perfil completo del guía</h2>
             <button 
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-200"
+              className="text-gray-500 hover:text-gray-700 focus:outline-none"
             >
-              <X className="h-6 w-6" />
+              <X size={24} />
             </button>
           </div>
           
           <div className="p-6">
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-shrink-0 flex flex-col items-center">
-                <div 
-                  className="w-40 h-40 rounded-full overflow-hidden border-4 border-blue-500 mx-auto cursor-pointer"
-                  onClick={() => handleMostrarImagenAmpliada(
-                    guia.foto
-                      ? (guia.foto.startsWith('http') ? guia.foto : `http://localhost:10101/uploads/images/${guia.foto}`)
-                      : "https://i.pinimg.com/736x/8d/37/31/8d3731a57b8209114c08488eeb0b6a64.jpg"
-                  )}
-                >
-                  <img
+            <div className="flex flex-col md:flex-row gap-8">
+              <div className="md:w-1/3 flex flex-col items-center">
+                <div className="w-48 h-48 rounded-full overflow-hidden border-4 border-emerald-500 mb-4">
+                  <img 
                     src={
                       guia.foto
                         ? (guia.foto.startsWith('http') ? guia.foto : `http://localhost:10101/uploads/images/${guia.foto}`)
@@ -553,106 +547,141 @@ const Guias = () => {
                     }}
                   />
                 </div>
-                <div className="mt-3 text-center">
-                  <div 
-                    className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
-                      guia.estado === 'disponible' ? 'bg-green-700 text-green-100' : 
-                      guia.estado === 'ocupado' ? 'bg-yellow-700 text-yellow-100' : 
-                      'bg-red-700 text-red-100'
-                    }`}
+                
+                <div className={`px-4 py-2 rounded-full text-sm font-medium flex items-center mb-4 ${
+                  guia.estado === 'disponible' ? 'bg-emerald-100 text-emerald-800' : 
+                  guia.estado === 'ocupado' ? 'bg-yellow-100 text-yellow-800' : 
+                  'bg-red-100 text-red-800'
+                }`}>
+                  {guia.estado === 'disponible' ? (
+                    <>
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Disponible
+                    </>
+                  ) : guia.estado === 'ocupado' ? (
+                    <>
+                      <Clock className="w-4 h-4 mr-2" />
+                      Ocupado
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="w-4 h-4 mr-2" />
+                      Inactivo
+                    </>
+                  )}
+                </div>
+                
+                <div className="flex space-x-2">
+                  <button 
+                    onClick={() => {
+                      onClose();
+                      handleOpenEditarGuiaModal(guia);
+                    }}
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg flex items-center"
                   >
-                    {guia.estado === 'disponible' ? 'Disponible' : 
-                     guia.estado === 'ocupado' ? 'Ocupado' : 
-                     'Inactivo'}
-                  </div>
+                    <Edit className="w-4 h-4 mr-2" />
+                    Editar información
+                  </button>
                 </div>
               </div>
               
-              <div className="flex-grow">
-                <h1 className="text-2xl font-bold mb-1">{construirNombreCompleto(guia)}</h1>
-                <p className="text-lg text-gray-300 mb-4">
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                  {construirNombreCompleto(guia)}
+                </h3>
+                <p className="text-emerald-600 font-medium mb-4">
                   {guia.especialidad || 'Guía Turístico General'}
-                  {guia.calificacion && (
-                    <span className="ml-2 inline-flex items-center text-yellow-500">
-                      <Star className="w-4 h-4 fill-current" />
-                      <span className="text-sm ml-1">{guia.calificacion}</span>
-                    </span>
-                  )}
                 </p>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   <div className="flex items-center">
-                    <CreditCard className="w-5 h-5 mr-3 text-blue-400" />
+                    <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600 mr-3">
+                      <FaIdCard className="w-5 h-5" />
+                    </div>
                     <div>
-                      <span className="text-gray-400">Cédula:</span>
-                      <span className="ml-2">{guia.cedula || 'No disponible'}</span>
+                      <p className="text-sm text-gray-500">Cédula:</p>
+                      <p className="font-medium text-gray-800">{guia.cedula}</p>
                     </div>
                   </div>
+                  
                   <div className="flex items-center">
-                    <Mail className="w-5 h-5 mr-3 text-blue-400" />
+                    <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600 mr-3">
+                      <Mail className="w-5 h-5" />
+                    </div>
                     <div>
-                      <span className="text-gray-400">Email:</span>
-                      <span className="ml-2">{guia.email || 'No disponible'}</span>
+                      <p className="text-sm text-gray-500">Email:</p>
+                      <p className="font-medium text-gray-800">{guia.email}</p>
                     </div>
                   </div>
+                  
                   <div className="flex items-center">
-                    <Phone className="w-5 h-5 mr-3 text-green-400" />
+                    <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600 mr-3">
+                      <Phone className="w-5 h-5" />
+                    </div>
                     <div>
-                      <span className="text-gray-400">Teléfono:</span>
-                      <span className="ml-2">{guia.telefono || guia.numeroCelular || guia.numero_celular || 'No disponible'}</span>
+                      <p className="text-sm text-gray-500">Teléfono:</p>
+                      <p className="font-medium text-gray-800">{guia.telefono || guia.numeroCelular || guia.numero_celular || 'No especificado'}</p>
                     </div>
                   </div>
+                  
                   <div className="flex items-center">
-                    <MapPin className="w-5 h-5 mr-3 text-red-400" />
+                    <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600 mr-3">
+                      <MapPin className="w-5 h-5" />
+                    </div>
                     <div>
-                      <span className="text-gray-400">Ubicación:</span>
-                      <span className="ml-2">{guia.ubicacion || 'No especificada'}</span>
+                      <p className="text-sm text-gray-500">Ubicación:</p>
+                      <p className="font-medium text-gray-800">{guia.ubicacion || 'No especificada'}</p>
                     </div>
                   </div>
+                  
                   <div className="flex items-center">
-                    <Calendar className="w-5 h-5 mr-3 text-blue-400" />
+                    <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600 mr-3">
+                      <Calendar className="w-5 h-5" />
+                    </div>
                     <div>
-                      <span className="text-gray-400">Fecha de registro:</span>
-                      <span className="ml-2">{new Date(guia.fecha_registro || Date.now()).toLocaleDateString()}</span>
+                      <p className="text-sm text-gray-500">Fecha de registro:</p>
+                      <p className="font-medium text-gray-800">{new Date(guia.fecha_registro || Date.now()).toLocaleDateString()}</p>
                     </div>
                   </div>
+                  
                   <div className="flex items-center">
-                    <Globe className="w-5 h-5 mr-3 text-purple-400" />
+                    <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600 mr-3">
+                      <Globe className="w-5 h-5" />
+                    </div>
                     <div>
-                      <span className="text-gray-400">Idiomas:</span>
-                      <span className="ml-2">{guia.idiomas || 'No especificados'}</span>
+                      <p className="text-sm text-gray-500">Idiomas:</p>
+                      <p className="font-medium text-gray-800">{guia.idiomas || 'No especificados'}</p>
                     </div>
                   </div>
                 </div>
+                
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-2">Descripción</h4>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <p className="text-gray-700">
+                      {guia.descripcion || 'No hay descripción disponible para este guía.'}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={onClose}
+                    className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg"
+                  >
+                    Cerrar
+                  </button>
+                  <button
+                    onClick={() => {
+                      onClose();
+                      handleOpenEditarGuiaModal(guia);
+                    }}
+                    className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg"
+                  >
+                    Editar información
+                  </button>
+                </div>
               </div>
-            </div>
-            
-            {guia.descripcion && (
-              <div className="mt-6">
-                <h2 className="text-xl font-semibold mb-2">Descripción</h2>
-                <p className="text-gray-300">
-                  {guia.descripcion}
-                </p>
-              </div>
-            )}
-            
-            <div className="flex justify-end mt-6 gap-3">
-              <button
-                onClick={() => {
-                  setGuiaParaEditar(guia);
-                  setShowEditarGuiaModal(true);
-                  onClose();
-                }}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
-              >
-                Editar información
-              </button>
-              <button
-                onClick={onClose}
-                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md"
-              >
-                Cerrar
-              </button>
             </div>
           </div>
         </div>
@@ -662,66 +691,53 @@ const Guias = () => {
 
   return (
     <DashboardLayoutAdmin>
-      <div className={`p-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <h1 className="text-2xl font-bold">Gestión de Guías</h1>
+      <div className="p-4">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">Gestión de Guías</h1>
           
-          <div className="flex flex-wrap gap-2">
-            <div className="flex">
+          <div className="flex items-center gap-3 mt-4 md:mt-0">
+            <div className="relative">
               <input
                 type="text"
                 placeholder="Buscar por nombre, cédula o email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className={`px-4 py-2 rounded-l-md ${darkMode ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-800'} min-w-[400px]`}
+                className="pl-10 pr-4 py-2 rounded-lg border border-gray-200 w-64 md:w-80 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
-              <button 
-                onClick={handleSearch}
-                className={`px-3 py-2 rounded-r-md ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
-              >
-                <Search className="w-5 h-5" />
-              </button>
+              <Search className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
             </div>
             
             <button
               onClick={() => setMostrarFiltros(!mostrarFiltros)}
-              className={`px-3 py-2 rounded-md flex items-center ${darkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-purple-500 hover:bg-purple-600'} text-white`}
+              className="px-4 py-2 rounded-lg border border-gray-200 flex items-center gap-2 hover:bg-gray-50"
             >
-              <Filter className="w-5 h-5 mr-1.5" />
-              Filtros
+              <Filter className="w-5 h-5 text-emerald-600" />
+              <span className="text-gray-700">Filtros</span>
             </button>
             
             <button
               onClick={handleAddGuia}
-              className={`px-3 py-2 rounded-md flex items-center ${darkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'} text-white`}
+              className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white flex items-center gap-2"
             >
-              <UserPlus className="w-5 h-5 mr-1.5" />
-              Nuevo guía
-            </button>
-            
-            <button
-              onClick={() => window.location.reload()}
-              className={`px-3 py-2 rounded-md flex items-center ${darkMode ? 'bg-gray-600 hover:bg-gray-700' : 'bg-gray-500 hover:bg-gray-600'} text-white`}
-            >
-              <RefreshCw className="w-5 h-5 mr-1.5" />
-              Actualizar
+              <UserPlus className="w-5 h-5" />
+              <span>Nuevo guía</span>
             </button>
           </div>
         </div>
         
         {/* Panel de filtros */}
         {mostrarFiltros && (
-          <div className={`mb-6 p-4 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
+          <div className="mb-6 p-4 rounded-lg bg-white shadow-sm border border-gray-100">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <h3 className="text-sm font-medium mb-2">Estado</h3>
+                <h3 className="text-sm font-medium mb-2 text-gray-700">Estado</h3>
                 <div className="flex space-x-2">
                   <button
                     onClick={() => setFiltroEstado('todos')}
                     className={`px-3 py-1 text-sm rounded-md ${
                       filtroEstado === 'todos' 
-                        ? (darkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white') 
-                        : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-800')
+                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
+                        : 'bg-gray-100 text-gray-700 border border-gray-200'
                     }`}
                   >
                     Todos
@@ -730,8 +746,8 @@ const Guias = () => {
                     onClick={() => setFiltroEstado('disponible')}
                     className={`px-3 py-1 text-sm rounded-md ${
                       filtroEstado === 'disponible' 
-                        ? (darkMode ? 'bg-green-600 text-white' : 'bg-green-500 text-white') 
-                        : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-800')
+                        ? 'bg-green-100 text-green-800 border border-green-200' 
+                        : 'bg-gray-100 text-gray-700 border border-gray-200'
                     }`}
                   >
                     Disponible
@@ -740,8 +756,8 @@ const Guias = () => {
                     onClick={() => setFiltroEstado('ocupado')}
                     className={`px-3 py-1 text-sm rounded-md ${
                       filtroEstado === 'ocupado' 
-                        ? (darkMode ? 'bg-yellow-600 text-white' : 'bg-yellow-500 text-white') 
-                        : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-800')
+                        ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' 
+                        : 'bg-gray-100 text-gray-700 border border-gray-200'
                     }`}
                   >
                     Ocupado
@@ -750,8 +766,8 @@ const Guias = () => {
                     onClick={() => setFiltroEstado('inactivo')}
                     className={`px-3 py-1 text-sm rounded-md ${
                       filtroEstado === 'inactivo' 
-                        ? (darkMode ? 'bg-red-600 text-white' : 'bg-red-500 text-white') 
-                        : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-800')
+                        ? 'bg-red-100 text-red-800 border border-red-200' 
+                        : 'bg-gray-100 text-gray-700 border border-gray-200'
                     }`}
                   >
                     Inactivo
@@ -760,14 +776,14 @@ const Guias = () => {
               </div>
               
               <div>
-                <h3 className="text-sm font-medium mb-2">Ordenar por</h3>
+                <h3 className="text-sm font-medium mb-2 text-gray-700">Ordenar por</h3>
                 <div className="flex space-x-2">
                   <button
                     onClick={() => setOrdenarPor('nombre')}
                     className={`px-3 py-1 text-sm rounded-md ${
                       ordenarPor === 'nombre' 
-                        ? (darkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white') 
-                        : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-800')
+                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
+                        : 'bg-gray-100 text-gray-700 border border-gray-200'
                     }`}
                   >
                     Nombre
@@ -776,8 +792,8 @@ const Guias = () => {
                     onClick={() => setOrdenarPor('fecha')}
                     className={`px-3 py-1 text-sm rounded-md ${
                       ordenarPor === 'fecha' 
-                        ? (darkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white') 
-                        : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-800')
+                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
+                        : 'bg-gray-100 text-gray-700 border border-gray-200'
                     }`}
                   >
                     Más recientes
@@ -792,9 +808,7 @@ const Guias = () => {
                     setFiltroEstado('todos');
                     setOrdenarPor('nombre');
                   }}
-                  className={`px-3 py-1 text-sm rounded-md ${
-                    darkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
-                  }`}
+                  className="px-3 py-1 text-sm rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200"
                 >
                   Limpiar filtros
                 </button>
@@ -805,51 +819,51 @@ const Guias = () => {
 
         {/* Tarjetas de estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className={`p-4 rounded-lg ${darkMode ? 'bg-blue-900' : 'bg-blue-50'} flex items-center justify-between`}>
+          <div className="p-4 rounded-lg bg-emerald-50 border-l-4 border-emerald-500 flex items-center justify-between">
             <div>
-              <p className={`text-sm ${darkMode ? 'text-blue-300' : 'text-blue-600'}`}>Total de Guías</p>
-              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-blue-700'}`}>
+              <p className="text-sm text-emerald-700">Total de Guías</p>
+              <p className="text-2xl font-bold text-emerald-800">
                 {guiasCompletos.length}
               </p>
             </div>
-            <div className={`p-3 rounded-full ${darkMode ? 'bg-blue-800' : 'bg-blue-100'}`}>
-              <UserPlus className={`w-6 h-6 ${darkMode ? 'text-blue-300' : 'text-blue-600'}`} />
+            <div className="p-3 rounded-full bg-emerald-100">
+              <UserPlus className="w-6 h-6 text-emerald-500" />
             </div>
           </div>
           
-          <div className={`p-4 rounded-lg ${darkMode ? 'bg-green-900' : 'bg-green-50'} flex items-center justify-between`}>
+          <div className="p-4 rounded-lg bg-green-50 border-l-4 border-green-500 flex items-center justify-between">
             <div>
-              <p className={`text-sm ${darkMode ? 'text-green-300' : 'text-green-600'}`}>Guías Disponibles</p>
-              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-green-700'}`}>
+              <p className="text-sm text-green-700">Guías Disponibles</p>
+              <p className="text-2xl font-bold text-green-800">
                 {guiasCompletos.filter(g => g.estado === 'disponible').length}
               </p>
             </div>
-            <div className={`p-3 rounded-full ${darkMode ? 'bg-green-800' : 'bg-green-100'}`}>
-              <CheckCircle className={`w-6 h-6 ${darkMode ? 'text-green-300' : 'text-green-600'}`} />
+            <div className="p-3 rounded-full bg-green-100">
+              <CheckCircle className="w-6 h-6 text-green-500" />
             </div>
           </div>
 
-          <div className={`p-4 rounded-lg ${darkMode ? 'bg-yellow-900' : 'bg-yellow-50'} flex items-center justify-between`}>
+          <div className="p-4 rounded-lg bg-yellow-50 border-l-4 border-yellow-500 flex items-center justify-between">
             <div>
-              <p className={`text-sm ${darkMode ? 'text-yellow-300' : 'text-yellow-600'}`}>Guías Ocupados</p>
-              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-yellow-700'}`}>
+              <p className="text-sm text-yellow-700">Guías Ocupados</p>
+              <p className="text-2xl font-bold text-yellow-800">
                 {guiasCompletos.filter(g => g.estado === 'ocupado').length}
               </p>
             </div>
-            <div className={`p-3 rounded-full ${darkMode ? 'bg-yellow-800' : 'bg-yellow-100'}`}>
-              <Briefcase className={`w-6 h-6 ${darkMode ? 'text-yellow-300' : 'text-yellow-600'}`} />
+            <div className="p-3 rounded-full bg-yellow-100">
+              <Briefcase className="w-6 h-6 text-yellow-500" />
             </div>
           </div>
 
-          <div className={`p-4 rounded-lg ${darkMode ? 'bg-red-900' : 'bg-red-50'} flex items-center justify-between`}>
+          <div className="p-4 rounded-lg bg-red-50 border-l-4 border-red-500 flex items-center justify-between">
             <div>
-              <p className={`text-sm ${darkMode ? 'text-red-300' : 'text-red-600'}`}>Guías Inactivos</p>
-              <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-red-700'}`}>
+              <p className="text-sm text-red-700">Guías Inactivos</p>
+              <p className="text-2xl font-bold text-red-800">
                 {guiasCompletos.filter(g => g.estado === 'inactivo').length}
               </p>
             </div>
-            <div className={`p-3 rounded-full ${darkMode ? 'bg-red-800' : 'bg-red-100'}`}>
-              <XCircle className={`w-6 h-6 ${darkMode ? 'text-red-300' : 'text-red-600'}`} />
+            <div className="p-3 rounded-full bg-red-100">
+              <XCircle className="w-6 h-6 text-red-500" />
             </div>
           </div>
         </div>
@@ -857,44 +871,68 @@ const Guias = () => {
         {/* Lista de guías */}
         {loading ? (
           <div className="flex justify-center items-center p-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
           </div>
         ) : error ? (
-          <div className={`p-6 rounded-lg text-center ${darkMode ? 'bg-red-900/30 text-red-300' : 'bg-red-100 text-red-800'}`}>
+          <div className="p-6 rounded-lg text-center bg-red-50 text-red-800 border border-red-200">
             <p className="text-lg font-medium mb-2">Error al cargar guías</p>
             <p className="mb-4">{error}</p>
             <button 
               onClick={() => window.location.reload()} 
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+              className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg"
             >
               Reintentar
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {guiasFiltrados().length > 0 ? (
               guiasFiltrados().map((guia) => (
                 <div 
                   key={guia.id || guia.cedula} 
-                  className={`rounded-lg shadow-lg overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'} relative`}
+                  className="rounded-lg shadow-sm overflow-hidden bg-white border border-gray-100 relative cursor-pointer"
+                  onClick={() => handleOpenDetallesModal(guia)}
                 >
                   {/* Cabecera con imagen */}
                   <div 
-                    className="h-36 relative bg-cover bg-center bg-no-repeat"
+                    className="h-28 relative bg-cover bg-center bg-no-repeat"
                     style={{
                       backgroundImage: `url(${logoExplococora})`,
-                      backgroundSize: '200px',
+                      backgroundSize: '150px',
                       backgroundPosition: 'center',
-                      backgroundColor: darkMode ? '#1e3a8a' : '#3b82f6',
+                      backgroundColor: '#10b981', // emerald-500
                       backgroundBlendMode: 'soft-light',
                       opacity: '0.9'
                     }}
                   >
-                    <BotonesAccion guia={guia} />
+                    {/* Botones de acción */}
+                    <div className="absolute top-2 left-2 flex space-x-2">
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEliminarGuiaModal(guia);
+                        }}
+                        className="p-2 bg-white hover:bg-red-50 text-red-500 rounded-full shadow-sm"
+                        title="Eliminar guía"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                      
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEditarGuiaModal(guia);
+                        }}
+                        className="p-2 bg-white hover:bg-emerald-50 text-emerald-500 rounded-full shadow-sm"
+                        title="Actualizar información"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                    </div>
                     
                     {/* Foto de perfil */}
-                    <div className="absolute -bottom-14 left-1/2 transform -translate-x-1/2">
-                      <div className="w-28 h-28 rounded-full bg-white p-1 shadow-lg overflow-hidden">
+                    <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2">
+                      <div className="w-20 h-20 rounded-full bg-white p-1 shadow-sm overflow-hidden">
                         <img
                           src={
                             guia.foto
@@ -913,63 +951,69 @@ const Guias = () => {
                     
                     {/* Insignia de estado */}
                     <div className="absolute top-2 right-2">
-                      <EstadoGuia 
-                        cedula={guia.cedula} 
-                        nombre={construirNombreCompleto(guia)}
-                        tamanio="normal" 
-                        onChangeEstado={(nuevoEstado) => {
-                          // Actualizar el estado en la base de datos
-                          actualizarEstadoGuia(guia, nuevoEstado);
-                        }}
-                      />
+                      <div className={`px-3 py-1 rounded-full text-xs font-medium flex items-center ${
+                        guia.estado === 'disponible' ? 'bg-green-100 text-green-800' : 
+                        guia.estado === 'ocupado' ? 'bg-yellow-100 text-yellow-800' : 
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {guia.estado === 'disponible' ? (
+                          <>
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Disponible
+                          </>
+                        ) : guia.estado === 'ocupado' ? (
+                          <>
+                            <Clock className="w-3 h-3 mr-1" />
+                            Ocupado
+                          </>
+                        ) : (
+                          <>
+                            <XCircle className="w-3 h-3 mr-1" />
+                            Inactivo
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                   
                   {/* Información del guía */}
-                  <div className="pt-16 px-6 pb-6">
-                    <div className="text-center mb-4">
-                      <h3 className="text-xl font-bold flex items-center justify-center">
+                  <div className="pt-12 px-4 pb-4">
+                    <div className="text-center mb-3">
+                      <h3 className="text-lg font-bold text-gray-800 truncate">
                         {construirNombreCompleto(guia)}
-                        {guia.calificacion && (
-                          <div className="ml-2 flex items-center text-yellow-500">
-                            <Star className="w-4 h-4 fill-current" />
-                            <span className="text-sm ml-1">{guia.calificacion}</span>
-                          </div>
-                        )}
                       </h3>
-                      <p className={`text-sm mt-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      <p className="text-xs text-emerald-600">
                         {guia.especialidad || 'Guía Turístico General'}
                       </p>
                     </div>
                     
-                    <div className="space-y-3 mb-6">
+                    <div className="space-y-2 text-sm">
                       <div className="flex items-center">
-                        <Mail className="w-4 h-4 mr-3 text-blue-500" />
-                        <span className="text-sm truncate">{guia.email}</span>
+                        <Mail className="w-4 h-4 mr-2 text-emerald-500 flex-shrink-0" />
+                        <span className="text-gray-600 truncate">{guia.email}</span>
                       </div>
                       <div className="flex items-center">
-                        <Phone className="w-4 h-4 mr-3 text-green-500" />
-                        <span className="text-sm">{guia.telefono || guia.numeroCelular || guia.numero_celular || 'No disponible'}</span>
+                        <Phone className="w-4 h-4 mr-2 text-emerald-500 flex-shrink-0" />
+                        <span className="text-gray-600 truncate">{guia.telefono || guia.numeroCelular || guia.numero_celular || 'No disponible'}</span>
                       </div>
                       <div className="flex items-center">
-                        <MapPin className="w-4 h-4 mr-3 text-red-500" />
-                        <span className="text-sm">{guia.ubicacion || 'No especificada'}</span>
+                        <MapPin className="w-4 h-4 mr-2 text-emerald-500 flex-shrink-0" />
+                        <span className="text-gray-600 truncate">{guia.ubicacion || 'No especificada'}</span>
                       </div>
                       <div className="flex items-center">
-                        <Calendar className="w-4 h-4 mr-3 text-blue-500" />
-                        <span className="text-sm">Desde {new Date(guia.fecha_registro || Date.now()).toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <CreditCard className="w-4 h-4 mr-3 text-purple-500" />
-                        <span className="text-sm">{guia.cedula || 'No disponible'}</span>
+                        <Calendar className="w-4 h-4 mr-2 text-emerald-500 flex-shrink-0" />
+                        <span className="text-gray-600 truncate">Desde {new Date(guia.fecha_registro || Date.now()).toLocaleDateString()}</span>
                       </div>
                     </div>
                     
                     {/* Botones de acción */}
-                    <div className="flex justify-center gap-2 mt-4">
+                    <div className="flex justify-center gap-2 mt-3">
                       <button 
-                        onClick={() => handleOpenDetallesModal(guia)}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium flex-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDetallesModal(guia);
+                        }}
+                        className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md text-xs font-medium flex-1"
                       >
                         Ver detalles
                       </button>
@@ -990,9 +1034,9 @@ const Guias = () => {
                 </div>
               ))
             ) : (
-              <div className={`col-span-3 text-center py-12 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              <div className="col-span-4 text-center py-12 text-gray-600">
                 <div className="flex flex-col items-center">
-                  <XCircle className="w-16 h-16 mb-4 opacity-30" />
+                  <XCircle className="w-16 h-16 mb-4 text-gray-300" />
                   <h3 className="text-xl font-semibold mb-2">No se encontraron guías</h3>
                   <p className="mb-6">No hay guías que coincidan con los criterios de búsqueda.</p>
                   <div className="flex space-x-4">
@@ -1001,13 +1045,13 @@ const Guias = () => {
                         setSearchTerm('');
                         setFiltroEstado('todos');
                       }}
-                      className={`px-4 py-2 rounded-md ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+                      className="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700"
                     >
                       Limpiar filtros
                     </button>
                     <button 
                       onClick={handleAddGuia}
-                      className={`px-4 py-2 rounded-md ${darkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'} text-white`}
+                      className="px-4 py-2 rounded-md bg-emerald-500 hover:bg-emerald-600 text-white"
                     >
                       Añadir nuevo guía
                     </button>
