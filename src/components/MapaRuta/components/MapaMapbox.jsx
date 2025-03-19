@@ -1,6 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getRouteDirections } from '../../../services/mapboxService';
 import { MAPBOX_CONFIG } from '../config/mapboxConfig';
 
@@ -114,14 +114,15 @@ const MapboxMap = ({
   }, [origin, destination]);
 
   return (
-    <div 
-      ref={mapContainer} 
-      style={{ 
-        width: '100%', 
-        height: '100%',
-        position: 'relative'
-      }}
-    >
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <div 
+        ref={mapContainer} 
+        style={{ 
+          width: '100%', 
+          height: '100%'
+        }}
+      />
+      
       {isLoading && (
         <div style={{
           position: 'absolute',
@@ -131,7 +132,8 @@ const MapboxMap = ({
           background: 'rgba(255, 255, 255, 0.9)',
           padding: '10px 20px',
           borderRadius: '5px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          zIndex: 5
         }}>
           Cargando mapa...
         </div>
