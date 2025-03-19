@@ -506,10 +506,11 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
             <p className="text-gray-700">{rutaPrincipal?.descripcion}</p>
           </div>
 
-          {/* Nuevo componente de Mapa de Mapbox */}
+          {/* Nuevo componente de Mapa de Mapbox 
           {rutaPrincipal && (
             <MapaRutaIntegracion rutaPrincipal={rutaPrincipal} altura="400px" />
           )}
+            */}
 
           <div className="bg-gradient-to-br from-teal-50 via-white to-teal-50 p-8 shadow-xl  relative overflow-hidden">
 

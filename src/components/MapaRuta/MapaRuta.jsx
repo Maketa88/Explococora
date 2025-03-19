@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { geocodeAddress } from '../../services/mapboxService';
 import MapboxMap from './components/MapaMapbox';
 
