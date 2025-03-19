@@ -12,6 +12,7 @@ import {
   FiUsers,
 } from "react-icons/fi";
 import { GiMountainRoad } from "react-icons/gi";
+import MapaRutaIntegracion from "../../../../../components/MapaRuta/components/MapaRutaIntegracion";
 import {
   obtenerFotosRuta,
   obtenerRutas,
@@ -494,11 +495,7 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
             </div>
           </div>
         </div>
-        {/* Nuevo componente de Mapa de Azure
-        {rutaPrincipal && (
-          <MapaRutaIntegracion rutaPrincipal={rutaPrincipal} altura="400px" />
-        )}
-          */}
+      
 
         {/* Contenido detallado */}
         <div className="">
@@ -508,6 +505,11 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
             </h3>
             <p className="text-gray-700">{rutaPrincipal?.descripcion}</p>
           </div>
+
+          {/* Nuevo componente de Mapa de Mapbox */}
+          {rutaPrincipal && (
+            <MapaRutaIntegracion rutaPrincipal={rutaPrincipal} altura="400px" />
+          )}
 
           <div className="bg-gradient-to-br from-teal-50 via-white to-teal-50 p-8 shadow-xl  relative overflow-hidden">
 
