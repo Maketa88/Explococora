@@ -1,6 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { getRouteDirections } from '../../../services/mapboxService';
 import { MAPBOX_CONFIG } from '../config/mapboxConfig';
 
@@ -14,36 +14,7 @@ const MapboxMap = ({
   const map = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if (!mapContainer.current) return;
-
-    mapboxgl.accessToken = MAPBOX_CONFIG.accessToken;
-
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      ...MAPBOX_CONFIG.defaultOptions
-    });
-
-    map.current.on('load', () => {
-      setIsLoading(false);
-      if (origin && destination) {
-        updateRoute();
-      }
-    });
-
-    map.current.on('error', (e) => {
-      console.error('Error en el mapa:', e);
-      onError && onError('Error al cargar el mapa');
-    });
-
-    return () => {
-      if (map.current) {
-        map.current.remove();
-      }
-    };
-  }, []);
-
-  const updateRoute = async () => {
+  const updateRoute = useCallback(async () => {
     try {
       const response = await getRouteDirections(origin, destination);
       
@@ -105,13 +76,42 @@ const MapboxMap = ({
       console.error('Error al actualizar la ruta:', error);
       onError && onError(error.message || 'Error al obtener la ruta');
     }
-  };
+  }, [origin, destination, onRouteUpdate, onError]);
+
+  useEffect(() => {
+    if (!mapContainer.current) return;
+
+    mapboxgl.accessToken = MAPBOX_CONFIG.accessToken;
+
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      ...MAPBOX_CONFIG.defaultOptions
+    });
+
+    map.current.on('load', () => {
+      setIsLoading(false);
+      if (origin && destination) {
+        updateRoute();
+      }
+    });
+
+    map.current.on('error', (e) => {
+      console.error('Error en el mapa:', e);
+      onError && onError('Error al cargar el mapa');
+    });
+
+    return () => {
+      if (map.current) {
+        map.current.remove();
+      }
+    };
+  }, [origin, destination, onError, updateRoute]);
 
   useEffect(() => {
     if (map.current && origin && destination) {
       updateRoute();
     }
-  }, [origin, destination]);
+  }, [origin, destination, updateRoute]);
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
