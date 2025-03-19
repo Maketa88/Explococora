@@ -16,7 +16,7 @@ import {
   obtenerFotosRuta,
   obtenerRutas,
 } from "../../../../../services/rutasService";
-import MapaRutaIntegracion from "../../../../MapaRuta/components/MapaRutaIntegracion";
+
 
 // Imágenes de respaldo por dificultad (se usarán si no hay fotos disponibles de la API)
 const imagenesRespaldoPorDificultad = {
