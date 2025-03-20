@@ -257,28 +257,205 @@ const MapboxMap = ({
 
       // Añadir marcadores en los puntos de interés
       try {
-        const poiLocations = [
-          { name: 'Mirador Principal', coordinates: [-75.4893, 4.6386] },
-          { name: 'Palmas de Cera', coordinates: [-75.5010, 4.6475] },
-          { name: 'Cascada', coordinates: [-75.4800, 4.6440] }
+        const routePoints = [
+          { 
+            name: 'Inicio de Ruta', 
+            coordinates: [-75.4893, 4.6386],
+            type: 'start',
+            description: 'Punto de partida del recorrido',
+            imageUrl: 'https://images.pexels.com/photos/5342974/pexels-photo-5342974.jpeg'
+          },
+          { 
+            name: 'Punto de Interés 1', 
+            coordinates: [-75.4950, 4.6415],
+            type: 'poi',
+            description: 'Mirador con vista panorámica',
+            imageUrl: 'https://images.pexels.com/photos/5342976/pexels-photo-5342976.jpeg'
+          },
+          { 
+            name: 'Punto de Interés 2', 
+            coordinates: [-75.5010, 4.6475],
+            type: 'poi',
+            description: 'Zona de palmas de cera',
+            imageUrl: 'https://images.pexels.com/photos/5342978/pexels-photo-5342978.jpeg'
+          },
+          { 
+            name: 'Fin de Ruta', 
+            coordinates: [-75.4898, 4.6386],
+            type: 'end',
+            description: 'Punto final del recorrido',
+            imageUrl: 'https://images.pexels.com/photos/5342980/pexels-photo-5342980.jpeg'
+          }
         ];
 
-        poiLocations.forEach(poi => {
-          if (!poi || !poi.coordinates || !Array.isArray(poi.coordinates) || poi.coordinates.length < 2) return;
+        routePoints.forEach(point => {
+          if (!point || !point.coordinates || !Array.isArray(point.coordinates) || point.coordinates.length < 2) return;
           
           const el = document.createElement('div');
-          el.className = 'marker';
+          el.className = `marker marker-${point.type}`;
           el.style.backgroundImage = 'url(https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-512.png)';
-          el.style.width = '32px';
-          el.style.height = '32px';
+          el.style.width = 'clamp(30px, 4vw, 40px)';
+          el.style.height = 'clamp(30px, 4vw, 40px)';
           el.style.backgroundSize = 'cover';
           el.style.cursor = 'pointer';
+          
+          // Añadir estilos específicos según el tipo de punto
+          switch(point.type) {
+            case 'start':
+              el.style.filter = 'hue-rotate(120deg)'; // Verde
+              break;
+            case 'poi':
+              el.style.filter = 'hue-rotate(210deg)'; // Azul
+              break;
+            case 'end':
+              el.style.filter = 'hue-rotate(0deg)'; // Rojo
+              break;
+          }
 
+          // Crear el contenido del popup
+          const getPopupContent = (zoom) => {
+            // Ajustar tamaños según el zoom
+            const containerWidth = zoom < 13 ? 'min(60vw, 200px)' : 'min(70vw, 250px)';
+            const imageHeight = zoom < 13 ? '120px' : '150px';
+            const titleSize = zoom < 13 ? '14px' : '16px';
+            const descSize = zoom < 13 ? '11px' : '12px';
+            const padding = zoom < 13 ? '6px' : '8px';
+
+            return `
+              <div style="
+                text-align: center;
+                width: ${containerWidth};
+                max-height: ${zoom < 13 ? '50vh' : '60vh'};
+                overflow-y: auto;
+                box-sizing: border-box;
+                padding: ${padding};
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(8px);
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+              ">
+                <h3 style="
+                  margin: 0;
+                  color: #333;
+                  padding: 4px 0;
+                  font-size: ${titleSize};
+                  font-weight: 600;
+                  border-bottom: 1px solid #eee;
+                ">${point.name}</h3>
+                
+                <div style="
+                  position: relative;
+                  width: 100%;
+                  height: ${imageHeight};
+                  margin: 6px 0;
+                  border-radius: 6px;
+                  overflow: hidden;
+                  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+                ">
+                  <img 
+                    src="${point.imageUrl}" 
+                    style="
+                      width: 100%;
+                      height: 100%;
+                      object-fit: cover;
+                    "
+                    alt="${point.name}"
+                    onerror="this.src='https://via.placeholder.com/300x200?text=Imagen+no+disponible'"
+                  />
+                </div>
+
+                <div style="
+                  padding: 4px;
+                  background: rgba(255,255,255,0.8);
+                  border-radius: 4px;
+                ">
+                  <p style="
+                    margin: 0 0 3px 0;
+                    color: #444;
+                    font-size: ${descSize};
+                    line-height: 1.3;
+                  ">${point.description}</p>
+
+                  <p style="
+                    margin: 0;
+                    color: #666;
+                    font-size: ${parseInt(descSize) - 1}px;
+                    font-style: italic;
+                  ">
+                    ${point.type === 'start' ? '🚩' :
+                      point.type === 'end' ? '🏁' :
+                      '📍'}
+                  </p>
+                </div>
+              </div>
+            `;
+          };
+
+          // Crear el popup
+          const popup = new mapboxgl.Popup({
+            closeButton: true,
+            closeOnClick: false,
+            maxWidth: 'none',
+            className: 'centered-popup',
+            anchor: 'center',
+            offset: [0, 0]
+          });
+
+          // Añadir el marcador al mapa
           new mapboxgl.Marker(el)
-            .setLngLat(poi.coordinates)
-            .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(`<h3>${poi.name}</h3>`))
+            .setLngLat(point.coordinates)
             .addTo(map.current);
+
+          // Añadir evento de clic al marcador
+          el.addEventListener('click', () => {
+            // Cerrar cualquier popup existente
+            const existingPopups = document.getElementsByClassName('mapboxgl-popup');
+            Array.from(existingPopups).forEach(popup => popup.remove());
+            
+            // Obtener el zoom actual
+            const currentZoom = map.current.getZoom();
+            
+            // Actualizar el contenido del popup según el zoom
+            popup.setHTML(getPopupContent(currentZoom));
+            
+            // Obtener el centro del mapa
+            const center = map.current.getCenter();
+            
+            // Mostrar el popup en el centro del mapa
+            popup.setLngLat(center);
+            popup.addTo(map.current);
+
+            // Ajustar la vista del mapa
+            map.current.easeTo({
+              center: center,
+              duration: 1000,
+              zoom: currentZoom < 14 ? 14 : currentZoom
+            });
+          });
         });
+
+        // Actualizar la ruta para que pase por todos los puntos
+        if (map.current.getSource('trails')) {
+          const updatedTrailsData = {
+            'type': 'FeatureCollection',
+            'features': [
+              {
+                'type': 'Feature',
+                'properties': {
+                  'name': 'Ruta Circular Valle del Cocora',
+                  'difficulty': 'Moderado'
+                },
+                'geometry': {
+                  'type': 'LineString',
+                  'coordinates': routePoints.map(point => point.coordinates)
+                }
+              }
+            ]
+          };
+
+          map.current.getSource('trails').setData(updatedTrailsData);
+        }
+
       } catch (markerError) {
         console.error('Error al añadir marcadores:', markerError);
       }
