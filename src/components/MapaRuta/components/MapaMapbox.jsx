@@ -300,28 +300,163 @@ const MapboxMap = ({
           }
 
           if (labelLayerId) {
+            // Capa base de edificios
             map.current.addLayer({
-              'id': '3d-buildings',
+              'id': '3d-buildings-base',
+              'source': 'composite',
+              'source-layer': 'building',
+              'filter': ['==', 'extrude', 'true'],
+              'type': 'fill-extrusion',
+              'minzoom': 11,
+              'paint': {
+                // Esquema de color mejorado para casas de estilo colonial/tradicional
+                'fill-extrusion-color': [
+                  'interpolate',
+                  ['linear'],
+                  ['get', 'height'],
+                  0, '#FCF3CF', // Amarillo muy claro para casas pequeñas
+                  5, '#F5EEF8', // Blanco con tinte púrpura para casas medianas
+                  10, '#F9E79F', // Amarillo más intenso para casas grandes
+                  15, '#FDEBD0'  // Beige cálido para edificios más altos
+                ],
+                // Altura uniforme simplificada
+                'fill-extrusion-height': [
+                  'case',
+                  ['has', 'height'],
+                  ['get', 'height'],
+                  8 // Altura fija para todas las casas
+                ],
+                // Base de los edificios
+                'fill-extrusion-base': [
+                  'case',
+                  ['has', 'min_height'],
+                  ['get', 'min_height'],
+                  0
+                ],
+                'fill-extrusion-opacity': 0.95,
+                'fill-extrusion-vertical-gradient': true,
+                'fill-extrusion-height-transition': {
+                  duration: 800,
+                  delay: 0
+                }
+              }
+            }, labelLayerId);
+
+            // Capa de paredes con detalles
+            map.current.addLayer({
+              'id': '3d-buildings-walls',
               'source': 'composite',
               'source-layer': 'building',
               'filter': ['==', 'extrude', 'true'],
               'type': 'fill-extrusion',
               'minzoom': 14,
               'paint': {
-                'fill-extrusion-color': '#aaa',
+                'fill-extrusion-color': '#FFFFFF', // Paredes blancas
                 'fill-extrusion-height': [
-                  'interpolate', ['linear'], ['zoom'],
-                  14, 0,
-                  16, ['get', 'height']
+                  'case',
+                  ['has', 'height'],
+                  ['get', 'height'],
+                  7.5 // Altura fija para edificios sin altura definida
                 ],
                 'fill-extrusion-base': [
-                  'interpolate', ['linear'], ['zoom'],
-                  14, 0,
-                  16, ['get', 'min_height']
+                  'case',
+                  ['has', 'min_height'],
+                  ['get', 'min_height'],
+                  0
                 ],
-                'fill-extrusion-opacity': 0.6
+                'fill-extrusion-opacity': 0.9,
+                'fill-extrusion-vertical-gradient': true,
+                'fill-extrusion-translate': [0.2, 0.2],
+                'fill-extrusion-translate-anchor': 'viewport'
               }
-            }, labelLayerId);
+            }, '3d-buildings-base');
+
+            // Techos con color terracota y detalles
+            map.current.addLayer({
+              'id': 'building-roofs',
+              'source': 'composite',
+              'source-layer': 'building',
+              'filter': ['==', 'extrude', 'true'],
+              'type': 'fill-extrusion',
+              'minzoom': 13,
+              'paint': {
+                'fill-extrusion-color': '#C0392B', // Rojo terracota
+                'fill-extrusion-height': [
+                  'case',
+                  ['has', 'height'],
+                  ['+', ['get', 'height'], 0.8],
+                  8.8 // Altura fija + 0.8 para el techo
+                ],
+                'fill-extrusion-base': [
+                  'case',
+                  ['has', 'height'],
+                  ['get', 'height'],
+                  8 // Altura base fija
+                ],
+                'fill-extrusion-opacity': 0.95,
+                'fill-extrusion-vertical-gradient': true
+              }
+            }, '3d-buildings-walls');
+
+            // Detalle para ventanas y detalles de fachada
+            map.current.addLayer({
+              'id': 'building-windows',
+              'source': 'composite',
+              'source-layer': 'building',
+              'filter': ['==', 'extrude', 'true'],
+              'type': 'fill-extrusion',
+              'minzoom': 16, // Solo visible muy de cerca
+              'paint': {
+                'fill-extrusion-color': '#85C1E9', // Color azul claro para ventanas
+                'fill-extrusion-height': [
+                  'case',
+                  ['has', 'height'],
+                  ['-', ['get', 'height'], 0.2],
+                  7.8 // Altura fija - 0.2 para ventanas
+                ],
+                'fill-extrusion-base': [
+                  'case',
+                  ['has', 'min_height'],
+                  ['+', ['get', 'min_height'], 1.5],
+                  1.5
+                ],
+                'fill-extrusion-opacity': 0.7,
+                'fill-extrusion-vertical-gradient': false,
+                'fill-extrusion-translate': [0.1, 0.1],
+                'fill-extrusion-translate-anchor': 'map'
+              }
+            }, 'building-roofs');
+
+            // Sombras mejoradas para mayor realismo
+            map.current.addLayer({
+              'id': 'building-shadows',
+              'source': 'composite',
+              'source-layer': 'building',
+              'filter': ['==', 'extrude', 'true'],
+              'type': 'fill-extrusion',
+              'minzoom': 12,
+              'paint': {
+                'fill-extrusion-color': '#000000',
+                'fill-extrusion-height': [
+                  'case',
+                  ['has', 'height'],
+                  ['get', 'height'],
+                  8
+                ],
+                'fill-extrusion-base': [
+                  'case',
+                  ['has', 'min_height'],
+                  ['get', 'min_height'],
+                  0
+                ],
+                'fill-extrusion-opacity': 0.2,
+                'fill-extrusion-translate': [4, 4],
+                'fill-extrusion-translate-anchor': 'viewport',
+                'fill-extrusion-vertical-gradient': true
+              }
+            }, '3d-buildings-base');
+
+            // Fin de las capas de edificios
           }
         }
       } catch (buildingError) {
