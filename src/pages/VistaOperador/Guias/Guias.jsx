@@ -406,36 +406,52 @@ const Guias = () => {
         setUpdating(false);
         return;
       }
-      
-      // Datos para actualizar
-      const dataToUpdate = {
+
+      // Preparar datos para actualizar - IGUAL QUE EN EDITAR GUIA
+      const datosActualizar = {
         primerNombre: formData.primerNombre,
         segundoNombre: formData.segundoNombre || '',
         primerApellido: formData.primerApellido,
         segundoApellido: formData.segundoApellido || '',
         email: formData.email,
         numeroCelular: formData.telefono,
+        telefono: formData.telefono, // Enviar en ambos campos para asegurarnos
         descripcion: formData.descripcion || ''
       };
       
-      // Mostrar datos que se están enviando (para depuración)
-      console.log('Datos enviados al servidor:', dataToUpdate);
-      console.log('URL de actualización:', `http://localhost:10101/guia/actualizar/${guiaDetalle.cedula}`);
+      console.log("DATOS QUE SE ENVIARÁN PARA ACTUALIZAR:", datosActualizar);
       
-      // Realizar petición
+      // Realizar la actualización principal como en EditarGuia.jsx
       const response = await axios.patch(
         `http://localhost:10101/guia/actualizar/${guiaDetalle.cedula}`,
-        dataToUpdate,
+        datosActualizar,
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
-      
-      console.log('Respuesta del servidor:', response);
-      
+
+      console.log("Respuesta de actualización:", response.data);
+
+      // Actualizar específicamente el teléfono en la tabla de teléfonos
+      try {
+        console.log("Actualizando teléfono específicamente...");
+        const telefonoResponse = await axios.post(
+          `http://localhost:10101/guia/telefono/${guiaDetalle.cedula}`,
+          { numeroCelular: formData.telefono },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log("Teléfono actualizado específicamente:", telefonoResponse.data);
+      } catch (telefonoError) {
+        console.error("Error al actualizar teléfono específicamente:", telefonoError);
+        // No interrumpimos el flujo, continuamos con la actualización general
+      }
+
       // Cerrar modal
       setShowEditarModal(false);
       
@@ -443,37 +459,15 @@ const Guias = () => {
       showAlert('¡Perfil actualizado correctamente!', 'success');
       
       // Actualizar datos sin recargar la página
-      setGuiaDetalle({...guiaDetalle, ...dataToUpdate});
+      setGuiaDetalle({...guiaDetalle, ...datosActualizar});
       setTimeout(() => {
         cargarGuias();
       }, 1000);
       
     } catch (error) {
       console.error('Error al actualizar guía:', error);
-      console.error('Detalles del error:', error.response?.data);
-      
-      // Cerrar el modal incluso si hay un error
+      showAlert(`Error: ${error.response?.data?.message || 'No se pudo actualizar el guía'}`, 'error');
       setShowEditarModal(false);
-      
-      // Manejar diferentes tipos de errores
-      if (error.response) {
-        // El servidor respondió con un código de error
-        if (error.response.status === 403) {
-          showAlert('Error de permisos al actualizar el guía. Contacta al administrador.', 'error');
-        } else if (error.response.status === 401) {
-          showAlert('Sesión expirada. Los cambios no se guardaron.', 'error');
-        } else if (error.response.status === 400) {
-          showAlert(`Error en los datos: ${error.response.data.message || 'Verifique la información'}`, 'error');
-        } else {
-          showAlert(`Error ${error.response.status}: ${error.response.data.message || 'No se pudo actualizar'}`, 'error');
-        }
-      } else if (error.request) {
-        // La petición fue hecha pero no se recibió respuesta
-        showAlert('No se pudo conectar con el servidor. Verifique su conexión.', 'error');
-      } else {
-        // Error en la configuración de la petición
-        showAlert('Error al procesar la solicitud. Intente nuevamente.', 'error');
-      }
     } finally {
       setUpdating(false);
     }
