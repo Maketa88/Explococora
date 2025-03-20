@@ -1,0 +1,47 @@
+/* Estilos para elementos del mapa 3D */
+
+/* Estilo para los marcadores de casa 3D */
+.casa-3d {
+  width: 40px;
+  height: 40px;
+  background-size: cover;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  transform-origin: bottom center;
+  filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.5));
+}
+
+.casa-3d:hover {
+  transform: scale(1.2) translateY(-5px);
+  filter: drop-shadow(2px 8px 6px rgba(0, 0, 0, 0.5));
+}
+
+/* Estilo para los popups */
+.mapboxgl-popup-content {
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+.mapboxgl-popup-content h3 {
+  margin: 0 0 10px;
+  color: #3c4043;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.mapboxgl-popup-content p {
+  margin: 0;
+  color: #5f6368;
+  font-size: 14px;
+}
+
+/* Estilo para marcadores generales */
+.marker {
+  transition: all 0.3s ease;
+}
+
+.marker:hover {
+  transform: scale(1.2);
+} 
