@@ -352,9 +352,10 @@ export const NuestrasRutas = () => {
             <div>
               {/* Descripción estilo notas de explorador */}
               <div className="mb-10 mx-4">
-                <div className="border-l-4 border-teal-700 pl-4 py-2 italic text-gray-700">
-                  <p className="text-lg">{rutaActual.descripcion}</p>
-                  <p className="mt-3 text-sm font-serif text-teal-800">
+                <div className="relative pl-4 py-2">
+                  <div className="absolute -left-3 top-1/2 -translate-y-1/2 h-10 w-1 bg-gradient-to-b from-teal-400 via-teal-500 to-teal-600 rounded-full shadow-sm"></div>
+                  <p className="text-gray-900 text-lg font-medium">{rutaActual.descripcion}</p>
+                  <p className="mt-2 text-gray-700 text-base font-normal">
                     &ldquo;La ruta {rutaActual.nombreRuta} ofrece un recorrido que te permitirá conectar con la naturaleza mientras disfrutas 
                     de impresionantes vistas panorámicas del valle. El camino serpentea entre la vegetación nativa, revelando 
                     la diversidad ecológica de nuestro paisaje.&rdquo;
@@ -588,7 +589,7 @@ export const NuestrasRutas = () => {
                         </div>
                         <div>
                           <p className="text-teal-800 text-sm font-medium">Consejos Prácticos</p>
-                          <p className="text-gray-700 text-sm">Programa tu visita temprano (antes de las 9 a.m.) para evitar la neblina y lluvias de la tarde. Lleva calzado impermeable, ropa abrigada por capas, y repelente.</p>
+                          <p className="text-gray-700 text-sm">Programa tu visita temprano (antes de las 9 a.m.) para evitar la neblina y lluvias de la tarde. Lleva calzado impermeable, ropa abrigada, y repelente.</p>
                         </div>
                       </div>
                     </div>
