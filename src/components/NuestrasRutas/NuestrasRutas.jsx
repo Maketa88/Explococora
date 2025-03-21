@@ -1,21 +1,17 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export const NuestrasRutas = () => {
   const { t } = useTranslation();
   const { idRuta } = useParams();
-  const location = useLocation();
   const [rutas, setRutas] = useState([]);
   const [rutaActual, setRutaActual] = useState(null);
   const [fotosRutaActual, setFotosRutaActual] = useState([]);
   const [indiceSliderFotos, setIndiceSliderFotos] = useState(0);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
-
-  // Determinar si estamos en la vista de cliente
-  const isClientView = location.pathname.includes('/VistaCliente');
 
   useEffect(() => {
     const fetchRutas = async () => {
