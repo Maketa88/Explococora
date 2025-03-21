@@ -99,6 +99,43 @@ export const NuestrasRutas = () => {
   }
 
   return (
+    <>
+    <div className="relative py-6 mb-4">
+        {/* Bolitas decorativas a los lados */}
+       
+        
+        {/* Líneas decorativas */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-teal-600 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-teal-600 to-transparent"></div>
+        
+        {/* Título principal con efectos */}
+        <div className="relative z-10 text-center">
+          <h1 className="text-5xl font-black tracking-tight relative inline-block">
+            <span className="relative bg-clip-text text-transparent bg-gradient-to-br from-teal-600 via-teal-700 to-teal-800 drop-shadow-sm">
+              {t('tituloRutas', 'Nuestras Rutas')}
+            </span>
+          </h1>
+          
+          {/* Subtítulo o decoración */}
+          <div className="mt-2 text-xs font-medium uppercase tracking-widest text-teal-600 group relative">
+            <span className="inline-block mx-2">✦</span>
+            <span className="relative inline-block">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-teal-700 font-semibold">
+                {rutaActual.nombreRuta}
+              </span>
+              <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-teal-400 to-teal-600 transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
+            </span>
+            <span className="inline-block mx-2">✦</span>
+          </div>
+          
+          {/* Líneas decorativas bajo el título */}
+          <div className="mt-3 flex justify-center space-x-1">
+            <div className="w-12 h-1 bg-gradient-to-r from-transparent to-teal-600 rounded-full"></div>
+            <div className="w-24 h-1 bg-gradient-to-r from-teal-600 to-teal-700 rounded-full"></div>
+            <div className="w-12 h-1 bg-gradient-to-r from-teal-700 to-transparent rounded-full"></div>
+          </div>
+        </div>
+      </div>
     <div className="container mx-auto px-4 py-8">
       {/* Botones de navegación entre rutas */}
       <div className="fixed left-4 right-4 top-[63%] -translate-y-1/2 flex justify-between z-10">
@@ -148,6 +185,7 @@ export const NuestrasRutas = () => {
           ))}
         </div>
         
+        
         {/* Botones de navegación fotos */}
         <button
           onClick={() => cambiarFoto('anterior')}
@@ -192,6 +230,7 @@ export const NuestrasRutas = () => {
           ))}
         </div>
       </div>
+      
 
       {/* Información de la Ruta - Estilo Guía de Senderismo */}
       <div className="relative">
@@ -201,23 +240,7 @@ export const NuestrasRutas = () => {
         {/* Guía de Senderismo */}
         <div className="max-w-[1360px] mx-auto">
           {/* Título estilo mapa de aventura con color teal */}
-          <div className="relative text-center mb-8">
-            <h1 className="text-5xl font-serif font-bold text-teal-800 tracking-wide drop-shadow-md">
-              {rutaActual.nombreRuta}
-            </h1>
-            <div className="w-56 h-1.5 mx-auto mt-3 bg-teal-600 rounded-full"></div>
-            {/* Brújula decorativa en teal */}
-            <div className="absolute -right-10 -top-10 w-24 h-24 opacity-20">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-teal-900 fill-current">
-                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" strokeWidth="2" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 15L15 12L12 9L9 12L12 15Z" fill="currentColor" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 2V4" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 20V22" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M20 12H22" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M2 12H4" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-          </div>
+          
 
           {/* Sendero ilustrativo con estilo más natural */}
           <div className="relative overflow-hidden mb-10 border-4 border-teal-800/20 rounded-lg shadow-xl">
@@ -646,6 +669,7 @@ export const NuestrasRutas = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
