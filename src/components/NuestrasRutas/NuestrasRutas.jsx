@@ -342,7 +342,7 @@ export const NuestrasRutas = () => {
             {/* Columna izquierda */}
             <div>
               {/* Panel de características con estilo de cuaderno */}
-              <div className="bg-teal-50 p-6 rounded-lg border border-teal-200 shadow-md transform rotate-[-0.5deg]">
+              <div className="bg-teal-50 p-6 rounded-lg border border-teal-200 shadow-md h-full">
                 <h2 className="font-serif text-teal-800 text-2xl mb-4 underline underline-offset-4 decoration-wavy decoration-teal-300">
                   Detalles de la Expedición
                 </h2>
@@ -412,11 +412,11 @@ export const NuestrasRutas = () => {
                     rutaActual.estado === 'Activa' 
                       ? 'border-green-700 text-green-800 bg-green-50' 
                       : 'border-red-700 text-red-800 bg-red-50'
-                  } transform rotate-[-1deg] inline-block`}>
+                  } inline-block`}>
                     <span className="font-serif">{rutaActual.estado}</span>
                   </div>
                   
-                  <div className="py-2 px-4 rounded-lg bg-teal-100 border border-teal-600 text-teal-800 transform rotate-[1deg] inline-block">
+                  <div className="py-2 px-4 rounded-lg bg-teal-100 border border-teal-600 text-teal-800 inline-block">
                     <span className="font-serif font-bold">${rutaActual.precio}</span>
                   </div>
                 </div>
@@ -426,7 +426,7 @@ export const NuestrasRutas = () => {
             {/* Columna derecha */}
             <div>
               {/* Información añadida creativamente - Vegetación y consejos */}
-              <div className="bg-teal-50/80 p-6 rounded-lg border border-teal-200 shadow-md transform rotate-[0.5deg]">
+              <div className="bg-teal-50 p-6 rounded-lg border border-teal-200 shadow-md h-full">
                 <h2 className="font-serif text-teal-800 text-2xl mb-4 underline underline-offset-4 decoration-wavy decoration-teal-300">
                   Maravillas Naturales
                 </h2>
@@ -494,7 +494,7 @@ export const NuestrasRutas = () => {
                 </div>
                 
                 {/* Pequeño mapa de ubicación con estilo teal */}
-                <div className="mt-4 w-full h-24 bg-teal-50 rounded-lg relative overflow-hidden opacity-70 border border-teal-100">
+                <div className="mt-4 w-full h-24 bg-teal-50 rounded-lg relative overflow-hidden border border-teal-100">
                   {/* Simulación de mapa */}
                   <div className="absolute inset-0 opacity-40">
                     <svg viewBox="0 0 100 50" className="w-full h-full">
