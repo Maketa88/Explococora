@@ -19,6 +19,7 @@ export const NuestrasRutas = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchRutas = async () => {
       try {
         const response = await axios.get('http://localhost:10101/rutas');
