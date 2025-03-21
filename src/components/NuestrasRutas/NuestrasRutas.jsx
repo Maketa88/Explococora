@@ -341,101 +341,195 @@ export const NuestrasRutas = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             {/* Columna izquierda */}
             <div>
-              {/* Panel con estilo moderno de tarjetas */}
-              <div className="bg-gradient-to-br from-teal-50 to-white p-6 rounded-lg border border-teal-100 h-full flex flex-col shadow-sm">
-                {/* Título con estilo moderno */}
-                <div className="flex items-center mb-6">
-                  <div className="bg-teal-600 w-1.5 h-8 rounded-full mr-3"></div>
-                  <h2 className="text-teal-800 text-2xl font-medium">
-                    Detalles de la Ruta
+              {/* Panel con estilo ultra premium de tarjetas con tema teal */}
+              <div className="bg-gradient-to-br from-teal-50/90 via-white to-teal-50/70 p-6 rounded-2xl border border-teal-100 h-full flex flex-col shadow-[0_10px_25px_-12px_rgba(13,148,136,0.25)] relative overflow-hidden backdrop-blur-sm">
+                {/* Patrones decorativos elegantes */}
+                <div className="absolute -top-12 -right-12 w-56 h-56 opacity-[0.03] rotate-12">
+                  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="40" stroke="#0d9488" strokeWidth="0.6" />
+                    <circle cx="50" cy="50" r="30" stroke="#0d9488" strokeWidth="0.6" />
+                    <circle cx="50" cy="50" r="20" stroke="#0d9488" strokeWidth="0.6" />
+                    <path d="M50 10V90M10 50H90M26 26L74 74M26 74L74 26" stroke="#0d9488" strokeWidth="0.4" />
+                  </svg>
+                </div>
+                
+                {/* Título con estilo exquisito pero más compacto */}
+                <div className="relative mb-4">
+                  <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-1 h-10 bg-gradient-to-b from-teal-400 via-teal-500 to-teal-600 rounded-full shadow-sm"></div>
+                  <h2 className="pl-4 text-transparent bg-clip-text bg-gradient-to-r from-teal-700 to-teal-900 text-xl font-medium tracking-wide">
+                    Detalles de la Expedición
                   </h2>
+                  <div className="mt-1 w-40 h-0.5 ml-4 bg-gradient-to-r from-teal-400 to-transparent rounded-full"></div>
                 </div>
                 
-                {/* Tarjetas de información */}
-                <div className="flex-grow grid grid-cols-1 gap-5">
-                  {/* Duración - tarjeta */}
-                  <div className="bg-white p-4 rounded-lg border border-teal-100 hover:shadow-md transition-shadow group">
-                    <div className="flex items-center justify-between">
+                {/* Tarjetas de información con efectos elegantes pero más compactas */}
+                <div className="flex-grow grid grid-cols-1 gap-3">
+                  {/* Duración - tarjeta elegante */}
+                  <div className="bg-gradient-to-br from-white to-teal-50/50 p-3 rounded-xl border border-teal-100/80 hover:shadow-md group transition-all duration-300 transform hover:-translate-y-0.5 hover:border-teal-200">
+                    <div className="flex items-center justify-between relative z-10">
                       <div className="flex items-center">
-                        <div className="bg-teal-100 p-2 rounded-lg mr-3 group-hover:bg-teal-200 transition-colors">
-                          <svg className="w-5 h-5 text-teal-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <circle cx="12" cy="12" r="8" />
-                            <path d="M12 8v4l3 2" />
-                          </svg>
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-teal-500/10 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-500"></div>
+                          <div className="relative bg-gradient-to-br from-teal-50 to-white p-2.5 rounded-lg shadow-sm group-hover:shadow transition-all duration-500 flex items-center justify-center">
+                            {/* Icono mejorado de duración */}
+                            <svg className="w-5 h-5 text-teal-700" viewBox="0 0 24 24" fill="none">
+                              <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.5" />
+                              <path d="M12 8v4l3 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                              <path d="M7 3.34998C8.5 3.12012 10.1667 3 12 3C13.8333 3 15.5 3.12012 17 3.34998" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="0.5 3.5" />
+                              <path d="M17 20.8C15.5 21.0333 13.8333 21.15 12 21.15C10.1667 21.15 8.5 21.0333 7 20.8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="0.5 3.5" />
+                            </svg>
+                          </div>
                         </div>
-                        <span className="text-teal-700 font-medium">Duración</span>
+                        <div className="ml-3">
+                          <span className="text-teal-600 text-xs font-medium block leading-tight">Duración</span>
+                          <span className="text-gray-800 text-base tracking-wide block group-hover:text-teal-800 transition-colors duration-500">{rutaActual.duracion}</span>
+                        </div>
                       </div>
-                      <span className="text-gray-800 text-lg">{rutaActual.duracion}</span>
+                      <div className="text-teal-400 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-2 group-hover:translate-x-0">
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
                     </div>
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-teal-500 via-teal-400 to-teal-500 group-hover:w-2/3 transition-all duration-700"></div>
                   </div>
                   
-                  {/* Dificultad - tarjeta */}
-                  <div className="bg-white p-4 rounded-lg border border-teal-100 hover:shadow-md transition-shadow group">
-                    <div className="flex items-center justify-between">
+                  {/* Dificultad - tarjeta elegante */}
+                  <div className="bg-gradient-to-br from-white to-teal-50/50 p-3 rounded-xl border border-teal-100/80 hover:shadow-md group transition-all duration-300 transform hover:-translate-y-0.5 hover:border-teal-200">
+                    <div className="flex items-center justify-between relative z-10">
                       <div className="flex items-center">
-                        <div className="bg-teal-100 p-2 rounded-lg mr-3 group-hover:bg-teal-200 transition-colors">
-                          <svg className="w-5 h-5 text-teal-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M8 15l4-8 4 8" />
-                          </svg>
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-teal-500/10 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-500"></div>
+                          <div className="relative bg-gradient-to-br from-teal-50 to-white p-2.5 rounded-lg shadow-sm group-hover:shadow transition-all duration-500 flex items-center justify-center">
+                            {/* Icono mejorado de dificultad */}
+                            <svg className="w-5 h-5 text-teal-700" viewBox="0 0 24 24" fill="none">
+                              <path d="M12 3L4 15H20L12 3Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                              <path d="M12 3V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                              <path d="M16 9L12 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                              <path d="M8 9L12 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                              <path d="M10 15L8 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                              <path d="M14 15L16 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                            </svg>
+                          </div>
                         </div>
-                        <span className="text-teal-700 font-medium">Dificultad</span>
+                        <div className="ml-3">
+                          <span className="text-teal-600 text-xs font-medium block leading-tight">Dificultad</span>
+                          <span className="text-gray-800 text-base tracking-wide block group-hover:text-teal-800 transition-colors duration-500">{rutaActual.dificultad}</span>
+                        </div>
                       </div>
-                      <span className="text-gray-800 text-lg">{rutaActual.dificultad}</span>
+                      <div className="text-teal-400 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-2 group-hover:translate-x-0">
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
                     </div>
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-teal-500 via-teal-400 to-teal-500 group-hover:w-2/3 transition-all duration-700"></div>
                   </div>
                   
-                  {/* Tipo - tarjeta */}
-                  <div className="bg-white p-4 rounded-lg border border-teal-100 hover:shadow-md transition-shadow group">
-                    <div className="flex items-center justify-between">
+                  {/* Tipo - tarjeta elegante */}
+                  <div className="bg-gradient-to-br from-white to-teal-50/50 p-3 rounded-xl border border-teal-100/80 hover:shadow-md group transition-all duration-300 transform hover:-translate-y-0.5 hover:border-teal-200">
+                    <div className="flex items-center justify-between relative z-10">
                       <div className="flex items-center">
-                        <div className="bg-teal-100 p-2 rounded-lg mr-3 group-hover:bg-teal-200 transition-colors">
-                          <svg className="w-5 h-5 text-teal-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M3 9h18M3 15h18" />
-                          </svg>
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-teal-500/10 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-500"></div>
+                          <div className="relative bg-gradient-to-br from-teal-50 to-white p-2.5 rounded-lg shadow-sm group-hover:shadow transition-all duration-500 flex items-center justify-center">
+                            {/* Icono mejorado de tipo */}
+                            <svg className="w-5 h-5 text-teal-700" viewBox="0 0 24 24" fill="none">
+                              <path d="M3 7H21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                              <path d="M6 12H18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                              <path d="M10 17H14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                              <path d="M2 4C2 3.44772 2.44772 3 3 3H21C21.5523 3 22 3.44772 22 4V5C22 5.55228 21.5523 6 21 6H3C2.44772 6 2 5.55228 2 5V4Z" stroke="currentColor" strokeWidth="1.5" />
+                              <path d="M5 9C5 8.44772 5.44772 8 6 8H18C18.5523 8 19 8.44772 19 9V10C19 10.5523 18.5523 11 18 11H6C5.44772 11 5 10.5523 5 10V9Z" stroke="currentColor" strokeWidth="1.5" />
+                              <path d="M9 14C9 13.4477 9.44772 13 10 13H14C14.5523 13 15 13.4477 15 14V15C15 15.5523 14.5523 16 14 16H10C9.44772 16 9 15.5523 9 15V14Z" stroke="currentColor" strokeWidth="1.5" />
+                            </svg>
+                          </div>
                         </div>
-                        <span className="text-teal-700 font-medium">Tipo</span>
+                        <div className="ml-3">
+                          <span className="text-teal-600 text-xs font-medium block leading-tight">Tipo</span>
+                          <span className="text-gray-800 text-base tracking-wide block group-hover:text-teal-800 transition-colors duration-500">{rutaActual.tipo}</span>
+                        </div>
                       </div>
-                      <span className="text-gray-800 text-lg">{rutaActual.tipo}</span>
+                      <div className="text-teal-400 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-2 group-hover:translate-x-0">
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
                     </div>
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-teal-500 via-teal-400 to-teal-500 group-hover:w-2/3 transition-all duration-700"></div>
                   </div>
                   
-                  {/* Distancia - tarjeta */}
-                  <div className="bg-white p-4 rounded-lg border border-teal-100 hover:shadow-md transition-shadow group">
-                    <div className="flex items-center justify-between">
+                  {/* Distancia - tarjeta elegante */}
+                  <div className="bg-gradient-to-br from-white to-teal-50/50 p-3 rounded-xl border border-teal-100/80 hover:shadow-md group transition-all duration-300 transform hover:-translate-y-0.5 hover:border-teal-200">
+                    <div className="flex items-center justify-between relative z-10">
                       <div className="flex items-center">
-                        <div className="bg-teal-100 p-2 rounded-lg mr-3 group-hover:bg-teal-200 transition-colors">
-                          <svg className="w-5 h-5 text-teal-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M5 12h14" />
-                            <path d="M3 12l2-2m-2 2l2 2" />
-                            <path d="M21 12l-2-2m2 2l-2 2" />
-                          </svg>
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-teal-500/10 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-500"></div>
+                          <div className="relative bg-gradient-to-br from-teal-50 to-white p-2.5 rounded-lg shadow-sm group-hover:shadow transition-all duration-500 flex items-center justify-center">
+                            {/* Icono mejorado de distancia */}
+                            <svg className="w-5 h-5 text-teal-700" viewBox="0 0 24 24" fill="none">
+                              <path d="M21 12H3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                              <path d="M19 9L22 12L19 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                              <path d="M5 9L2 12L5 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                              <path d="M7.5 8C8.5 5 9.5 4 12 4C14.5 4 15.5 5 16.5 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="0.5 3" />
+                              <path d="M7.5 16C8.5 19 9.5 20 12 20C14.5 20 15.5 19 16.5 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="0.5 3" />
+                            </svg>
+                          </div>
                         </div>
-                        <span className="text-teal-700 font-medium">Distancia</span>
+                        <div className="ml-3">
+                          <span className="text-teal-600 text-xs font-medium block leading-tight">Distancia</span>
+                          <span className="text-gray-800 text-base tracking-wide block group-hover:text-teal-800 transition-colors duration-500">{rutaActual.distancia} km</span>
+                        </div>
                       </div>
-                      <span className="text-gray-800 text-lg">{rutaActual.distancia} km</span>
+                      <div className="text-teal-400 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-2 group-hover:translate-x-0">
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
                     </div>
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-teal-500 via-teal-400 to-teal-500 group-hover:w-2/3 transition-all duration-700"></div>
                   </div>
                 </div>
                 
-                {/* Botones con estilo moderno */}
-                <div className="mt-6 flex gap-4">
+                {/* Separador elegante */}
+                <div className="my-4 w-full h-px bg-gradient-to-r from-transparent via-teal-200 to-transparent opacity-70"></div>
+                
+                {/* Botones con estilo elegante pero más compactos */}
+                <div className="flex gap-4">
                   <button 
-                    className={`flex-1 py-3 rounded-lg border transition-all ${
+                    className={`flex-1 py-3 rounded-xl transition-all duration-500 relative overflow-hidden group shadow-sm ${
                       rutaActual.estado === 'Activa' 
-                        ? 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100' 
-                        : 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100'
+                        ? 'bg-gradient-to-br from-emerald-50 to-green-50 text-green-700 border border-green-100 hover:border-green-200' 
+                        : 'bg-gradient-to-br from-rose-50 to-red-50 text-red-700 border border-red-100 hover:border-red-200'
                     }`}
                   >
-                    <div className="flex items-center justify-center">
-                      <div className={`w-2 h-2 rounded-full mr-2 ${
-                        rutaActual.estado === 'Activa' ? 'bg-green-500' : 'bg-red-500'
+                    <div className="absolute inset-0 w-full h-full overflow-hidden">
+                      <div className={`absolute -inset-[100%] ${
+                        rutaActual.estado === 'Activa' 
+                          ? 'bg-gradient-to-tr from-green-500/5 to-emerald-500/10' 
+                          : 'bg-gradient-to-tr from-red-500/5 to-rose-500/10'
+                      } animate-[gradient_8s_ease_infinite] blur-xl opacity-30`}></div>
+                    </div>
+                    <div className="relative z-10 flex items-center justify-center">
+                      <div className={`w-2 h-2 rounded-full mr-2 shadow-sm ${
+                        rutaActual.estado === 'Activa' 
+                          ? 'bg-gradient-to-br from-emerald-400 to-green-500' 
+                          : 'bg-gradient-to-br from-rose-400 to-red-500'
                       }`}></div>
-                      <span className="font-medium">{rutaActual.estado}</span>
+                      <span className="font-medium tracking-wide text-sm">{rutaActual.estado}</span>
                     </div>
                   </button>
                   
-                  <button className="flex-1 py-3 rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors">
-                    <span className="font-medium">${rutaActual.precio}</span>
+                  <button className="flex-1 py-3 rounded-xl text-white relative overflow-hidden group shadow-sm transition-all duration-500">
+                    <div className="absolute inset-0 bg-gradient-to-br from-teal-500 to-teal-600 group-hover:scale-[1.02] transition-transform duration-500"></div>
+                    <div className="absolute inset-0">
+                      <div className="absolute -inset-[100%] bg-gradient-to-tr from-teal-400/0 via-white/5 to-teal-400/0 animate-[shimmer_4s_ease_infinite] blur-md"></div>
+                    </div>
+                    <span className="relative z-10 font-medium tracking-wide flex items-center justify-center text-white/90 group-hover:text-white transition-colors duration-500 text-sm">
+                      <svg className="w-4 h-4 mr-1.5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                      </svg>
+                      {rutaActual.precio}
+                    </span>
                   </button>
                 </div>
               </div>
