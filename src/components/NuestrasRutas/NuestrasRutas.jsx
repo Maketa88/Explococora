@@ -172,7 +172,7 @@ export const NuestrasRutas = () => {
       </div>
 
       {/* Slider de Fotos */}
-      <div className="relative mb-8 h-96">
+      <div className="max-w-[1360px] mx-auto relative mb-8 h-96">
         <div className="flex h-full overflow-hidden rounded-lg">
           {fotosRutaActual.slice(indiceSliderFotos, indiceSliderFotos + 2).map((foto, index) => (
             <div key={index} className="w-1/2 p-1">
