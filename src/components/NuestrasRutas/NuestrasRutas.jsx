@@ -341,84 +341,102 @@ export const NuestrasRutas = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             {/* Columna izquierda */}
             <div>
-              {/* Panel de características con estilo de cuaderno */}
-              <div className="bg-teal-50 p-6 rounded-lg border border-teal-200 shadow-md h-full">
-                <h2 className="font-serif text-teal-800 text-2xl mb-4 underline underline-offset-4 decoration-wavy decoration-teal-300">
-                  Detalles de la Expedición
-                </h2>
+              {/* Panel con estilo moderno de tarjetas */}
+              <div className="bg-gradient-to-br from-teal-50 to-white p-6 rounded-lg border border-teal-100 h-full flex flex-col shadow-sm">
+                {/* Título con estilo moderno */}
+                <div className="flex items-center mb-6">
+                  <div className="bg-teal-600 w-1.5 h-8 rounded-full mr-3"></div>
+                  <h2 className="text-teal-800 text-2xl font-medium">
+                    Detalles de la Ruta
+                  </h2>
+                </div>
                 
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Duración con icono artesanal */}
-                  <div className="flex items-start">
-                    <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-3">
-                      <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" className="text-teal-700">
-                        <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="1"/>
-                        <path d="M12 6V12L16 14" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-teal-900 text-sm font-medium">Duración</p>
-                      <p className="font-serif text-lg">{rutaActual.duracion}</p>
-                    </div>
-                  </div>
-                  
-                  {/* Dificultad con icono artesanal */}
-                  <div className="flex items-start">
-                    <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-3">
-                      <svg viewBox="0 0 24 24" width="24" height="24" className="text-teal-700">
-                        <path d="M4 18L9 12L4 6" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-                        <path d="M12 18L17 12L12 6" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-                        <path d="M20 18L20 6" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-teal-900 text-sm font-medium">Dificultad</p>
-                      <p className="font-serif text-lg">{rutaActual.dificultad}</p>
+                {/* Tarjetas de información */}
+                <div className="flex-grow grid grid-cols-1 gap-5">
+                  {/* Duración - tarjeta */}
+                  <div className="bg-white p-4 rounded-lg border border-teal-100 hover:shadow-md transition-shadow group">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="bg-teal-100 p-2 rounded-lg mr-3 group-hover:bg-teal-200 transition-colors">
+                          <svg className="w-5 h-5 text-teal-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="12" cy="12" r="8" />
+                            <path d="M12 8v4l3 2" />
+                          </svg>
+                        </div>
+                        <span className="text-teal-700 font-medium">Duración</span>
+                      </div>
+                      <span className="text-gray-800 text-lg">{rutaActual.duracion}</span>
                     </div>
                   </div>
                   
-                  {/* Tipo con icono artesanal */}
-                  <div className="flex items-start">
-                    <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-3">
-                      <svg viewBox="0 0 24 24" width="24" height="24" className="text-teal-700">
-                        <path d="M3 18L7 16L10 18L13 16L17 18L21 16V8L17 10L13 8L10 10L7 8L3 10V18Z" fill="none" stroke="currentColor" strokeWidth="1"/>
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-teal-900 text-sm font-medium">Tipo</p>
-                      <p className="font-serif text-lg">{rutaActual.tipo}</p>
+                  {/* Dificultad - tarjeta */}
+                  <div className="bg-white p-4 rounded-lg border border-teal-100 hover:shadow-md transition-shadow group">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="bg-teal-100 p-2 rounded-lg mr-3 group-hover:bg-teal-200 transition-colors">
+                          <svg className="w-5 h-5 text-teal-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M8 15l4-8 4 8" />
+                          </svg>
+                        </div>
+                        <span className="text-teal-700 font-medium">Dificultad</span>
+                      </div>
+                      <span className="text-gray-800 text-lg">{rutaActual.dificultad}</span>
                     </div>
                   </div>
                   
-                  {/* Distancia con icono artesanal */}
-                  <div className="flex items-start">
-                    <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-3">
-                      <svg viewBox="0 0 24 24" width="24" height="24" className="text-teal-700">
-                        <path d="M5 9L2 12L5 15" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-                        <path d="M19 9L22 12L19 15" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-                        <path d="M2 12H22" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-                      </svg>
+                  {/* Tipo - tarjeta */}
+                  <div className="bg-white p-4 rounded-lg border border-teal-100 hover:shadow-md transition-shadow group">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="bg-teal-100 p-2 rounded-lg mr-3 group-hover:bg-teal-200 transition-colors">
+                          <svg className="w-5 h-5 text-teal-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M3 9h18M3 15h18" />
+                          </svg>
+                        </div>
+                        <span className="text-teal-700 font-medium">Tipo</span>
+                      </div>
+                      <span className="text-gray-800 text-lg">{rutaActual.tipo}</span>
                     </div>
-                    <div>
-                      <p className="text-teal-900 text-sm font-medium">Distancia</p>
-                      <p className="font-serif text-lg">{rutaActual.distancia} km</p>
+                  </div>
+                  
+                  {/* Distancia - tarjeta */}
+                  <div className="bg-white p-4 rounded-lg border border-teal-100 hover:shadow-md transition-shadow group">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="bg-teal-100 p-2 rounded-lg mr-3 group-hover:bg-teal-200 transition-colors">
+                          <svg className="w-5 h-5 text-teal-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M5 12h14" />
+                            <path d="M3 12l2-2m-2 2l2 2" />
+                            <path d="M21 12l-2-2m2 2l-2 2" />
+                          </svg>
+                        </div>
+                        <span className="text-teal-700 font-medium">Distancia</span>
+                      </div>
+                      <span className="text-gray-800 text-lg">{rutaActual.distancia} km</span>
                     </div>
                   </div>
                 </div>
                 
-                {/* Estado y Precio en estilo de sello */}
-                <div className="mt-6 flex flex-wrap gap-4">
-                  <div className={`py-2 px-4 rounded-lg border ${
-                    rutaActual.estado === 'Activa' 
-                      ? 'border-green-700 text-green-800 bg-green-50' 
-                      : 'border-red-700 text-red-800 bg-red-50'
-                  } inline-block`}>
-                    <span className="font-serif">{rutaActual.estado}</span>
-                  </div>
+                {/* Botones con estilo moderno */}
+                <div className="mt-6 flex gap-4">
+                  <button 
+                    className={`flex-1 py-3 rounded-lg border transition-all ${
+                      rutaActual.estado === 'Activa' 
+                        ? 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100' 
+                        : 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center">
+                      <div className={`w-2 h-2 rounded-full mr-2 ${
+                        rutaActual.estado === 'Activa' ? 'bg-green-500' : 'bg-red-500'
+                      }`}></div>
+                      <span className="font-medium">{rutaActual.estado}</span>
+                    </div>
+                  </button>
                   
-                  <div className="py-2 px-4 rounded-lg bg-teal-100 border border-teal-600 text-teal-800 inline-block">
-                    <span className="font-serif font-bold">${rutaActual.precio}</span>
-                  </div>
+                  <button className="flex-1 py-3 rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors">
+                    <span className="font-medium">${rutaActual.precio}</span>
+                  </button>
                 </div>
               </div>
             </div>
