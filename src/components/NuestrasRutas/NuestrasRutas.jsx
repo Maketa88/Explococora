@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { FaCompass, FaHiking } from 'react-icons/fa';
+import { GiHorseHead, GiPalmTree } from 'react-icons/gi';
 import { useParams } from 'react-router-dom';
 import { Paisaje } from './Paisaje';
 
@@ -380,7 +382,7 @@ export const NuestrasRutas = () => {
                       <h2 className="pl-4 text-transparent bg-clip-text bg-gradient-to-r from-teal-700 to-teal-900 text-xl font-medium tracking-wide">
                         Detalles de la Expedición
                       </h2>
-                      <div className="mt-1 w-40 h-0.5 ml-4 bg-gradient-to-r from-teal-400 to-transparent rounded-full"></div>
+                     
                     </div>
                     
                     {/* Tarjetas de información con efectos elegantes pero más compactas */}
@@ -560,75 +562,59 @@ export const NuestrasRutas = () => {
                 <div>
                   {/* Información añadida creativamente - Vegetación y consejos */}
                   <div className="bg-teal-50 p-6 rounded-lg border border-teal-200 shadow-md h-full">
-                    <h2 className="font-serif text-teal-800 text-2xl mb-4 underline underline-offset-4 decoration-wavy decoration-teal-300">
-                      Maravillas Naturales
-                    </h2>
+                    <div className="relative mb-4">
+                      <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-1 h-10 bg-gradient-to-b from-teal-400 via-teal-500 to-teal-600 rounded-full shadow-sm"></div>
+                      <h2 className="pl-4 text-transparent bg-clip-text bg-gradient-to-r from-teal-700 to-teal-900 text-xl font-medium tracking-wide">
+                        Valle del Cocora
+                      </h2>
+            
+                    </div>
                     
                     <div className="space-y-4">
-                      {/* Flora y fauna */}
+                      {/* Palmas de cera */}
                       <div className="flex items-start">
-                        <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-2">
-                          <svg viewBox="0 0 24 24" width="24" height="24" className="text-teal-700">
-                            <path d="M12 8C12 8 10 4 6 4C2 4 2 8 2 8C2 11 3 14 6 16L12 22L18 16C21 14 22 11 22 8C22 8 22 4 18 4C14 4 12 8 12 8Z" 
-                              fill="none" stroke="currentColor" strokeWidth="1"/>
-                          </svg>
+                        <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-2 bg-teal-100/50 rounded-lg">
+                          <GiPalmTree className="text-teal-700 w-6 h-6" />
                         </div>
                         <div>
-                          <p className="text-teal-800 text-sm font-medium">Flora y Fauna</p>
-                          <p className="text-gray-700 text-sm">Bromelias, helechos nativos, mariposas multicolores, y si tienes suerte, podrás avistar el esquivo pájaro carpintero.</p>
+                          <p className="text-teal-800 text-sm font-medium">Palmas de Cera</p>
+                          <p className="text-gray-700 text-sm">Hogar del árbol nacional de Colombia, la majestuosa Palma de Cera puede alcanzar hasta 60 metros de altura. Estas imponentes palmas crean un paisaje surrealista durante los recorridos.</p>
                         </div>
                       </div>
                       
-                      {/* Mejor temporada */}
+                      {/* Caminatas */}
                       <div className="flex items-start">
-                        <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-2">
-                          <svg viewBox="0 0 24 24" width="24" height="24" className="text-teal-700">
-                            <path d="M12 3V5" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-                            <path d="M21 12H19" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-                            <path d="M5 12H3" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-                            <path d="M12 21V19" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-                            <circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" strokeWidth="1"/>
-                          </svg>
+                        <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-2 bg-teal-100/50 rounded-lg">
+                          <FaHiking className="text-teal-700 w-5 h-5" />
                         </div>
                         <div>
-                          <p className="text-teal-800 text-sm font-medium">Mejor Temporada</p>
-                          <p className="text-gray-700 text-sm">De diciembre a mayo, cuando el clima es más estable y los colores del valle son más vibrantes.</p>
+                          <p className="text-teal-800 text-sm font-medium">Caminatas</p>
+                          <p className="text-gray-700 text-sm">Recorre senderos ecológicos de diferentes niveles de dificultad. El circuito principal 5 km cruza ríos con puentes colgantes y te lleva a miradores con vistas panorámicas espectaculares.</p>
                         </div>
                       </div>
                       
-                      {/* Consejos del guía */}
+                      {/* Cabalgatas */}
                       <div className="flex items-start">
-                        <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-2">
-                          <svg viewBox="0 0 24 24" width="24" height="24" className="text-teal-700">
-                            <path d="M2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12Z" 
-                              fill="none" stroke="currentColor" strokeWidth="1"/>
-                            <path d="M12 16V12M12 8H12.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                          </svg>
+                        <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-2 bg-teal-100/50 rounded-lg">
+                          <GiHorseHead className="text-teal-700 w-6 h-6" />
                         </div>
                         <div>
-                          <p className="text-teal-800 text-sm font-medium">Consejos del Guía</p>
-                          <p className="text-gray-700 text-sm">Lleva calzado cómodo, protector solar y una cámara para capturar los impresionantes paisajes. El amanecer ofrece la mejor luz para fotografías.</p>
+                          <p className="text-teal-800 text-sm font-medium">Cabalgatas</p>
+                          <p className="text-gray-700 text-sm">Explora el valle a lomos de caballos criollos dóciles y entrenados. Las cabalgatas duran entre 1 y 3 horas y permiten acceder a zonas que serían difíciles a pie mientras disfrutas del paisaje.</p>
                         </div>
                       </div>
                       
-                      {/* Historia local */}
+                      {/* Recomendaciones */}
                       <div className="flex items-start">
-                        <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-2">
-                          <svg viewBox="0 0 24 24" width="24" height="24" className="text-teal-700">
-                            <path d="M12 6.25278V19.2528M12 6.25278C10.8321 5.47686 9.24649 5 7.5 5C5.75351 5 4.16789 5.47686 3 6.25278V19.2528C4.16789 18.4769 5.75351 18 7.5 18C9.24649 18 10.8321 18.4769 12 19.2528M12 6.25278C13.1679 5.47686 14.7535 5 16.5 5C18.2465 5 19.8321 5.47686 21 6.25278V19.2528C19.8321 18.4769 18.2465 18 16.5 18C14.7535 18 13.1679 18.4769 12 19.2528" 
-                              fill="none" stroke="currentColor" strokeWidth="1"/>
-                          </svg>
+                        <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-2 bg-teal-100/50 rounded-lg">
+                          <FaCompass className="text-teal-700 w-5 h-5" />
                         </div>
                         <div>
-                          <p className="text-teal-800 text-sm font-medium">Historia Local</p>
-                          <p className="text-gray-700 text-sm">Este valle fue el hogar ancestral de comunidades indígenas que consideraban la montaña como un guardián sagrado de la región.</p>
+                          <p className="text-teal-800 text-sm font-medium">Consejos Prácticos</p>
+                          <p className="text-gray-700 text-sm">Programa tu visita temprano (antes de las 9 a.m.) para evitar la neblina y lluvias de la tarde. Lleva calzado impermeable, ropa abrigada por capas, y repelente.</p>
                         </div>
                       </div>
                     </div>
-                            
-                  
-                
-                           
                   </div>
                 </div>
               </div>
