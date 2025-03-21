@@ -2,7 +2,9 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaCompass, FaHiking } from 'react-icons/fa';
-import { GiHorseHead, GiPalmTree } from 'react-icons/gi';
+import { GiHorseHead, GiMountainClimbing, GiPalmTree, GiPathDistance } from 'react-icons/gi';
+import { IoTrailSignSharp } from 'react-icons/io5';
+import { RiTimerFlashFill } from 'react-icons/ri';
 import { useParams } from 'react-router-dom';
 import { Paisaje } from './Paisaje';
 
@@ -395,12 +397,7 @@ export const NuestrasRutas = () => {
                               <div className="absolute inset-0 bg-teal-500/10 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-500"></div>
                               <div className="relative bg-gradient-to-br from-teal-50 to-white p-2.5 rounded-lg shadow-sm group-hover:shadow transition-all duration-500 flex items-center justify-center">
                                 {/* Icono mejorado de duración */}
-                                <svg className="w-5 h-5 text-teal-700" viewBox="0 0 24 24" fill="none">
-                                  <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.5" />
-                                  <path d="M12 8v4l3 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                  <path d="M7 3.34998C8.5 3.12012 10.1667 3 12 3C13.8333 3 15.5 3.12012 17 3.34998" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="0.5 3.5" />
-                                  <path d="M17 20.8C15.5 21.0333 13.8333 21.15 12 21.15C10.1667 21.15 8.5 21.0333 7 20.8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="0.5 3.5" />
-                                </svg>
+                                <RiTimerFlashFill className="w-5 h-5 text-teal-700" />
                               </div>
                             </div>
                             <div className="ml-3">
@@ -425,14 +422,7 @@ export const NuestrasRutas = () => {
                               <div className="absolute inset-0 bg-teal-500/10 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-500"></div>
                               <div className="relative bg-gradient-to-br from-teal-50 to-white p-2.5 rounded-lg shadow-sm group-hover:shadow transition-all duration-500 flex items-center justify-center">
                                 {/* Icono mejorado de dificultad */}
-                                <svg className="w-5 h-5 text-teal-700" viewBox="0 0 24 24" fill="none">
-                                  <path d="M12 3L4 15H20L12 3Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                  <path d="M12 3V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                                  <path d="M16 9L12 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                                  <path d="M8 9L12 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                                  <path d="M10 15L8 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                                  <path d="M14 15L16 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                                </svg>
+                                <GiMountainClimbing className="w-6 h-6 text-teal-700" />
                               </div>
                             </div>
                             <div className="ml-3">
@@ -457,14 +447,7 @@ export const NuestrasRutas = () => {
                               <div className="absolute inset-0 bg-teal-500/10 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-500"></div>
                               <div className="relative bg-gradient-to-br from-teal-50 to-white p-2.5 rounded-lg shadow-sm group-hover:shadow transition-all duration-500 flex items-center justify-center">
                                 {/* Icono mejorado de tipo */}
-                                <svg className="w-5 h-5 text-teal-700" viewBox="0 0 24 24" fill="none">
-                                  <path d="M3 7H21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                                  <path d="M6 12H18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                                  <path d="M10 17H14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                                  <path d="M2 4C2 3.44772 2.44772 3 3 3H21C21.5523 3 22 3.44772 22 4V5C22 5.55228 21.5523 6 21 6H3C2.44772 6 2 5.55228 2 5V4Z" stroke="currentColor" strokeWidth="1.5" />
-                                  <path d="M5 9C5 8.44772 5.44772 8 6 8H18C18.5523 8 19 8.44772 19 9V10C19 10.5523 18.5523 11 18 11H6C5.44772 11 5 10.5523 5 10V9Z" stroke="currentColor" strokeWidth="1.5" />
-                                  <path d="M9 14C9 13.4477 9.44772 13 10 13H14C14.5523 13 15 13.4477 15 14V15C15 15.5523 14.5523 16 14 16H10C9.44772 16 9 15.5523 9 15V14Z" stroke="currentColor" strokeWidth="1.5" />
-                                </svg>
+                                <IoTrailSignSharp className="w-5 h-5 text-teal-700" />
                               </div>
                             </div>
                             <div className="ml-3">
@@ -489,13 +472,7 @@ export const NuestrasRutas = () => {
                               <div className="absolute inset-0 bg-teal-500/10 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-500"></div>
                               <div className="relative bg-gradient-to-br from-teal-50 to-white p-2.5 rounded-lg shadow-sm group-hover:shadow transition-all duration-500 flex items-center justify-center">
                                 {/* Icono mejorado de distancia */}
-                                <svg className="w-5 h-5 text-teal-700" viewBox="0 0 24 24" fill="none">
-                                  <path d="M21 12H3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                                  <path d="M19 9L22 12L19 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                  <path d="M5 9L2 12L5 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                  <path d="M7.5 8C8.5 5 9.5 4 12 4C14.5 4 15.5 5 16.5 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="0.5 3" />
-                                  <path d="M7.5 16C8.5 19 9.5 20 12 20C14.5 20 15.5 19 16.5 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="0.5 3" />
-                                </svg>
+                                <GiPathDistance className="w-6 h-6 text-teal-700" />
                               </div>
                             </div>
                             <div className="ml-3">
