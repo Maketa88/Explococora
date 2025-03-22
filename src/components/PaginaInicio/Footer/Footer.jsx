@@ -1,12 +1,13 @@
-import React from "react";
-import { FaFacebookSquare, FaInstagram } from "react-icons/fa";
-import { FaTiktok } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
+import { FaFacebookSquare, FaInstagram, FaTiktok } from "react-icons/fa";
 import logo from "../../../assets/Images/logo.webp";
+import { FooterSeccion } from "./FooterSeccion";
 import { IconoRedes } from "./IconoRedes";
 import { LinkFooter } from "./LinkFooter";
-import { FooterSeccion } from "./FooterSeccion";
 
 export const Footer = () => {
+  const { t } = useTranslation();
+  
   return (
     <footer className="bg-teal-800">
       <div className="max-w-7xl mx-auto  py-2">
@@ -16,55 +17,53 @@ export const Footer = () => {
           <div className="flex flex-col items-start">
             <img
               src={logo}
-              alt="Valle del Cocora Logo"
+              alt={t("valleCocora")}
               className="h-16 w-auto mb-4"
             />
             <p className="text-white font-medium text-lg">
-              Descubre la magia del Valle del Cocora, hogar de las majestuosas
-              palmas de cera y experiencias únicas en la naturaleza.
+              {t("footerDescripcion")}
             </p>
           </div>
 
           {/* Links Sections */}
-          <FooterSeccion title="Acerca de Nosotros">
-            <LinkFooter href="/QuienesSomos">Quiénes Somos</LinkFooter>
-
-            <LinkFooter href="/ContactForm">Contacto</LinkFooter>
+          <FooterSeccion title={t("acercaDeNosotros")}>
+            <LinkFooter href="/QuienesSomos">{t("quienesSomos")}</LinkFooter>
+            <LinkFooter href="/ContactForm">{t("contacto")}</LinkFooter>
           </FooterSeccion>
 
-          <FooterSeccion title="Políticas">
+          <FooterSeccion title={t("politicas")}>
             <LinkFooter href="/privacidad">
-              Políticas de Privacidad
+              {t("politicasPrivacidad")}
             </LinkFooter>
             <LinkFooter href="/seguridad">
-              Seguridad en Caminatas y Cabalgatas
+              {t("seguridadCaminatas")}
             </LinkFooter>
-            <LinkFooter href="/terminos">Términos y Condiciones</LinkFooter>
+            <LinkFooter href="/terminos">{t("terminosCondiciones")}</LinkFooter>
           </FooterSeccion>
 
-          <FooterSeccion title="Síguenos">
+          <FooterSeccion title={t("siguenos")}>
             <div className="flex gap-6 items-center">
               <IconoRedes
                 Icon={FaFacebookSquare}
                 href="https://facebook.com/valledelcocora"
-                label="Síguenos en Facebook"
+                label={t("sigueFacebook")}
                 color="#1877F2" // Color oficial de Facebook
               />
               <IconoRedes
                 Icon={FaInstagram}
                 href="https://instagram.com/valledelcocora"
-                label="Síguenos en Instagram"
+                label={t("sigueInstagram")}
                 color="#E4405F" // Color oficial de Instagram
               />
               <IconoRedes
                 Icon={FaTiktok}
                 href="https://tiktok.com/@valledelcocora"
-                label="Síguenos en TikTok"
+                label={t("sigueTiktok")}
                 color="#000000" // Color oficial de TikTok
               />
             </div>
             <p className="text-lg text-white font-medium mt-4">
-              Mantente conectado con nuestras últimas aventuras y novedades
+              {t("mantenteConectado")}
             </p>
           </FooterSeccion>
         </div>

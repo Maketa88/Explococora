@@ -1,6 +1,6 @@
 import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import { initReactI18next } from 'react-i18next';
 
 i18n
   .use(LanguageDetector)
@@ -17,6 +17,23 @@ i18n
           contactanos: "Contáctanos",
           ingresar: "Iniciar Sesión",
           crearCuenta: "Crear Cuenta",
+          paquetesTuristicos: "Paquetes Turísticos",
+          
+          // Footer
+          valleCocora: "Valle del Cocora Logo",
+          footerDescripcion: "Descubre la magia del Valle del Cocora, hogar de las majestuosas palmas de cera y experiencias únicas en la naturaleza.",
+          acercaDeNosotros: "Acerca de Nosotros",
+          quienesSomos: "Quiénes Somos",
+          contacto: "Contacto",
+          politicas: "Políticas",
+          politicasPrivacidad: "Políticas de Privacidad",
+          seguridadCaminatas: "Seguridad en Caminatas y Cabalgatas",
+          terminosCondiciones: "Términos y Condiciones",
+          siguenos: "Síguenos",
+          sigueFacebook: "Síguenos en Facebook",
+          sigueInstagram: "Síguenos en Instagram",
+          sigueTiktok: "Síguenos en TikTok",
+          mantenteConectado: "Mantente conectado con nuestras últimas aventuras y novedades",
           
           // Página de Nuestros Guías
           tituloGuias: "Nuestros Guías",
@@ -178,6 +195,23 @@ i18n
           contactanos: "Contact Us",
           ingresar: "Sign In",
           crearCuenta: "Sign Up",
+          paquetesTuristicos: "Tourist Packages",
+          
+          // Footer
+          valleCocora: "Cocora Valley Logo",
+          footerDescripcion: "Discover the magic of Cocora Valley, home to majestic wax palms and unique nature experiences.",
+          acercaDeNosotros: "About Us",
+          quienesSomos: "Who We Are",
+          contacto: "Contact",
+          politicas: "Policies",
+          politicasPrivacidad: "Privacy Policy",
+          seguridadCaminatas: "Safety in Hiking and Horseback Riding",
+          terminosCondiciones: "Terms and Conditions",
+          siguenos: "Follow Us",
+          sigueFacebook: "Follow us on Facebook",
+          sigueInstagram: "Follow us on Instagram",
+          sigueTiktok: "Follow us on TikTok",
+          mantenteConectado: "Stay connected with our latest adventures and news",
           
           // Our Guides Page
           tituloGuias: "Our Guides",

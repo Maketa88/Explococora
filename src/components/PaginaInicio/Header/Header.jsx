@@ -40,7 +40,7 @@ export const Header = () => {
           />
           <NavItem
             tipo="enlace"
-            contenido="Paquetes Turísticos"
+            contenido={t("paquetesTuristicos")}
             to="/PaquetesTuristicos"
           />
           <NavItem
