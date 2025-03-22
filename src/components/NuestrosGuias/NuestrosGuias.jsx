@@ -281,7 +281,7 @@ const NuestrosGuias = () => {
           </div>
         </div>
     <div className="max-w-7xl mx-auto relative">
-      <div className="text-center mb-16">
+      <div className="text-center mb-8">
         {/* Título principal con efectos */}
         <div className="relative py-8 mb-10">
           {/* Bolitas decorativas a los lados */}
@@ -324,54 +324,55 @@ const NuestrosGuias = () => {
           </div>
         </div>
 
-        {/* Barra de búsqueda mejorada */}
-        <div className="max-w-md mx-auto transform transition-all duration-300 hover:scale-105">
-          <div className="relative flex items-center w-full h-14 rounded-full focus-within:shadow-lg bg-white overflow-hidden border border-emerald-200 shadow-md">
-            <div className="grid place-items-center h-full w-14 text-emerald-500">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
-            <input
-              className="peer h-full w-full outline-none text-md text-gray-700 pr-6 pl-2"
-              type="text"
-              id="search"
-              placeholder="Buscar guías por nombre, email o teléfono..."
-              value={busqueda}
-              onChange={handleBusquedaChange}
-            />
-            {busqueda && (
-              <button
-                className="absolute right-4 text-gray-400 hover:text-gray-600"
-                onClick={() => setBusqueda("")}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
+        {/* Buscador con nuevo diseño elegante y minimalista */}
+        <div className="max-w-lg mx-auto mt-6">
+          <div className="bg-white/90 backdrop-blur-sm border-b-2 border-emerald-500 shadow-md rounded-t-lg overflow-hidden transition-all duration-300 hover:shadow-lg">
+            <div className="flex items-center px-4 py-3">
+              {/* Ícono lateral */}
+              <div className="text-emerald-600 mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
                 </svg>
-              </button>
-            )}
+              </div>
+              
+              {/* Campo de búsqueda */}
+              <input
+                type="text"
+                className="flex-1 bg-transparent border-none outline-none text-gray-700 placeholder-emerald-300/80 text-base"
+                placeholder={t("buscarGuias", "Buscar guías por nombre o contacto...")}
+                value={busqueda}
+                onChange={handleBusquedaChange}
+              />
+              
+              {/* Botones de acción */}
+              <div className="flex items-center space-x-1">
+                {/* Botón para limpiar búsqueda */}
+                {busqueda && (
+                  <button
+                    onClick={() => setBusqueda("")}
+                    className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors duration-200"
+                    aria-label="Limpiar búsqueda"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+                
+                {/* Separador vertical */}
+                <div className="w-px h-6 bg-gray-200"></div>
+                
+                {/* Botón de búsqueda */}
+                <button
+                  className="p-1.5 text-emerald-600 hover:text-emerald-700 transition-colors duration-200"
+                  aria-label="Buscar"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
