@@ -125,20 +125,16 @@ export const NuestrasRutas = () => {
           <div className="mt-2 text-xs font-medium uppercase tracking-widest text-teal-600 group relative">
             <span className="inline-block mx-2">✦</span>
             <span className="relative inline-block">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-teal-700 font-semibold">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-teal-700 font-semibold text-2xl">
                 {rutaActual.nombreRuta}
               </span>
-              <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-teal-400 to-teal-600 transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
+              
             </span>
             <span className="inline-block mx-2">✦</span>
           </div>
           
           {/* Líneas decorativas bajo el título */}
-          <div className="mt-3 flex justify-center space-x-1">
-            <div className="w-12 h-1 bg-gradient-to-r from-transparent to-teal-600 rounded-full"></div>
-            <div className="w-24 h-1 bg-gradient-to-r from-teal-600 to-teal-700 rounded-full"></div>
-            <div className="w-12 h-1 bg-gradient-to-r from-teal-700 to-transparent rounded-full"></div>
-          </div>
+          
         </div>
       </div>
     <div className="container mx-auto px-4 py-8">
