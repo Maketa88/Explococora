@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaCompass, FaHiking } from 'react-icons/fa';
 import { GiHorseHead, GiMountainClimbing, GiPalmTree, GiPathDistance } from 'react-icons/gi';
@@ -17,6 +17,8 @@ export const NuestrasRutas = () => {
   const [indiceSliderFotos, setIndiceSliderFotos] = useState(0);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
+  const [desplazando, setDesplazando] = useState(false);
+  const carouselRef = useRef(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -42,6 +44,7 @@ export const NuestrasRutas = () => {
         setCargando(false);
       }
     };
+    
     fetchRutas();
   }, [idRuta]);
 
@@ -54,6 +57,10 @@ export const NuestrasRutas = () => {
           .map(item => item.foto);
         setFotosRutaActual(fotos);
         setIndiceSliderFotos(0);
+        // Resetear la posición del scroll cuando cambian las fotos
+        if (carouselRef.current) {
+          carouselRef.current.scrollLeft = 0;
+        }
       }
     } catch (error) {
       console.error('Error al obtener fotos:', error);
@@ -70,12 +77,35 @@ export const NuestrasRutas = () => {
     await obtenerFotosRuta(rutas[nuevoIndice].idRuta);
   };
 
-  const cambiarFoto = (direccion) => {
-    setIndiceSliderFotos(prevIndice => {
-      const nuevoIndice = direccion === 'siguiente'
-        ? (prevIndice + 1) % fotosRutaActual.length
-        : (prevIndice - 1 + fotosRutaActual.length) % fotosRutaActual.length;
-      return nuevoIndice;
+  const desplazarCarousel = (direccion) => {
+    if (desplazando || !carouselRef.current) return;
+    
+    setDesplazando(true);
+    
+    const carousel = carouselRef.current;
+    const scrollAmount = carousel.clientWidth * 0.7; // 70% del ancho visible
+    const newScrollLeft = direccion === 'derecha' 
+      ? carousel.scrollLeft + scrollAmount 
+      : carousel.scrollLeft - scrollAmount;
+    
+    carousel.scrollTo({
+      left: newScrollLeft,
+      behavior: 'smooth'
+    });
+    
+    setTimeout(() => setDesplazando(false), 500);
+  };
+
+  const irAFoto = (index) => {
+    if (!carouselRef.current) return;
+    
+    const carousel = carouselRef.current;
+    const itemWidth = carousel.clientWidth / 2; // Cada item ocupa la mitad del ancho
+    const scrollTo = index * itemWidth;
+    
+    carousel.scrollTo({
+      left: scrollTo,
+      behavior: 'smooth'
     });
   };
 
@@ -102,6 +132,97 @@ export const NuestrasRutas = () => {
       </div>
     );
   }
+
+  // Renderizado del slider
+  const renderSlider = () => {
+    return (
+      <div className="max-w-[1360px] mx-auto relative mb-8">
+        {/* Áreas clickeables para navegar */}
+        <div 
+          className="absolute left-0 top-0 w-16 h-full z-10 cursor-pointer hover:bg-gradient-to-r from-black/20 to-transparent transition-all duration-300"
+          onClick={() => desplazarCarousel('izquierda')}
+        ></div>
+        <div 
+          className="absolute right-0 top-0 w-16 h-full z-10 cursor-pointer hover:bg-gradient-to-l from-black/20 to-transparent transition-all duration-300"
+          onClick={() => desplazarCarousel('derecha')}
+        ></div>
+        
+        {/* Contenedor del carousel */}
+        <div 
+          ref={carouselRef}
+          className="flex overflow-x-auto h-96 rounded-lg shadow-lg scroll-smooth"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
+        >
+          {fotosRutaActual.map((foto, index) => (
+            <div 
+              key={index} 
+              className="flex-shrink-0 w-1/2 p-1 relative"
+            >
+              <div 
+                className="w-full h-full relative rounded-lg overflow-hidden cursor-pointer group"
+                onClick={() => irAFoto(index)}
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
+                <img
+                  src={foto}
+                  alt={`Foto ${index + 1} de ${rutaActual.nombreRuta}`}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute bottom-0 left-0 right-0 text-white p-3 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0 z-20">
+                  <p className="text-sm font-medium">{rutaActual.nombreRuta} • Foto {index + 1}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Botones de navegación fotos */}
+        <button
+          onClick={() => desplazarCarousel('izquierda')}
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2.5 rounded-full transition-all duration-300 ease-in-out shadow-lg hover:scale-110 group z-20"
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className="h-5 w-5 transform group-hover:-translate-x-1 transition-transform duration-300" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button
+          onClick={() => desplazarCarousel('derecha')}
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2.5 rounded-full transition-all duration-300 ease-in-out shadow-lg hover:scale-110 group z-20"
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className="h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+        
+        {/* Indicadores de fotos */}
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-3 bg-black/30 px-4 py-2 rounded-full backdrop-blur-sm z-20">
+          {fotosRutaActual.map((_, index) => (
+            <div
+              key={index}
+              onClick={() => irAFoto(index)}
+              className={`w-3 h-3 rounded-full transition-all duration-300 cursor-pointer ${
+                index === indiceSliderFotos 
+                  ? 'bg-white scale-110' 
+                  : 'bg-white/50 hover:bg-white/70'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <>
@@ -173,64 +294,7 @@ export const NuestrasRutas = () => {
       </div>
 
       {/* Slider de Fotos */}
-      <div className="max-w-[1360px] mx-auto relative mb-8 h-96">
-        <div className="flex h-full overflow-hidden rounded-lg">
-          {fotosRutaActual.slice(indiceSliderFotos, indiceSliderFotos + 2).map((foto, index) => (
-            <div key={index} className="w-1/2 p-1">
-              <img
-                src={foto}
-                alt={`Foto ${index + 1} de ${rutaActual.nombreRuta}`}
-                className="w-full h-full object-cover rounded-lg"
-              />
-            </div>
-          ))}
-        </div>
-        
-        
-        {/* Botones de navegación fotos */}
-        <button
-          onClick={() => cambiarFoto('anterior')}
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2.5 rounded-full transition-all duration-300 ease-in-out shadow-lg hover:scale-110 group"
-        >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            className="h-5 w-5 transform group-hover:-translate-x-1 transition-transform duration-300" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <button
-          onClick={() => cambiarFoto('siguiente')}
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2.5 rounded-full transition-all duration-300 ease-in-out shadow-lg hover:scale-110 group"
-        >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            className="h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-        
-        {/* Indicadores de fotos */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-3 bg-black/30 px-4 py-2 rounded-full backdrop-blur-sm">
-          {fotosRutaActual.map((_, index) => (
-            <div
-              key={index}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === indiceSliderFotos 
-                  ? 'bg-white scale-110' 
-                  : 'bg-white/50 hover:bg-white/70'
-              }`}
-            />
-          ))}
-        </div>
-      </div>
+      {renderSlider()}
       
 
       {/* Información de la Ruta - Estilo Guía de Senderismo */}
