@@ -13,7 +13,6 @@ const ActualizarPaquetes = ({ onClose, onUpdated, paquete, rutasDisponibles }) =
     fechaFin: '',
     precio: '',
     descuento: 0,
-    estado: 'Activo',
     idRutas: []
   });
   
@@ -44,7 +43,6 @@ const ActualizarPaquetes = ({ onClose, onUpdated, paquete, rutasDisponibles }) =
         fechaFin: paquete.fechaFin ? paquete.fechaFin.split('T')[0] : '',
         precio: paquete.precio || '',
         descuento: paquete.descuento || 0,
-        estado: paquete.estado || 'Activo',
         idRutas: Array.isArray(paquete.idRutas) ? paquete.idRutas : []
       });
       
@@ -443,20 +441,6 @@ const ActualizarPaquetes = ({ onClose, onUpdated, paquete, rutasDisponibles }) =
                 placeholder="Ej: 150000"
                 required
               />
-            </div>
-            
-            <div>
-              <label className="block text-emerald-600 mb-1">Estado</label>
-              <select
-                name="estado"
-                value={paqueteData.estado}
-                onChange={handleInputChange}
-                className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                required
-              >
-                <option value="Activo">Activo</option>
-                <option value="Inactivo">Inactivo</option>
-              </select>
             </div>
             
             {/* Sección informativa de rutas asociadas */}
