@@ -1,8 +1,8 @@
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CardGuia } from "./Card";
 import Feedback from "../Feedback/Feedback";
+import { CardGuia } from "./Card";
 
 // URL del backend (mejor moverla a un archivo de configuración)
 const API_URL = "http://localhost:10101";
@@ -282,11 +282,46 @@ const NuestrosGuias = () => {
         </div>
     <div className="max-w-7xl mx-auto relative">
       <div className="text-center mb-16">
-        <div className="inline-block mb-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-emerald-900 relative">
-            {t("tituloGuias")}
-            <span className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-emerald-500 rounded-full"></span>
-          </h1>
+        {/* Título principal con efectos */}
+        <div className="relative py-8 mb-10">
+          {/* Bolitas decorativas a los lados */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {/* Bolitas lado izquierdo */}
+            <div className="absolute top-1/4 left-4 w-6 h-6 bg-emerald-600 rounded-full opacity-20 animate-pulse"></div>
+            <div className="absolute top-1/2 left-12 w-4 h-4 bg-emerald-700 rounded-full opacity-30 animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+            <div className="absolute bottom-1/4 left-8 w-5 h-5 bg-emerald-500 rounded-full opacity-25 animate-pulse" style={{ animationDelay: '1.5s' }}></div>
+            
+            {/* Bolitas lado derecho */}
+            <div className="absolute top-1/3 right-10 w-5 h-5 bg-emerald-600 rounded-full opacity-20 animate-pulse" style={{ animationDelay: '0.7s' }}></div>
+            <div className="absolute top-2/3 right-6 w-7 h-7 bg-emerald-700 rounded-full opacity-15 animate-pulse" style={{ animationDelay: '1.2s' }}></div>
+            <div className="absolute bottom-1/3 right-16 w-4 h-4 bg-emerald-500 rounded-full opacity-25 animate-pulse" style={{ animationDelay: '2s' }}></div>
+          </div>
+          
+          {/* Líneas decorativas */}
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-600 to-transparent"></div>
+          <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-600 to-transparent"></div>
+          
+          <div className="relative z-10 text-center">
+            <h1 className="text-5xl font-black tracking-tight relative inline-block">
+              <span className="relative bg-clip-text text-transparent bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 drop-shadow-sm">
+                {t("tituloGuias")}
+              </span>
+            </h1>
+            
+            {/* Subtítulo o decoración */}
+            <div className="mt-2 text-xs font-medium uppercase tracking-widest text-emerald-600 opacity-80">
+              <span className="inline-block mx-2">✦</span>
+              <span>{t("exploraYConoce", "Explora y Conoce")}</span>
+              <span className="inline-block mx-2">✦</span>
+            </div>
+            
+            {/* Líneas decorativas bajo el título */}
+            <div className="mt-3 flex justify-center space-x-1">
+              <div className="w-12 h-1 bg-gradient-to-r from-transparent to-emerald-600 rounded-full"></div>
+              <div className="w-24 h-1 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-full"></div>
+              <div className="w-12 h-1 bg-gradient-to-r from-emerald-700 to-transparent rounded-full"></div>
+            </div>
+          </div>
         </div>
 
         {/* Barra de búsqueda mejorada */}
