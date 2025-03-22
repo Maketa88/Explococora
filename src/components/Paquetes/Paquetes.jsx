@@ -1,6 +1,5 @@
 import axios from 'axios';
 import {
-  
   Clock, DollarSign,
   Eye,
   Map,
@@ -606,14 +605,6 @@ const GestionPaquetes = () => {
                       >
                         <Eye size={16} />
                       </button>
-                    </div>
-                    
-                    <div className="absolute bottom-2 left-2">
-                      <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                        paquete.estado === 'Activo' ? 'bg-emerald-500 text-emerald-900' : 'bg-red-500 text-red-900'
-                      }`}>
-                        {paquete.estado}
-                      </span>
                     </div>
                   </div>
                   
