@@ -12,8 +12,8 @@ i18n
           // Menú principal
           inicio: "Inicio",
           historia: "Historia",
-          nuestrasRutas: "Nuestras Rutas",
-          nuestrosGuias: "Nuestros Guías",
+          nuestrasRutas: "Rutas",
+          nuestrosGuias: "Guías",
           contactanos: "Contáctanos",
           ingresar: "Iniciar Sesión",
           crearCuenta: "Crear Cuenta",
@@ -173,8 +173,8 @@ i18n
           // Main menu
           inicio: "Home",
           historia: "History",
-          nuestrasRutas: "Our Routes",
-          nuestrosGuias: "Our Guides",
+          nuestrasRutas: "Routes",
+          nuestrosGuias: "Guides",
           contactanos: "Contact Us",
           ingresar: "Sign In",
           crearCuenta: "Sign Up",

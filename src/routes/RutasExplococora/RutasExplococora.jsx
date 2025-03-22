@@ -1,25 +1,25 @@
-import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
+import AccesoDenegado from "../../components/AccesoDenegado/AccesoDenegado";
 import ChatBot from "../../components/chatbot/Chatbot";
 import ContactForm from "../../components/ContactForm/ContactForm";
+import Feedback from "../../components/Feedback/Feedback";
 import { HistoriaCultura } from "../../components/HistoriaCultura/Body/HistoriaCultura";
 import { PaginaNoEncontrada } from "../../components/HistoriaCultura/Body/PaginanoEncontrada/paginaNoEncontrada";
 import { InicioSesion } from "../../components/InicioSesion/InicioSesion";
+import NuestrasRutas from "../../components/NuestrasRutas/NuestrasRutas";
 import { NuestrosGuias } from "../../components/NuestrosGuias/NuestrosGuias";
 import { Footer } from "../../components/PaginaInicio/Footer/Footer";
 import { Header } from "../../components/PaginaInicio/Header/Header";
+import GestionPaquetes from "../../components/Paquetes/Paquetes";
+import ProtectedRoute from "../../components/ProtectedRoute/ProtectedRoute";
 import QuienesSomos from "../../components/QuienesSomos/QuienesSomos";
 import { Registro } from "../../components/Registro/Registro";
+import { VerificacionOTP } from '../../components/VerificacionOTP/VerificacionOTP';
 import { PaginaInicio } from "../../pages/PaginaInicio/PaginaInicio";
 import VistaAdmin from "../../pages/VistaAdmin/VistaAdmin";
 import VistaCliente from "../../pages/VistaCliente/VistaCliente";
 import VistaGuia from "../../pages/VistaGuia/VistaGuia";
 import VistaOperador from "../../pages/VistaOperador/VistaOperador";
-import NuestrasRutas from "../../components/NuestrasRutas/NuestrasRutas";
-import Feedback from "../../components/Feedback/Feedback";
-import { VerificacionOTP } from '../../components/VerificacionOTP/VerificacionOTP';
-import ProtectedRoute from "../../components/ProtectedRoute/ProtectedRoute";
-import AccesoDenegado from "../../components/AccesoDenegado/AccesoDenegado";
-import { useAuth } from "../../context/AuthContext";
 
 export const RutasExplococora = () => {
   const location = useLocation();
@@ -45,6 +45,7 @@ export const RutasExplococora = () => {
         <Route path="/NuestrosGuias" element={<NuestrosGuias />} />
         <Route path="/NuestrasRutas" element={<NuestrasRutas />} />
         <Route path="/NuestrasRutas/:idRuta" element={<NuestrasRutas />} />
+        <Route path="/PaquetesTuristicos" element={<GestionPaquetes />} />
         <Route path="/Ingreso" element={<InicioSesion />} />
         <Route path="/Registro" element={<Registro />} />
         <Route path="/ContactForm" element={<ContactForm />} />

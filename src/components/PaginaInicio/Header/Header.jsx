@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { FaBars, FaTimes } from "react-icons/fa";
-import { useAlternarMenu } from "../../../hooks/MenuHamburguesa";
 import Colombia from "../../../assets/Images/Colombia.png";
 import Usa from "../../../assets/Images/Usa.png";
+import { useAlternarMenu } from "../../../hooks/MenuHamburguesa";
 import { NavItem } from "./Lista";
 import { Logo } from "./Logo";
 
@@ -37,6 +37,11 @@ export const Header = () => {
             tipo="enlace"
             contenido={t("nuestrasRutas")}
             to="/NuestrasRutas"
+          />
+          <NavItem
+            tipo="enlace"
+            contenido="Paquetes Turísticos"
+            to="/PaquetesTuristicos"
           />
           <NavItem
             tipo="enlace"
