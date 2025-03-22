@@ -8,6 +8,7 @@ const RutasAsignadas = () => {
   const [rutas, setRutas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [modalDetails, setModalDetails] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,38 +26,110 @@ const RutasAsignadas = () => {
         return;
       }
 
-      // Endpoint para obtener todas las rutas asignadas al guía
+      // Primero obtenemos el ID del guía actual
+      let idGuiaActual;
+      try {
+        // Podemos decodificar el token JWT para obtener el ID del guía
+        // Esto asume que el token tiene la información del usuario
+        const tokenParts = token.split('.');
+        if (tokenParts.length === 3) {
+          const payload = JSON.parse(atob(tokenParts[1]));
+          idGuiaActual = payload.id || payload.userId || payload.guiaId;
+          console.log("ID del guía actual:", idGuiaActual);
+        }
+        
+        // Si no podemos obtener el ID del token, intentamos con una llamada al API
+        if (!idGuiaActual) {
+          const perfilResponse = await axios.get('http://localhost:10101/guia/perfil', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          idGuiaActual = perfilResponse.data.id || perfilResponse.data.idGuia;
+          console.log("ID del guía obtenido del perfil:", idGuiaActual);
+        }
+      } catch (err) {
+        console.error("Error al obtener ID del guía:", err);
+      }
+
+      // Endpoint para obtener todas las rutas
       const response = await axios.get('http://localhost:10101/guia/mi-historial-rutas', {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
       
-      // Log de la respuesta completa del API
       console.log("RESPUESTA RAW DEL API:", response);
       console.log("DATOS RESPUESTA COMPLETA:", JSON.stringify(response.data, null, 2));
       
-      // Mejorar el manejo de la respuesta para asegurar que se procesen todas las rutas
       let rutasData = [];
-      if (Array.isArray(response.data)) {
-        console.log("Formato detectado: Array directo");
-        rutasData = response.data;
-      } else if (response.data && Array.isArray(response.data.rutas)) {
-        console.log("Formato detectado: Array en propiedad 'rutas'");
-        rutasData = response.data.rutas;
-      } else if (response.data && typeof response.data === 'object' && response.data.data) {
-        // En caso de que la respuesta esté en response.data.data
-        console.log("Formato detectado: Objeto con propiedad 'data'");
-        rutasData = Array.isArray(response.data.data) ? response.data.data : [response.data.data];
-      } else if (response.data && typeof response.data === 'object') {
-        console.log("Formato detectado: Objeto único");
-        rutasData = [response.data]; // Si es un único objeto
+      
+      if (response.data) {
+        // Caso 1: La respuesta es directamente un array de rutas
+        if (Array.isArray(response.data)) {
+          console.log("Formato detectado: Array directo");
+          rutasData = response.data;
+        }
+        // Caso 2: La respuesta es un objeto con una propiedad "rutas" que es un array
+        else if (response.data.rutas && Array.isArray(response.data.rutas)) {
+          console.log("Formato detectado: Array en propiedad 'rutas'");
+          rutasData = response.data.rutas;
+        }
+        // Caso 3: La respuesta es un objeto con una propiedad "data" que puede ser un array u objeto
+        else if (response.data.data) {
+          console.log("Formato detectado: Propiedad 'data'");
+          if (Array.isArray(response.data.data)) {
+            rutasData = response.data.data;
+          } else if (typeof response.data.data === 'object') {
+            rutasData = [response.data.data];
+          }
+        }
+        // Caso 4: La respuesta contiene objetos con formato diferente en propiedades anidadas
+        else if (typeof response.data === 'object') {
+          console.log("Formato detectado: Objeto con posibles rutas anidadas");
+          // Verificar si hay propiedades que podrían contener arrays de rutas
+          for (const key in response.data) {
+            if (Array.isArray(response.data[key])) {
+              console.log(`Encontrado array en propiedad '${key}'`);
+              rutasData = [...rutasData, ...response.data[key]];
+            } else if (typeof response.data[key] === 'object' && response.data[key] !== null) {
+              // Si es un objeto pero no un array, podría ser una única ruta
+              if (response.data[key].idRuta || response.data[key].id || 
+                  response.data[key].nombreRuta || response.data[key].nombre) {
+                console.log(`Encontrada posible ruta individual en '${key}'`);
+                rutasData.push(response.data[key]);
+              }
+            }
+          }
+          
+          // Si no se encontraron rutas en propiedades anidadas, tratar el objeto completo como una ruta
+          if (rutasData.length === 0 && (response.data.idRuta || response.data.id || 
+              response.data.nombreRuta || response.data.nombre)) {
+            console.log("Formato detectado: Objeto único como ruta");
+            rutasData = [response.data];
+          }
+        }
       }
       
-      console.log("RUTAS PROCESADAS ANTES DE SETEAR:", rutasData);
+      // Filtrar cualquier elemento null o undefined que pudiera haberse añadido
+      rutasData = rutasData.filter(ruta => ruta !== null && ruta !== undefined);
+      
+      // Filtrar para mostrar solo las rutas asignadas al guía actual
+      if (idGuiaActual) {
+        console.log("Filtrando rutas para el guía con ID:", idGuiaActual);
+        rutasData = rutasData.filter(ruta => {
+          // Verificar todas las posibles propiedades donde podría estar el ID del guía
+          const guiaId = ruta.idGuia || ruta.guiaId || 
+                         (ruta.guia && ruta.guia.id) || 
+                         (ruta.guia && ruta.guia.idGuia) ||
+                         (ruta.asignaciones && ruta.asignaciones.idGuia);
+          
+          console.log(`Ruta ${ruta.id || ruta.idRuta || 'desconocida'} - ID del guía: ${guiaId}`);
+          return guiaId == idGuiaActual; // Usar == en lugar de === porque los IDs podrían ser string o number
+        });
+      }
+      
+      console.log("RUTAS FILTRADAS PARA EL GUÍA ACTUAL:", rutasData);
       console.log("NÚMERO DE RUTAS ENCONTRADAS:", rutasData.length);
       
-      // Log de cada ruta individual para ver estructura
       rutasData.forEach((ruta, index) => {
         console.log(`RUTA #${index + 1}:`, JSON.stringify(ruta, null, 2));
       });
@@ -138,6 +211,16 @@ const RutasAsignadas = () => {
     }
   };
 
+  // Función para mostrar el modal con los detalles
+  const mostrarDetalles = (reserva) => {
+    setModalDetails(reserva);
+  };
+
+  // Función para cerrar el modal
+  const cerrarModal = () => {
+    setModalDetails(null);
+  };
+
   const renderContenido = () => {
     if (loading) {
       return (
@@ -175,7 +258,53 @@ const RutasAsignadas = () => {
       );
     }
 
-    if (!rutas || rutas.length === 0) {
+    // Procesamos las rutas para extraer todas las reservas
+    let todasLasReservas = [];
+    
+    if (rutas && rutas.length > 0) {
+      // Iteramos por cada ruta para extraer sus reservas
+      rutas.forEach(ruta => {
+        // Si la ruta tiene un array de reservas, las agregamos a nuestro array
+        if (ruta.reservas && Array.isArray(ruta.reservas) && ruta.reservas.length > 0) {
+          // Agregamos información de la ruta a cada reserva para mostrarla
+          const reservasConDetallesRuta = ruta.reservas.map(reserva => ({
+            ...reserva,
+            rutaInfo: {
+              idRuta: ruta.idRuta || ruta.id,
+              nombreRuta: ruta.nombreRuta || ruta.nombre,
+              descripcion: ruta.descripcion || ruta.descripcionRuta,
+              duracion: ruta.duracion || ruta.duracionEstimada,
+              dificultad: ruta.dificultad,
+              puntoEncuentro: ruta.puntoEncuentro || ruta.lugar
+            }
+          }));
+          
+          todasLasReservas = [...todasLasReservas, ...reservasConDetallesRuta];
+        } else {
+          // Si la ruta no tiene reservas, la tratamos como una sola asignación
+          todasLasReservas.push({
+            idReserva: ruta.idReserva,
+            estado: ruta.estado || ruta.estadoRuta,
+            fechaInicio: ruta.fechaInicio || ruta.fecha_inicio,
+            fechaFin: ruta.fechaFin || ruta.fecha_fin,
+            cedulaCliente: ruta.cedulaCliente,
+            nombreCliente: ruta.nombreCliente,
+            rutaInfo: {
+              idRuta: ruta.idRuta || ruta.id,
+              nombreRuta: ruta.nombreRuta || ruta.nombre,
+              descripcion: ruta.descripcion || ruta.descripcionRuta,
+              duracion: ruta.duracion || ruta.duracionEstimada,
+              dificultad: ruta.dificultad,
+              puntoEncuentro: ruta.puntoEncuentro || ruta.lugar
+            }
+          });
+        }
+      });
+    }
+    
+    console.log("TOTAL DE RESERVAS A MOSTRAR:", todasLasReservas.length);
+    
+    if (todasLasReservas.length === 0) {
       return (
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-6 sm:p-8">
           <div className="text-center py-10 sm:py-16">
@@ -203,52 +332,42 @@ const RutasAsignadas = () => {
       );
     }
 
+    // Definir colorClasses aquí para que esté disponible en todo el renderContenido
+    const colorClasses = {
+      "emerald": "bg-emerald-100 text-emerald-800",
+      "red": "bg-red-100 text-red-800",
+      "yellow": "bg-yellow-100 text-yellow-800",
+      "blue": "bg-blue-100 text-blue-800",
+      "purple": "bg-purple-100 text-purple-800",
+      "gray": "bg-gray-100 text-gray-800"
+    };
+
     return (
       <div className="space-y-6">
-        {rutas.map((ruta, index) => {
-          // Log detallado de cada ruta durante el render
-          console.log(`RENDERIZANDO RUTA #${index + 1}:`, ruta);
+        {console.log("RENDERIZANDO TOTAL DE RESERVAS:", todasLasReservas.length)}
+        
+        {todasLasReservas.map((reserva, index) => {
+          // Log detallado de cada reserva durante el render
+          console.log(`RENDERIZANDO RESERVA #${index + 1}:`, reserva);
           
-          const estado = getEstadoRuta(ruta.estado || ruta.estadoRuta);
-          console.log(`  - Estado detectado:`, estado);
+          // Extraer información relevante de la reserva
+          const estado = getEstadoRuta(reserva.estado);
           
-          const colorClasses = {
-            "emerald": "bg-emerald-100 text-emerald-800",
-            "red": "bg-red-100 text-red-800",
-            "yellow": "bg-yellow-100 text-yellow-800",
-            "blue": "bg-blue-100 text-blue-800",
-            "purple": "bg-purple-100 text-purple-800",
-            "gray": "bg-gray-100 text-gray-800"
-          };
+          // Obtener información de la ruta asociada a la reserva
+          const rutaInfo = reserva.rutaInfo || {};
+          const nombreRuta = rutaInfo.nombreRuta || `Ruta #${rutaInfo.idRuta || index + 1}`;
+          const descripcion = rutaInfo.descripcion || "Sin descripción disponible";
+          const duracion = rutaInfo.duracion || "No especificada";
+          const dificultad = rutaInfo.dificultad;
+          const puntoEncuentro = rutaInfo.puntoEncuentro || "No especificado";
           
-          // Extraer información relevante de la ruta para mostrar
-          const nombreRuta = ruta.nombreRuta || ruta.nombre || `Ruta #${ruta.idRuta || ruta.id || index + 1}`;
-          const descripcion = ruta.descripcion || ruta.descripcionRuta || "Sin descripción disponible";
-          const fechaInicio = formatearFecha(ruta.fechaInicio || ruta.fecha_inicio);
-          const fechaFin = formatearFecha(ruta.fechaFin || ruta.fecha_fin);
-          const duracion = ruta.duracion || ruta.duracionEstimada || 
-                          (ruta.fechaInicio && ruta.fechaFin ? "Ver fechas" : "No especificada");
-          const puntoEncuentro = ruta.puntoEncuentro || ruta.lugar || "No especificado";
-          const participantes = ruta.cantidadPersonas || ruta.participantes || "No especificado";
-          const radicado = ruta.radicado || "No disponible";
-          
-          console.log(`  - Datos extraídos:`, {
-            nombreRuta,
-            descripcion,
-            fechaInicio,
-            fechaFin,
-            duracion, 
-            puntoEncuentro,
-            participantes,
-            radicado,
-            idReserva: ruta.idReserva,
-            idRuta: ruta.idRuta || ruta.id,
-            idCliente: ruta.idCliente
-          });
+          // Formatear fechas
+          const fechaInicio = formatearFecha(reserva.fechaInicio);
+          const fechaFin = formatearFecha(reserva.fechaFin);
           
           return (
             <div 
-              key={ruta.idReserva || ruta.id || index} 
+              key={reserva.idReserva || index} 
               className="bg-white rounded-xl sm:rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 p-4 sm:p-6 border border-emerald-100"
             >
               <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
@@ -259,11 +378,6 @@ const RutasAsignadas = () => {
                   <p className="text-sm text-gray-600">
                     {descripcion}
                   </p>
-                  {radicado && radicado !== "No disponible" && (
-                    <p className="text-xs font-medium text-emerald-600 mt-1">
-                      Radicado: {radicado}
-                    </p>
-                  )}
                 </div>
                 <div className={`px-3 py-1 rounded-full text-sm font-medium mt-2 md:mt-0 inline-flex items-center ${colorClasses[estado.color]}`}>
                   <span className={`w-2 h-2 rounded-full bg-${estado.color}-500 mr-1.5`}></span>
@@ -302,24 +416,19 @@ const RutasAsignadas = () => {
               </div>
               
               <div className="flex flex-wrap gap-2 mb-4">
-                {ruta.detalles && (
+                {reserva.nombreCliente && (
                   <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs">
-                    {ruta.detalles}
+                    Cliente: {reserva.nombreCliente}
                   </span>
                 )}
-                {ruta.dificultad && (
+                {dificultad && (
                   <span className="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs">
-                    Dificultad: {ruta.dificultad}
+                    Dificultad: {dificultad}
                   </span>
                 )}
-                {ruta.tipoRuta && (
+                {reserva.cedulaCliente && (
                   <span className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs">
-                    {ruta.tipoRuta}
-                  </span>
-                )}
-                {participantes && (
-                  <span className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs">
-                    {typeof participantes === 'number' ? `${participantes} participantes` : participantes}
+                    Cédula: {reserva.cedulaCliente}
                   </span>
                 )}
               </div>
@@ -327,29 +436,9 @@ const RutasAsignadas = () => {
               <div className="border-t border-gray-100 pt-4">
                 <div className="flex justify-between items-center">
                   <div className="text-sm text-gray-500">
-                    {ruta.idReserva && (
-                      <span className="inline-flex items-center mr-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                          <line x1="16" y1="2" x2="16" y2="6"></line>
-                          <line x1="8" y1="2" x2="8" y2="6"></line>
-                          <line x1="3" y1="10" x2="21" y2="10"></line>
-                        </svg>
-                        Reserva: #{ruta.idReserva}
-                      </span>
-                    )}
-                    {ruta.idCliente && (
-                      <span className="inline-flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                          <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-                        Cliente: #{ruta.idCliente}
-                      </span>
-                    )}
                   </div>
                   <button 
-                    onClick={() => navigate(`/VistaGuia/DetalleRuta/${ruta.idRuta || ruta.id || index}`)}
+                    onClick={() => mostrarDetalles(reserva)}
                     className="py-2.5 px-5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white rounded-lg transition-all shadow-md flex items-center gap-2"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -363,6 +452,138 @@ const RutasAsignadas = () => {
             </div>
           );
         })}
+        
+        {/* Modal de detalles flotante */}
+        {modalDetails && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 animate-fadeIn">
+            <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+              <div className="sticky top-0 bg-emerald-600 text-white p-4 flex justify-between items-center">
+                <h3 className="text-xl font-bold">
+                  {modalDetails.rutaInfo?.nombreRuta || `Ruta #${modalDetails.rutaInfo?.idRuta || ''}`}
+                </h3>
+                <button 
+                  onClick={cerrarModal}
+                  className="text-white hover:text-red-200 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="p-6">
+                {/* Resumen de la reserva */}
+                <div className="mb-6">
+                  <div className="flex flex-wrap gap-3 mb-4">
+                    <div className={`px-3 py-1 rounded-full text-sm font-medium inline-flex items-center ${colorClasses[getEstadoRuta(modalDetails.estado).color]}`}>
+                      <span className={`w-2 h-2 rounded-full bg-${getEstadoRuta(modalDetails.estado).color}-500 mr-1.5`}></span>
+                      {getEstadoRuta(modalDetails.estado).texto}
+                    </div>
+                  </div>
+                  
+                  <p className="text-gray-700 mb-4">
+                    {modalDetails.rutaInfo?.descripcion || "Sin descripción disponible"}
+                  </p>
+                </div>
+                
+                {/* Detalles completos */}
+                <div className="bg-emerald-50 rounded-lg p-6 mb-6">
+                  <h4 className="text-lg font-semibold text-emerald-800 mb-4">Información detallada</h4>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Primera columna */}
+                    <div>
+                      <div className="mb-4">
+                        <h5 className="text-sm font-medium text-emerald-700 mb-1">Punto de encuentro</h5>
+                        <p className="text-gray-800">
+                          {modalDetails.rutaInfo?.puntoEncuentro || "No especificado"}
+                        </p>
+                      </div>
+                      
+                      <div className="mb-4">
+                        <h5 className="text-sm font-medium text-emerald-700 mb-1">Dificultad</h5>
+                        <p className="text-gray-800">
+                          {modalDetails.rutaInfo?.dificultad || "No especificada"}
+                        </p>
+                      </div>
+                      
+                      <div className="mb-4">
+                        <h5 className="text-sm font-medium text-emerald-700 mb-1">Duración</h5>
+                        <p className="text-gray-800">
+                          {modalDetails.rutaInfo?.duracion || "No especificada"}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Segunda columna */}
+                    <div>
+                      <div className="mb-4">
+                        <h5 className="text-sm font-medium text-emerald-700 mb-1">Fecha y hora de inicio</h5>
+                        <p className="text-gray-800">
+                          {formatearFecha(modalDetails.fechaInicio)}
+                        </p>
+                      </div>
+                      
+                      <div className="mb-4">
+                        <h5 className="text-sm font-medium text-emerald-700 mb-1">Fecha y hora de finalización</h5>
+                        <p className="text-gray-800">
+                          {formatearFecha(modalDetails.fechaFin)}
+                        </p>
+                      </div>
+                      
+                      {modalDetails.nombreCliente && (
+                        <div className="mb-4">
+                          <h5 className="text-sm font-medium text-emerald-700 mb-1">Cliente</h5>
+                          <p className="text-gray-800">
+                            {modalDetails.nombreCliente}
+                            {modalDetails.cedulaCliente && ` - Cédula: ${modalDetails.cedulaCliente}`}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Información adicional si está disponible */}
+                {Object.keys(modalDetails).filter(key => 
+                  !['idReserva', 'estado', 'fechaInicio', 'fechaFin', 'cedulaCliente', 'nombreCliente', 'rutaInfo'].includes(key) && 
+                  modalDetails[key] !== null && 
+                  modalDetails[key] !== undefined &&
+                  typeof modalDetails[key] !== 'object'
+                ).length > 0 && (
+                  <div>
+                    <h4 className="text-lg font-semibold text-emerald-800 mb-4">Información adicional</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {Object.keys(modalDetails).filter(key => 
+                        !['idReserva', 'estado', 'fechaInicio', 'fechaFin', 'cedulaCliente', 'nombreCliente', 'rutaInfo'].includes(key) && 
+                        modalDetails[key] !== null && 
+                        modalDetails[key] !== undefined &&
+                        typeof modalDetails[key] !== 'object'
+                      ).map(key => (
+                        <div key={key} className="bg-gray-50 p-4 rounded-lg">
+                          <p className="text-gray-500 text-xs mb-1 capitalize">{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</p>
+                          <p className="font-medium text-gray-800">
+                            {typeof modalDetails[key] === 'boolean' ? (modalDetails[key] ? 'Sí' : 'No') : modalDetails[key].toString()}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div className="border-t border-gray-200 p-4 flex justify-end">
+                <button 
+                  onClick={cerrarModal}
+                  className="py-2 px-4 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   };

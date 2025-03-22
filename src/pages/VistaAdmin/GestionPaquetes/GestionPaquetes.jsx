@@ -178,7 +178,7 @@ const GestionPaquetes = () => {
       
       // Intentar obtener el paquete directamente por ID
       const response = await axios.get(`http://localhost:10101/paquete/obtener-paquete/${idPaquete}`);
-      console.log('Respuesta de obtener-paquete:', response.data);
+      console.log('Respuesta completa de obtener-paquete:', response.data);
       
       // Verificar si la respuesta es un array
       if (response.data && Array.isArray(response.data)) {
@@ -187,10 +187,18 @@ const GestionPaquetes = () => {
         
         // Recorrer cada elemento del array para extraer información de rutas
         response.data.forEach(item => {
+          console.log('Analizando item de ruta:', item);
+          // Buscar el tipo de ruta en diferentes propiedades posibles
+          // El campo 'tipo' parece ser el correcto según la captura de pantalla
+          const tipoRuta = item.tipo || item.tipoRuta || item.type || item.categoria || 
+                           item.categoriaRuta || 'Cabalgata y Caminata';
+          
           // Agregar cada ruta del array sin filtrar por ID
           rutasInfo.push({
             idRuta: item.idRuta,
-            nombreRuta: item.nombreRuta || `Ruta ${item.idRuta}`
+            nombreRuta: item.nombreRuta || `Ruta ${item.idRuta}`,
+            tiempoEstimado: item.duracion || item.tiempoEstimado || null,
+            tipoRuta: tipoRuta
           });
         });
         
@@ -202,19 +210,30 @@ const GestionPaquetes = () => {
         
         // Verificar si el objeto tiene propiedades de ruta
         if (response.data.idRuta || response.data.nombreRuta) {
+          const tipoRuta = response.data.tipo || response.data.tipoRuta || response.data.type || 
+                           response.data.categoria || response.data.categoriaRuta || 'Cabalgata y Caminata';
+          
           rutasInfo.push({
             idRuta: response.data.idRuta,
-            nombreRuta: response.data.nombreRuta || `Ruta ${response.data.idRuta}`
+            nombreRuta: response.data.nombreRuta || `Ruta ${response.data.idRuta}`,
+            tiempoEstimado: response.data.duracion || response.data.tiempoEstimado || null,
+            tipoRuta: tipoRuta
           });
         }
         
         // Verificar si hay un array de rutas en alguna propiedad
         if (response.data.rutas && Array.isArray(response.data.rutas)) {
+          console.log('Array de rutas encontrado:', response.data.rutas);
           response.data.rutas.forEach(ruta => {
             if (!rutasInfo.some(r => r.idRuta === ruta.idRuta)) {
+              const tipoRuta = ruta.tipo || ruta.tipoRuta || ruta.type || 
+                               ruta.categoria || ruta.categoriaRuta || 'Cabalgata y Caminata';
+              
               rutasInfo.push({
                 idRuta: ruta.idRuta,
-                nombreRuta: ruta.nombreRuta || `Ruta ${ruta.idRuta}`
+                nombreRuta: ruta.nombreRuta || `Ruta ${ruta.idRuta}`,
+                tiempoEstimado: ruta.duracion || ruta.tiempoEstimado || null,
+                tipoRuta: tipoRuta
               });
             }
           });
@@ -349,16 +368,15 @@ const GestionPaquetes = () => {
     }
   };
 
-  // Función para formatear fechas
-  const formatearFecha = (fechaStr) => {
-    if (!fechaStr) return 'Fecha no disponible';
+  // Función para mostrar el tipo de ruta
+  const mostrarTipoRuta = (paquete) => {
+    if (!paquete.rutasAsociadas || paquete.rutasAsociadas.length === 0) return 'Tipo no disponible';
     
-    const fecha = new Date(fechaStr);
-    return fecha.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
+    // Obtener todos los tipos de ruta únicos
+    const tiposUnicos = Array.from(new Set(paquete.rutasAsociadas.map(r => r.tipoRuta)));
+    
+    // Devolver los tipos separados por coma
+    return tiposUnicos.join(', ');
   };
 
   // Función para mostrar precio formateado
@@ -378,8 +396,84 @@ const GestionPaquetes = () => {
     setIsDetailView(true);
   };
 
+  // Función para calcular la duración total de las rutas de un paquete
+  const calcularDuracionTotalPaquete = (paquete) => {
+    if (!paquete.rutasAsociadas || !paquete.rutasAsociadas.length) return paquete.duracion || 'No especificada';
+    
+    let horasTotales = 0;
+    let minutosTotales = 0;
+    
+    paquete.rutasAsociadas.forEach(ruta => {
+      if (ruta.tiempoEstimado) {
+        const tiempo = ruta.tiempoEstimado.toLowerCase();
+        
+        // Extraer horas
+        const horasMatch = tiempo.match(/(\d+)\s*(?:h|hora|horas)/);
+        if (horasMatch) horasTotales += parseInt(horasMatch[1]);
+        
+        // Extraer minutos
+        const minutosMatch = tiempo.match(/(\d+)\s*(?:m|min|minuto|minutos)/);
+        if (minutosMatch) minutosTotales += parseInt(minutosMatch[1]);
+      }
+    });
+    
+    // Convertir minutos excedentes a horas
+    if (minutosTotales >= 60) {
+      horasTotales += Math.floor(minutosTotales / 60);
+      minutosTotales = minutosTotales % 60;
+    }
+    
+    // Formar el string de duración total
+    let duracionTotal = '';
+    if (horasTotales > 0) duracionTotal += `${horasTotales} hora${horasTotales !== 1 ? 's' : ''}`;
+    if (minutosTotales > 0) {
+      if (duracionTotal) duracionTotal += ' ';
+      duracionTotal += `${minutosTotales} minuto${minutosTotales !== 1 ? 's' : ''}`;
+    }
+    
+    return duracionTotal || paquete.duracion || 'No especificada';
+  };
+
   // Componente para renderizar la vista detallada
   const DetallePaquete = ({ paquete, onClose, imagenes = [] }) => {
+    // Calcular duración total de las rutas
+    const calcularDuracionTotal = () => {
+      if (!paquete.rutasAsociadas || !paquete.rutasAsociadas.length) return paquete.duracion || 'No especificada';
+      
+      let duracionTotal = '';
+      let horasTotales = 0;
+      let minutosTotales = 0;
+      
+      paquete.rutasAsociadas.forEach(ruta => {
+        if (ruta.tiempoEstimado) {
+          const tiempo = ruta.tiempoEstimado.toLowerCase();
+          
+          // Extraer horas
+          const horasMatch = tiempo.match(/(\d+)\s*(?:h|hora|horas)/);
+          if (horasMatch) horasTotales += parseInt(horasMatch[1]);
+          
+          // Extraer minutos
+          const minutosMatch = tiempo.match(/(\d+)\s*(?:m|min|minuto|minutos)/);
+          if (minutosMatch) minutosTotales += parseInt(minutosMatch[1]);
+        }
+      });
+      
+      // Convertir minutos excedentes a horas
+      if (minutosTotales >= 60) {
+        horasTotales += Math.floor(minutosTotales / 60);
+        minutosTotales = minutosTotales % 60;
+      }
+      
+      // Formar el string de duración total
+      if (horasTotales > 0) duracionTotal += `${horasTotales} hora${horasTotales !== 1 ? 's' : ''}`;
+      if (minutosTotales > 0) {
+        if (duracionTotal) duracionTotal += ' ';
+        duracionTotal += `${minutosTotales} minuto${minutosTotales !== 1 ? 's' : ''}`;
+      }
+      
+      return duracionTotal || paquete.duracion || 'No especificada';
+    };
+
     // Obtener nombres de rutas
     const getNombresRutas = () => {
       if (!paquete.rutasAsociadas || !paquete.rutasAsociadas.length) return 'Ninguna ruta asociada';
@@ -389,7 +483,15 @@ const GestionPaquetes = () => {
           {paquete.rutasAsociadas.map((ruta, index) => (
             <div key={index} className="flex items-center gap-2 bg-emerald-100 p-2 rounded">
               <Map size={16} className="text-emerald-400" />
-              <span>{ruta.nombreRuta}</span>
+              <div>
+                <span className="font-medium">{ruta.nombreRuta}</span>
+                {ruta.tiempoEstimado && (
+                  <div className="text-xs text-emerald-700 flex items-center mt-1">
+                    <Clock size={12} className="mr-1" />
+                    <span>{ruta.tiempoEstimado}</span>
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -462,18 +564,15 @@ const GestionPaquetes = () => {
                       <h4 className="text-emerald-700 font-medium mb-1">Duración</h4>
                       <div className="flex items-center gap-2">
                         <Clock size={18} className="text-emerald-600" />
-                        <span className="text-lg text-gray-800">{paquete.duracion}</span>
+                        <span className="text-lg text-gray-800">{calcularDuracionTotal()}</span>
                       </div>
                     </div>
                     
                     <div>
-                      <h4 className="text-emerald-700 font-medium mb-1">Fechas</h4>
+                      <h4 className="text-emerald-700 font-medium mb-1">Tipo</h4>
                       <div className="flex items-center gap-2">
-                        <Calendar size={18} className="text-emerald-600" />
-                        <div className="text-gray-800">
-                          <div>Desde: {formatearFecha(paquete.fechaInicio)}</div>
-                          <div>Hasta: {formatearFecha(paquete.fechaFin)}</div>
-                        </div>
+                        <Map size={18} className="text-emerald-600" />
+                        <span>{mostrarTipoRuta(paquete)}</span>
                       </div>
                     </div>
                     
@@ -495,19 +594,6 @@ const GestionPaquetes = () => {
                           Precio final: ${(paquete.precio * (1 - paquete.descuento / 100)).toFixed(2)}
                         </div>
                       )}
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-emerald-700 font-medium mb-1">Estado</h4>
-                      <div className="flex items-center gap-2">
-                        <span className={`px-3 py-1 rounded-full text-sm ${
-                          paquete.estado === 'Activo' 
-                            ? 'bg-emerald-600 text-white' 
-                            : 'bg-gray-600 text-white'
-                        }`}>
-                          {paquete.estado}
-                        </span>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -765,14 +851,6 @@ const GestionPaquetes = () => {
                           <Eye size={16} />
                         </button>
                       </div>
-                      
-                      <div className="absolute bottom-2 left-2">
-                        <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                          paquete.estado === 'Activo' ? 'bg-emerald-500 text-white' : 'bg-red-400 text-white'
-                        }`}>
-                          {paquete.estado}
-                        </span>
-                      </div>
                     </div>
                     
                     <div className="p-4">
@@ -781,12 +859,12 @@ const GestionPaquetes = () => {
                       <div className="mt-2 space-y-2">
                         <div className="flex items-center gap-2 text-gray-600">
                           <Clock size={16} className="text-emerald-500" />
-                          <span>{paquete.duracion}</span>
+                          <span className="font-medium">Duración total: {calcularDuracionTotalPaquete(paquete)}</span>
                         </div>
                         
                         <div className="flex items-center gap-2 text-gray-600">
-                          <Calendar size={16} className="text-emerald-500" />
-                          <span>{formatearFecha(paquete.fechaInicio)} - {formatearFecha(paquete.fechaFin)}</span>
+                          <Map size={16} className="text-emerald-500" />
+                          <span>{mostrarTipoRuta(paquete)}</span>
                         </div>
                         
                         <div className="flex items-center gap-2 text-gray-600">
@@ -801,7 +879,18 @@ const GestionPaquetes = () => {
                         
                         <div className="flex items-center gap-2 text-gray-600">
                           <Map size={16} className="text-emerald-500" />
-                          <span>{paquete.rutasAsociadas?.length || 0} rutas incluidas</span>
+                          <div className="flex flex-wrap gap-1 items-center">
+                            <span>{paquete.rutasAsociadas?.length || 0} rutas incluidas</span>
+                            {paquete.rutasAsociadas && paquete.rutasAsociadas.length > 0 && (
+                              <div className="flex gap-1 ml-1">
+                                {Array.from(new Set(paquete.rutasAsociadas.map(r => r.tipoRuta))).map((tipo, idx) => (
+                                  <span key={idx} className="bg-emerald-100 text-emerald-800 text-xs px-1.5 py-0.5 rounded">
+                                    {tipo}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                       
