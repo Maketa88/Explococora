@@ -434,13 +434,10 @@ const GestionPaquetes = () => {
                     </div>
                     
                     <div>
-                      <h4 className="text-emerald-700 font-medium mb-1">Fechas</h4>
+                      <h4 className="text-emerald-700 font-medium mb-1">Tipo</h4>
                       <div className="flex items-center gap-2">
-                        <Calendar size={18} className="text-emerald-600" />
-                        <div className="text-gray-800">
-                          <div>Desde: {formatearFecha(paquete.fechaInicio)}</div>
-                          <div>Hasta: {formatearFecha(paquete.fechaFin)}</div>
-                        </div>
+                        <Map size={18} className="text-emerald-600" />
+                        <span className="text-lg text-gray-800">Cabalgata y Caminata</span>
                       </div>
                     </div>
                     
