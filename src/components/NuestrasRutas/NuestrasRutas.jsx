@@ -14,7 +14,6 @@ export const NuestrasRutas = () => {
   const [rutas, setRutas] = useState([]);
   const [rutaActual, setRutaActual] = useState(null);
   const [fotosRutaActual, setFotosRutaActual] = useState([]);
-  const [indiceSliderFotos, setIndiceSliderFotos] = useState(0);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [desplazando, setDesplazando] = useState(false);
@@ -56,7 +55,6 @@ export const NuestrasRutas = () => {
           .filter(item => item?.foto)
           .map(item => item.foto);
         setFotosRutaActual(fotos);
-        setIndiceSliderFotos(0);
         // Resetear la posición del scroll cuando cambian las fotos
         if (carouselRef.current) {
           carouselRef.current.scrollLeft = 0;
@@ -83,7 +81,7 @@ export const NuestrasRutas = () => {
     setDesplazando(true);
     
     const carousel = carouselRef.current;
-    const scrollAmount = carousel.clientWidth * 0.7; // 70% del ancho visible
+    const scrollAmount = carousel.clientWidth * 0.5; // 30% del ancho visible (reducido del 70% original)
     const newScrollLeft = direccion === 'derecha' 
       ? carousel.scrollLeft + scrollAmount 
       : carousel.scrollLeft - scrollAmount;
@@ -94,19 +92,6 @@ export const NuestrasRutas = () => {
     });
     
     setTimeout(() => setDesplazando(false), 500);
-  };
-
-  const irAFoto = (index) => {
-    if (!carouselRef.current) return;
-    
-    const carousel = carouselRef.current;
-    const itemWidth = carousel.clientWidth / 2; // Cada item ocupa la mitad del ancho
-    const scrollTo = index * itemWidth;
-    
-    carousel.scrollTo({
-      left: scrollTo,
-      behavior: 'smooth'
-    });
   };
 
   if (cargando) {
@@ -160,7 +145,6 @@ export const NuestrasRutas = () => {
             >
               <div 
                 className="w-full h-full relative rounded-lg overflow-hidden cursor-pointer group"
-                onClick={() => irAFoto(index)}
               >
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
                 <img
@@ -205,21 +189,6 @@ export const NuestrasRutas = () => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
           </svg>
         </button>
-        
-        {/* Indicadores de fotos */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-3 bg-black/30 px-4 py-2 rounded-full backdrop-blur-sm z-20">
-          {fotosRutaActual.map((_, index) => (
-            <div
-              key={index}
-              onClick={() => irAFoto(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 cursor-pointer ${
-                index === indiceSliderFotos 
-                  ? 'bg-white scale-110' 
-                  : 'bg-white/50 hover:bg-white/70'
-              }`}
-            />
-          ))}
-        </div>
       </div>
     );
   };
