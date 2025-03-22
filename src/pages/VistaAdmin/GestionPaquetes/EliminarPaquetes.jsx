@@ -88,48 +88,48 @@ const EliminarPaquetes = ({ onClose, onDeleted, paquete }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 px-4">
-      <div className="bg-teal-900 rounded-lg shadow-xl w-full max-w-md text-white animate-fadeIn overflow-hidden">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md text-gray-800 animate-fadeIn overflow-hidden">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold flex items-center gap-2">
-              <Package className="w-6 h-6 text-rose-400" />
+              <Package className="w-6 h-6 text-rose-500" />
               Eliminar Paquete
             </h2>
             <button
               onClick={onClose}
-              className="text-teal-300 hover:text-white transition-colors"
+              className="text-gray-500 hover:text-gray-700 transition-colors"
             >
               <X size={24} />
             </button>
           </div>
           
           <div className="mb-6">
-            <div className="bg-rose-900 bg-opacity-50 p-4 rounded-lg mb-4 flex items-start gap-3">
-              <AlertTriangle className="w-6 h-6 text-rose-400 flex-shrink-0 mt-0.5" />
+            <div className="bg-rose-100 p-4 rounded-lg mb-4 flex items-start gap-3">
+              <AlertTriangle className="w-6 h-6 text-rose-500 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-bold text-rose-300">¿Está seguro de eliminar este paquete?</h3>
-                <p className="text-sm text-rose-200 mt-1">
+                <h3 className="font-bold text-rose-700">¿Está seguro de eliminar este paquete?</h3>
+                <p className="text-sm text-rose-600 mt-1">
                   Esta acción no se puede deshacer. El paquete será eliminado permanentemente del sistema
                   junto con todas sus imágenes asociadas.
                 </p>
               </div>
             </div>
             
-            <div className="bg-teal-800 p-4 rounded-lg">
-              <h4 className="font-bold mb-2 text-teal-300">Detalles del paquete:</h4>
+            <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
+              <h4 className="font-bold mb-2 text-emerald-600">Detalles del paquete:</h4>
               <ul className="space-y-2 text-sm">
-                <li><span className="text-teal-400">Nombre:</span> {paquete.nombrePaquete}</li>
-                <li><span className="text-teal-400">Duración:</span> {paquete.duracion}</li>
-                <li><span className="text-teal-400">Precio:</span> ${paquete.precio}</li>
+                <li><span className="text-emerald-600">Nombre:</span> {paquete.nombrePaquete}</li>
+                <li><span className="text-emerald-600">Duración:</span> {paquete.duracion}</li>
+                <li><span className="text-emerald-600">Precio:</span> ${paquete.precio}</li>
                 <li>
-                  <span className="text-teal-400">Descripción:</span>
-                  <p className="text-white mt-1 line-clamp-2">{paquete.descripcion}</p>
+                  <span className="text-emerald-600">Descripción:</span>
+                  <p className="text-gray-700 mt-1 line-clamp-2">{paquete.descripcion}</p>
                 </li>
               </ul>
             </div>
             
             {error && (
-              <div className="bg-rose-900 bg-opacity-50 p-3 rounded mt-4 text-rose-200 text-sm">
+              <div className="bg-rose-100 p-3 rounded mt-4 text-rose-700 text-sm">
                 {error}
               </div>
             )}
@@ -139,7 +139,7 @@ const EliminarPaquetes = ({ onClose, onDeleted, paquete }) => {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-teal-800 hover:bg-teal-700 text-white rounded transition-colors"
+              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded transition-colors"
               disabled={loading}
             >
               Cancelar
@@ -147,7 +147,7 @@ const EliminarPaquetes = ({ onClose, onDeleted, paquete }) => {
             <button
               type="button"
               onClick={handleEliminar}
-              className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-rose-500 hover:bg-rose-400 text-white rounded transition-colors flex items-center gap-2"
               disabled={loading}
             >
               {loading ? (

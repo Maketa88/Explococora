@@ -7,7 +7,6 @@ import Settings from '../../pages/VistaAdmin/Settings/Settings';
 import CambioEstado from '../../pages/VistaAdmin/CambioEstado/CambioEstado';
 import CambiarContraseñaAdmin from '../../pages/VistaAdmin/PerfilAdmin/CambiarContraseñaAdmin';
 import ActualizarCorreoAdmin from '../../pages/VistaAdmin/PerfilAdmin/ActualizarCorreoAdmin';
-import EliminarUsuario from '../../pages/VistaAdmin/PerfilAdmin/EliminarUsuario';
 import PerfilAdmin from '../../pages/VistaAdmin/PerfilAdmin/PerfilAdmin';
 import GestionGuias from '../../pages/VistaAdmin/GestionUsuarios/GestionGuias';
 import GestionOperadores from '../../pages/VistaAdmin/GestionUsuarios/GestionOperadores';
@@ -18,6 +17,7 @@ import CrearPaquetes from '../../pages/VistaAdmin/GestionPaquetes/CrearPaquetes'
 import PagoPaquete from '../../pages/VistaAdmin/Informes/PagoPaquete';
 import Reservas from '../../pages/VistaAdmin/Informes/Reserva';
 import PagoRuta from '../../pages/VistaAdmin/Informes/PagoRuta';
+import EstadoGuia from '../../pages/VistaAdmin/GestionUsuarios/EstadoGuia';
 
 const RutasAdmin = () => {
   return (
@@ -31,7 +31,6 @@ const RutasAdmin = () => {
       <Route path="/CambiarContraseña" element={<CambiarContraseñaAdmin />} />
       <Route path="/PerfilAdmin" element={<PerfilAdmin />} />
       <Route path="/ActualizarCorreo" element={<ActualizarCorreoAdmin />} />
-      <Route path="/EliminarUsuario" element={<EliminarUsuario />} />
       <Route path="/GestionGuias" element={<GestionGuias />} />
       <Route path="/GestionOperadores" element={<GestionOperadores />} />
       <Route path="/GestionPaquetes" element={<GestionPaquetes />} />
@@ -41,7 +40,8 @@ const RutasAdmin = () => {
       <Route path="/PagoPaquete" element={<PagoPaquete />} />
       <Route path="/Reservas" element={<Reservas />} />
       <Route path="/PagoRuta" element={<PagoRuta />} />
-      
+      <Route path="/EstadoGuia" element={<EstadoGuia />} />
+
     </Routes>
   );
 };

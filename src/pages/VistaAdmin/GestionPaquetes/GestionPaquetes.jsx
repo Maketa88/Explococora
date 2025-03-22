@@ -387,7 +387,7 @@ const GestionPaquetes = () => {
       return (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
           {paquete.rutasAsociadas.map((ruta, index) => (
-            <div key={index} className="flex items-center gap-2 bg-emerald-800 p-2 rounded">
+            <div key={index} className="flex items-center gap-2 bg-emerald-100 p-2 rounded">
               <Map size={16} className="text-emerald-400" />
               <span>{ruta.nombreRuta}</span>
             </div>
@@ -401,7 +401,7 @@ const GestionPaquetes = () => {
         <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl text-gray-800 animate-fadeIn max-h-[90vh] overflow-y-auto">
           <div className="relative">
             {/* Encabezado con fondo de imagen (si hay imágenes) */}
-            <div className="h-48 bg-emerald-900 rounded-t-lg overflow-hidden relative">
+            <div className="h-48 bg-emerald-100 rounded-t-lg overflow-hidden relative">
               {imagenes && imagenes.length > 0 ? (
                 <div className="w-full h-full overflow-hidden">
                   <img 
@@ -427,7 +427,7 @@ const GestionPaquetes = () => {
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-full">
-                  <Package size={64} className="text-emerald-600" />
+                  <Package size={64} className="text-emerald-200" />
                 </div>
               )}
               
@@ -440,8 +440,8 @@ const GestionPaquetes = () => {
               </button>
               
               {/* Nombre del paquete */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-emerald-900 to-transparent">
-                <h2 className="text-3xl font-bold text-white">{paquete.nombrePaquete}</h2>
+              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white to-transparent">
+                <h2 className="text-3xl font-bold text-gray-800">{paquete.nombrePaquete}</h2>
               </div>
             </div>
             
@@ -449,10 +449,10 @@ const GestionPaquetes = () => {
               {/* Información principal */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div className="col-span-2">
-                  <h3 className="text-xl font-semibold mb-2 text-emerald-700">Descripción</h3>
+                  <h3 className="text-xl font-semibold mb-2 text-emerald-600">Descripción</h3>
                   <p className="text-gray-700 mb-6">{paquete.descripcion}</p>
                   
-                  <h3 className="text-xl font-semibold mb-2 text-emerald-700">Rutas incluidas</h3>
+                  <h3 className="text-xl font-semibold mb-2 text-emerald-600">Rutas incluidas</h3>
                   {getNombresRutas()}
                 </div>
                 
@@ -552,7 +552,7 @@ const GestionPaquetes = () => {
               <div className="mt-8 flex justify-end space-x-4">
                 <button
                   onClick={onClose}
-                  className="px-6 py-2 bg-emerald-800 hover:bg-emerald-700 text-white rounded-lg transition-colors shadow-md"
+                  className="px-6 py-2 bg-emerald-100 hover:bg-emerald-200 text-gray-800 rounded-lg transition-colors shadow-md"
                 >
                   Cerrar
                 </button>
@@ -561,7 +561,7 @@ const GestionPaquetes = () => {
                     onClose();
                     handleOpenActualizarModal(paquete);
                   }}
-                  className="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors shadow-md flex items-center gap-2"
+                  className="px-6 py-2 bg-emerald-100 hover:bg-emerald-200 text-gray-800 rounded-lg transition-colors shadow-md flex items-center gap-2"
                 >
                   <Pencil size={16} />
                   Editar
@@ -600,7 +600,7 @@ const GestionPaquetes = () => {
         <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-800">Gestión de Paquetes Turísticos</h1>
-            <p className="text-emerald-700 mt-1">Administre los paquetes turísticos disponibles</p>
+            <p className="text-emerald-600 mt-1">Administre los paquetes turísticos disponibles</p>
           </div>
           
           <div className="flex flex-wrap gap-2">
@@ -610,14 +610,14 @@ const GestionPaquetes = () => {
                 placeholder="Buscar paquetes..."
                 value={terminoBusqueda}
                 onChange={handleSearchChange}
-                className="w-full md:w-64 px-4 py-2 bg-emerald-50 rounded text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400 placeholder-emerald-700"
+                className="w-full md:w-64 px-4 py-2 bg-emerald-50 rounded text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400 placeholder-emerald-600"
               />
-              <Search className="absolute right-3 top-2.5 text-emerald-700 w-5 h-5" />
+              <Search className="absolute right-3 top-2.5 text-emerald-600 w-5 h-5" />
             </div>
             
             <button
               onClick={() => setMostrarFiltros(!mostrarFiltros)}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-800 hover:bg-emerald-700 text-white rounded transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded transition-colors"
             >
               <Filter size={18} />
               Filtros
@@ -625,7 +625,7 @@ const GestionPaquetes = () => {
             
             <button
               onClick={fetchPaquetes}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-800 hover:bg-emerald-700 text-white rounded transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded transition-colors"
               title="Recargar paquetes"
             >
               <RefreshCw size={18} />
@@ -633,7 +633,7 @@ const GestionPaquetes = () => {
             
             <button
               onClick={handleOpenCrearModal}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white rounded transition-colors"
             >
               <Plus size={18} />
               Nuevo Paquete
@@ -648,33 +648,33 @@ const GestionPaquetes = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-emerald-700 text-sm mb-1">Duración</label>
+                <label className="block text-emerald-600 text-sm mb-1">Duración</label>
                 <input
                   type="text"
                   placeholder="Ej: 3 días"
                   value={filtros.duracion}
                   onChange={(e) => setFiltros({...filtros, duracion: e.target.value})}
-                  className="w-full p-2 rounded bg-emerald-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  className="w-full p-2 rounded bg-white border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
                 />
               </div>
               
               <div>
-                <label className="block text-emerald-700 text-sm mb-1">Precio Máximo</label>
+                <label className="block text-emerald-600 text-sm mb-1">Precio Máximo</label>
                 <input
                   type="number"
                   placeholder="Precio máximo"
                   value={filtros.precio}
                   onChange={(e) => setFiltros({...filtros, precio: e.target.value})}
-                  className="w-full p-2 rounded bg-emerald-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  className="w-full p-2 rounded bg-white border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
                 />
               </div>
               
               <div>
-                <label className="block text-emerald-700 text-sm mb-1">Estado</label>
+                <label className="block text-emerald-600 text-sm mb-1">Estado</label>
                 <select
                   value={filtros.estado}
                   onChange={(e) => setFiltros({...filtros, estado: e.target.value})}
-                  className="w-full p-2 rounded bg-emerald-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  className="w-full p-2 rounded bg-white border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
                 >
                   <option value="">Todos</option>
                   <option value="Activo">Activos</option>
@@ -685,13 +685,13 @@ const GestionPaquetes = () => {
               <div className="flex items-end gap-2">
                 <button 
                   onClick={aplicarFiltros}
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded transition-colors"
+                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white rounded transition-colors"
                 >
                   Aplicar Filtros
                 </button>
                 <button 
                   onClick={limpiarFiltros}
-                  className="px-4 py-2 bg-emerald-800 hover:bg-emerald-700 text-white rounded transition-colors"
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded transition-colors"
                 >
                   Limpiar
                 </button>
@@ -714,20 +714,20 @@ const GestionPaquetes = () => {
                 <div className="animate-spin w-12 h-12 border-4 border-emerald-400 border-t-transparent rounded-full"></div>
               </div>
             ) : error ? (
-              <div className="bg-rose-900 bg-opacity-30 text-white p-4 rounded-lg">
+              <div className="bg-rose-100 text-rose-700 p-4 rounded-lg border border-rose-200">
                 <p className="text-center">{error}</p>
               </div>
             ) : paquetesFiltrados.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {paquetesFiltrados.map((paquete, index) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {paquetesFiltrados.map(paquete => (
                   <div 
-                    key={`paquete-${paquete.idPaquete || paquete.id || index}`} 
-                    className="bg-emerald-50 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-emerald-900/30 transition-all"
+                    key={paquete.idPaquete} 
+                    className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow"
                   >
-                    <div className="h-48 bg-emerald-950 relative overflow-hidden">
-                      {cargandoFotos[paquete.idPaquete] ? (
-                        <div className="flex justify-center items-center h-full bg-emerald-950">
-                          <div className="animate-spin w-8 h-8 border-2 border-emerald-300 border-t-transparent rounded-full"></div>
+                    <div className="relative h-48">
+                      {loading ? (
+                        <div className="w-full h-full flex items-center justify-center bg-emerald-50">
+                          <div className="animate-spin w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full"></div>
                         </div>
                       ) : paquetesConFotos[paquete.idPaquete] && paquetesConFotos[paquete.idPaquete].length > 0 ? (
                         <div className="w-full h-full overflow-hidden">
@@ -738,7 +738,7 @@ const GestionPaquetes = () => {
                             onError={(e) => {
                               e.target.onerror = null;
                               e.target.parentNode.innerHTML = `
-                                <div class="w-full h-full flex items-center justify-center bg-emerald-950">
+                                <div class="w-full h-full flex items-center justify-center bg-emerald-50">
                                   <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <rect x="2" y="6" width="20" height="12" rx="2"/>
                                     <circle cx="12" cy="12" r="2"/>
@@ -751,15 +751,15 @@ const GestionPaquetes = () => {
                           />
                         </div>
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Package size={64} className="text-emerald-600" />
+                        <div className="w-full h-full flex items-center justify-center bg-emerald-50">
+                          <Package size={64} className="text-emerald-500" />
                         </div>
                       )}
                       
                       <div className="absolute top-2 right-2 flex gap-1">
                         <button
                           onClick={() => openDetailView(paquete)}
-                          className="p-2 bg-emerald-800 bg-opacity-80 hover:bg-emerald-700 text-white rounded-full"
+                          className="p-2 bg-emerald-500 bg-opacity-80 hover:bg-emerald-400 text-white rounded-full"
                           title="Ver detalles"
                         >
                           <Eye size={16} />
@@ -768,7 +768,7 @@ const GestionPaquetes = () => {
                       
                       <div className="absolute bottom-2 left-2">
                         <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                          paquete.estado === 'Activo' ? 'bg-emerald-500 text-emerald-900' : 'bg-red-500 text-red-900'
+                          paquete.estado === 'Activo' ? 'bg-emerald-500 text-white' : 'bg-red-400 text-white'
                         }`}>
                           {paquete.estado}
                         </span>
@@ -776,31 +776,31 @@ const GestionPaquetes = () => {
                     </div>
                     
                     <div className="p-4">
-                      <h3 className="text-lg font-bold text-gray-800 truncate">{paquete.nombrePaquete}</h3>
+                      <h3 className="text-lg font-bold text-gray-700 truncate">{paquete.nombrePaquete}</h3>
                       
                       <div className="mt-2 space-y-2">
-                        <div className="flex items-center gap-2 text-emerald-700">
-                          <Clock size={16} />
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Clock size={16} className="text-emerald-500" />
                           <span>{paquete.duracion}</span>
                         </div>
                         
-                        <div className="flex items-center gap-2 text-emerald-700">
-                          <Calendar size={16} />
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Calendar size={16} className="text-emerald-500" />
                           <span>{formatearFecha(paquete.fechaInicio)} - {formatearFecha(paquete.fechaFin)}</span>
                         </div>
                         
-                        <div className="flex items-center gap-2 text-emerald-700">
-                          <DollarSign size={16} />
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <DollarSign size={16} className="text-emerald-500" />
                           <span>{mostrarPrecio(paquete.precio)}</span>
                           {paquete.descuento > 0 && (
-                            <span className="bg-emerald-600 text-white text-xs px-1 rounded">
+                            <span className="bg-emerald-500 text-white text-xs px-1 rounded">
                               {paquete.descuento}% desc.
                             </span>
                           )}
                         </div>
                         
-                        <div className="flex items-center gap-2 text-emerald-700">
-                          <Map size={16} />
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Map size={16} className="text-emerald-500" />
                           <span>{paquete.rutasAsociadas?.length || 0} rutas incluidas</span>
                         </div>
                       </div>
@@ -808,13 +808,13 @@ const GestionPaquetes = () => {
                       <div className="mt-4 flex gap-2 justify-between">
                         <button
                           onClick={() => handleOpenActualizarModal(paquete)}
-                          className="flex-1 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded transition-colors"
+                          className="flex-1 py-2 text-sm bg-emerald-500 hover:bg-emerald-400 text-white rounded transition-colors"
                         >
                           Actualizar
                         </button>
                         <button
                           onClick={() => handleOpenEliminarModal(paquete)}
-                          className="flex-1 py-2 text-sm bg-rose-700 hover:bg-rose-600 text-white rounded transition-colors"
+                          className="flex-1 py-2 text-sm bg-rose-500 hover:bg-rose-400 text-white rounded transition-colors"
                         >
                           Eliminar
                         </button>
@@ -826,13 +826,13 @@ const GestionPaquetes = () => {
             ) : (
               <div className="bg-emerald-50 text-center p-8 rounded-lg border border-emerald-100">
                 <div className="flex justify-center mb-4">
-                  {getPackageIcon()}
+                  <Package size={64} className="text-emerald-500" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">No hay paquetes disponibles</h3>
-                <p className="text-emerald-700 mb-6">No se encontraron paquetes turísticos. ¿Desea crear uno nuevo?</p>
+                <p className="text-emerald-600 mb-6">No se encontraron paquetes turísticos. ¿Desea crear uno nuevo?</p>
                 <button
                   onClick={handleOpenCrearModal}
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded transition-colors"
+                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white rounded transition-colors"
                 >
                   Crear Nuevo Paquete
                 </button>

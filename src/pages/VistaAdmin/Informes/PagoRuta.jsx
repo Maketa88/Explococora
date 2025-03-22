@@ -9,6 +9,8 @@ const PagoRuta = () => {
   const [error, setError] = useState(null);
   const [filtro, setFiltro] = useState('');
   const [estadoFiltro, setEstadoFiltro] = useState('todos');
+  const [paginaActual, setPaginaActual] = useState(1);
+  const pagosPorPagina = 10;
 
   useEffect(() => {
     const fetchPagos = async () => {
@@ -60,7 +62,37 @@ const PagoRuta = () => {
                            (pago.estadoPago?.toLowerCase() === estadoFiltro.toLowerCase());
     
     return coincideFiltro && coincideEstado;
+  }).sort((a, b) => {
+    // Ordenar por ID de forma descendente (más reciente primero)
+    return (b.idPago || 0) - (a.idPago || 0);
   }) : [];
+
+  // Calcular pagos para la página actual
+  const indexUltimoPago = paginaActual * pagosPorPagina;
+  const indexPrimerPago = indexUltimoPago - pagosPorPagina;
+  const pagosActuales = pagosFiltrados.slice(indexPrimerPago, indexUltimoPago);
+  
+  // Calcular total de páginas
+  const totalPaginas = Math.ceil(pagosFiltrados.length / pagosPorPagina);
+  
+  // Cambiar de página
+  const cambiarPagina = (numeroPagina) => {
+    setPaginaActual(numeroPagina);
+  };
+  
+  // Ir a la página anterior
+  const irPaginaAnterior = () => {
+    if (paginaActual > 1) {
+      setPaginaActual(paginaActual - 1);
+    }
+  };
+  
+  // Ir a la página siguiente
+  const irPaginaSiguiente = () => {
+    if (paginaActual < totalPaginas) {
+      setPaginaActual(paginaActual + 1);
+    }
+  };
 
   // Formatear fecha
   const formatearFecha = (fechaStr) => {
@@ -73,34 +105,58 @@ const PagoRuta = () => {
     });
   };
 
-  // Exportar a CSV
+  // Exportar a Excel
   const exportarCSV = () => {
     if (!Array.isArray(pagos) || pagos.length === 0) {
       alert('No hay datos para exportar');
       return;
     }
     
-    const encabezados = ['ID', 'Ruta', 'Cliente', 'Monto', 'Método de Pago', 'Estado', 'Fecha'];
-    const filas = pagosFiltrados.map(pago => [
-      pago.idPago || '',
-      pago.nombreRuta || '',
-      `${pago.clienteNombre || ''} ${pago.clienteApellido || ''}`,
-      pago.monto || 0,
-      pago.metodoPago || '',
-      pago.estadoPago || '',
-      formatearFecha(pago.fechaPago)
-    ]);
+    // Crear encabezados exactamente como en el ejemplo
+    const headers = ['ID,Ruta,Cliente,Monto,Método de Pago,Estado,Fecha'];
     
-    let csvContent = encabezados.join(',') + '\n';
-    filas.forEach(fila => {
-      csvContent += fila.join(',') + '\n';
+    // Crear filas de datos con el formato exacto del ejemplo
+    const filas = pagosFiltrados.map(pago => {
+      // Obtener ID del pago
+      const id = pago.idPago || '';
+      
+      // Obtener nombre de la ruta
+      const ruta = pago.nombreRuta || '';
+      
+      // Nombre completo del cliente
+      const cliente = `${pago.clienteNombre || ''} ${pago.clienteApellido || ''}`.trim();
+      
+      // Monto del pago
+      const monto = pago.monto || '0';
+      
+      // Método de pago
+      const metodoPago = pago.metodoPago || 'MercadoPago';
+      
+      // Estado del pago
+      const estado = pago.estadoPago || 'pendiente';
+      
+      // Fecha formateada
+      const fecha = formatearFecha(pago.fechaPago);
+      
+      // Formato exacto como en el ejemplo
+      return `${id},${ruta},${cliente},${monto},${metodoPago},${estado},${fecha}`;
     });
     
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    // Combinar encabezados y filas
+    const csvContent = [headers, ...filas].join('\n');
+    
+    // Para asegurar que Excel interprete correctamente los caracteres
+    const BOM = '\uFEFF';
+    const csvContentWithBOM = BOM + csvContent;
+    
+    // Crear un blob con el contenido
+    const blob = new Blob([csvContentWithBOM], { type: 'application/vnd.ms-excel' });
     const url = URL.createObjectURL(blob);
+    
+    // Crear un enlace para descargar el archivo
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `pagos_rutas_${new Date().toISOString().slice(0,10)}.csv`);
+    link.setAttribute('download', `pagos_rutas_${new Date().toISOString().slice(0,10)}.xls`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -167,8 +223,8 @@ const PagoRuta = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {pagosFiltrados.length > 0 ? (
-                  pagosFiltrados.map((pago) => (
+                {pagosActuales.length > 0 ? (
+                  pagosActuales.map((pago) => (
                     <tr key={pago.idPago || Math.random()} className="hover:bg-gray-50">
                       <td className="px-4 py-3 text-gray-700">{pago.idPago}</td>
                       <td className="px-4 py-3 text-gray-700">{pago.nombreRuta || 'N/A'}</td>
@@ -196,6 +252,86 @@ const PagoRuta = () => {
                 )}
               </tbody>
             </table>
+            
+            {/* Paginador */}
+            {pagosFiltrados.length > 0 && (
+              <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200">
+                <div className="flex-1 flex justify-between sm:hidden">
+                  <button
+                    onClick={irPaginaAnterior}
+                    disabled={paginaActual === 1}
+                    className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                      paginaActual === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    Anterior
+                  </button>
+                  <button
+                    onClick={irPaginaSiguiente}
+                    disabled={paginaActual === totalPaginas}
+                    className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                      paginaActual === totalPaginas ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    Siguiente
+                  </button>
+                </div>
+                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm text-gray-700">
+                      Mostrando <span className="font-medium">{indexPrimerPago + 1}</span> a{' '}
+                      <span className="font-medium">
+                        {indexUltimoPago > pagosFiltrados.length ? pagosFiltrados.length : indexUltimoPago}
+                      </span>{' '}
+                      de <span className="font-medium">{pagosFiltrados.length}</span> resultados
+                    </p>
+                  </div>
+                  <div>
+                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                      <button
+                        onClick={irPaginaAnterior}
+                        disabled={paginaActual === 1}
+                        className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 text-sm font-medium ${
+                          paginaActual === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        <span className="sr-only">Anterior</span>
+                        <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                          <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                      
+                      {[...Array(totalPaginas).keys()].map((numero) => (
+                        <button
+                          key={numero + 1}
+                          onClick={() => cambiarPagina(numero + 1)}
+                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                            paginaActual === numero + 1
+                              ? 'z-10 bg-emerald-50 border-emerald-500 text-emerald-600'
+                              : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                          }`}
+                        >
+                          {numero + 1}
+                        </button>
+                      ))}
+                      
+                      <button
+                        onClick={irPaginaSiguiente}
+                        disabled={paginaActual === totalPaginas}
+                        className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 text-sm font-medium ${
+                          paginaActual === totalPaginas ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        <span className="sr-only">Siguiente</span>
+                        <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                          <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                    </nav>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
         

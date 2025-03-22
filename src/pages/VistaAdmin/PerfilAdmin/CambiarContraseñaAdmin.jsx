@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import DashboardLayoutAdmin from "../../../layouts/DashboardLayoutAdmin";
 import { AlertCircle, CheckCircle, X, ArrowLeft, Eye, EyeOff, Lock } from "lucide-react";
+import Swal from "sweetalert2";
 
 const CambiarContraseñaAdmin = () => {
   const [formData, setFormData] = useState({
@@ -18,7 +19,6 @@ const CambiarContraseñaAdmin = () => {
   });
   const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(true);
-  const [alert, setAlert] = useState({ show: false, message: "", type: "" });
   const [submitting, setSubmitting] = useState(false);
   const [cambiosRealizados, setCambiosRealizados] = useState(false);
   const [requisitosContrasena, setRequisitosContrasena] = useState({
@@ -30,7 +30,6 @@ const CambiarContraseñaAdmin = () => {
   });
   const navigate = useNavigate();
 
-  // Cargar email desde localStorage al iniciar
   useEffect(() => {
     const emailAdmin = localStorage.getItem("email");
     if (emailAdmin) {
@@ -50,42 +49,25 @@ const CambiarContraseñaAdmin = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
-    let valorValidado = value;
-    
-    if (['nuevaContrasena', 'confirmarContrasena'].includes(name)) {
-      if (name === 'nuevaContrasena') {
-        verificarRequisitos(valorValidado);
-      }
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    if (name === 'nuevaContrasena') {
+      verificarRequisitos(value);
     }
+
+    // Verificar si hay cambios válidos
+    const nuevaContrasenaDiferente = value !== formData.contrasenaActual;
+    const confirmacionCorrecta = formData.confirmarContrasena === value;
+    const contrasenaActualIngresada = formData.contrasenaActual !== "";
     
-    setFormData(prev => {
-      const nuevoEstado = {
-        ...prev,
-        [name]: valorValidado
-      };
-      
-      // Verificar si hay cambios en la contraseña
-      const nuevaContrasenaDiferente = 
-        nuevoEstado.nuevaContrasena !== "" && 
-        nuevoEstado.nuevaContrasena !== nuevoEstado.contrasenaActual;
-      
-      const confirmacionCorrecta = 
-        nuevoEstado.confirmarContrasena !== "" && 
-        nuevoEstado.nuevaContrasena === nuevoEstado.confirmarContrasena;
-      
-      const contrasenaActualIngresada = nuevoEstado.contrasenaActual !== "";
-      const emailValido = nuevoEstado.email !== "";
-      
-      setCambiosRealizados(
-        nuevaContrasenaDiferente && 
-        confirmacionCorrecta && 
-        contrasenaActualIngresada &&
-        emailValido
-      );
-      
-      return nuevoEstado;
-    });
+    setCambiosRealizados(
+      nuevaContrasenaDiferente && 
+      confirmacionCorrecta && 
+      contrasenaActualIngresada
+    );
   };
 
   const togglePasswordVisibility = (field) => {
@@ -95,148 +77,79 @@ const CambiarContraseñaAdmin = () => {
     }));
   };
 
-  const validarContrasenaSegura = (contrasena) => {
-    const tieneMinuscula = /[a-z]/.test(contrasena);
-    const tieneMayuscula = /[A-Z]/.test(contrasena);
-    const tieneNumero = /[0-9]/.test(contrasena);
-    const tieneEspecial = /[\W_]/.test(contrasena);
-    
-    return tieneMinuscula && tieneMayuscula && tieneNumero && tieneEspecial;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validar que la nueva contraseña sea diferente a la actual
-    if (formData.nuevaContrasena === formData.contrasenaActual) {
-      showAlert("La nueva contraseña no puede ser igual a la actual", "error");
-      return;
-    }
-
-    // Validar contraseña segura
-    if (!validarContrasenaSegura(formData.nuevaContrasena)) {
-      showAlert("La contraseña debe contener al menos una minúscula, una mayúscula, un número y un carácter especial", "error");
-      return;
-    }
-    
-    // Validar que las contraseñas coincidan
-    if (formData.nuevaContrasena !== formData.confirmarContrasena) {
-      showAlert("Las contraseñas no coinciden", "error");
-      return;
-    }
-    
     setSubmitting(true);
-    
+
     try {
       const token = localStorage.getItem("token");
-      
-      if (!token) {
-        showAlert("No se encontraron credenciales de autenticación", "error");
-        setSubmitting(false);
+      const email = localStorage.getItem("email");
+
+      if (!token || !email) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "No se encontraron credenciales de autenticación",
+        });
         return;
       }
 
-      // Primero verificar la contraseña actual
+      // Verificar contraseña actual
       await axios.post(
-        `http://localhost:10101/admin/verificar-contrasena`,
+        `http://localhost:10101/administrador/verificar-contrasena`,
         {
-          email: formData.email,
+          email: email,
           contrasena: formData.contrasenaActual
         },
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
           }
         }
       );
 
-      // Si la verificación es exitosa, cambiar la contraseña
+      // Cambiar contraseña - Actualizada la ruta para coincidir con el backend
       await axios.patch(
-        `http://localhost:10101/admin/cambiar-contrasenia/${formData.email}`,
+        `http://localhost:10101/administrador/cambiarcontrasenia/${email}`, // Ruta actualizada
         {
-          contrasenia: formData.nuevaContrasena
+          contrasenia: formData.nuevaContrasena // Cambiado a 'contrasenia' para coincidir con el backend
         },
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
           }
         }
       );
-      
-      showAlert("Contraseña actualizada exitosamente", "success");
-      
+
+      Swal.fire({
+        icon: "success",
+        title: "¡Éxito!",
+        text: "Contraseña actualizada correctamente",
+      });
+
       // Limpiar el formulario
       setFormData({
-        email: formData.email,
+        email: email,
         contrasenaActual: "",
         nuevaContrasena: "",
         confirmarContrasena: ""
       });
-      
+
       // Redirigir después de 2 segundos
       setTimeout(() => {
         navigate("/VistaAdmin/PerfilAdmin");
       }, 2000);
-      
+
     } catch (error) {
-      console.error("Error al cambiar contraseña:", error);
-      
-      let errorMessage;
-      
-      switch (error.response?.status) {
-        case 401:
-          errorMessage = "Credenciales inválidas o contraseña actual incorrecta";
-          break;
-        case 403:
-          errorMessage = "No tiene permisos para realizar esta acción";
-          break;
-        case 404:
-          errorMessage = "Usuario no encontrado";
-          break;
-        case 400:
-          errorMessage = error.response?.data?.message || "La nueva contraseña no cumple con los requisitos";
-          break;
-        default:
-          errorMessage = error.response?.data?.message || "Error al cambiar la contraseña";
-      }
-      
-      showAlert(errorMessage, "error");
+      console.error("Error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.response?.data?.message || "Error al actualizar la contraseña",
+      });
+    } finally {
       setSubmitting(false);
     }
-  };
-
-  const showAlert = (message, type) => {
-    setAlert({ show: true, message, type });
-    
-    if (type === "success") {
-      setTimeout(() => {
-        setAlert({ show: false, message: "", type: "" });
-      }, 3000);
-    }
-  };
-
-  const closeAlert = () => {
-    setAlert({ show: false, message: "", type: "" });
-  };
-
-  // Componente de Alerta
-  const AlertComponent = () => {
-    if (!alert.show) return null;
-    
-    const bgColor = alert.type === "success" ? "bg-green-500" : "bg-red-500";
-    const Icon = alert.type === "success" ? CheckCircle : AlertCircle;
-    
-    return (
-      <div className={`${bgColor} text-white p-4 rounded-lg mb-4 flex items-start`}>
-        <Icon className="w-5 h-5 mr-2 mt-0.5" />
-        <div className="flex-1">{alert.message}</div>
-        <button onClick={closeAlert} className="text-white">
-          <X className="w-5 h-5" />
-        </button>
-      </div>
-    );
   };
 
   return (
@@ -251,9 +164,7 @@ const CambiarContraseñaAdmin = () => {
               Cambiar Contraseña
             </h2>
           </div>
-          
-          <AlertComponent />
-          
+
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
@@ -264,13 +175,11 @@ const CambiarContraseñaAdmin = () => {
                   type="email"
                   name="email"
                   value={formData.email}
-                  onChange={handleInputChange}
                   className="w-full p-3 rounded-lg bg-teal-800 text-white border border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                  readOnly={!!localStorage.getItem("email")}
-                  required
+                  readOnly
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium mb-2 text-white">
                   Contraseña Actual
@@ -297,7 +206,7 @@ const CambiarContraseñaAdmin = () => {
                   </button>
                 </div>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium mb-2 text-white">
                   Nueva Contraseña
@@ -323,45 +232,27 @@ const CambiarContraseñaAdmin = () => {
                     )}
                   </button>
                 </div>
-                
+
                 {/* Requisitos de contraseña */}
                 <div className="mt-2 space-y-1">
                   <p className="text-sm font-medium text-white">La contraseña debe contener:</p>
                   <ul className="text-xs space-y-1">
-                    <li className={`flex items-center ${requisitosContrasena.longitud ? 'text-green-400' : 'text-gray-300'}`}>
-                      <div className={`mr-2 w-4 h-4 rounded-full flex items-center justify-center ${requisitosContrasena.longitud ? 'bg-green-500' : 'bg-gray-600'}`}>
-                        {requisitosContrasena.longitud ? '✓' : ''}
-                      </div>
-                      Al menos 8 caracteres
-                    </li>
-                    <li className={`flex items-center ${requisitosContrasena.mayuscula ? 'text-green-400' : 'text-gray-300'}`}>
-                      <div className={`mr-2 w-4 h-4 rounded-full flex items-center justify-center ${requisitosContrasena.mayuscula ? 'bg-green-500' : 'bg-gray-600'}`}>
-                        {requisitosContrasena.mayuscula ? '✓' : ''}
-                      </div>
-                      Al menos una mayúscula
-                    </li>
-                    <li className={`flex items-center ${requisitosContrasena.minuscula ? 'text-green-400' : 'text-gray-300'}`}>
-                      <div className={`mr-2 w-4 h-4 rounded-full flex items-center justify-center ${requisitosContrasena.minuscula ? 'bg-green-500' : 'bg-gray-600'}`}>
-                        {requisitosContrasena.minuscula ? '✓' : ''}
-                      </div>
-                      Al menos una minúscula
-                    </li>
-                    <li className={`flex items-center ${requisitosContrasena.numero ? 'text-green-400' : 'text-gray-300'}`}>
-                      <div className={`mr-2 w-4 h-4 rounded-full flex items-center justify-center ${requisitosContrasena.numero ? 'bg-green-500' : 'bg-gray-600'}`}>
-                        {requisitosContrasena.numero ? '✓' : ''}
-                      </div>
-                      Al menos un número
-                    </li>
-                    <li className={`flex items-center ${requisitosContrasena.especial ? 'text-green-400' : 'text-gray-300'}`}>
-                      <div className={`mr-2 w-4 h-4 rounded-full flex items-center justify-center ${requisitosContrasena.especial ? 'bg-green-500' : 'bg-gray-600'}`}>
-                        {requisitosContrasena.especial ? '✓' : ''}
-                      </div>
-                      Al menos un carácter especial
-                    </li>
+                    {Object.entries(requisitosContrasena).map(([req, cumple]) => (
+                      <li key={req} className={`flex items-center ${cumple ? 'text-green-400' : 'text-gray-300'}`}>
+                        <div className={`mr-2 w-4 h-4 rounded-full flex items-center justify-center ${cumple ? 'bg-green-500' : 'bg-gray-600'}`}>
+                          {cumple ? '✓' : ''}
+                        </div>
+                        {req === 'longitud' ? 'Al menos 8 caracteres' :
+                         req === 'mayuscula' ? 'Al menos una mayúscula' :
+                         req === 'minuscula' ? 'Al menos una minúscula' :
+                         req === 'numero' ? 'Al menos un número' :
+                         'Al menos un carácter especial'}
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium mb-2 text-white">
                   Confirmar Nueva Contraseña
@@ -387,8 +278,7 @@ const CambiarContraseñaAdmin = () => {
                     )}
                   </button>
                 </div>
-                
-                {/* Indicador de coincidencia */}
+
                 {formData.confirmarContrasena && (
                   <p className={`text-sm mt-1 ${
                     formData.nuevaContrasena === formData.confirmarContrasena
@@ -402,7 +292,7 @@ const CambiarContraseñaAdmin = () => {
                 )}
               </div>
             </div>
-            
+
             <div className="flex justify-between mt-8">
               <button
                 type="button"
@@ -412,7 +302,7 @@ const CambiarContraseñaAdmin = () => {
                 <ArrowLeft className="w-5 h-5" />
                 Volver
               </button>
-              
+
               <button
                 type="submit"
                 disabled={submitting || !cambiosRealizados}

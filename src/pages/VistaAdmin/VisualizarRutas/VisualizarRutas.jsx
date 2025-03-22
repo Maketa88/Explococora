@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import DashboardLayout from '../../../layouts/DashboardLayout';
+import DashboardLayoutAdmin from '../../../layouts/DashboardLayoutAdmin';
 import axios from 'axios';
 import { Pencil, Plus, Trash, Mountain, X, Filter, RefreshCw, Eye, ChevronLeft, ChevronRight, Search, XCircle } from 'lucide-react';
 import { toast, ToastContainer } from 'react-toastify';
@@ -1017,7 +1017,7 @@ const Rutas = () => {
   }, [isDetailView]);
 
   return (
-    <DashboardLayout>
+    <DashboardLayoutAdmin>
       <div className="p-6">
         {/* Modal de confirmación de eliminación */}
         <ConfirmacionEliminarModal />
@@ -1646,7 +1646,7 @@ const Rutas = () => {
           </div>
         )}
       </div>
-    </DashboardLayout>
+    </DashboardLayoutAdmin>
   );
 };
 

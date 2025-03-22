@@ -48,6 +48,9 @@ const DashboardLayoutAdmin = ({ children }) => {
   
   const [previewFoto, setPreviewFoto] = useState(null);
   
+  // Add this constant near the top of the component function
+  const defaultAvatar = "https://cdn-icons-png.flaticon.com/512/5556/5556468.png";
+  
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
@@ -276,6 +279,12 @@ const DashboardLayoutAdmin = ({ children }) => {
       section: "Usuarios"
     },
     {
+      title: "Estado de Guias",
+      icon: <Users className="w-5 h-5" />,
+      path: "/VistaAdmin/EstadoGuia",
+      section: "Usuarios"
+    },
+    {
       title: "Gestión de Operadores",
       icon: <Users className="w-5 h-5" />,
       path: "/VistaAdmin/GestionOperadores",
@@ -445,23 +454,11 @@ const DashboardLayoutAdmin = ({ children }) => {
           {/* Imagen de perfil */}
           <div className="flex flex-col items-center">
             <div className="w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-emerald-500">
-              {previewFoto ? (
-                <img
-                  src={previewFoto}
-                  alt="Perfil del administrador"
-                  className="h-full w-full object-cover"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto)}&size=200&background=0D9488&color=fff`;
-                  }}
-                />
-              ) : (
-                <img
-                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(nombreCompleto)}&size=200&background=0D9488&color=fff`}
-                  alt="Perfil del administrador"
-                  className="h-full w-full object-cover"
-                />
-              )}
+              <img
+                src={defaultAvatar}
+                alt="Perfil por defecto"
+                className="h-full w-full object-cover"
+              />
             </div>
             <button className={`py-2 px-4 rounded-lg ${darkMode ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-emerald-500 hover:bg-emerald-600'} text-white font-medium transition-colors duration-200`}>
               Cambiar foto
@@ -801,22 +798,11 @@ const DashboardLayoutAdmin = ({ children }) => {
                   onClick={() => setProfileMenuOpen(!profileMenuOpen)}
                   className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-100 overflow-hidden cursor-pointer"
                 >
-                  {previewFoto ? (
-                    <img 
-                      src={previewFoto} 
-                      alt="Foto de perfil" 
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        const nombreAdmin = admin ? (Array.isArray(admin) ? admin[0].nombre : admin.nombre) : "Admin";
-                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nombreAdmin || "Admin")}&background=0D9488&color=fff`;
-                      }}
-                    />
-                  ) : (
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white">
-                      A
-                    </div>
-                  )}
+                  <img 
+                    src={defaultAvatar}
+                    alt="Perfil por defecto" 
+                    className="w-full h-full object-cover"
+                  />
                 </button>
                 
                 {/* Menú desplegable de perfil */}
@@ -832,27 +818,6 @@ const DashboardLayoutAdmin = ({ children }) => {
                     >
                       <User className="w-4 h-4" />
                       Ver Perfil
-                    </div>
-                    <div 
-                      onClick={() => handleOptionClick("/VistaAdmin/ActualizarAdmin")}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 flex items-center gap-2 cursor-pointer"
-                    >
-                      <Edit className="w-4 h-4" />
-                      Actualizar Información
-                    </div>
-                    <div 
-                      onClick={() => handleOptionClick("/VistaAdmin/CambiarContraseña")}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 flex items-center gap-2 cursor-pointer"
-                    >
-                      <Key className="w-4 h-4" />
-                      Cambiar Contraseña
-                    </div>
-                    <div 
-                      onClick={() => handleOptionClick("/VistaAdmin/EliminarCuentaAdmin")}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 flex items-center gap-2 cursor-pointer"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Eliminar Cuenta
                     </div>
                     <div 
                       onClick={() => handleOptionClick("/")}
