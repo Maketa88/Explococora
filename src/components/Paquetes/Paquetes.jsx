@@ -1,13 +1,13 @@
 import axios from 'axios';
 import {
-    Calendar,
-    Clock, DollarSign,
-    Eye,
-    Map,
-    Package,
-    RefreshCw,
-    Search,
-    X
+  
+  Clock, DollarSign,
+  Eye,
+  Map,
+  Package,
+  RefreshCw,
+  Search,
+  X
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -166,7 +166,8 @@ const GestionPaquetes = () => {
           // Agregar cada ruta del array sin filtrar por ID
           rutasInfo.push({
             idRuta: item.idRuta,
-            nombreRuta: item.nombreRuta || `Ruta ${item.idRuta}`
+            nombreRuta: item.nombreRuta || `Ruta ${item.idRuta}`,
+            tiempoEstimado: item.duracion || item.tiempoEstimado || null
           });
         });
         
@@ -180,7 +181,8 @@ const GestionPaquetes = () => {
         if (response.data.idRuta || response.data.nombreRuta) {
           rutasInfo.push({
             idRuta: response.data.idRuta,
-            nombreRuta: response.data.nombreRuta || `Ruta ${response.data.idRuta}`
+            nombreRuta: response.data.nombreRuta || `Ruta ${response.data.idRuta}`,
+            tiempoEstimado: response.data.duracion || response.data.tiempoEstimado || null
           });
         }
         
@@ -190,7 +192,8 @@ const GestionPaquetes = () => {
             if (!rutasInfo.some(r => r.idRuta === ruta.idRuta)) {
               rutasInfo.push({
                 idRuta: ruta.idRuta,
-                nombreRuta: ruta.nombreRuta || `Ruta ${ruta.idRuta}`
+                nombreRuta: ruta.nombreRuta || `Ruta ${ruta.idRuta}`,
+                tiempoEstimado: ruta.duracion || ruta.tiempoEstimado || null
               });
             }
           });
@@ -237,16 +240,7 @@ const GestionPaquetes = () => {
   };
 
   // Función para formatear fechas
-  const formatearFecha = (fechaStr) => {
-    if (!fechaStr) return 'Fecha no disponible';
-    
-    const fecha = new Date(fechaStr);
-    return fecha.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
+ 
 
   // Función para mostrar precio formateado
   const mostrarPrecio = (precio) => {
@@ -300,6 +294,44 @@ const GestionPaquetes = () => {
     }
   };
 
+  // Función para calcular la duración total de las rutas de un paquete
+  const calcularDuracionTotalPaquete = (paquete) => {
+    if (!paquete.rutasAsociadas || !paquete.rutasAsociadas.length) return paquete.duracion || 'No especificada';
+    
+    let horasTotales = 0;
+    let minutosTotales = 0;
+    
+    paquete.rutasAsociadas.forEach(ruta => {
+      if (ruta.tiempoEstimado) {
+        const tiempo = ruta.tiempoEstimado.toLowerCase();
+        
+        // Extraer horas
+        const horasMatch = tiempo.match(/(\d+)\s*(?:h|hora|horas)/);
+        if (horasMatch) horasTotales += parseInt(horasMatch[1]);
+        
+        // Extraer minutos
+        const minutosMatch = tiempo.match(/(\d+)\s*(?:m|min|minuto|minutos)/);
+        if (minutosMatch) minutosTotales += parseInt(minutosMatch[1]);
+      }
+    });
+    
+    // Convertir minutos excedentes a horas
+    if (minutosTotales >= 60) {
+      horasTotales += Math.floor(minutosTotales / 60);
+      minutosTotales = minutosTotales % 60;
+    }
+    
+    // Formar el string de duración total
+    let duracionTotal = '';
+    if (horasTotales > 0) duracionTotal += `${horasTotales} hora${horasTotales !== 1 ? 's' : ''}`;
+    if (minutosTotales > 0) {
+      if (duracionTotal) duracionTotal += ' ';
+      duracionTotal += `${minutosTotales} minuto${minutosTotales !== 1 ? 's' : ''}`;
+    }
+    
+    return duracionTotal || paquete.duracion || 'No especificada';
+  };
+
   // Componente para renderizar la vista detallada
   const DetallePaquete = ({ paquete, onClose, imagenes = [] }) => {
     // Obtener nombres de rutas
@@ -311,7 +343,15 @@ const GestionPaquetes = () => {
           {paquete.rutasAsociadas.map((ruta, index) => (
             <div key={index} className="flex items-center gap-2 bg-emerald-50  p-2 rounded">
               <Map size={16} className="text-emerald-400" />
-              <span>{ruta.nombreRuta}</span>
+              <div>
+                <span>{ruta.nombreRuta}</span>
+                {ruta.tiempoEstimado && (
+                  <div className="text-xs text-emerald-600 flex items-center mt-1">
+                    <Clock size={12} className="mr-1" />
+                    <span>{ruta.tiempoEstimado}</span>
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -384,7 +424,7 @@ const GestionPaquetes = () => {
                       <h4 className="text-emerald-700 font-medium mb-1">Duración</h4>
                       <div className="flex items-center gap-2">
                         <Clock size={18} className="text-emerald-600" />
-                        <span className="text-lg text-gray-800">{paquete.duracion}</span>
+                        <span className="text-lg text-gray-800">{calcularDuracionTotalPaquete(paquete)}</span>
                       </div>
                     </div>
                     
@@ -583,13 +623,10 @@ const GestionPaquetes = () => {
                     <div className="mt-2 space-y-2">
                       <div className="flex items-center gap-2 text-emerald-700">
                         <Clock size={16} />
-                        <span>{paquete.duracion}</span>
+                        <span>{calcularDuracionTotalPaquete(paquete)}</span>
                       </div>
                       
-                      <div className="flex items-center gap-2 text-emerald-700">
-                        <Calendar size={16} />
-                        <span>{formatearFecha(paquete.fechaInicio)} - {formatearFecha(paquete.fechaFin)}</span>
-                      </div>
+                      
                       
                       <div className="flex items-center gap-2 text-emerald-700">
                         <DollarSign size={16} />
