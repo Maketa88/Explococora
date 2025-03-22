@@ -3,7 +3,6 @@ import {
     Calendar,
     Clock, DollarSign,
     Eye,
-    Filter,
     Map,
     Package,
     RefreshCw,
@@ -21,12 +20,6 @@ const GestionPaquetes = () => {
 
   const [error, setError] = useState(null);
   const [terminoBusqueda, setTerminoBusqueda] = useState('');
-  const [mostrarFiltros, setMostrarFiltros] = useState(false);
-  const [filtros, setFiltros] = useState({
-    duracion: '',
-    precio: '',
-    estado: ''
-  });
   
   // Estados para las imágenes y vista detallada
   const [paquetesConFotos, setPaquetesConFotos] = useState({});
@@ -226,44 +219,6 @@ const GestionPaquetes = () => {
   useEffect(() => {
     fetchPaquetes();
   }, []);
-
-  // Función para aplicar filtros
-  const aplicarFiltros = () => {
-    let resultado = [...paquetes];
-    
-    // Filtrar por duración
-    if (filtros.duracion) {
-      resultado = resultado.filter(paquete => 
-        paquete.duracion && paquete.duracion.toLowerCase().includes(filtros.duracion.toLowerCase())
-      );
-    }
-    
-    // Filtrar por precio máximo
-    if (filtros.precio) {
-      resultado = resultado.filter(paquete => 
-        paquete.precio && parseFloat(paquete.precio) <= parseFloat(filtros.precio)
-      );
-    }
-    
-    // Filtrar por estado
-    if (filtros.estado) {
-      resultado = resultado.filter(paquete => 
-        paquete.estado === filtros.estado
-      );
-    }
-    
-    setPaquetesFiltrados(resultado);
-  };
-
-  // Función para limpiar filtros
-  const limpiarFiltros = () => {
-    setFiltros({
-      duracion: '',
-      precio: '',
-      estado: ''
-    });
-    setPaquetesFiltrados(paquetes);
-  };
 
   // Función para manejar búsqueda
   const handleSearchChange = (e) => {
@@ -538,14 +493,6 @@ const GestionPaquetes = () => {
           </div>
           
           <button
-            onClick={() => setMostrarFiltros(!mostrarFiltros)}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-800 hover:bg-emerald-700 text-white rounded transition-colors"
-          >
-            <Filter size={18} />
-            Filtros
-          </button>
-          
-          <button
             onClick={fetchPaquetes}
             className="flex items-center gap-2 px-4 py-2 bg-emerald-800 hover:bg-emerald-700 text-white rounded transition-colors"
             title="Recargar paquetes"
@@ -554,65 +501,6 @@ const GestionPaquetes = () => {
           </button>
         </div>
       </div>
-      
-      {/* Panel de filtros */}
-      {mostrarFiltros && (
-        <div className="mb-6 p-4 bg-emerald-50 rounded-lg border border-emerald-100">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Filtrar Paquetes</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-emerald-700 text-sm mb-1">Duración</label>
-              <input
-                type="text"
-                placeholder="Ej: 3 días"
-                value={filtros.duracion}
-                onChange={(e) => setFiltros({...filtros, duracion: e.target.value})}
-                className="w-full p-2 rounded bg-emerald-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-emerald-700 text-sm mb-1">Precio Máximo</label>
-              <input
-                type="number"
-                placeholder="Precio máximo"
-                value={filtros.precio}
-                onChange={(e) => setFiltros({...filtros, precio: e.target.value})}
-                className="w-full p-2 rounded bg-emerald-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-emerald-700 text-sm mb-1">Estado</label>
-              <select
-                value={filtros.estado}
-                onChange={(e) => setFiltros({...filtros, estado: e.target.value})}
-                className="w-full p-2 rounded bg-emerald-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
-              >
-                <option value="">Todos</option>
-                <option value="Activo">Activos</option>
-                <option value="Inactivo">Inactivos</option>
-              </select>
-            </div>
-            
-            <div className="flex items-end gap-2">
-              <button 
-                onClick={aplicarFiltros}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded transition-colors"
-              >
-                Aplicar Filtros
-              </button>
-              <button 
-                onClick={limpiarFiltros}
-                className="px-4 py-2 bg-emerald-800 hover:bg-emerald-700 text-white rounded transition-colors"
-              >
-                Limpiar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
       
       {/* Vista detallada o lista de paquetes */}
       {isDetailView ? (
