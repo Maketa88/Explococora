@@ -4,8 +4,8 @@ import Dashboard from '../../pages/VistaGuia/Dashboard/Dashboard';
 import VisualizarRutas from '../../pages/VistaGuia/VisualizarRutas/VisualizarRutas';
 import RutasAsignadas from '../../pages/VistaGuia/RutasAsignadas/RutasAsignadas';
 import Customers from '../../pages/VistaGuia/Customers/Customers';
-import NewCustomer from '../../pages/VistaGuia/Customers/NewCustomer';
-import VerifiedCustomers from '../../pages/VistaGuia/Customers/VerifiedCustomers';
+import AlertasyRecordatorios from '../../pages/VistaGuia/Customers/AlertasyRecordatorios';
+import CalendarioCitas from '../../pages/VistaGuia/Customers/CalendarioCitas';
 import Products from '../../pages/VistaGuia/Products/Products';
 import NewProduct from '../../pages/VistaGuia/Products/NewProduct';
 import Inventory from '../../pages/VistaGuia/Products/Inventory';
@@ -24,8 +24,8 @@ const RutasGuia = () => {
       <Route path="/Dashboard" element={<Dashboard />} />
       <Route path="/RutasAsignadas" element={<RutasAsignadas />} />
       <Route path="/customers" element={<Customers />} />
-      <Route path="/new-customer" element={<NewCustomer />} />
-      <Route path="/verified-customers" element={<VerifiedCustomers />} />
+      <Route path="/AlertasyRecordatorios" element={<AlertasyRecordatorios />} />
+      <Route path="/CalendarioCitas" element={<CalendarioCitas />} />
       <Route path="/products" element={<Products />} />
       <Route path="/new-product" element={<NewProduct />} />
       <Route path="/inventory" element={<Inventory />} />

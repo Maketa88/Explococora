@@ -204,155 +204,197 @@ const CertificadoGuia = () => {
 
   const renderContent = () => {
     return (
-      <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-teal-900' : 'bg-teal-50'}`}>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-teal-800'}`}>Mis Certificados</h2>
-          <button 
-            onClick={() => navigate('/VistaGuia/PerfilGuia')}
-            className={`flex items-center gap-2 py-2 px-4 rounded-lg ${darkMode ? 'bg-teal-700 hover:bg-teal-600' : 'bg-teal-200 hover:bg-teal-300'} ${darkMode ? 'text-white' : 'text-teal-800'} transition-colors`}
-          >
-            <FaArrowLeft /> Volver al Perfil
-          </button>
-        </div>
-        
-        <div className={`mb-8 p-6 rounded-lg shadow-md ${darkMode ? 'bg-teal-800/70' : 'bg-white'}`}>
-          <h3 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-teal-200' : 'text-teal-700'}`}>Subir Nuevo Certificado</h3>
-          
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="nombre" className={`block mb-2 font-medium ${darkMode ? 'text-teal-300' : 'text-teal-700'}`}>
-                Nombre del Certificado*
-              </label>
-              <input
-                type="text"
-                id="nombre"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                placeholder="Ej: Certificado de Inglés"
-                className={`w-full p-3 rounded-lg border ${darkMode ? 'bg-teal-700/50 border-teal-600 text-white placeholder-teal-400' : 'bg-teal-50 border-teal-200 text-teal-900 placeholder-teal-500'} focus:outline-none focus:ring-2 ${darkMode ? 'focus:ring-teal-500' : 'focus:ring-teal-400'}`}
-                required
-              />
+      <div className="p-3 sm:p-6">
+        {/* Card principal con diseño innovador */}
+        <div className="bg-gradient-to-br from-white to-emerald-50 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
+          {/* Header con estilo moderno */}
+          <div className="bg-emerald-600 p-4 sm:p-6 text-white relative overflow-hidden">
+            {/* Elementos decorativos */}
+            <div className="absolute top-0 left-0 w-full h-full">
+              <div className="absolute top-10 right-20 sm:right-40 w-20 sm:w-40 h-20 sm:h-40 rounded-full bg-emerald-500 opacity-20 blur-xl"></div>
+              <div className="absolute bottom-0 right-10 sm:right-20 w-30 sm:w-60 h-30 sm:h-60 rounded-full bg-emerald-400 opacity-10 blur-2xl"></div>
+              <div className="absolute top-5 left-1/2 w-10 sm:w-20 h-10 sm:h-20 rounded-full bg-emerald-300 opacity-20 blur-md"></div>
             </div>
             
-            <div>
-              <label htmlFor="descripcion" className={`block mb-2 font-medium ${darkMode ? 'text-teal-300' : 'text-teal-700'}`}>
-                Descripción
-              </label>
-              <textarea
-                id="descripcion"
-                value={descripcion}
-                onChange={(e) => setDescripcion(e.target.value)}
-                placeholder="Ej: Nivel B2 de Cambridge"
-                className={`w-full p-3 rounded-lg border ${darkMode ? 'bg-teal-700/50 border-teal-600 text-white placeholder-teal-400' : 'bg-teal-50 border-teal-200 text-teal-900 placeholder-teal-500'} focus:outline-none focus:ring-2 ${darkMode ? 'focus:ring-teal-500' : 'focus:ring-teal-400'} min-h-[100px]`}
-              />
+            {/* Título y botón de volver */}
+            <div className="relative flex justify-between items-center">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-1">Mis Certificados</h1>
+              <button 
+                onClick={() => navigate('/VistaGuia/PerfilGuia')}
+                className="flex items-center gap-2 py-2 px-3 sm:px-4 bg-emerald-700/60 hover:bg-emerald-700/80 rounded-lg text-white text-sm transition-colors shadow-lg"
+              >
+                <FaArrowLeft className="w-3.5 h-3.5" /> Volver al Perfil
+              </button>
             </div>
-            
-            <div>
-              <label htmlFor="certificado" className={`block mb-2 font-medium ${darkMode ? 'text-teal-300' : 'text-teal-700'}`}>
-                Archivo PDF*
-              </label>
-              <div className={`flex items-center gap-2 p-3 rounded-lg border ${darkMode ? 'bg-teal-700/50 border-teal-600' : 'bg-teal-50 border-teal-200'}`}>
-                <input
-                  type="file"
-                  id="certificado"
-                  accept=".pdf"
-                  onChange={handleFileChange}
-                  className="hidden"
-                  required
-                />
-                <label 
-                  htmlFor="certificado" 
-                  className={`cursor-pointer py-2 px-4 rounded-lg ${darkMode ? 'bg-teal-600 hover:bg-teal-500 text-white' : 'bg-teal-500 hover:bg-teal-400 text-white'} transition-colors flex items-center gap-2`}
-                >
-                  <FaPlus /> Seleccionar archivo
-                </label>
-                <span className={`ml-2 truncate ${darkMode ? 'text-teal-300' : 'text-teal-700'}`}>
-                  {fileName || 'Ningún archivo seleccionado'}
-                </span>
+          </div>
+
+          {/* Contenido */}
+          <div className="p-4 sm:p-6">
+            {/* Sección de carga de certificados */}
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 mb-6 sm:mb-8">
+              <div className="flex items-center mb-4 sm:mb-5">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mr-2 sm:mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="sm:w-5 sm:h-5 w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.5 15v4a2 2 0 0 1-2 2h-15a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" x2="12" y1="3" y2="15"></line></svg>
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-emerald-700">
+                  Subir Nuevo Certificado
+                </h3>
               </div>
-            </div>
-            
-            <button 
-              type="submit" 
-              className={`py-3 px-6 rounded-lg ${darkMode ? 'bg-teal-600 hover:bg-teal-500' : 'bg-teal-500 hover:bg-teal-400'} text-white font-medium transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
-              disabled={uploading}
-            >
-              {uploading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Subiendo...
-                </>
-              ) : (
-                <>
-                  <FaPlus /> Subir Certificado
-                </>
-              )}
-            </button>
-          </form>
-        </div>
-        
-        <div>
-          <h3 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-teal-200' : 'text-teal-700'}`}>Certificados Actuales</h3>
-          
-          {loading ? (
-            <div className="flex justify-center py-8">
-              <svg className="animate-spin h-10 w-10 text-teal-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-            </div>
-          ) : !Array.isArray(certificados) || certificados.length === 0 ? (
-            <div className={`p-8 rounded-lg ${darkMode ? 'bg-teal-800/50' : 'bg-teal-100'} text-center`}>
-              <p className={`text-lg ${darkMode ? 'text-teal-300' : 'text-teal-700'}`}>No tienes certificados registrados</p>
-              <p className={`mt-2 ${darkMode ? 'text-teal-400' : 'text-teal-600'}`}>Utiliza el formulario de arriba para subir tu primer certificado</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {certificados.map((cert) => (
-                <div 
-                  key={cert.id} 
-                  className={`p-4 rounded-lg shadow-md ${darkMode ? 'bg-teal-800/70 hover:bg-teal-800/90' : 'bg-white hover:bg-teal-50'} transition-colors`}
-                >
-                  <div className="flex justify-between items-start mb-3">
-                    <h4 className={`font-semibold text-lg ${darkMode ? 'text-white' : 'text-teal-800'}`}>{cert.nombre}</h4>
-                    <div className={`text-xs px-2 py-1 rounded-full ${darkMode ? 'bg-teal-700 text-teal-200' : 'bg-teal-200 text-teal-800'}`}>
-                      PDF
-                    </div>
+              
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                  <div>
+                    <label htmlFor="nombre" className="block mb-1.5 text-sm font-medium text-emerald-700">
+                      Nombre del Certificado*
+                    </label>
+                    <input
+                      type="text"
+                      id="nombre"
+                      value={nombre}
+                      onChange={(e) => setNombre(e.target.value)}
+                      placeholder="Ej: Certificado de Inglés"
+                      className="w-full p-2.5 sm:p-3 rounded-lg border border-emerald-200 bg-emerald-50/70 text-emerald-900 placeholder-emerald-500/70 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      required
+                    />
                   </div>
                   
-                  <p className={`text-sm mb-3 ${darkMode ? 'text-teal-300' : 'text-teal-700'}`}>
-                    {cert.descripcion || "Sin descripción"}
-                  </p>
-                  
-                  <div className="flex justify-between items-center">
-                    <p className={`text-xs ${darkMode ? 'text-teal-400' : 'text-teal-600'}`}>
-                      Subido: {new Date(cert.fechaSubida || Date.now()).toLocaleDateString()}
-                    </p>
-                    
-                    <div className="flex gap-2">
-                      <button 
-                        className={`p-2 rounded-full ${darkMode ? 'bg-blue-600 hover:bg-blue-500' : 'bg-blue-500 hover:bg-blue-400'} text-white transition-colors`}
-                        onClick={() => handleDownload(cert.urlArchivo, cert.nombre)}
-                        title="Descargar certificado"
-                      >
-                        <FaFileDownload />
-                      </button>
-                      <button 
-                        className={`p-2 rounded-full ${darkMode ? 'bg-red-600 hover:bg-red-500' : 'bg-red-500 hover:bg-red-400'} text-white transition-colors`}
-                        onClick={() => handleDelete(cert.id)}
-                        title="Eliminar certificado"
-                      >
-                        <FaTrash />
-                      </button>
-                    </div>
+                  <div>
+                    <label htmlFor="descripcion" className="block mb-1.5 text-sm font-medium text-emerald-700">
+                      Descripción
+                    </label>
+                    <textarea
+                      id="descripcion"
+                      value={descripcion}
+                      onChange={(e) => setDescripcion(e.target.value)}
+                      placeholder="Ej: Nivel B2 de Cambridge"
+                      className="w-full p-2.5 sm:p-3 rounded-lg border border-emerald-200 bg-emerald-50/70 text-emerald-900 placeholder-emerald-500/70 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent min-h-[85px]"
+                    />
                   </div>
                 </div>
-              ))}
+                
+                <div>
+                  <label htmlFor="certificado" className="block mb-1.5 text-sm font-medium text-emerald-700">
+                    Archivo PDF*
+                  </label>
+                  <div className="flex items-center gap-2 p-3 rounded-lg border border-emerald-200 bg-emerald-50/70">
+                    <input
+                      type="file"
+                      id="certificado"
+                      accept=".pdf"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      required
+                    />
+                    <label 
+                      htmlFor="certificado" 
+                      className="cursor-pointer py-2 px-4 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2 text-sm"
+                    >
+                      <FaPlus className="w-3.5 h-3.5" /> Seleccionar archivo
+                    </label>
+                    <span className="ml-2 truncate text-sm text-emerald-700 flex-1">
+                      {fileName || 'Ningún archivo seleccionado'}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="pt-2">
+                  <button 
+                    type="submit" 
+                    className="py-2.5 sm:py-3 px-5 sm:px-6 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white font-medium transition-all duration-300 shadow-lg hover:shadow-emerald-200/50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-emerald-600 disabled:hover:to-emerald-500"
+                    disabled={uploading}
+                  >
+                    {uploading ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Subiendo...
+                      </>
+                    ) : (
+                      <>
+                        <FaPlus className="w-3.5 h-3.5" /> Subir Certificado
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
             </div>
-          )}
+            
+            {/* Sección de certificados actuales */}
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="flex items-center mb-4 sm:mb-5">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mr-2 sm:mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="sm:w-5 sm:h-5 w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path></svg>
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-emerald-700">
+                  Certificados Actuales
+                </h3>
+              </div>
+              
+              {loading ? (
+                <div className="flex justify-center items-center py-12">
+                  <div className="relative w-16 h-16">
+                    <div className="absolute top-0 left-0 w-full h-full border-4 border-emerald-200 rounded-full animate-pulse"></div>
+                    <div className="absolute top-0 left-0 w-full h-full border-t-4 border-emerald-500 rounded-full animate-spin"></div>
+                  </div>
+                </div>
+              ) : !Array.isArray(certificados) || certificados.length === 0 ? (
+                <div className="bg-emerald-50 rounded-xl p-8 text-center">
+                  <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path></svg>
+                  </div>
+                  <h4 className="text-lg font-semibold text-emerald-700 mb-2">No tienes certificados registrados</h4>
+                  <p className="text-emerald-600 mb-4">Utiliza el formulario de arriba para subir tu primer certificado</p>
+                  <div className="w-16 h-1 bg-emerald-200 mx-auto rounded-full"></div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {certificados.map((cert) => (
+                    <div 
+                      key={cert.id} 
+                      className="bg-gradient-to-br from-emerald-50 to-emerald-100/70 p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-emerald-200/50 group"
+                    >
+                      <div className="flex justify-between items-start mb-3">
+                        <h4 className="font-semibold text-emerald-800 text-lg line-clamp-1">{cert.nombre}</h4>
+                        <div className="text-xs px-2 py-1 rounded-full bg-emerald-200 text-emerald-800 font-medium">
+                          PDF
+                        </div>
+                      </div>
+                      
+                      <p className="text-sm text-emerald-700 mb-3 line-clamp-2 min-h-[40px]">
+                        {cert.descripcion || "Sin descripción"}
+                      </p>
+                      
+                      <div className="flex justify-between items-center">
+                        <p className="text-xs text-emerald-600 flex items-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect><line x1="16" x2="16" y1="2" y2="6"></line><line x1="8" x2="8" y1="2" y2="6"></line><line x1="3" x2="21" y1="10" y2="10"></line></svg>
+                          {new Date(cert.fechaSubida || Date.now()).toLocaleDateString()}
+                        </p>
+                        
+                        <div className="flex gap-2">
+                          <button 
+                            className="p-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors shadow-md hover:shadow-lg"
+                            onClick={() => handleDownload(cert.urlArchivo, cert.nombre)}
+                            title="Descargar certificado"
+                          >
+                            <FaFileDownload className="w-3.5 h-3.5" />
+                          </button>
+                          <button 
+                            className="p-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition-colors shadow-md hover:shadow-lg"
+                            onClick={() => handleDelete(cert.id)}
+                            title="Eliminar certificado"
+                          >
+                            <FaTrash className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     );

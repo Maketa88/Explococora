@@ -31,7 +31,7 @@ const Reserva = () => {
   return (
     <DashboardLayoutAdmin>
       <div className="flex flex-col gap-4 p-6">
-        <h1 className="text-2xl font-bold text-white">Informe de Reservas</h1>
+        <h1 className="text-2xl font-bold text-black">Informe de Reservas</h1>
         
         {loading ? (
           <div className="flex justify-center items-center h-64">

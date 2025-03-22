@@ -382,15 +382,15 @@ const ActualizarPaquetes = ({ onClose, onUpdated, paquete, rutasDisponibles }) =
   
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
-      <div className="bg-teal-900 rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-auto">
-        <div className="flex justify-between items-center p-6 border-b border-teal-800">
-          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Package size={24} />
+      <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-auto">
+        <div className="flex justify-between items-center p-6 border-b border-emerald-100">
+          <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <Package size={24} className="text-emerald-500" />
             Actualizar Paquete Turístico
           </h2>
           <button
             onClick={onClose}
-            className="text-teal-300 hover:text-white transition-colors"
+            className="text-gray-500 hover:text-gray-700 transition-colors"
           >
             <X size={24} />
           </button>
@@ -398,7 +398,7 @@ const ActualizarPaquetes = ({ onClose, onUpdated, paquete, rutasDisponibles }) =
         
         <div className="p-6">
           {error && (
-            <div className="mb-6 bg-rose-900 bg-opacity-40 text-white p-4 rounded-lg flex items-start gap-3">
+            <div className="mb-6 bg-rose-100 text-rose-700 p-4 rounded-lg flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-rose-500 mt-0.5" />
               <p>{error}</p>
             </div>
@@ -406,52 +406,52 @@ const ActualizarPaquetes = ({ onClose, onUpdated, paquete, rutasDisponibles }) =
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-teal-300 mb-1">Nombre del Paquete</label>
+              <label className="block text-emerald-600 mb-1">Nombre del Paquete</label>
               <input
                 type="text"
                 name="nombrePaquete"
                 value={paqueteData.nombrePaquete}
                 onChange={handleInputChange}
-                className="w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
                 placeholder="Ej: Tour Valle del Cocora Premium"
                 required
               />
             </div>
             
             <div>
-              <label className="block text-teal-300 mb-1">Descripción</label>
+              <label className="block text-emerald-600 mb-1">Descripción</label>
               <textarea
                 name="descripcion"
                 value={paqueteData.descripcion}
                 onChange={handleInputChange}
-                className="w-full p-2 rounded bg-teal-800 text-white h-32 resize-none focus:outline-none focus:ring-2 focus:ring-teal-400"
+                className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 h-32 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-400"
                 placeholder="Describe el paquete turístico..."
                 required
               />
             </div>
             
             <div>
-              <label className="block text-teal-300 mb-1">
-                <DollarSign className="inline w-4 h-4 mr-1" /> Precio (COP)
+              <label className="block text-emerald-600 mb-1">
+                <DollarSign className="inline w-4 h-4 mr-1 text-emerald-500" /> Precio (COP)
               </label>
               <input
                 type="text"
                 name="precio"
                 value={paqueteData.precio}
                 onChange={handleInputChange}
-                className="w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
                 placeholder="Ej: 150000"
                 required
               />
             </div>
             
             <div>
-              <label className="block text-teal-300 mb-1">Estado</label>
+              <label className="block text-emerald-600 mb-1">Estado</label>
               <select
                 name="estado"
                 value={paqueteData.estado}
                 onChange={handleInputChange}
-                className="w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
                 required
               >
                 <option value="Activo">Activo</option>
@@ -461,33 +461,33 @@ const ActualizarPaquetes = ({ onClose, onUpdated, paquete, rutasDisponibles }) =
             
             {/* Sección informativa de rutas asociadas */}
             <div>
-              <label className="block text-teal-300 mb-1">
-                <Map className="inline w-4 h-4 mr-1" /> Rutas Asociadas
+              <label className="block text-emerald-600 mb-1">
+                <Map className="inline w-4 h-4 mr-1 text-emerald-500" /> Rutas Asociadas
               </label>
               
               {rutasAsociadas && rutasAsociadas.length > 0 ? (
-                <div className="bg-teal-800 p-3 rounded">
+                <div className="bg-emerald-50 p-3 rounded border border-emerald-200">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {rutasAsociadas.map((ruta, index) => (
-                      <div key={index} className="flex items-center gap-2 bg-teal-700 p-2 rounded">
-                        <Map size={16} className="text-teal-300" />
-                        <span className="text-white">
+                      <div key={index} className="flex items-center gap-2 bg-emerald-100 p-2 rounded">
+                        <Map size={16} className="text-emerald-500" />
+                        <span className="text-gray-800">
                           {ruta.nombreRuta || `Ruta ID: ${ruta.idRuta || ruta.id || 'Desconocido'}`}
                         </span>
                       </div>
                     ))}
                   </div>
-                  <p className="text-teal-400 text-sm mt-2">
+                  <p className="text-emerald-600 text-sm mt-2">
                     Las rutas asociadas no pueden modificarse desde aquí.
                   </p>
                 </div>
               ) : (
-                <p className="text-teal-400">Este paquete no tiene rutas asociadas</p>
+                <p className="text-emerald-600">Este paquete no tiene rutas asociadas</p>
               )}
             </div>
             
             <div>
-              <label className="block text-teal-300 mb-1">Imágenes actuales</label>
+              <label className="block text-emerald-600 mb-1">Imágenes actuales</label>
               {imagenesExistentes.length > 0 ? (
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-2">
                   {imagenesExistentes.map((imagen, index) => (
@@ -499,13 +499,13 @@ const ActualizarPaquetes = ({ onClose, onUpdated, paquete, rutasDisponibles }) =
                         onError={(e) => {
                           console.log('Error cargando imagen:', imagen.url);
                           e.target.onerror = null;
-                          e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%2314b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M14.5 12l2.5 -2.5"/><path d="M14.5 12l2.5 2.5"/></svg>';
+                          e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%2310b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M14.5 12l2.5 -2.5"/><path d="M14.5 12l2.5 2.5"/></svg>';
                         }}
                       />
                       <button
                         type="button"
                         onClick={() => marcarImagenParaEliminar(imagen, index)}
-                        className="absolute top-1 right-1 bg-rose-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-1 right-1 bg-rose-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                         title="Eliminar imagen"
                       >
                         <Trash2 size={14} />
@@ -514,18 +514,18 @@ const ActualizarPaquetes = ({ onClose, onUpdated, paquete, rutasDisponibles }) =
                   ))}
                 </div>
               ) : (
-                <p className="text-teal-400">No hay imágenes asociadas a este paquete</p>
+                <p className="text-emerald-600">No hay imágenes asociadas a este paquete</p>
               )}
             </div>
             
             <div>
-              <label className="block text-teal-300 mb-1">Agregar nuevas imágenes</label>
+              <label className="block text-emerald-600 mb-1">Agregar nuevas imágenes</label>
               <input
                 type="file"
                 accept="image/*"
                 multiple
                 onChange={handleImageChange}
-                className="w-full p-2 rounded bg-teal-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                className="w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
               />
               
               {nuevasImagenesPreview.length > 0 && (
@@ -540,7 +540,7 @@ const ActualizarPaquetes = ({ onClose, onUpdated, paquete, rutasDisponibles }) =
                       <button
                         type="button"
                         onClick={() => removeNuevaImagen(index)}
-                        className="absolute top-1 right-1 bg-rose-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-1 right-1 bg-rose-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <X size={14} />
                       </button>
@@ -550,18 +550,18 @@ const ActualizarPaquetes = ({ onClose, onUpdated, paquete, rutasDisponibles }) =
               )}
             </div>
             
-            <div className="flex justify-end gap-2 pt-4 border-t border-teal-800">
+            <div className="flex justify-end gap-2 pt-4 border-t border-emerald-100">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 bg-teal-800 hover:bg-teal-700 text-white rounded transition-colors"
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded transition-colors"
                 disabled={loading}
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className={`px-4 py-2 ${loading ? 'bg-teal-700' : 'bg-teal-500 hover:bg-teal-400'} text-white rounded transition-colors flex items-center gap-2`}
+                className={`px-4 py-2 ${loading ? 'bg-emerald-400' : 'bg-emerald-500 hover:bg-emerald-400'} text-white rounded transition-colors flex items-center gap-2`}
                 disabled={loading}
               >
                 {loading ? (
