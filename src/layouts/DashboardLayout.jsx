@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -6,20 +6,20 @@ import {
   Users, 
   UserPlus,
   UserCheck,
-  PackagePlus,
   PackageSearch,
   Bell,
   ChevronLeft,
   ChevronRight,
   Settings,
-  Moon,
-  Sun,
   Search,
   User,
   Edit,
   Key,
   LogOut,
-  Map
+  Map,
+  CreditCard,
+  Package,
+  CalendarDays
 } from 'lucide-react';
 import SelectorEstado from '../pages/VistaOperador/CambioEstadoOpe/Selector_Estado_Ope';
 import axios from 'axios';
@@ -217,6 +217,11 @@ const DashboardLayout = ({ children }) => {
 
   const handleCambioEstado = (nuevoEstado) => {
     setOperadorEstado(nuevoEstado);
+    // Emitir evento para otros componentes
+    const event = new CustomEvent('estadoOperadorCambiado', { 
+      detail: { estado: nuevoEstado } 
+    });
+    window.dispatchEvent(event);
   };
 
   const menuItems = [
@@ -227,16 +232,22 @@ const DashboardLayout = ({ children }) => {
       section: "Dashboard"
     },
     {
+      title: "Reports",
+      icon: <FileText className="w-5 h-5" />,
+      path: "/VistaOperador/reports",
+      section: "Dashboard"
+    },
+    {
       title: "Rutas",
       icon: <Map className="w-5 h-5" />,
       path: "/VistaOperador/Rutas",
       section: "Rutas"
     },
     {
-      title: "Reports",
-      icon: <FileText className="w-5 h-5" />,
-      path: "/VistaOperador/reports",
-      section: "Dashboard"
+      title: "Gestión de paquetes",
+      icon: <PackageSearch className="w-5 h-5" />,
+      path: "/VistaOperador/gestion-paquetes",
+      section: "Rutas"
     },
     {
       title: "Gestionar Guías",
@@ -257,20 +268,26 @@ const DashboardLayout = ({ children }) => {
       section: "Guías"
     },
     {
-      title: "New Product",
-      icon: <PackagePlus className="w-5 h-5" />,
-      path: "/VistaOperador/new-product",
-      section: "Products"
+      title: "Pago Rutas",
+      icon: <CreditCard className="w-5 h-5" />,
+      path: "/VistaOperador/pago-rutas",
+      section: "Informes"
     },
     {
-      title: "Inventory",
-      icon: <PackageSearch className="w-5 h-5" />,
-      path: "/VistaOperador/inventory",
-      section: "Products"
+      title: "Pago Paquetes",
+      icon: <Package className="w-5 h-5" />,
+      path: "/VistaOperador/pago-paquetes",
+      section: "Informes"
+    },
+    {
+      title: "Reservas",
+      icon: <CalendarDays className="w-5 h-5" />,
+      path: "/VistaOperador/reservas",
+      section: "Informes"
     }
   ];
 
-  const sections = ["Dashboard", "Rutas", "Guías", "Products"];
+  const sections = ["Dashboard", "Rutas", "Guías", "Informes"];
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -359,7 +376,7 @@ const DashboardLayout = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const handleBeforeUnload = async (e) => {
+    const handleBeforeUnload = async () => {
       try {
         const token = localStorage.getItem('token');
         const cedula = localStorage.getItem('cedula');

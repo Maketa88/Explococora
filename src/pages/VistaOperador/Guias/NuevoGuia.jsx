@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import DashboardLayout from '../../../layouts/DashboardLayout';
-import { ArrowLeft, CheckCircle, Pencil, Eye, EyeOff, AlertCircle, X } from 'lucide-react';
-import Swal from 'sweetalert2';
+import { ArrowLeft, CheckCircle, Eye, EyeOff, AlertCircle, X } from 'lucide-react';
 import { RegistroCliente } from "../../../services/RegistroCliente";
 
 const NuevoGuia = () => {
@@ -97,6 +95,7 @@ const NuevoGuia = () => {
         contrasenia: formData.contrasenia
       };
       
+      // eslint-disable-next-line
       const response = await RegistroCliente(guiaData);
       
       // Mostrar alerta de éxito con el mensaje específico
@@ -155,14 +154,17 @@ const NuevoGuia = () => {
 
   return (
     <DashboardLayout>
+      {/* Renderizar el componente de alerta */}
+      <AlertComponent />
+      
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
         {/* Encabezado verde */}
-        <div className="bg-emerald-600 p-4 sm:p-6">
+        <div className="bg-emerald-700 p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <h1 className="text-xl sm:text-2xl font-bold text-white">Registrar Nuevo Guía</h1>
             <button 
               onClick={() => navigate('/VistaOperador/guias')}
-              className="text-white hover:text-gray-200 bg-emerald-700 hover:bg-emerald-800 rounded-full p-1.5"
+              className="text-white hover:text-gray-200 bg-emerald-800 hover:bg-emerald-900 rounded-full p-1.5"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
@@ -300,7 +302,7 @@ const NuevoGuia = () => {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full sm:w-auto px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md flex items-center justify-center order-1 sm:order-2 mb-3 sm:mb-0"
+                className="w-full sm:w-auto px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-md flex items-center justify-center order-1 sm:order-2 mb-3 sm:mb-0 shadow-sm"
               >
                 {submitting ? (
                   <>

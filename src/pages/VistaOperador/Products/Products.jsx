@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import DashboardLayout from '../../../layouts/DashboardLayout';
 import axios from 'axios';
-import { Users, UserCheck, UserMinus, RefreshCw, Clock, Eye } from 'lucide-react';
+import { Users, UserCheck, UserMinus, RefreshCw, Clock, Eye, X } from 'lucide-react';
 
 const Products = () => {
   const [guias, setGuias] = useState([]);
@@ -206,9 +206,9 @@ const Products = () => {
       <div className="flex flex-col gap-6 transition-all duration-300 transform">
         {/* Panel superior con estadísticas */}
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
-          <div className="px-6 py-4 bg-gradient-to-r from-teal-600 to-emerald-500">
+          <div className="px-6 py-4 bg-emerald-600">
             <h1 className="text-2xl font-bold text-white">Estado de Guías</h1>
-            <p className="text-teal-100 text-sm">Monitoreo y control de disponibilidad</p>
+            <p className="text-emerald-100 text-sm">Monitoreo y control de disponibilidad</p>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4">
@@ -277,7 +277,7 @@ const Products = () => {
                 inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium
                 ${actualizando 
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                  : 'bg-emerald-500 text-white hover:bg-emerald-600 transition-colors duration-200'}
+                  : 'bg-emerald-600 text-white hover:bg-emerald-700 transition-colors duration-200'}
               `}
             >
               <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${actualizando ? 'animate-spin' : ''}`} />
@@ -349,7 +349,7 @@ const Products = () => {
                     <tr key={guia._id || guia.id || `guia-${Math.random()}`} className="hover:bg-gray-50 transition-colors duration-150">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-white font-bold overflow-hidden">
+                          <div className="flex-shrink-0 h-10 w-10 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold overflow-hidden">
                             {guia.foto ? (
                               <img 
                                 src={guia.foto.startsWith('http') ? guia.foto : `http://localhost:10101/uploads/images/${guia.foto}`} 
@@ -443,20 +443,18 @@ const Products = () => {
       {guiaSeleccionado && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-md w-full">
-            <div className="px-6 py-4 bg-gradient-to-r from-teal-600 to-emerald-500 flex justify-between items-center">
+            <div className="px-6 py-4 bg-emerald-700 flex justify-between items-center border-b border-emerald-600 rounded-t-lg">
               <h3 className="text-lg font-medium text-white">Detalles del Guía</h3>
               <button 
                 onClick={cerrarModal}
-                className="text-white hover:text-gray-200 transition-colors"
+                className="text-white hover:text-gray-200 bg-emerald-800 hover:bg-emerald-900 rounded-full p-1.5 transition-colors"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="w-5 h-5" />
               </button>
             </div>
             <div className="p-6">
               <div className="flex items-center mb-6">
-                <div className="h-16 w-16 rounded-full overflow-hidden bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-white text-xl font-bold">
+                <div className="h-16 w-16 rounded-full overflow-hidden bg-emerald-600 flex items-center justify-center text-white text-xl font-bold">
                   {guiaSeleccionado.foto ? (
                     <img 
                       src={guiaSeleccionado.foto.startsWith('http') ? guiaSeleccionado.foto : `http://localhost:10101/uploads/images/${guiaSeleccionado.foto}`} 

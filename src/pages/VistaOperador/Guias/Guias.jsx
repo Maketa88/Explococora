@@ -1,13 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import DashboardLayout from '../../../layouts/DashboardLayout';
-import { Mail, Phone, MapPin, Calendar, CheckCircle, Clock, XCircle, Search, Filter, UserPlus, Star, CreditCard, Trash2, Edit, Languages, X, AlertCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Calendar, CheckCircle, Clock, Search, Filter, UserPlus, Star, CreditCard, Trash2, Edit, Languages, X, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import logoExplococora from '../../../assets/Images/logo.webp';
 import EstadoGuia from '../../../components/Guias/EstadoGuia';
-import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Swal from 'sweetalert2';
 
 const Guias = () => {
   const navigate = useNavigate();
@@ -18,20 +16,9 @@ const Guias = () => {
   const [ordenarPor, setOrdenarPor] = useState('nombre'); // nombre, fecha, experiencia
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
   
-  // Contadores de estados
-  const [contadores, setContadores] = useState({
-    total: 0,
-    disponibles: 0,
-    ocupados: 0,
-    inactivos: 0
-  });
-
   const [guiaAEliminar, setGuiaAEliminar] = useState(null);
   const [showEliminarModal, setShowEliminarModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [countdownActive, setCountdownActive] = useState(false);
-  const [countdown, setCountdown] = useState(2);
-  const countdownRef = useRef(null);
   const [showDetallesModal, setShowDetallesModal] = useState(false);
   const [guiaDetalle, setGuiaDetalle] = useState(null);
   const [showEditarModal, setShowEditarModal] = useState(false);
@@ -64,7 +51,7 @@ const Guias = () => {
     return `${primerNombre} ${segundoNombre} ${primerApellido} ${segundoApellido}`.trim();
   };
 
-  // Función corregida para obtener el estado del operador
+  // Función para obtener el estado del operador
   const obtenerEstadoOperador = async (cedula) => {
     if (!cedula) return 'disponible';
     
@@ -79,40 +66,24 @@ const Guias = () => {
       });
       
       return response.data?.data?.estado || 'disponible';
-    } catch (_) {
+    } catch (err) {
       // Sin mensajes de error en consola
+      console.log("Error obteniendo estado:", err.message);
       return 'disponible';
     }
   };
 
-  // Función para actualizar contadores basados en la lista de guías
+  // Función para actualizar contadores basados en la lista de guías (sin cambiar estado)
   const actualizarContadores = (listaGuias) => {
-    const conteo = {
-      total: listaGuias.length,
-      disponibles: 0,
-      ocupados: 0,
-      inactivos: 0
-    };
+    // Esta función ahora se utiliza solo para actualizar la lista visual
+    console.log("Actualizando contadores visualmente...");
     
-    listaGuias.forEach(guia => {
-      const estado = guia.estado || 'disponible';
-      
-      switch (estado) {
-        case 'disponible':
-          conteo.disponibles++;
-          break;
-        case 'ocupado':
-          conteo.ocupados++;
-          break;
-        case 'inactivo':
-          conteo.inactivos++;
-          break;
-        default:
-          conteo.disponibles++;
-      }
-    });
+    // Calculamos estadísticas solo para propósitos informativos
+    const disponibles = listaGuias.filter(g => g.estado === 'disponible').length;
+    const ocupados = listaGuias.filter(g => g.estado === 'ocupado').length;
+    const inactivos = listaGuias.filter(g => g.estado === 'inactivo').length;
     
-    setContadores(conteo);
+    console.log(`Total: ${listaGuias.length}, Disponibles: ${disponibles}, Ocupados: ${ocupados}, Inactivos: ${inactivos}`);
   };
 
   // Función para filtrar guías según búsqueda y filtros
@@ -156,32 +127,6 @@ const Guias = () => {
     setShowEliminarModal(true);
   };
 
-  // Función para iniciar la cuenta regresiva
-  const startCountdown = () => {
-    setCountdownActive(true);
-    setCountdown(2);
-    
-    countdownRef.current = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) {
-          clearInterval(countdownRef.current);
-          setCountdownActive(false);
-          handleActualDelete();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
-  // Función para cancelar la cuenta regresiva
-  const cancelCountdown = () => {
-    if (countdownRef.current) {
-      clearInterval(countdownRef.current);
-      setCountdownActive(false);
-    }
-  };
-
   // Función para eliminar un guía
   const handleActualDelete = async () => {
     if (!guiaAEliminar) return;
@@ -191,27 +136,82 @@ const Guias = () => {
       const token = localStorage.getItem('token');
       
       if (!token) {
+        showAlert("No hay token de autenticación. Por favor, inicie sesión nuevamente.", "error");
         setIsDeleting(false);
         setShowEliminarModal(false);
         return;
       }
 
       const cedula = guiaAEliminar.cedula;
+      const nombreCompleto = construirNombreCompleto(guiaAEliminar);
       
-      const response = await axios.delete(`http://localhost:10101/guia/eliminar/${cedula}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
+      // Lista de posibles endpoints para probar, igual que en EliminarGuia.jsx
+      const endpoints = [
+        `http://localhost:10101/guia/eliminar/${cedula}`
+      ];
+      
+      let success = false;
+      
+      // Probar cada endpoint hasta encontrar uno que funcione
+      for (const endpoint of endpoints) {
+        try {
+          console.log(`Intentando eliminar guía con endpoint: ${endpoint}`);
+          const response = await axios.delete(endpoint, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          
+          if (response.status === 200 || response.status === 204) {
+            success = true;
+            break;
+          }
+        } catch (err) {
+          console.warn(`Error con endpoint ${endpoint}:`, err.message);
         }
-      });
+      }
       
-      if (response.status === 200 || response.status === 204) {
+      if (success) {
         // Remover el guía de la lista
         setGuiasCompletos(prev => prev.filter(g => g.cedula !== cedula));
         // Actualizar contadores
         actualizarContadores(guiasCompletos.filter(g => g.cedula !== cedula));
+        // Mostrar alerta de éxito
+        showAlert(`El guía ${nombreCompleto} ha sido eliminado correctamente`, 'success');
+      } else {
+        // No se pudo eliminar con ningún endpoint
+        showAlert("No se pudo eliminar el guía. Intente nuevamente.", "error");
       }
     } catch (error) {
       console.error("Error al eliminar guía:", error);
+      
+      // Intentar extraer el mensaje de error
+      let errorMessage = "Ha ocurrido un error al eliminar el guía";
+      
+      if (error.response && error.response.data) {
+        if (typeof error.response.data === 'string') {
+          errorMessage = error.response.data;
+        } else if (error.response.data.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response.data.mensaje) {
+          errorMessage = error.response.data.mensaje;
+        } else if (error.response.data.error) {
+          errorMessage = error.response.data.error;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      // Mostrar mensaje de error específico para ayudar a depurar
+      console.error('Mensaje de error específico:', errorMessage);
+      console.error('Código de estado HTTP:', error.response?.status);
+      
+      // Verificar si el token es válido
+      if (error.response?.status === 401) {
+        errorMessage = 'Sesión expirada o no autorizada. Por favor, inicie sesión nuevamente.';
+      }
+      
+      showAlert(errorMessage, "error");
     } finally {
       setIsDeleting(false);
       setShowEliminarModal(false);
@@ -349,8 +349,9 @@ const Guias = () => {
                 telefono: obtenerTelefono(perfilCompleto)
               };
             }
-          } catch (_) {
+          } catch (err) {
             // Silenciar error
+            console.log("Error obteniendo perfil:", err.message);
           }
           
           // Si no pudimos obtener el perfil completo, devolvemos lo básico
@@ -359,7 +360,8 @@ const Guias = () => {
             estado,
             telefono: obtenerTelefono(guia)
           };
-        } catch (error) {
+        } catch (err) {
+          console.log("Error en proceso de guía:", err.message);
           return { 
             ...guia, 
             estado: 'disponible',
@@ -540,7 +542,10 @@ const Guias = () => {
       <div className="p-6 bg-white">
         {/* Cabecera con título y botones */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Gestión de Guías</h1>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">Gestión de Guías</h1>
+            <p className="text-emerald-600">Administre la información de los guías turísticos</p>
+          </div>
           
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
             {/* Barra de búsqueda adaptativa */}
@@ -561,7 +566,7 @@ const Guias = () => {
             <div className="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
               <button
                 onClick={() => setMostrarFiltros(!mostrarFiltros)}
-                className={`py-2 px-4 flex-1 sm:flex-initial bg-white border border-gray-200 text-emerald-600 rounded-lg flex items-center justify-center hover:bg-gray-50 ${mostrarFiltros ? 'border-emerald-500' : ''}`}
+                className={`py-2 px-4 flex-1 sm:flex-initial text-emerald-700 border border-emerald-200 bg-white rounded-lg flex items-center justify-center hover:bg-emerald-50 shadow-sm transition-colors ${mostrarFiltros ? 'border-emerald-500' : ''}`}
               >
                 <Filter className="w-5 h-5 mr-2" />
                 Filtros
@@ -569,7 +574,7 @@ const Guias = () => {
               
               <button
                 onClick={handleAddGuia}
-                className="py-2 px-4 flex-1 sm:flex-initial bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg flex items-center justify-center"
+                className="py-2 px-4 flex-1 sm:flex-initial bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg flex items-center justify-center shadow-sm transition-colors"
               >
                 <UserPlus className="w-5 h-5 mr-2" />
                 Nuevo guía
@@ -699,7 +704,7 @@ const Guias = () => {
                 <div className="absolute top-2 left-2 flex space-x-2 z-10">
                   <button 
                     onClick={() => handleEliminarGuia(guia)}
-                    className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg"
+                    className="p-2 bg-white bg-opacity-90 hover:bg-red-50 text-red-600 rounded-full shadow-sm transition-colors"
                     title="Eliminar guía"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -710,7 +715,7 @@ const Guias = () => {
                       e.stopPropagation();
                       handleEditButtonClick(guia);
                     }}
-                    className="p-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg"
+                    className="p-2 bg-white bg-opacity-90 hover:bg-emerald-50 text-emerald-700 rounded-full shadow-sm transition-colors"
                     title="Editar guía"
                   >
                     <Edit className="w-4 h-4" />
@@ -810,7 +815,7 @@ const Guias = () => {
                   <div className="flex justify-center">
                     <button 
                       onClick={() => handleVerDetalles(guia)}
-                      className="px-4 sm:px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md text-xs sm:text-sm font-medium w-full max-w-[200px] flex items-center justify-center"
+                      className="px-4 sm:px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs sm:text-sm font-medium w-full max-w-[200px] flex items-center justify-center shadow-sm transition-colors"
                     >
                       <span>Ver detalles</span>
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -828,7 +833,7 @@ const Guias = () => {
                 onClick={() => {
                   cargarGuias();
                 }}
-                className="mt-3 sm:mt-4 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg"
+                className="mt-3 sm:mt-4 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition-colors"
               >
                 Cargar guías
               </button>
@@ -842,11 +847,14 @@ const Guias = () => {
         <div className="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
           <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
             {/* Encabezado verde con botón de cierre */}
-            <div className="flex justify-between items-center p-3 sm:p-4 border-b border-emerald-100 sticky top-0 bg-emerald-600 z-10 rounded-t-lg">
-              <h2 className="text-lg sm:text-xl font-bold text-white">Perfil completo del guía</h2>
+            <div className="flex justify-between items-center p-3 sm:p-4 border-b border-emerald-600 sticky top-0 bg-emerald-700 z-10 rounded-t-lg">
+              <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+                <UserPlus className="w-5 h-5" />
+                Perfil completo del guía
+              </h2>
               <button 
                 onClick={() => setShowDetallesModal(false)}
-                className="text-white hover:text-gray-200 bg-emerald-700 hover:bg-emerald-800 rounded-full p-1.5"
+                className="text-white hover:text-gray-200 bg-emerald-800 hover:bg-emerald-900 rounded-full p-1.5"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -958,14 +966,14 @@ const Guias = () => {
                     setShowEditarModal(true);
                     setShowDetallesModal(false);
                   }}
-                  className="w-full sm:w-auto px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md"
+                  className="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md shadow-sm transition-colors"
                 >
                   Editar información
                 </button>
                 
                 <button
                   onClick={() => setShowDetallesModal(false)}
-                  className="w-full sm:w-auto px-5 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md"
+                  className="w-full sm:w-auto px-5 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md shadow-sm transition-colors"
                 >
                   Cerrar
                 </button>
@@ -978,95 +986,79 @@ const Guias = () => {
       {/* Modal de eliminación */}
       {showEliminarModal && guiaAEliminar && (
         <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-0">
-          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md shadow-2xl border border-gray-200 transform transition-all m-2">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 border-b border-emerald-100 pb-2 bg-emerald-50 p-2 sm:p-3 -mt-4 -mx-4 sm:-mx-6 rounded-t-lg">Confirmar Eliminación</h2>
-            <div className="flex items-center gap-4 mb-6 p-4 bg-emerald-50 rounded-lg border border-emerald-100">
-              <div className="relative">
-                {guiaAEliminar.foto ? (
-                  <img 
-                    src={guiaAEliminar.foto.startsWith('http') ? guiaAEliminar.foto : `http://localhost:10101/uploads/images/${guiaAEliminar.foto}`} 
-                    alt={construirNombreCompleto(guiaAEliminar)}
-                    className="w-20 h-20 rounded-full object-cover border-2 border-red-500 shadow-lg"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = `https://ui-avatars.com/api/?name=No+Foto&background=6B7280&color=fff&size=128`;
-                    }}
-                  />
-                ) : (
-                  <div className="w-20 h-20 rounded-full bg-gray-200 border-2 border-red-500 flex items-center justify-center shadow-lg">
-                    <span className="text-gray-800 text-sm">No Foto</span>
-                  </div>
-                )}
-                <div className="absolute -top-1 -right-1 bg-red-500 w-6 h-6 rounded-full flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-4 h-4 text-white">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </div>
-              </div>
-              <div>
-                <p className="text-gray-800 font-bold text-lg">{construirNombreCompleto(guiaAEliminar)}</p>
-                <p className="text-gray-500 text-sm">Cédula: {guiaAEliminar.cedula}</p>
-                <div className="mt-1 inline-block px-2 py-1 bg-red-100 text-red-500 text-xs rounded-full">
-                  Será eliminado permanentemente
-                </div>
-              </div>
+          <div className="bg-white rounded-lg overflow-hidden w-full max-w-md shadow-2xl transform transition-all m-2">
+            <div className="bg-emerald-700 p-3 sm:p-4 flex items-center">
+              <Trash2 className="w-5 h-5 mr-2 text-white" />
+              <h2 className="text-lg sm:text-xl font-bold text-white">Confirmar Eliminación</h2>
             </div>
-            <p className="text-gray-700 mb-6 bg-emerald-50 border-l-4 border-emerald-500 pl-3 py-2 italic">
-              ¿Está seguro que desea eliminar este guía? Esta acción no se puede deshacer.
-            </p>
             
-            {countdownActive && (
-              <div className="mb-6 bg-red-100 border border-red-500 rounded-lg p-4 text-center">
-                <p className="text-gray-800 mb-2">Eliminando en <span className="font-bold text-2xl text-red-500">{countdown}</span> segundos</p>
-                <button 
-                  onClick={cancelCountdown}
-                  className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium"
+            <div className="p-4 sm:p-6">
+              <div className="flex items-center gap-4 mb-6 p-4 bg-emerald-50 rounded-lg border border-emerald-100">
+                <div className="relative">
+                  {guiaAEliminar.foto ? (
+                    <img 
+                      src={guiaAEliminar.foto.startsWith('http') ? guiaAEliminar.foto : `http://localhost:10101/uploads/images/${guiaAEliminar.foto}`} 
+                      alt={construirNombreCompleto(guiaAEliminar)}
+                      className="w-20 h-20 rounded-full object-cover border-2 border-red-500 shadow-lg"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = `https://ui-avatars.com/api/?name=No+Foto&background=6B7280&color=fff&size=128`;
+                      }}
+                    />
+                  ) : (
+                    <div className="w-20 h-20 rounded-full bg-gray-200 border-2 border-red-500 flex items-center justify-center shadow-lg">
+                      <span className="text-gray-800 text-sm">No Foto</span>
+                    </div>
+                  )}
+                  <div className="absolute -top-1 -right-1 bg-red-500 w-6 h-6 rounded-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-4 h-4 text-white">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-gray-800 font-bold text-lg">{construirNombreCompleto(guiaAEliminar)}</p>
+                  <p className="text-gray-500 text-sm">Cédula: {guiaAEliminar.cedula}</p>
+                  <div className="mt-1 inline-block px-2 py-1 bg-red-100 text-red-500 text-xs rounded-full">
+                    Será eliminado permanentemente
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-6 bg-red-50 border-l-4 border-red-400 pl-3 py-2 italic flex items-center">
+                <AlertCircle className="w-5 h-5 mr-2 text-red-500" />
+                ¿Está seguro que desea eliminar este guía? Esta acción no se puede deshacer.
+              </p>
+              
+              <div className="flex justify-end gap-4 mt-6">
+                <button
+                  onClick={() => {
+                    setShowEliminarModal(false);
+                    setGuiaAEliminar(null);
+                  }}
+                  className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md shadow-sm transition-colors font-medium w-32"
+                  disabled={isDeleting}
                 >
-                  Cancelar eliminación
+                  Cancelar
+                </button>
+                
+                <button
+                  onClick={handleActualDelete}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md shadow-sm transition-colors font-medium w-32 flex items-center justify-center"
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? (
+                    <div className="flex items-center justify-center">
+                      <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Eliminando...
+                    </div>
+                  ) : (
+                    "Eliminar"
+                  )}
                 </button>
               </div>
-            )}
-            
-            <div className="flex flex-col sm:flex-row justify-end gap-2 sm:space-x-3 mt-4">
-              <button
-                onClick={() => {
-                  setShowEliminarModal(false);
-                  setGuiaAEliminar(null);
-                }}
-                className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2.5 px-5 rounded-lg transition-all duration-300"
-                disabled={isDeleting || countdownActive}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleActualDelete}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2.5 px-5 rounded-lg transition-all duration-300"
-                disabled={isDeleting || countdownActive}
-              >
-                Eliminar sin conteo
-              </button>
-              <button
-                onClick={startCountdown}
-                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-2.5 px-5 rounded-lg transition-all duration-300 flex items-center justify-center"
-                disabled={isDeleting || countdownActive}
-              >
-                {isDeleting ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Eliminando...
-                  </>
-                ) : (
-                  <>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Eliminar
-                  </>
-                )}
-              </button>
             </div>
           </div>
         </div>
@@ -1077,11 +1069,14 @@ const Guias = () => {
         <div className="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
           <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
             {/* Encabezado verde con botón X para cerrar */}
-            <div className="flex justify-between items-center p-4 sm:p-6 bg-emerald-600 rounded-t-lg">
-              <h2 className="text-xl sm:text-2xl font-bold text-white">Actualizar Información</h2>
+            <div className="flex justify-between items-center p-4 sm:p-6 bg-emerald-700 rounded-t-lg border-b border-emerald-600">
+              <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                <Edit className="w-6 h-6" />
+                Actualizar Información
+              </h2>
               <button 
                 onClick={() => setShowEditarModal(false)}
-                className="text-white hover:text-gray-200 bg-emerald-700 hover:bg-emerald-800 rounded-full p-1.5"
+                className="text-white hover:text-gray-200 bg-emerald-800 hover:bg-emerald-900 rounded-full p-1.5"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1113,7 +1108,7 @@ const Guias = () => {
                     </div>
                     <button 
                       type="button"
-                      className="absolute bottom-0 right-0 bg-emerald-500 text-white p-2 rounded-full shadow-md hover:bg-emerald-600 transition-colors"
+                      className="absolute bottom-0 right-0 bg-emerald-600 hover:bg-emerald-700 text-white p-2 rounded-full shadow-sm transition-colors"
                       title="Cambiar foto"
                     >
                       <Edit className="w-4 h-4" />
@@ -1226,7 +1221,7 @@ const Guias = () => {
                   <button
                     type="button"
                     onClick={() => setShowEditarModal(false)}
-                    className="w-full sm:w-auto px-5 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md order-2 sm:order-1"
+                    className="w-full sm:w-auto px-5 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md order-2 sm:order-1 shadow-sm transition-colors"
                   >
                     Cancelar
                   </button>
@@ -1234,7 +1229,7 @@ const Guias = () => {
                   <button
                     type="submit"
                     disabled={updating}
-                    className="w-full sm:w-auto px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md flex items-center justify-center order-1 sm:order-2 mb-3 sm:mb-0"
+                    className="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md flex items-center justify-center order-1 sm:order-2 mb-3 sm:mb-0 shadow-sm transition-colors"
                   >
                     {updating ? (
                       <>
@@ -1254,27 +1249,12 @@ const Guias = () => {
           </div>
         </div>
       )}
-      
-      {/* Añadir ToastContainer dentro del DashboardLayout */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="colored"
-      />
     </DashboardLayout>
   );
 };
 
 export default Guias;
-
-<style jsx="true">{`
+<style>{`
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
@@ -1291,3 +1271,4 @@ export default Guias;
     animation: pulse 0.5s ease-in-out;
   }
 `}</style> 
+

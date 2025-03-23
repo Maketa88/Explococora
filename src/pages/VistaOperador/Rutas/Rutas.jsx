@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import DashboardLayout from '../../../layouts/DashboardLayout';
 import axios from 'axios';
-import { Pencil, Plus, Trash, Mountain, X, Filter, RefreshCw, Eye, ChevronLeft, ChevronRight, Search, XCircle } from 'lucide-react';
+import { Pencil, Plus, Trash, Mountain, X, Filter, Eye, ChevronLeft, ChevronRight, Search, XCircle } from 'lucide-react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -397,24 +397,42 @@ const Rutas = () => {
     const esFoto = confirmacionEliminar.tipo === 'foto';
     
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg w-full max-w-md mx-auto shadow-xl">
+      <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100] px-4">
+        <div className="bg-white rounded-lg w-full max-w-md mx-auto shadow-xl overflow-hidden animate-fadeIn">
+          <div className="bg-emerald-700 text-white p-6 border-b border-emerald-600">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                {esFoto ? (
+                  <XCircle className="w-6 h-6" />
+                ) : (
+                  <Mountain className="w-6 h-6" />
+                )}
+                Confirmar Eliminación
+              </h2>
+              <button
+                onClick={() => {
+                  setConfirmacionEliminar({ mostrar: false, tipo: '', id: null, ids: [] });
+                }}
+                className="text-white hover:text-emerald-200 bg-emerald-800 hover:bg-emerald-900 rounded-full p-1.5 transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+          </div>
+          
           <div className="p-6">
-            <h2 className="text-xl font-bold text-emerald-700 mb-4">Confirmar Eliminación</h2>
-            
-            <div className="flex items-start gap-4 mb-6">
-              <div className="bg-red-100 rounded-full p-2 text-red-600 shrink-0">
-                <XCircle size={24} />
-              </div>
-              
+            <div className="bg-rose-100 p-4 rounded-lg mb-4 flex items-start gap-3">
+              <XCircle className="w-6 h-6 text-rose-500 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-semibold text-gray-800">{confirmacionEliminar.nombre}</h3>
-                <p className="text-red-600 mt-2">Será eliminado permanentemente</p>
+                <h3 className="font-bold text-rose-700">{confirmacionEliminar.nombre}</h3>
+                <p className="text-sm text-rose-600 mt-1">
+                  Será eliminado permanentemente
+                </p>
               </div>
             </div>
             
-            <div className="border-l-4 border-amber-400 pl-3 py-2 bg-amber-50 mb-6">
-              <p className="text-gray-700 text-sm">
+            <div className="bg-amber-50 p-4 rounded-lg border border-amber-100 mb-6">
+              <p className="text-gray-700">
                 {confirmacionEliminar.mensaje || "¿Está seguro que desea eliminar este elemento? Esta acción no se puede deshacer."}
               </p>
             </div>
@@ -424,7 +442,7 @@ const Rutas = () => {
                 onClick={() => {
                   setConfirmacionEliminar({ mostrar: false, tipo: '', id: null, ids: [] });
                 }}
-                className="px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded transition-colors"
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded transition-colors shadow-sm"
                 disabled={isProcessing}
               >
                 Cancelar
@@ -438,12 +456,12 @@ const Rutas = () => {
                     eliminarFotoConfirmada(confirmacionEliminar.id);
                   }
                 }}
-                className="px-4 py-2 flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white rounded transition-colors"
+                className="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded transition-colors flex items-center gap-2 shadow-sm"
                 disabled={isProcessing}
               >
                 {isProcessing ? (
                   <>
-                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
                     <span>Eliminando...</span>
                   </>
                 ) : (
@@ -876,11 +894,17 @@ const Rutas = () => {
 
   // Función para verificar si el nombre de la ruta ya existe
   const checkRouteNameExists = (name) => {
-    // Skip check if editing and name hasn't changed
-    if (isEditing && rutaActual.nombreRuta === name) {
-      return false;
+    // Si estamos editando, permitir cualquier cambio ortográfico al nombre actual
+    if (isEditing) {
+      // Comprobar solo que el nombre no coincida exactamente con otro nombre de ruta diferente
+      return rutas.some(ruta => 
+        ruta.nombreRuta.toLowerCase() === name.toLowerCase() && 
+        ruta.id !== rutaActual.id && 
+        ruta.idRuta !== rutaActual.idRuta
+      );
     }
     
+    // Para nuevas rutas, verificar si ya existe el nombre
     return rutas.some(ruta => 
       ruta.nombreRuta.toLowerCase() === name.toLowerCase()
     );
@@ -1093,56 +1117,6 @@ const Rutas = () => {
     };
   }, [isDetailView]);
 
-  // Añadir esta función al componente
-  const verificarRespuestaServidor = async () => {
-    try {
-      // Prueba obtener una ruta específica para verificar la estructura
-      const rutaId = rutas.length > 0 ? (rutas[0].idRuta || rutas[0].id) : null;
-      
-      if (!rutaId) {
-        console.error('No hay rutas disponibles para verificar');
-        return;
-      }
-      
-      console.log(`Verificando estructura de datos para la ruta ${rutaId}...`);
-      
-      // Probar los diferentes endpoints
-      const respuestaRuta = await axios.get(`http://localhost:10101/rutas/${rutaId}`);
-      console.log('Estructura de respuesta de ruta individual:', respuestaRuta.data);
-      
-      const respuestaFotos = await axios.get(`http://localhost:10101/rutas/fotos/${rutaId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      console.log('Estructura de respuesta de fotos:', respuestaFotos.data);
-      
-      // Mostrar resultados detallados en consola
-      console.log('=== ANÁLISIS DE ESTRUCTURA DE RESPUESTA ===');
-      
-      if (respuestaFotos.data) {
-        console.log('Tipo de respuesta fotos:', typeof respuestaFotos.data);
-        if (respuestaFotos.data.fotos) {
-          console.log('Tipo de fotos:', typeof respuestaFotos.data.fotos);
-          console.log('Es array:', Array.isArray(respuestaFotos.data.fotos));
-          
-          if (Array.isArray(respuestaFotos.data.fotos) && respuestaFotos.data.fotos.length > 0) {
-            console.log('Primer elemento:', respuestaFotos.data.fotos[0]);
-            console.log('Tipo del primer elemento:', typeof respuestaFotos.data.fotos[0]);
-          }
-        }
-      }
-      
-      toast.info('Verificación de estructura completada. Revisa la consola', {
-        position: "top-right",
-        autoClose: 3000,
-        containerId: "rutas-toast"
-      });
-    } catch (error) {
-      console.error('Error al verificar estructura:', error);
-    }
-  };
-
   return (
     <DashboardLayout>
       <div className="p-6">
@@ -1168,7 +1142,7 @@ const Rutas = () => {
         {/* Header with Title and Create Button */}
         <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-emerald-700 mb-2">Rutas Disponibles</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Rutas Disponibles</h1>
             <p className="text-emerald-600">Gestiona las rutas de turismo ecológico</p>
           </div>
           
@@ -1194,16 +1168,8 @@ const Rutas = () => {
             </button>
             
             <button
-              onClick={fetchRutas}
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-emerald-200 hover:bg-emerald-50 text-emerald-700 rounded shadow-sm transition-colors"
-              title="Recargar rutas"
-            >
-              <RefreshCw size={18} />
-            </button>
-            
-            <button
               onClick={() => handleOpenModal()}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded shadow-sm transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded shadow-sm transition-colors"
             >
               <Plus size={18} />
               Nueva Ruta
@@ -1347,7 +1313,7 @@ const Rutas = () => {
                     <div className="absolute top-2 right-2 flex gap-1">
                       <button
                         onClick={() => handleOpenModal(ruta)}
-                        className="p-2 bg-white bg-opacity-90 hover:bg-emerald-50 text-emerald-600 rounded-full shadow-sm transition-colors"
+                        className="p-2 bg-white bg-opacity-90 hover:bg-emerald-50 text-emerald-700 rounded-full shadow-sm transition-colors"
                         title="Editar ruta"
                       >
                         <Pencil size={16} />
@@ -1402,7 +1368,7 @@ const Rutas = () => {
                     
                     <button 
                       onClick={() => openDetailView(ruta)}
-                      className="w-full mt-4 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded flex items-center justify-center gap-2"
+                      className="w-full mt-4 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded flex items-center justify-center gap-2 shadow-sm transition-colors"
                     >
                       <Eye size={16} />
                       Ver detalles
@@ -1469,11 +1435,10 @@ const Rutas = () => {
                                 if (idFoto) {
                                   confirmarEliminarFoto(idFoto, idx);
                                 } else {
-                                  console.error('No se pudo determinar el ID de la foto a eliminar');
-                                  toast.error('No se pudo identificar esta imagen para eliminar');
+                                  removeImage(idx);
                                 }
                               }}
-                              className="absolute top-2 right-2 bg-white bg-opacity-80 p-1.5 rounded-full text-red-600 hover:bg-red-100 transition-all opacity-0 group-hover:opacity-100"
+                              className="absolute top-2 right-2 bg-white bg-opacity-90 hover:bg-red-50 text-red-600 p-1.5 rounded-full shadow-sm transition-colors opacity-0 group-hover:opacity-100"
                             >
                               <Trash size={16} />
                             </button>
@@ -1552,7 +1517,7 @@ const Rutas = () => {
                 <div className="flex justify-end gap-3 pt-4 border-t border-emerald-100">
                   <button
                     onClick={() => handleDeleteRuta(activeRoute)}
-                    className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white flex items-center gap-2 transition-colors shadow-sm"
+                    className="px-4 py-2 bg-rose-500 hover:bg-rose-600 rounded-lg text-white flex items-center gap-2 transition-colors shadow-sm"
                   >
                     <Trash size={16} />
                     Eliminar
@@ -1562,7 +1527,7 @@ const Rutas = () => {
                       closeDetailView();
                       handleOpenModal(activeRoute);
                     }}
-                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-white flex items-center gap-2 transition-colors shadow-sm"
+                    className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 rounded-lg text-white flex items-center gap-2 transition-colors shadow-sm"
                   >
                     <Pencil size={16} />
                     Editar
@@ -1615,38 +1580,46 @@ const Rutas = () => {
         
         {/* Create/Edit Modal */}
         {modalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-start justify-center p-4 z-40">
-            <div className="bg-white rounded-lg w-full max-w-md mx-auto mt-20 shadow-xl">
-              <div className="p-6">
-                <h2 className="text-xl font-bold text-emerald-700 mb-4 flex items-center">
+          <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-auto max-h-[90vh] overflow-auto">
+              <div className="flex justify-between items-center p-6 bg-emerald-700 text-white border-b border-emerald-600 rounded-t-lg">
+                <h2 className="text-2xl font-bold flex items-center gap-2">
+                  <Mountain size={24} />
                   {isEditing ? 'Modificar Ruta' : 'Nueva Ruta'}
                 </h2>
-                
+                <button
+                  onClick={() => setModalOpen(false)}
+                  className="text-white hover:text-emerald-200 bg-emerald-800 hover:bg-emerald-900 rounded-full p-1.5 transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              
+              <div className="p-6">
                 {alert.show && alert.type === 'error' && (
-                  <div className="mb-4 p-3 bg-red-50 rounded border border-red-100">
-                    <p className="text-red-700 text-sm">
-                      {alert.message.includes("Error 403") ? "Token inválido" : alert.message}
-                    </p>
+                  <div className="mb-6 bg-rose-100 text-rose-700 p-4 rounded-lg flex items-start gap-3">
+                    <XCircle className="w-5 h-5 text-rose-500 mt-0.5" />
+                    <p>{alert.message.includes("Error 403") ? "Token inválido" : alert.message}</p>
                   </div>
                 )}
                 
-                <form onSubmit={handleCreateOrUpdate} className="space-y-4 overflow-y-auto max-h-[60vh]">
+                <form onSubmit={handleCreateOrUpdate} className="space-y-6">
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">Nombre de la ruta</label>
+                    <label className="block text-emerald-600 mb-1">Nombre de la ruta</label>
                     <input
                       type="text"
                       placeholder="Nombre de la ruta"
                       value={rutaActual.nombreRuta}
                       onChange={handleRouteNameChange}
                       className={`w-full p-2 rounded bg-emerald-50 border border-emerald-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400 ${
-                        checkRouteNameExists(rutaActual.nombreRuta) ? 'border-2 border-red-500' : ''
+                        alert.show && alert.message.includes('nombre de ruta ya existe') ? 'border-2 border-red-500' : ''
                       }`}
                       required
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">Descripción</label>
+                    <label className="block text-emerald-600 mb-1">Descripción</label>
                     <textarea
                       placeholder="Descripción detallada de la ruta"
                       value={rutaActual.descripcion}
@@ -1658,7 +1631,7 @@ const Rutas = () => {
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm text-gray-600 mb-1">Duración</label>
+                      <label className="block text-emerald-600 mb-1">Duración</label>
                       <input
                         type="text"
                         placeholder="ej: 2 horas"
@@ -1669,7 +1642,7 @@ const Rutas = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-600 mb-1">Distancia (km)</label>
+                      <label className="block text-emerald-600 mb-1">Distancia (km)</label>
                       <input
                         type="number"
                         placeholder="ej: 2.5"
@@ -1685,7 +1658,7 @@ const Rutas = () => {
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm text-gray-600 mb-1">Capacidad</label>
+                      <label className="block text-emerald-600 mb-1">Capacidad</label>
                       <input
                         type="number"
                         placeholder="ej: 20"
@@ -1697,7 +1670,7 @@ const Rutas = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-600 mb-1">Dificultad</label>
+                      <label className="block text-emerald-600 mb-1">Dificultad</label>
                       <select
                         value={rutaActual.dificultad}
                         onChange={(e) => setRutaActual({ ...rutaActual, dificultad: e.target.value })}
@@ -1713,7 +1686,7 @@ const Rutas = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">Precio (COP)</label>
+                    <label className="block text-emerald-600 mb-1">Precio (COP)</label>
                     <div className="relative">
                       <span className="absolute left-2 top-2 text-gray-600">$</span>
                       <input
@@ -1732,7 +1705,7 @@ const Rutas = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">Tipo de ruta</label>
+                    <label className="block text-emerald-600 mb-1">Tipo de ruta</label>
                     <select
                       value={rutaActual.tipo}
                       onChange={(e) => setRutaActual({ ...rutaActual, tipo: e.target.value })}
@@ -1747,7 +1720,7 @@ const Rutas = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">Estado</label>
+                    <label className="block text-emerald-600 mb-1">Estado</label>
                     <select
                       value={rutaActual.estado}
                       onChange={(e) => setRutaActual({ ...rutaActual, estado: e.target.value })}
@@ -1761,7 +1734,7 @@ const Rutas = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="block text-sm text-gray-600 mb-1">Imágenes de la ruta (opcional)</label>
+                    <label className="block text-emerald-600 mb-1">Imágenes de la ruta (opcional)</label>
                     <input
                       type="file"
                       onChange={handleImageChange}
@@ -1788,9 +1761,22 @@ const Rutas = () => {
                               />
                               <button
                                 type="button"
-                                onClick={() => removeImage(index)}
-                                className="absolute top-1 right-1 bg-white bg-opacity-80 text-red-500 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                title="Eliminar imagen"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  // Determinar el ID de la foto para eliminar
+                                  let idFoto;
+                                  if (fotosCompletas[index]) {
+                                    // Imprimir info para depurar
+                                    debugPhotoInfo(fotosCompletas[index]);
+                                    idFoto = fotosCompletas[index].id || fotosCompletas[index].idFoto;
+                                  }
+                                  if (idFoto) {
+                                    confirmarEliminarFoto(idFoto, index);
+                                  } else {
+                                    removeImage(index);
+                                  }
+                                }}
+                                className="absolute top-1 right-1 bg-white bg-opacity-90 hover:bg-red-50 text-red-600 p-1 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-colors"
                               >
                                 <Trash size={16} />
                               </button>
@@ -1801,19 +1787,26 @@ const Rutas = () => {
                     )}
                   </div>
                   
-                  <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 mt-4">
+                  <div className="flex justify-end gap-2 pt-4 border-t border-emerald-100 mt-4">
                     <button
                       type="button"
                       onClick={() => setModalOpen(false)}
-                      className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+                      className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded transition-colors shadow-sm"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded transition-colors"
+                      className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded transition-colors shadow-sm"
                     >
-                      {isEditing ? 'Actualizar' : 'Crear'}
+                      {isProcessing ? (
+                        <>
+                          <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 inline-block"></span>
+                          Procesando...
+                        </>
+                      ) : (
+                        <>{isEditing ? 'Actualizar' : 'Crear'}</>
+                      )}
                     </button>
                   </div>
                 </form>
