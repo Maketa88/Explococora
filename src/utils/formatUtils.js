@@ -176,4 +176,25 @@ export const mostrarFechaHoraLegible = (fechaISO) => {
     console.error("Error al mostrar fecha y hora legible:", e);
     return fechaISO;
   }
+};
+
+/**
+ * Genera un timestamp en formato MySQL (YYYY-MM-DD HH:MM:SS) para la fecha y hora actual
+ * @returns {string} - Timestamp en formato MySQL
+ */
+export const generarTimestampMySQL = () => {
+  const fecha = new Date();
+  
+  // Obtener componentes de la fecha
+  const anio = fecha.getFullYear();
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+  const dia = String(fecha.getDate()).padStart(2, '0');
+  
+  // Obtener componentes de la hora
+  const hora = String(fecha.getHours()).padStart(2, '0');
+  const minutos = String(fecha.getMinutes()).padStart(2, '0');
+  const segundos = String(fecha.getSeconds()).padStart(2, '0');
+  
+  // Formatear en YYYY-MM-DD HH:MM:SS
+  return `${anio}-${mes}-${dia} ${hora}:${minutos}:${segundos}`;
 }; 

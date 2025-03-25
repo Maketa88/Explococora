@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { combinarFechaHoraISO } from '../../utils/formatUtils';
+import { combinarFechaHoraISO, generarTimestampMySQL } from '../../utils/formatUtils';
 
 export const FormularioReservaRuta = () => {
   const { t } = useTranslation();
@@ -23,7 +23,6 @@ export const FormularioReservaRuta = () => {
   // Añadir nuevos estados para manejar opciones de pago
   const [radicado, setRadicado] = useState(null);
   const [mostrarOpcionesPago, setMostrarOpcionesPago] = useState(false);
-  const [mercadoPagoUrl, setMercadoPagoUrl] = useState(null);
 
   // Si no hay información de la ruta en location.state, cargarla desde la API
   useEffect(() => {
@@ -110,10 +109,14 @@ export const FormularioReservaRuta = () => {
       const fechaInicioISO = combinarFechaHoraISO(formData.fechaInicio, formData.horaInicio);
       const fechaFinISO = combinarFechaHoraISO(formData.fechaFin, formData.horaInicio);
       
+      // Generar el timestamp actual para la fecha de reserva
+      const fechaReservaMySQL = generarTimestampMySQL();
+      
       console.log('Fecha original seleccionada (inicio):', formData.fechaInicio);
       console.log('Fecha original seleccionada (fin):', formData.fechaFin);
       console.log('Fecha procesada para enviar (inicio):', fechaInicioISO);
       console.log('Fecha procesada para enviar (fin):', fechaFinISO);
+      console.log('Fecha de reserva (MySQL):', fechaReservaMySQL);
       
       // Realizar petición al backend
       const response = await axios.post('http://localhost:10101/pagos-rutas/crear', 
@@ -123,6 +126,7 @@ export const FormularioReservaRuta = () => {
           fechaInicio: fechaInicioISO,
           fechaFin: fechaFinISO,
           horaInicio: formData.horaInicio,
+          fechaReserva: fechaReservaMySQL, // Añadir fecha de reserva en formato MySQL
           estado: 'pendiente' // Añadir estado pendiente según validación del backend
         },
         {
@@ -137,7 +141,7 @@ export const FormularioReservaRuta = () => {
       if (response.data && response.data.radicado) {
         localStorage.setItem('reserva_pendiente', JSON.stringify({
           radicado: response.data.radicado,
-          fechaCreacion: new Date().toISOString(),
+          fechaCreacion: fechaReservaMySQL,
           guiaAsignado: response.data.guiaAsignado || null
         }));
         
@@ -146,11 +150,6 @@ export const FormularioReservaRuta = () => {
         
         // Mostrar opciones de pago en lugar de redireccionar inmediatamente
         setMostrarOpcionesPago(true);
-        
-        // Si hay init_point disponible, guardarlo para el botón de pago real
-        if (response.data.preference && response.data.preference.init_point) {
-          setMercadoPagoUrl(response.data.preference.init_point);
-        }
       } else {
         throw new Error(t('respuestaInvalida', 'La respuesta del servidor no es válida'));
       }
@@ -172,7 +171,9 @@ export const FormularioReservaRuta = () => {
         throw new Error(t('datosFaltantes', 'Faltan datos para realizar el pago simulado'));
       }
       
-      console.log(`Iniciando simulación de pago para radicado: ${radicado}`);
+      // Generar timestamp para los logs
+      const fechaSimulacionMySQL = generarTimestampMySQL();
+      console.log(`Iniciando simulación de pago para radicado: ${radicado} a las ${fechaSimulacionMySQL}`);
       
       // Llamar a endpoint de simulación
       const response = await axios.get(`http://localhost:10101/pagos-rutas/simular/${radicado}`, {
@@ -224,15 +225,6 @@ export const FormularioReservaRuta = () => {
       setError(mensajeError);
     } finally {
       setCargando(false);
-    }
-  };
-  
-  // Función para continuar a Mercado Pago
-  const continuarAMercadoPago = () => {
-    if (mercadoPagoUrl) {
-      window.location.href = mercadoPagoUrl;
-    } else {
-      setError(t('urlPagoNoDisponible', 'URL de pago no disponible'));
     }
   };
 
@@ -465,23 +457,11 @@ export const FormularioReservaRuta = () => {
                         {t('reservaCreada', 'Reserva creada con éxito. Radicado: ')} {radicado}
                       </p>
                       <p className="text-sm text-green-700 mt-1">
-                        {t('seleccioneTipoPago', 'Seleccione cómo desea realizar el pago:')}
+                        {t('procederPagoSimulado', 'Proceder con el pago simulado:')}
                       </p>
                     </div>
                   </div>
                 </div>
-                
-                <button
-                  type="button"
-                  onClick={continuarAMercadoPago}
-                  disabled={cargando || !mercadoPagoUrl}
-                  className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center"
-                >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                  </svg>
-                  {t('pagarConMercadoPago', 'Pagar con Mercado Pago')}
-                </button>
                 
                 <button
                   type="button"
@@ -502,7 +482,7 @@ export const FormularioReservaRuta = () => {
                       <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
                       </svg>
-                      {t('usarPagoSimulado', 'Usar Pago Simulado (Testing)')}
+                      {t('realizarPagoSimulado', 'Realizar Pago Simulado')}
                     </>
                   )}
                 </button>
@@ -519,7 +499,7 @@ export const FormularioReservaRuta = () => {
           <li>{t('notaCapacidad', 'La reserva está sujeta a disponibilidad.')}</li>
           <li>{t('notaGuia', 'Se te asignará un guía experimentado para tu aventura.')}</li>
           <li>{t('notaEquipo', 'Recomendamos llevar ropa cómoda, protector solar y agua.')}</li>
-          <li>{t('notaPago', 'El pago se procesa de forma segura a través de Mercado Pago.')}</li>
+          <li>{t('notaPagoSimulado', 'Estás usando un entorno de prueba con pagos simulados.')}</li>
         </ul>
       </div>
     </div>
