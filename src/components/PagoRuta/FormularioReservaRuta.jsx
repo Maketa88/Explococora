@@ -452,7 +452,7 @@ export const FormularioReservaRuta = () => {
           <li>{t('notaCapacidad', 'La reserva está sujeta a disponibilidad.')}</li>
           <li>{t('notaGuia', 'Se te asignará un guía experimentado para tu aventura.')}</li>
           <li>{t('notaEquipo', 'Recomendamos llevar ropa cómoda, protector solar y agua.')}</li>
-          <li>{t('notaPagoSimulado', 'Estás usando un entorno de prueba con pagos simulados.')}</li>
+          
         </ul>
       </div>
     </div>

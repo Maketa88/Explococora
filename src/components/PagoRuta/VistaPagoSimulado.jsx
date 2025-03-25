@@ -390,14 +390,7 @@ export const VistaPagoSimulado = () => {
           </div>
         </div>
 
-        {/* Pie de página */}
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-          <div className="flex items-center justify-center">
-            <p className="text-xs text-gray-500">
-              {t('procesoSimulado', 'Este proceso es una simulación con fines educativos. Entorno de pruebas.')}
-            </p>
-          </div>
-        </div>
+        
       </div>
     </div>
   );
