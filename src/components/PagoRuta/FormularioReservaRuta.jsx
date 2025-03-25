@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { combinarFechaHoraISO } from '../../utils/formatUtils';
 
 export const FormularioReservaRuta = () => {
   const { t } = useTranslation();
@@ -98,21 +99,31 @@ export const FormularioReservaRuta = () => {
     setError(null);
     
     try {
-      // Obtener token del localStorage (asumiendo que está almacenado ahí)
+      // Obtener token del localStorage
       const token = localStorage.getItem('token');
       
       if (!token) {
         throw new Error(t('noAutenticado', 'No estás autenticado'));
       }
+
+      // Usar nuestra utilidad para combinar fecha y hora correctamente
+      const fechaInicioISO = combinarFechaHoraISO(formData.fechaInicio, formData.horaInicio);
+      const fechaFinISO = combinarFechaHoraISO(formData.fechaFin, formData.horaInicio);
+      
+      console.log('Fecha original seleccionada (inicio):', formData.fechaInicio);
+      console.log('Fecha original seleccionada (fin):', formData.fechaFin);
+      console.log('Fecha procesada para enviar (inicio):', fechaInicioISO);
+      console.log('Fecha procesada para enviar (fin):', fechaFinISO);
       
       // Realizar petición al backend
       const response = await axios.post('http://localhost:10101/pagos-rutas/crear', 
         {
           idRuta: parseInt(idRuta),
           cantidadPersonas: parseInt(formData.cantidadPersonas),
-          fechaInicio: formData.fechaInicio,
-          fechaFin: formData.fechaFin,
-          horaInicio: formData.horaInicio
+          fechaInicio: fechaInicioISO,
+          fechaFin: fechaFinISO,
+          horaInicio: formData.horaInicio,
+          estado: 'pendiente' // Añadir estado pendiente según validación del backend
         },
         {
           headers: {
@@ -161,6 +172,8 @@ export const FormularioReservaRuta = () => {
         throw new Error(t('datosFaltantes', 'Faltan datos para realizar el pago simulado'));
       }
       
+      console.log(`Iniciando simulación de pago para radicado: ${radicado}`);
+      
       // Llamar a endpoint de simulación
       const response = await axios.get(`http://localhost:10101/pagos-rutas/simular/${radicado}`, {
         headers: {
@@ -168,7 +181,11 @@ export const FormularioReservaRuta = () => {
         }
       });
       
+      console.log('Respuesta de simulación:', response.data);
+      
       if (response.data && response.data.success) {
+        console.log(`Simulación exitosa. ID de pago: ${response.data.idPago}`);
+        
         // Redireccionar a página de confirmación
         navigate('/VistaCliente/reserva/confirmacion', {
           state: {
@@ -178,11 +195,33 @@ export const FormularioReservaRuta = () => {
           }
         });
       } else {
-        throw new Error(t('errorSimulacion', 'Error en la simulación del pago'));
+        console.error('La respuesta no contiene el campo success=true:', response.data);
+        throw new Error(t('errorSimulacion', 'Error en la simulación del pago: Respuesta inválida del servidor'));
       }
     } catch (error) {
       console.error('Error al simular pago:', error);
-      setError(error.response?.data?.message || error.message || t('errorSimulacionPago', 'Error al simular el pago'));
+      // Mostrar mensaje de error más específico
+      let mensajeError = t('errorSimulacionPago', 'Error al simular el pago');
+      
+      if (error.response) {
+        console.error('Detalles del error:', {
+          status: error.response.status,
+          data: error.response.data
+        });
+        
+        // Si el servidor devuelve un mensaje de error, mostrarlo
+        if (error.response.data && error.response.data.message) {
+          mensajeError = `${mensajeError}: ${error.response.data.message}`;
+        } else if (error.response.status === 404) {
+          mensajeError = `${mensajeError}: Endpoint de simulación no encontrado`;
+        } else if (error.response.status === 401) {
+          mensajeError = `${mensajeError}: No autorizado`;
+        }
+      } else if (error.message) {
+        mensajeError = `${mensajeError}: ${error.message}`;
+      }
+      
+      setError(mensajeError);
     } finally {
       setCargando(false);
     }
