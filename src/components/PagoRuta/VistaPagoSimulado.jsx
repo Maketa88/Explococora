@@ -151,21 +151,7 @@ export const VistaPagoSimulado = () => {
                 {t('pagoConTarjeta', 'Pago con tarjeta')}
               </h2>
 
-              {/* Mensaje de entorno simulado */}
-              <div className="mb-6 bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-blue-700">
-                      {t('entornoPrueba', 'Este es un entorno de prueba estudiantil. Puedes ingresar datos ficticios.')}
-                    </p>
-                  </div>
-                </div>
-              </div>
+              
 
               {/* Mensaje de error */}
               {error && (
@@ -314,6 +300,11 @@ export const VistaPagoSimulado = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">{t('radicado', 'Referencia')}:</span>
                     <span className="font-medium text-gray-800">{radicado}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">{t('numeroPago', 'Número de pago')}:</span>
+                    <span className="font-medium text-gray-800">184841580058</span>
                   </div>
                   
                   {rutaInfo && (
