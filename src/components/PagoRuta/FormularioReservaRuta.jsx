@@ -410,7 +410,7 @@ export const FormularioReservaRuta = () => {
                         {t('reservaCreada', 'Reserva creada con éxito. Radicado: ')} {radicado}
                       </p>
                       <p className="text-sm text-green-700 mt-1">
-                        {t('procederPagoSimulado', 'Proceder con el pago simulado:')}
+                        {t('procederPagoSimulado', 'Continuar con el pago a través de Mercado Libre:')}
                       </p>
                     </div>
                   </div>
