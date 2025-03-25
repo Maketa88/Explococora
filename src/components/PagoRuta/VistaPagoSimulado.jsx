@@ -176,24 +176,24 @@ export const VistaPagoSimulado = () => {
               )}
 
               {/* Tipos de tarjetas */}
-              <div className="flex mb-4 space-x-4 items-center">
+              <div className="flex mb-6 space-x-6 items-center justify-center">
                 {/* Visa */}
-                <div className="bg-white p-2 rounded-md border border-gray-200 hover:shadow-md transition-shadow w-16 h-12 flex items-center justify-center">
+                <div className="bg-white p-3 rounded-md border border-gray-200 hover:shadow-lg transition-shadow w-24 h-16 flex items-center justify-center">
                   <img src={Visa} alt="Visa" className="max-w-full max-h-full object-contain" />
                 </div>
                 
                 {/* Mastercard */}
-                <div className="bg-white p-2 rounded-md border border-gray-200 hover:shadow-md transition-shadow w-16 h-12 flex items-center justify-center">
+                <div className="bg-white p-3 rounded-md border border-gray-200 hover:shadow-lg transition-shadow w-24 h-16 flex items-center justify-center">
                   <img src={Master} alt="Mastercard" className="max-w-full max-h-full object-contain" />
                 </div>
                 
                 {/* American Express */}
-                <div className="bg-white p-2 rounded-md border border-gray-200 hover:shadow-md transition-shadow w-16 h-12 flex items-center justify-center">
+                <div className="bg-white p-3 rounded-md border border-gray-200 hover:shadow-lg transition-shadow w-24 h-16 flex items-center justify-center">
                   <img src={AmericanExpress} alt="American Express" className="max-w-full max-h-full object-contain" />
                 </div>
                 
                 {/* Diners Club */}
-                <div className="bg-white p-2 rounded-md border border-gray-200 hover:shadow-md transition-shadow w-16 h-12 flex items-center justify-center">
+                <div className="bg-white p-3 rounded-md border border-gray-200 hover:shadow-lg transition-shadow w-24 h-16 flex items-center justify-center">
                   <img src={Diners} alt="Diners Club" className="max-w-full max-h-full object-contain" />
                 </div>
                 
