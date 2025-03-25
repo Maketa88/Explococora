@@ -14,7 +14,8 @@ export const VistaPagoSimulado = () => {
   const [formPago, setFormPago] = useState({
     numeroTarjeta: '',
     nombreTitular: '',
-    fechaExpiracion: '',
+    mesExpiracion: '',
+    anioExpiracion: '',
     codigoSeguridad: '',
     cuotas: '1'
   });
@@ -118,7 +119,8 @@ export const VistaPagoSimulado = () => {
   const camposCompletos = 
     formPago.numeroTarjeta.length === 16 && 
     formPago.nombreTitular.trim() !== '' && 
-    formPago.fechaExpiracion !== '' && 
+    formPago.mesExpiracion !== '' &&
+    formPago.anioExpiracion !== '' &&
     formPago.codigoSeguridad.length >= 3;
 
   return (
@@ -240,13 +242,40 @@ export const VistaPagoSimulado = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t('fechaExpiracion', 'Fecha de expiración')}
                     </label>
-                    <input
-                      type="month"
-                      name="fechaExpiracion"
-                      value={formPago.fechaExpiracion}
-                      onChange={handleChange}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      <select
+                        name="mesExpiracion"
+                        value={formPago.mesExpiracion}
+                        onChange={handleChange}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="">{t('mes', 'Mes')}</option>
+                        {Array.from({ length: 12 }, (_, i) => {
+                          const mes = (i + 1).toString().padStart(2, '0');
+                          return (
+                            <option key={mes} value={mes}>
+                              {mes}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      <select
+                        name="anioExpiracion"
+                        value={formPago.anioExpiracion}
+                        onChange={handleChange}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="">{t('año', 'Año')}</option>
+                        {Array.from({ length: 10 }, (_, i) => {
+                          const anio = (new Date().getFullYear() + i).toString();
+                          return (
+                            <option key={anio} value={anio}>
+                              {anio}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    </div>
                   </div>
                   
                   <div>
