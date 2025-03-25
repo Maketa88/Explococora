@@ -29,8 +29,8 @@ export const BotonPagoRuta = ({ ruta, className }) => {
     setError(null);
 
     try {
-      // Redirigir al formulario de reserva con los detalles de la ruta
-      navigate(`/reserva-ruta/${ruta.idRuta}`, { 
+      // Siempre usar la ruta absoluta para navegar al formulario de reserva
+      navigate(`/VistaCliente/reserva-ruta/${ruta.idRuta}`, { 
         state: { 
           rutaInfo: ruta
         }

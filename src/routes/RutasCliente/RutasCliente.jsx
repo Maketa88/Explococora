@@ -52,10 +52,10 @@ const RutasCliente = () => {
         <Route path="/QuienesSomos" element={<QuienesSomosCliente />} />
         
         {/* Rutas para pagos y reservas */}
-        <Route path="/reserva-ruta/:idRuta" element={<FormularioReservaRuta />} />
-        <Route path="/reserva/confirmacion" element={<ConfirmacionPago />} />
-        <Route path="/reserva/pendiente" element={<ConfirmacionPago />} />
-        <Route path="/reserva/error" element={<ConfirmacionPago />} />
+        <Route path="reserva-ruta/:idRuta" element={<FormularioReservaRuta />} />
+        <Route path="reserva/confirmacion" element={<ConfirmacionPago />} />
+        <Route path="reserva/pendiente" element={<ConfirmacionPago />} />
+        <Route path="reserva/error" element={<ConfirmacionPago />} />
       </Routes>
       {!ocultarFooter && <FooterCliente />}
       <ChatBot />
