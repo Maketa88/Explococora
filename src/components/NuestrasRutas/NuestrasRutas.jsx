@@ -6,6 +6,7 @@ import { GiHorseHead, GiMountainClimbing, GiPalmTree, GiPathDistance } from 'rea
 import { IoTrailSignSharp } from 'react-icons/io5';
 import { RiTimerFlashFill } from 'react-icons/ri';
 import { useParams } from 'react-router-dom';
+import { BotonPagoRuta } from '../PagoRuta';
 import { Paisaje } from './Paisaje';
 
 export const NuestrasRutas = () => {
@@ -525,43 +526,49 @@ export const NuestrasRutas = () => {
                     <div className="my-4 w-full h-px bg-gradient-to-r from-transparent via-teal-200 to-transparent opacity-70"></div>
                     
                     {/* Botones con estilo elegante pero más compactos */}
-                    <div className="flex gap-4">
-                      <button 
-                        className={`flex-1 py-3 rounded-xl transition-all duration-500 relative overflow-hidden group shadow-sm ${
-                          rutaActual.estado === 'Activa' 
-                            ? 'bg-gradient-to-br from-emerald-50 to-green-50 text-green-700 border border-green-100 hover:border-green-200' 
-                            : 'bg-gradient-to-br from-rose-50 to-red-50 text-red-700 border border-red-100 hover:border-red-200'
-                        }`}
-                      >
-                        <div className="absolute inset-0 w-full h-full overflow-hidden">
-                          <div className={`absolute -inset-[100%] ${
-                            rutaActual.estado === 'Activa' 
-                              ? 'bg-gradient-to-tr from-green-500/5 to-emerald-500/10' 
-                              : 'bg-gradient-to-tr from-red-500/5 to-rose-500/10'
-                          } animate-[gradient_8s_ease_infinite] blur-xl opacity-30`}></div>
-                        </div>
-                        <div className="relative z-10 flex items-center justify-center">
-                          <div className={`w-2 h-2 rounded-full mr-2 shadow-sm ${
-                            rutaActual.estado === 'Activa' 
-                              ? 'bg-gradient-to-br from-emerald-400 to-green-500' 
-                              : 'bg-gradient-to-br from-rose-400 to-red-500'
-                          }`}></div>
-                          <span className="font-medium tracking-wide text-sm">{rutaActual.estado}</span>
-                        </div>
-                      </button>
+                    <div className="flex flex-col gap-4">
+                      {/* Botón de pago/reserva */}
+                      <BotonPagoRuta 
+                        ruta={rutaActual} 
+                        className="w-full py-3 rounded-xl text-white relative overflow-hidden group shadow-md transition-all duration-500"
+                      />
                       
-                      <button className="flex-1 py-3 rounded-xl text-white relative overflow-hidden group shadow-sm transition-all duration-500">
-                        <div className="absolute inset-0 bg-gradient-to-br from-teal-500 to-teal-600 group-hover:scale-[1.02] transition-transform duration-500"></div>
-                        <div className="absolute inset-0">
-                          <div className="absolute -inset-[100%] bg-gradient-to-tr from-teal-400/0 via-white/5 to-teal-400/0 animate-[shimmer_4s_ease_infinite] blur-md"></div>
-                        </div>
-                        <span className="relative z-10 font-medium tracking-wide flex items-center justify-center text-white/90 group-hover:text-white transition-colors duration-500 text-sm">
-                          <svg className="w-4 h-4 mr-1.5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                          </svg>
-                          {rutaActual.precio}
-                        </span>
-                      </button>
+                      {/* Estado de la ruta */}
+                      <div className="flex gap-4">
+                        <button 
+                          className={`flex-1 py-3 rounded-xl transition-all duration-500 relative overflow-hidden group shadow-sm ${
+                            rutaActual.estado === 'Activa' 
+                              ? 'bg-gradient-to-br from-emerald-50 to-green-50 text-green-700 border border-green-100 hover:border-green-200' 
+                              : 'bg-gradient-to-br from-rose-50 to-red-50 text-red-700 border border-red-100 hover:border-red-200'
+                          }`}
+                        >
+                          <div className="absolute inset-0 w-full h-full overflow-hidden">
+                            <div className={`absolute -inset-[100%] ${
+                              rutaActual.estado === 'Activa' 
+                                ? 'bg-gradient-to-tr from-green-500/5 to-emerald-500/10' 
+                                : 'bg-gradient-to-tr from-red-500/5 to-rose-500/10'
+                            } animate-[gradient_8s_ease_infinite] blur-xl opacity-30`}></div>
+                          </div>
+                          <div className="relative z-10 flex items-center justify-center">
+                            <div className={`w-2 h-2 rounded-full mr-2 shadow-sm ${
+                              rutaActual.estado === 'Activa' 
+                                ? 'bg-gradient-to-br from-emerald-400 to-green-500' 
+                                : 'bg-gradient-to-br from-rose-400 to-red-500'
+                            }`}></div>
+                            <span className="font-medium tracking-wide text-sm">{rutaActual.estado}</span>
+                          </div>
+                        </button>
+                        
+                        {/* Precio */}
+                        <button className="flex-1 py-3 rounded-xl text-gray-700 relative overflow-hidden group shadow-sm transition-all duration-500 bg-white border border-teal-200 hover:bg-teal-50">
+                          <span className="relative z-10 font-medium tracking-wide flex items-center justify-center transition-colors duration-500 text-sm">
+                            <svg className="w-4 h-4 mr-1.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                            </svg>
+                            {rutaActual.precio} COP
+                          </span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

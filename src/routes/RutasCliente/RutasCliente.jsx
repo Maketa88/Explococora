@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
-import ChatBot from "../../components/Chatbot/Chatbot";
+import ChatBot from "../../components/chatbot/Chatbot";
 import ContactForm from "../../components/ContactForm/ContactForm";
 import { HistoriaCultura } from "../../components/HistoriaCultura/Body/HistoriaCultura";
 import NuestrasRutas from "../../components/NuestrasRutas/NuestrasRutas";
 import { NuestrosGuias } from "../../components/NuestrosGuias/NuestrosGuias";
+import { ConfirmacionPago, FormularioReservaRuta } from "../../components/PagoRuta";
 import { PaginaInicio } from "../../pages/PaginaInicio/PaginaInicio";
 import ActualizarDatosCliente from "../../pages/VistaCliente/ActualizarCliente";
 import { BorrarCuenta } from "../../pages/VistaCliente/BorrarCuenta";
@@ -49,6 +50,12 @@ const RutasCliente = () => {
         <Route path="/NuestrasRutas" element={<NuestrasRutas />} />
         <Route path="/NuestrasRutas/:idRuta" element={<NuestrasRutas />} />
         <Route path="/QuienesSomos" element={<QuienesSomosCliente />} />
+        
+        {/* Rutas para pagos y reservas */}
+        <Route path="reserva-ruta/:idRuta" element={<FormularioReservaRuta />} />
+        <Route path="reserva/confirmacion" element={<ConfirmacionPago />} />
+        <Route path="reserva/pendiente" element={<ConfirmacionPago />} />
+        <Route path="reserva/error" element={<ConfirmacionPago />} />
       </Routes>
       {!ocultarFooter && <FooterCliente />}
       <ChatBot />
