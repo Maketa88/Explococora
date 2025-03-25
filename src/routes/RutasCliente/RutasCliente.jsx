@@ -6,6 +6,7 @@ import { HistoriaCultura } from "../../components/HistoriaCultura/Body/HistoriaC
 import NuestrasRutas from "../../components/NuestrasRutas/NuestrasRutas";
 import { NuestrosGuias } from "../../components/NuestrosGuias/NuestrosGuias";
 import { ConfirmacionPago, FormularioReservaRuta } from "../../components/PagoRuta";
+import { VistaPagoSimulado } from "../../components/PagoRuta/VistaPagoSimulado";
 import { PaginaInicio } from "../../pages/PaginaInicio/PaginaInicio";
 import ActualizarDatosCliente from "../../pages/VistaCliente/ActualizarCliente";
 import { BorrarCuenta } from "../../pages/VistaCliente/BorrarCuenta";
@@ -53,6 +54,7 @@ const RutasCliente = () => {
         
         {/* Rutas para pagos y reservas */}
         <Route path="reserva-ruta/:idRuta" element={<FormularioReservaRuta />} />
+        <Route path="reserva/pago-simulado" element={<VistaPagoSimulado />} />
         <Route path="reserva/confirmacion" element={<ConfirmacionPago />} />
         <Route path="reserva/pendiente" element={<ConfirmacionPago />} />
         <Route path="reserva/error" element={<ConfirmacionPago />} />

@@ -162,70 +162,23 @@ export const FormularioReservaRuta = () => {
   };
   
   // Función para realizar pago simulado
-  const realizarPagoSimulado = async () => {
-    try {
-      setCargando(true);
-      const token = localStorage.getItem('token');
-      
-      if (!token || !radicado) {
-        throw new Error(t('datosFaltantes', 'Faltan datos para realizar el pago simulado'));
-      }
-      
-      // Generar timestamp para los logs
-      const fechaSimulacionMySQL = generarTimestampMySQL();
-      console.log(`Iniciando simulación de pago para radicado: ${radicado} a las ${fechaSimulacionMySQL}`);
-      
-      // Llamar a endpoint de simulación
-      const response = await axios.get(`http://localhost:10101/pagos-rutas/simular/${radicado}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      console.log('Respuesta de simulación:', response.data);
-      
-      if (response.data && response.data.success) {
-        console.log(`Simulación exitosa. ID de pago: ${response.data.idPago}`);
-        
-        // Redireccionar a página de confirmación
-        navigate('/VistaCliente/reserva/confirmacion', {
-          state: {
-            pagoSimulado: true,
-            radicado: radicado,
-            idPago: response.data.idPago
-          }
-        });
-      } else {
-        console.error('La respuesta no contiene el campo success=true:', response.data);
-        throw new Error(t('errorSimulacion', 'Error en la simulación del pago: Respuesta inválida del servidor'));
-      }
-    } catch (error) {
-      console.error('Error al simular pago:', error);
-      // Mostrar mensaje de error más específico
-      let mensajeError = t('errorSimulacionPago', 'Error al simular el pago');
-      
-      if (error.response) {
-        console.error('Detalles del error:', {
-          status: error.response.status,
-          data: error.response.data
-        });
-        
-        // Si el servidor devuelve un mensaje de error, mostrarlo
-        if (error.response.data && error.response.data.message) {
-          mensajeError = `${mensajeError}: ${error.response.data.message}`;
-        } else if (error.response.status === 404) {
-          mensajeError = `${mensajeError}: Endpoint de simulación no encontrado`;
-        } else if (error.response.status === 401) {
-          mensajeError = `${mensajeError}: No autorizado`;
-        }
-      } else if (error.message) {
-        mensajeError = `${mensajeError}: ${error.message}`;
-      }
-      
-      setError(mensajeError);
-    } finally {
-      setCargando(false);
+  const realizarPagoSimulado = () => {
+    if (!radicado) {
+      setError(t('datosFaltantes', 'Faltan datos para realizar el pago simulado'));
+      return;
     }
+    
+    // Redireccionar a la vista de pago simulado
+    navigate('/VistaCliente/reserva/pago-simulado', {
+      state: {
+        radicado: radicado,
+        rutaInfo: {
+          nombreRuta: rutaInfo?.nombreRuta,
+          precio: rutaInfo?.precio,
+          cantidadPersonas: formData.cantidadPersonas
+        }
+      }
+    });
   };
 
   // Si no hay ruta, mostrar mensaje de carga o error
