@@ -2,6 +2,10 @@ import axios from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
+import Master from "../../assets/Images/Master.png";
+import Visa from "../../assets/Images/Visa.png";
+import AmericanExpress from "../../assets/Images/american.png";
+import Diners from "../../assets/Images/dinner.png";
 
 export const VistaPagoSimulado = () => {
   const { t } = useTranslation();
@@ -14,7 +18,8 @@ export const VistaPagoSimulado = () => {
   const [formPago, setFormPago] = useState({
     numeroTarjeta: '',
     nombreTitular: '',
-    fechaExpiracion: '',
+    mesExpiracion: '',
+    anioExpiracion: '',
     codigoSeguridad: '',
     cuotas: '1'
   });
@@ -118,7 +123,8 @@ export const VistaPagoSimulado = () => {
   const camposCompletos = 
     formPago.numeroTarjeta.length === 16 && 
     formPago.nombreTitular.trim() !== '' && 
-    formPago.fechaExpiracion !== '' && 
+    formPago.mesExpiracion !== '' &&
+    formPago.anioExpiracion !== '' &&
     formPago.codigoSeguridad.length >= 3;
 
   return (
@@ -151,21 +157,7 @@ export const VistaPagoSimulado = () => {
                 {t('pagoConTarjeta', 'Pago con tarjeta')}
               </h2>
 
-              {/* Mensaje de entorno simulado */}
-              <div className="mb-6 bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-blue-700">
-                      {t('entornoPrueba', 'Este es un entorno de prueba estudiantil. Puedes ingresar datos ficticios.')}
-                    </p>
-                  </div>
-                </div>
-              </div>
+              
 
               {/* Mensaje de error */}
               {error && (
@@ -184,39 +176,28 @@ export const VistaPagoSimulado = () => {
               )}
 
               {/* Tipos de tarjetas */}
-              <div className="flex mb-4 space-x-2">
-                <div className="bg-gray-50 p-1 rounded-md">
-                  <svg className="w-10 h-8" viewBox="0 0 48 48" fill="none">
-                    <rect width="48" height="48" rx="6" fill="#016FD0"/>
-                    <path fillRule="evenodd" clipRule="evenodd" d="M24 28.9694L27.9528 18.9H31.7942L24.0043 37.4767L16 18.9H19.9879L24 28.9694Z" fill="white"/>
-                    <path d="M9 29.176L8.42323 27.0767C8.42323 27.0767 7.63247 28.9021 5.74607 28.9021C2.44257 28.9021 0 25.2365 0 21.1339C0 15.8597 3.15672 12.8 6.0264 12.8C9.95672 12.8 11.3676 16.3934 11.3676 16.3934L12 12.8H16.7007V29.176H9ZM9.97493 20.8673C9.97493 18.6153 9.03683 16.8969 7.17859 16.8969C5.30318 16.8969 4.36512 18.6153 4.36512 20.8673C4.36512 23.1046 5.30318 24.8152 7.17854 24.8152C9.03693 24.8152 9.97493 23.1046 9.97493 20.8673Z" fill="white"/>
-                    <path d="M30 29.2H26V10H30V29.2Z" fill="white"/>
-                    <path d="M42 29.2H34.5L37.5 10H45L42 29.2Z" fill="white"/>
-                  </svg>
+              <div className="flex mb-4 space-x-4 items-center">
+                {/* Visa */}
+                <div className="bg-white p-2 rounded-md border border-gray-200 hover:shadow-md transition-shadow w-16 h-12 flex items-center justify-center">
+                  <img src={Visa} alt="Visa" className="max-w-full max-h-full object-contain" />
                 </div>
-                <div className="bg-gray-50 p-1 rounded-md">
-                  <svg className="w-10 h-8" viewBox="0 0 48 48" fill="none">
-                    <rect width="48" height="48" rx="6" fill="#F79E1B"/>
-                    <path d="M14 24C14 17.9249 18.9249 13 25 13V35C18.9249 35 14 30.0751 14 24Z" fill="#EB001B"/>
-                    <path d="M36 24C36 30.0751 31.0751 35 25 35V13C31.0751 13 36 17.9249 36 24Z" fill="#F79E1B"/>
-                    <path d="M25 13V35C18.9249 35 14 30.0751 14 24C14 17.9249 18.9249 13 25 13Z" fill="#FF5F00"/>
-                    <path d="M25 35C31.0751 35 36 30.0751 36 24C36 17.9249 31.0751 13 25 13C18.9249 13 14 17.9249 14 24C14 30.0751 18.9249 35 25 35Z" fill="none" stroke="white" strokeWidth="0.5"/>
-                  </svg>
+                
+                {/* Mastercard */}
+                <div className="bg-white p-2 rounded-md border border-gray-200 hover:shadow-md transition-shadow w-16 h-12 flex items-center justify-center">
+                  <img src={Master} alt="Mastercard" className="max-w-full max-h-full object-contain" />
                 </div>
-                <div className="bg-gray-50 p-1 rounded-md">
-                  <svg className="w-10 h-8" viewBox="0 0 48 48" fill="none">
-                    <rect width="48" height="48" rx="6" fill="#2557D6"/>
-                    <path d="M20 16H28V32H20V16Z" fill="#FF5F00"/>
-                    <path d="M20.5714 24C20.5714 20.7375 22.1589 17.885 24.5714 16C22.5196 14.4 19.912 13.5 17.1429 13.5C10.9285 13.5 5.85718 18.15 5.85718 24C5.85718 29.85 10.9285 34.5 17.1429 34.5C19.912 34.5 22.5196 33.6 24.5714 32C22.1589 30.1225 20.5714 27.2625 20.5714 24Z" fill="#EB001B"/>
-                    <path d="M42.1429 24C42.1429 29.85 37.0715 34.5 30.8571 34.5C28.088 34.5 25.4804 33.6 23.4286 32C25.8411 30.115 27.4286 27.2625 27.4286 24C27.4286 20.7375 25.8411 17.885 23.4286 16C25.4804 14.4 28.088 13.5 30.8571 13.5C37.0715 13.5 42.1429 18.15 42.1429 24Z" fill="#F79E1B"/>
-                  </svg>
+                
+                {/* American Express */}
+                <div className="bg-white p-2 rounded-md border border-gray-200 hover:shadow-md transition-shadow w-16 h-12 flex items-center justify-center">
+                  <img src={AmericanExpress} alt="American Express" className="max-w-full max-h-full object-contain" />
                 </div>
-                <div className="bg-gray-50 p-1 rounded-md">
-                  <svg className="w-10 h-8" viewBox="0 0 48 48" fill="none">
-                    <rect width="48" height="48" rx="6" fill="#0E4595"/>
-                    <path d="M17.9831 31.7525H13.7453L9.78354 19.8081C9.63639 19.3303 9.3489 18.9224 8.90571 18.7284C7.66744 18.2505 6.32418 17.8426 5 17.5693V17.086H11.9202C12.7085 17.086 13.3066 17.6987 13.4283 18.3841L15.4584 26.9217L20.0513 17.086H24.0886L17.9831 31.7525ZM25.9522 31.7525H22.0933L25.1639 17.086H29.0228L25.9522 31.7525ZM34.0111 22.1324C34.0111 21.4665 33.8078 20.9099 33.0978 20.9099C31.6546 20.9099 30.8662 22.3198 30.8662 23.6616H35.5218C35.5218 22.3393 34.9746 22.1324 34.0111 22.1324ZM36.3831 28.0767H32.9235C32.9235 28.9926 33.5217 29.5248 34.3755 29.5248C35.0786 29.5248 35.6768 29.3686 36.2067 29.0953L36.5184 31.4037C35.6563 31.8035 34.6828 32 33.6309 32C30.5546 32 27.2389 30.4555 27.2389 26.5504C27.2389 22.9114 30.0791 20.0562 33.4277 20.0562C36.4431 20.0562 38.5459 22.3393 38.5459 25.2944C38.5459 26.3843 38.4242 27.3392 38.2426 28.0767H36.3831Z" fill="white"/>
-                  </svg>
+                
+                {/* Diners Club */}
+                <div className="bg-white p-2 rounded-md border border-gray-200 hover:shadow-md transition-shadow w-16 h-12 flex items-center justify-center">
+                  <img src={Diners} alt="Diners Club" className="max-w-full max-h-full object-contain" />
                 </div>
+                
+                
               </div>
 
               {/* Formulario de tarjeta */}
@@ -254,13 +235,40 @@ export const VistaPagoSimulado = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t('fechaExpiracion', 'Fecha de expiración')}
                     </label>
-                    <input
-                      type="month"
-                      name="fechaExpiracion"
-                      value={formPago.fechaExpiracion}
-                      onChange={handleChange}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      <select
+                        name="mesExpiracion"
+                        value={formPago.mesExpiracion}
+                        onChange={handleChange}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="">{t('mes', 'Mes')}</option>
+                        {Array.from({ length: 12 }, (_, i) => {
+                          const mes = (i + 1).toString().padStart(2, '0');
+                          return (
+                            <option key={mes} value={mes}>
+                              {mes}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      <select
+                        name="anioExpiracion"
+                        value={formPago.anioExpiracion}
+                        onChange={handleChange}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="">{t('año', 'Año')}</option>
+                        {Array.from({ length: 10 }, (_, i) => {
+                          const anio = (new Date().getFullYear() + i).toString();
+                          return (
+                            <option key={anio} value={anio}>
+                              {anio}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    </div>
                   </div>
                   
                   <div>
@@ -314,6 +322,11 @@ export const VistaPagoSimulado = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">{t('radicado', 'Referencia')}:</span>
                     <span className="font-medium text-gray-800">{radicado}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">{t('numeroPago', 'Número de pago')}:</span>
+                    <span className="font-medium text-gray-800">184841580058</span>
                   </div>
                   
                   {rutaInfo && (
@@ -390,14 +403,7 @@ export const VistaPagoSimulado = () => {
           </div>
         </div>
 
-        {/* Pie de página */}
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-          <div className="flex items-center justify-center">
-            <p className="text-xs text-gray-500">
-              {t('procesoSimulado', 'Este proceso es una simulación con fines educativos. Entorno de pruebas.')}
-            </p>
-          </div>
-        </div>
+        
       </div>
     </div>
   );

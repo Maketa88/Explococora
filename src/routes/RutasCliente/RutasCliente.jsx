@@ -54,7 +54,7 @@ const RutasCliente = () => {
         
         {/* Rutas para pagos y reservas */}
         <Route path="reserva-ruta/:idRuta" element={<FormularioReservaRuta />} />
-        <Route path="reserva/pago-simulado" element={<VistaPagoSimulado />} />
+        <Route path="reserva/mercado-libre" element={<VistaPagoSimulado />} />
         <Route path="reserva/confirmacion" element={<ConfirmacionPago />} />
         <Route path="reserva/pendiente" element={<ConfirmacionPago />} />
         <Route path="reserva/error" element={<ConfirmacionPago />} />
