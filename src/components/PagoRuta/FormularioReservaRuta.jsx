@@ -169,7 +169,7 @@ export const FormularioReservaRuta = () => {
     }
     
     // Redireccionar a la vista de pago simulado
-    navigate('/VistaCliente/reserva/pago-simulado', {
+    navigate('/VistaCliente/reserva/mercado-libre', {
       state: {
         radicado: radicado,
         rutaInfo: {

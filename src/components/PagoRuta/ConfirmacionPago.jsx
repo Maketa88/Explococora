@@ -13,7 +13,7 @@ export const ConfirmacionPago = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Verificar si vino de un pago simulado (state de navegación)
+    // Verificar si vino de un pago con Mercado Libre (state de navegación)
     if (location.state?.pagoSimulado) {
       setEstado('exitoso');
       setReservaInfo({
@@ -22,7 +22,7 @@ export const ConfirmacionPago = () => {
         idPago: location.state.idPago
       });
       
-      // Si el pago simulado fue exitoso, eliminamos la reserva pendiente
+      // Si el pago fue exitoso, eliminamos la reserva pendiente
       localStorage.removeItem('reserva_pendiente');
       return;
     }
@@ -87,7 +87,7 @@ export const ConfirmacionPago = () => {
             </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('pagoExitoso', '¡Pago Exitoso!')}</h2>
             <p className="text-gray-600 mb-6">
-              {t('reservaConfirmadaSimulada', 'Tu reserva ha sido confirmada con el método de pago Mercado Pago.')}
+              {t('reservaConfirmadaSimulada', 'Tu reserva ha sido confirmada con el método de pago Mercado Libre.')}
             </p>
             
             {reservaInfo && (
@@ -153,7 +153,7 @@ export const ConfirmacionPago = () => {
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('procesandoPago', 'Procesando Pago')}</h2>
-            <p className="text-gray-600 mb-6">{t('procesandoMensaje', 'Estamos procesando tu pago simulado. Esto tomará solo un momento.')}</p>
+            <p className="text-gray-600 mb-6">{t('procesandoMensaje', 'Estamos procesando tu pago con Mercado Libre. Esto tomará solo un momento.')}</p>
             
             {reservaInfo && (
               <div className="bg-white p-6 rounded-lg shadow-md mb-6 mx-auto max-w-md">
@@ -183,7 +183,7 @@ export const ConfirmacionPago = () => {
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('pagoRechazado', 'Pago Rechazado')}</h2>
-            <p className="text-gray-600 mb-6">{t('pagoRechazadoMensaje', 'La simulación de pago no pudo completarse. Por favor intenta nuevamente.')}</p>
+            <p className="text-gray-600 mb-6">{t('pagoRechazadoMensaje', 'El pago con Mercado Libre no pudo completarse. Por favor intenta nuevamente.')}</p>
             
             {error && <p className="text-red-600 mb-6">{error}</p>}
             
@@ -206,7 +206,7 @@ export const ConfirmacionPago = () => {
             </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('cargando', 'Cargando...')}</h2>
             <p className="text-gray-600">
-              {t('verificandoEstado', 'Verificando el estado de tu pago simulado...')}
+              {t('verificandoEstado', 'Verificando el estado de tu pago con Mercado Libre...')}
             </p>
           </div>
         );
