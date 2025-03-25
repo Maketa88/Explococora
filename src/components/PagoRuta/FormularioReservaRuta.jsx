@@ -12,13 +12,17 @@ export const FormularioReservaRuta = () => {
   
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
-  const [exito, setExito] = useState(false);
   const [formData, setFormData] = useState({
     cantidadPersonas: 1,
     fechaInicio: '',
     fechaFin: '',
     horaInicio: '08:00'
   });
+
+  // Añadir nuevos estados para manejar opciones de pago
+  const [radicado, setRadicado] = useState(null);
+  const [mostrarOpcionesPago, setMostrarOpcionesPago] = useState(false);
+  const [mercadoPagoUrl, setMercadoPagoUrl] = useState(null);
 
   // Si no hay información de la ruta en location.state, cargarla desde la API
   useEffect(() => {
@@ -118,27 +122,78 @@ export const FormularioReservaRuta = () => {
         }
       );
       
-      // Verificar la respuesta
-      if (response.data && response.data.preference && response.data.preference.init_point) {
-        // Guardar información en localStorage para recuperarla después
+      // Guardar información en localStorage para recuperarla después
+      if (response.data && response.data.radicado) {
         localStorage.setItem('reserva_pendiente', JSON.stringify({
           radicado: response.data.radicado,
           fechaCreacion: new Date().toISOString(),
-          guiaAsignado: response.data.guiaAsignado
+          guiaAsignado: response.data.guiaAsignado || null
         }));
         
-        // Redireccionar a Mercado Pago
-        window.location.href = response.data.preference.init_point;
+        // Almacenar el radicado en el estado para usarlo en el botón de simulación
+        setRadicado(response.data.radicado);
+        
+        // Mostrar opciones de pago en lugar de redireccionar inmediatamente
+        setMostrarOpcionesPago(true);
+        
+        // Si hay init_point disponible, guardarlo para el botón de pago real
+        if (response.data.preference && response.data.preference.init_point) {
+          setMercadoPagoUrl(response.data.preference.init_point);
+        }
       } else {
         throw new Error(t('respuestaInvalida', 'La respuesta del servidor no es válida'));
       }
-      
-      setExito(true);
     } catch (error) {
       console.error('Error al procesar la reserva:', error);
       setError(error.response?.data?.message || error.message || t('errorProcesandoReserva', 'Error al procesar la reserva'));
     } finally {
       setCargando(false);
+    }
+  };
+  
+  // Función para realizar pago simulado
+  const realizarPagoSimulado = async () => {
+    try {
+      setCargando(true);
+      const token = localStorage.getItem('token');
+      
+      if (!token || !radicado) {
+        throw new Error(t('datosFaltantes', 'Faltan datos para realizar el pago simulado'));
+      }
+      
+      // Llamar a endpoint de simulación
+      const response = await axios.get(`http://localhost:10101/pagos-rutas/simular/${radicado}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.data && response.data.success) {
+        // Redireccionar a página de confirmación
+        navigate('/VistaCliente/reserva/confirmacion', {
+          state: {
+            pagoSimulado: true,
+            radicado: radicado,
+            idPago: response.data.idPago
+          }
+        });
+      } else {
+        throw new Error(t('errorSimulacion', 'Error en la simulación del pago'));
+      }
+    } catch (error) {
+      console.error('Error al simular pago:', error);
+      setError(error.response?.data?.message || error.message || t('errorSimulacionPago', 'Error al simular el pago'));
+    } finally {
+      setCargando(false);
+    }
+  };
+  
+  // Función para continuar a Mercado Pago
+  const continuarAMercadoPago = () => {
+    if (mercadoPagoUrl) {
+      window.location.href = mercadoPagoUrl;
+    } else {
+      setError(t('urlPagoNoDisponible', 'URL de pago no disponible'));
     }
   };
 
@@ -328,30 +383,92 @@ export const FormularioReservaRuta = () => {
             </div>
           )}
 
-          {/* Botón de envío */}
+          {/* Botones de acción */}
           <div className="mt-8">
-            <button
-              type="submit"
-              disabled={cargando}
-              className="w-full py-3 px-4 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center relative overflow-hidden group"
-            >
-              {cargando ? (
-                <span className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            {!mostrarOpcionesPago ? (
+              <button
+                type="submit"
+                disabled={cargando}
+                className={`w-full py-4 rounded-xl ${
+                  cargando 
+                    ? 'bg-gray-300 cursor-not-allowed' 
+                    : 'bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white'
+                } font-medium transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center`}
+              >
+                {cargando ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {t('procesando', 'Procesando...')}
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {t('reservarAhora', 'Reservar Ahora')}
+                  </>
+                )}
+              </button>
+            ) : (
+              <div className="space-y-4">
+                <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded mb-6">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-green-700">
+                        {t('reservaCreada', 'Reserva creada con éxito. Radicado: ')} {radicado}
+                      </p>
+                      <p className="text-sm text-green-700 mt-1">
+                        {t('seleccioneTipoPago', 'Seleccione cómo desea realizar el pago:')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <button
+                  type="button"
+                  onClick={continuarAMercadoPago}
+                  disabled={cargando || !mercadoPagoUrl}
+                  className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                   </svg>
-                  {t('procesando', 'Procesando...')}
-                </span>
-              ) : (
-                <span className="flex items-center">
-                  <svg className="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                  {t('pagarYReservar', 'Pagar y Reservar')}
-                </span>
-              )}
-            </button>
+                  {t('pagarConMercadoPago', 'Pagar con Mercado Pago')}
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={realizarPagoSimulado}
+                  disabled={cargando}
+                  className="w-full py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-medium transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center"
+                >
+                  {cargando ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      {t('procesando', 'Procesando...')}
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+                      </svg>
+                      {t('usarPagoSimulado', 'Usar Pago Simulado (Testing)')}
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         </form>
       </div>

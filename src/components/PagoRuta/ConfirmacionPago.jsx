@@ -10,8 +10,24 @@ export const ConfirmacionPago = () => {
   const [estado, setEstado] = useState('procesando'); // procesando, exitoso, pendiente, rechazado
   const [reservaInfo, setReservaInfo] = useState(null);
   const [error, setError] = useState(null);
+  const [pagoSimulado, setPagoSimulado] = useState(false);
 
   useEffect(() => {
+    // Verificar si vino de un pago simulado (state de navegación)
+    if (location.state?.pagoSimulado) {
+      setPagoSimulado(true);
+      setEstado('exitoso');
+      setReservaInfo({
+        radicado: location.state.radicado,
+        fechaCreacion: new Date().toISOString(),
+        idPago: location.state.idPago
+      });
+      
+      // Si el pago simulado fue exitoso, eliminamos la reserva pendiente
+      localStorage.removeItem('reserva_pendiente');
+      return; // No continuamos con el resto de la lógica
+    }
+    
     // Extraer parámetros de la URL
     const params = new URLSearchParams(location.search);
     const status = params.get('status');
@@ -54,7 +70,7 @@ export const ConfirmacionPago = () => {
       localStorage.removeItem('reserva_pendiente');
     }
     
-  }, [location.search]);
+  }, [location]);
 
   // Función para actualizar el estado de la reserva en el backend
   const actualizarEstadoReserva = async (nuevoEstado, idPago, referencia) => {
@@ -130,13 +146,22 @@ export const ConfirmacionPago = () => {
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('pagoExitoso', '¡Pago Exitoso!')}</h2>
-            <p className="text-gray-600 mb-6">{t('reservaConfirmada', 'Tu reserva ha sido confirmada.')}</p>
+            <p className="text-gray-600 mb-6">
+              {pagoSimulado 
+                ? t('reservaConfirmadaSimulada', 'Tu reserva ha sido confirmada con el método de pago simulado.') 
+                : t('reservaConfirmada', 'Tu reserva ha sido confirmada.')}
+            </p>
             
             {reservaInfo && (
               <div className="bg-white p-6 rounded-lg shadow-md mb-6 mx-auto max-w-md">
                 <p className="text-gray-700 font-medium">
                   {t('radicado', 'Número de Reserva')}: <span className="font-bold text-teal-700">{reservaInfo.radicado}</span>
                 </p>
+                {pagoSimulado && (
+                  <p className="text-gray-700 font-medium mt-2">
+                    {t('pagoSimulado', 'Pago Simulado')}: <span className="font-bold text-teal-700">✓</span>
+                  </p>
+                )}
                 {reservaInfo.guiaAsignado && (
                   <p className="text-gray-700 font-medium mt-2">
                     {t('guiaAsignado', 'Guía Asignado')}: <span className="font-bold text-teal-700">{reservaInfo.guiaAsignado.nombre}</span>
@@ -145,18 +170,35 @@ export const ConfirmacionPago = () => {
               </div>
             )}
             
+            {pagoSimulado && (
+              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded mb-6">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-blue-700">
+                      {t('notaSimulacion', 'Este es un pago simulado para entorno de pruebas. En un entorno de producción, se procesaría un pago real con Mercado Pago.')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div className="flex flex-col sm:flex-row justify-center gap-4 mt-4">
               <button 
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/VistaCliente')}
                 className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-6 rounded-lg transition-colors duration-300"
               >
                 {t('volverInicio', 'Volver al Inicio')}
               </button>
               <button 
-                onClick={() => navigate('/mis-reservas')}
+                onClick={() => navigate('/VistaCliente/NuestrasRutas')}
                 className="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-300"
               >
-                {t('verMisReservas', 'Ver Mis Reservas')}
+                {t('verRutas', 'Ver Más Rutas')}
               </button>
             </div>
           </div>
@@ -198,16 +240,16 @@ export const ConfirmacionPago = () => {
             
             <div className="flex flex-col sm:flex-row justify-center gap-4 mt-6">
               <button 
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/VistaCliente')}
                 className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-6 rounded-lg transition-colors duration-300"
               >
                 {t('volverInicio', 'Volver al Inicio')}
               </button>
               <button 
-                onClick={() => navigate('/mis-reservas')}
+                onClick={() => navigate('/VistaCliente/NuestrasRutas')}
                 className="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-300"
               >
-                {t('verMisReservas', 'Ver Mis Reservas')}
+                {t('verRutas', 'Ver Más Rutas')}
               </button>
             </div>
           </div>
@@ -241,7 +283,7 @@ export const ConfirmacionPago = () => {
             
             <div className="flex flex-col sm:flex-row justify-center gap-4 mt-4">
               <button 
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/VistaCliente')}
                 className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-6 rounded-lg transition-colors duration-300"
               >
                 {t('volverInicio', 'Volver al Inicio')}
@@ -282,7 +324,7 @@ export const ConfirmacionPago = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('errorVerificacion', 'Error de Verificación')}</h2>
             <p className="text-red-600 mb-6">{error}</p>
             <button 
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/VistaCliente')}
               className="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-300"
             >
               {t('volverInicio', 'Volver al Inicio')}
