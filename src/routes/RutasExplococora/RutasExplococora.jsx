@@ -20,6 +20,7 @@ import VistaAdmin from "../../pages/VistaAdmin/VistaAdmin";
 import VistaCliente from "../../pages/VistaCliente/VistaCliente";
 import VistaGuia from "../../pages/VistaGuia/VistaGuia";
 import VistaOperador from "../../pages/VistaOperador/VistaOperador";
+import RecuperarContrasena from "../../components/RecuperarContrasena/RecuperarContrasena";
 
 export const RutasExplococora = () => {
   const location = useLocation();
@@ -53,6 +54,7 @@ export const RutasExplococora = () => {
         <Route path="/Feedback" element={<Feedback />} />
         <Route path="/verificar-otp" element={<VerificacionOTP />} />
         <Route path="/acceso-denegado" element={<AccesoDenegado />} />
+        <Route path="/recuperar-contrasenia/:token" element={<RecuperarContrasena />} />
 
         {/* Rutas protegidas */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
