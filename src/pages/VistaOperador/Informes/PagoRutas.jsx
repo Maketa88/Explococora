@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import DashboardLayout from '../../../layouts/DashboardLayout';
 import axios from 'axios';
 import { RefreshCw, DollarSign, Clock, AlertCircle, CheckCircle, FileText, Search, Filter, Download, Calendar } from 'lucide-react';
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
+import logoImage from '../../../assets/Images/logo.webp'; // Importamos el logo
 
 const PagoRutas = () => {
   const [pagos, setPagos] = useState([]);
@@ -151,60 +154,341 @@ const PagoRutas = () => {
   };
 
   // Exportar a Excel
-  const exportarCSV = () => {
+  const exportarCSV = async () => {
     if (!Array.isArray(pagos) || pagos.length === 0) {
       alert('No hay datos para exportar');
       return;
     }
     
-    // Crear encabezados exactamente como en el ejemplo
-    const headers = ['ID,Ruta,Cliente,Monto,Método de Pago,Estado,Fecha'];
-    
-    // Crear filas de datos con el formato exacto del ejemplo
-    const filas = pagosFiltrados.map(pago => {
-      // Obtener ID del pago
-      const id = pago.idPago || '';
+    try {
+      // Crear un nuevo libro y hoja de trabajo
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Pagos de Rutas', {
+        pageSetup: {
+          paperSize: 9, // A4
+          orientation: 'landscape',
+          fitToPage: true,
+          fitToWidth: 1,
+          fitToHeight: 0
+        }
+      });
       
-      // Obtener nombre de la ruta
-      const ruta = pago.nombreRuta || '';
+      // Estilos personalizados
+      const headerStyle = {
+        font: { bold: true, color: { argb: 'FFFFFF' }, size: 12 },
+        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: '007F66' } }, // Verde Explococora
+        alignment: { horizontal: 'center', vertical: 'middle' },
+        border: {
+          top: { style: 'thin', color: { argb: 'D1D5DB' } },
+          left: { style: 'thin', color: { argb: 'D1D5DB' } },
+          bottom: { style: 'thin', color: { argb: 'D1D5DB' } },
+          right: { style: 'thin', color: { argb: 'D1D5DB' } }
+        }
+      };
       
-      // Nombre completo del cliente
-      const cliente = `${pago.clienteNombre || ''} ${pago.clienteApellido || ''}`.trim();
+      const subHeaderStyle = {
+        font: { bold: true, color: { argb: 'FFFFFF' }, size: 12 },
+        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: '007F66' } }, // Verde Explococora
+        alignment: { horizontal: 'center', vertical: 'middle' },
+        border: {
+          top: { style: 'thin', color: { argb: 'D1D5DB' } },
+          left: { style: 'thin', color: { argb: 'D1D5DB' } },
+          bottom: { style: 'thin', color: { argb: 'D1D5DB' } },
+          right: { style: 'thin', color: { argb: 'D1D5DB' } }
+        }
+      };
       
-      // Monto del pago
-      const monto = pago.monto || '0';
+      const titleStyle = {
+        font: { bold: true, size: 16, color: { argb: '007F66' } },
+        alignment: { horizontal: 'center', vertical: 'middle' }
+      };
       
-      // Método de pago
-      const metodoPago = pago.metodoPago || 'MercadoPago';
+      const subtitleStyle = {
+        font: { italic: true, size: 10, color: { argb: '6B7280' } },
+        alignment: { horizontal: 'center', vertical: 'middle' }
+      };
       
-      // Estado del pago
-      const estado = pago.estadoPago || 'pendiente';
+      const totalPagosStyle = {
+        font: { bold: true, size: 14, color: { argb: '1B5E20' } },
+        alignment: { horizontal: 'center', vertical: 'middle' },
+        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E8F5E9' } }, // Verde muy claro
+        border: {
+          outline: { style: 'thin', color: { argb: 'D1D5DB' } }
+        }
+      };
       
-      // Fecha formateada
-      const fecha = formatearFecha(pago.fechaPago);
+      const pagosCompletadosStyle = {
+        font: { bold: true, size: 14, color: { argb: '166534' } },
+        alignment: { horizontal: 'center', vertical: 'middle' },
+        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'DCFCE7' } }, // Verde claro
+        border: {
+          outline: { style: 'thin', color: { argb: 'D1D5DB' } }
+        }
+      };
       
-      // Formato exacto como en el ejemplo
-      return `${id},${ruta},${cliente},${monto},${metodoPago},${estado},${fecha}`;
-    });
-    
-    // Combinar encabezados y filas
-    const csvContent = [headers, ...filas].join('\n');
-    
-    // Para asegurar que Excel interprete correctamente los caracteres
-    const BOM = '\uFEFF';
-    const csvContentWithBOM = BOM + csvContent;
-    
-    // Crear un blob con el contenido
-    const blob = new Blob([csvContentWithBOM], { type: 'application/vnd.ms-excel' });
-    const url = URL.createObjectURL(blob);
-    
-    // Crear un enlace para descargar el archivo
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `pagos_rutas_${new Date().toISOString().slice(0,10)}.xls`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      const pagosPendientesStyle = {
+        font: { bold: true, size: 14, color: { argb: '854D0E' } },
+        alignment: { horizontal: 'center', vertical: 'middle' },
+        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FEF9C3' } }, // Amarillo claro
+        border: {
+          outline: { style: 'thin', color: { argb: 'D1D5DB' } }
+        }
+      };
+      
+      const montoTotalStyle = {
+        font: { bold: true, size: 14, color: { argb: '1E40AF' } },
+        alignment: { horizontal: 'center', vertical: 'middle' },
+        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'DBEAFE' } }, // Azul claro
+        border: {
+          outline: { style: 'thin', color: { argb: 'D1D5DB' } }
+        },
+        numFmt: '$#,##0.00'
+      };
+      
+      const tableCellStyle = {
+        alignment: { horizontal: 'center', vertical: 'middle' },
+        border: {
+          top: { style: 'thin', color: { argb: 'D1D5DB' } },
+          left: { style: 'thin', color: { argb: 'D1D5DB' } },
+          bottom: { style: 'thin', color: { argb: 'D1D5DB' } },
+          right: { style: 'thin', color: { argb: 'D1D5DB' } }
+        }
+      };
+      
+      const moneyStyle = {
+        font: { color: { argb: '1E3A8A' } },
+        numFmt: '$#,##0.00',
+        alignment: { horizontal: 'center', vertical: 'middle' }
+      };
+      
+      const completadoCellStyle = {
+        font: { color: { argb: '166534' } },
+        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'DCFCE7' } },
+        alignment: { horizontal: 'center', vertical: 'middle' }
+      };
+      
+      const pendienteCellStyle = {
+        font: { color: { argb: '854D0E' } },
+        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FEF9C3' } },
+        alignment: { horizontal: 'center', vertical: 'middle' }
+      };
+      
+      const footerStyle = {
+        font: { italic: true, color: { argb: '6B7280' } },
+        alignment: { horizontal: 'center' }
+      };
+      
+      // Configurar ancho de columnas
+      worksheet.getColumn('A').width = 10;
+      worksheet.getColumn('B').width = 25;
+      worksheet.getColumn('C').width = 25;
+      worksheet.getColumn('D').width = 15;
+      worksheet.getColumn('E').width = 25;
+      worksheet.getColumn('F').width = 15;
+      worksheet.getColumn('G').width = 15;
+      
+      // Obtener el logo como Uint8Array
+      const logoResponse = await fetch(logoImage);
+      const logoArrayBuffer = await logoResponse.arrayBuffer();
+      const logoBuffer = new Uint8Array(logoArrayBuffer);
+      
+      // Agregar el logo
+      const logoId = workbook.addImage({
+        buffer: logoBuffer,
+        extension: 'webp',
+      });
+      
+      // Insertar logo en la esquina superior izquierda
+      worksheet.addImage(logoId, {
+        tl: { col: 0, row: 0 },
+        ext: { width: 110, height: 50 }
+      });
+      
+      // Título principal centrado
+      worksheet.mergeCells('A1:G1');
+      const titleRow = worksheet.getRow(1);
+      titleRow.height = 50;
+      titleRow.getCell(1).value = 'REPORTE DE PAGOS DE RUTAS TURÍSTICAS';
+      titleRow.getCell(1).style = titleStyle;
+      
+      // Subtítulo con fecha
+      worksheet.mergeCells('A2:G2');
+      const subtitleRow = worksheet.getRow(2);
+      subtitleRow.height = 20;
+      subtitleRow.getCell(1).value = `Generado el: ${new Date().toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })}`;
+      subtitleRow.getCell(1).style = subtitleStyle;
+      
+      // Línea divisoria verde
+      worksheet.mergeCells('A3:G3');
+      const dividerRow = worksheet.getRow(3);
+      dividerRow.height = 6;
+      dividerRow.getCell(1).fill = { 
+        type: 'pattern', 
+        pattern: 'solid', 
+        fgColor: { argb: '007F66' } 
+      };
+      
+      // Encabezado del resumen estadístico
+      worksheet.mergeCells('A4:G4');
+      const statsHeaderRow = worksheet.getRow(4);
+      statsHeaderRow.height = 25;
+      statsHeaderRow.getCell(1).value = 'RESUMEN ESTADÍSTICO';
+      statsHeaderRow.getCell(1).style = subHeaderStyle;
+      
+      // Etiquetas de estadísticas
+      const statLabelsRow = worksheet.getRow(5);
+      statLabelsRow.height = 20;
+      
+      // Total de Pagos
+      worksheet.mergeCells('A5:B5');
+      statLabelsRow.getCell(1).value = 'Total de Pagos';
+      statLabelsRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+      statLabelsRow.getCell(1).font = { bold: true };
+      
+      // Pagos Completados
+      worksheet.mergeCells('C5:D5');
+      statLabelsRow.getCell(3).value = 'Pagos Completados';
+      statLabelsRow.getCell(3).alignment = { horizontal: 'center', vertical: 'middle' };
+      statLabelsRow.getCell(3).font = { bold: true };
+      
+      // Pagos Pendientes
+      worksheet.mergeCells('E5:F5');
+      statLabelsRow.getCell(5).value = 'Pagos Pendientes';
+      statLabelsRow.getCell(5).alignment = { horizontal: 'center', vertical: 'middle' };
+      statLabelsRow.getCell(5).font = { bold: true };
+      
+      // Monto Total
+      worksheet.mergeCells('G5:G5');
+      statLabelsRow.getCell(7).value = 'Monto Total';
+      statLabelsRow.getCell(7).alignment = { horizontal: 'center', vertical: 'middle' };
+      statLabelsRow.getCell(7).font = { bold: true };
+      
+      // Calcular estadísticas
+      const totalPagos = pagosFiltrados.length;
+      const pagosCompletados = pagosFiltrados.filter(pago => pago.estadoPago === 'completado').length;
+      const pagosPendientes = pagosFiltrados.filter(pago => pago.estadoPago === 'pendiente').length;
+      const montoTotal = pagosFiltrados.reduce((sum, pago) => sum + (pago.monto || 0), 0);
+      
+      // Valores de estadísticas
+      const statValuesRow = worksheet.getRow(6);
+      statValuesRow.height = 30;
+      
+      // Valor Total de Pagos
+      worksheet.mergeCells('A6:B6');
+      statValuesRow.getCell(1).value = totalPagos;
+      statValuesRow.getCell(1).style = totalPagosStyle;
+      
+      // Valor Pagos Completados
+      worksheet.mergeCells('C6:D6');
+      statValuesRow.getCell(3).value = pagosCompletados;
+      statValuesRow.getCell(3).style = pagosCompletadosStyle;
+      
+      // Valor Pagos Pendientes
+      worksheet.mergeCells('E6:F6');
+      statValuesRow.getCell(5).value = pagosPendientes;
+      statValuesRow.getCell(5).style = pagosPendientesStyle;
+      
+      // Valor Monto Total
+      worksheet.mergeCells('G6:G6');
+      statValuesRow.getCell(7).value = montoTotal;
+      statValuesRow.getCell(7).style = montoTotalStyle;
+      
+      // Espacio entre estadísticas y tabla
+      const spacerRow = worksheet.getRow(7);
+      spacerRow.height = 10;
+      
+      // Encabezado de HISTORIAL DE TRANSACCIONES
+      worksheet.mergeCells('A8:G8');
+      const headerRow = worksheet.getRow(8);
+      headerRow.height = 25;
+      headerRow.getCell(1).value = 'HISTORIAL DE TRANSACCIONES';
+      headerRow.getCell(1).style = subHeaderStyle;
+      
+      // Encabezados de columnas
+      const columnHeaderRow = worksheet.getRow(9);
+      columnHeaderRow.height = 25;
+      columnHeaderRow.values = ['ID', 'Ruta', 'Cliente', 'Monto', 'Método de Pago', 'Estado', 'Fecha'];
+      columnHeaderRow.eachCell((cell) => {
+        cell.style = headerStyle;
+      });
+      
+      // Iniciar fila para datos
+      let rowIndex = 10;
+      
+      // Agregar datos de pagos
+      pagosFiltrados.forEach((pago, index) => {
+        // Obtener datos del pago
+        const id = pago.idPago || '';
+        const ruta = pago.nombreRuta || 'N/A';
+        const cliente = `${pago.clienteNombre || ''} ${pago.clienteApellido || ''}`.trim() || 'N/A';
+        const monto = pago.monto || 0;
+        const metodoPago = pago.metodoPago || 'N/A';
+        const estado = pago.estadoPago || 'pendiente';
+        const fecha = formatearFecha(pago.fechaPago);
+        
+        const row = worksheet.addRow([
+          id,
+          ruta,
+          cliente,
+          monto,
+          metodoPago,
+          estado.charAt(0).toUpperCase() + estado.slice(1),
+          fecha
+        ]);
+        
+        // Color de fondo alternado para mejor legibilidad
+        const fillColor = index % 2 === 0 ? 'F9FAFB' : 'FFFFFF';
+        
+        // Aplicar estilos a las celdas
+        row.eachCell((cell, colNumber) => {
+          cell.style = {
+            ...tableCellStyle,
+            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: fillColor } }
+          };
+          
+          // Formato especial para la columna de monto
+          if (colNumber === 4) {
+            cell.style = {
+              ...cell.style,
+              ...moneyStyle
+            };
+          }
+        });
+        
+        // Aplicar estilo especial a la columna de estado
+        const estadoCell = row.getCell(6);
+        if (estado.toLowerCase() === 'completado') {
+          Object.assign(estadoCell.style, completadoCellStyle);
+        } else {
+          Object.assign(estadoCell.style, pendienteCellStyle);
+        }
+        
+        rowIndex++;
+      });
+      
+      // Agregar un footer
+      const footerRowIndex = rowIndex + 1;
+      worksheet.mergeCells(`A${footerRowIndex}:G${footerRowIndex}`);
+      const footerRow = worksheet.getRow(footerRowIndex);
+      footerRow.height = 24;
+      footerRow.getCell(1).value = 'ExploCocora - Sistema de Gestión de Rutas Turísticas © 2024';
+      footerRow.getCell(1).style = footerStyle;
+      
+      // Generar el archivo
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      saveAs(blob, `pagos_rutas_${new Date().toISOString().slice(0,10)}.xlsx`);
+      
+    } catch (error) {
+      console.error('Error al exportar datos:', error);
+      alert('Error al exportar los datos a Excel');
+    }
   };
 
   return (
