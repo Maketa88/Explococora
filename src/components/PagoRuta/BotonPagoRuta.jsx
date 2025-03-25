@@ -88,12 +88,7 @@ export const BotonPagoRuta = ({ ruta, className }) => {
         </div>
       )}
 
-      {/* Mensaje de estado inactivo */}
-      {!estaHabilitado && ruta?.estado !== 'Activa' && (
-        <div className="absolute top-full left-0 right-0 mt-2 text-amber-600 text-sm bg-amber-50 p-2 rounded shadow-sm border border-amber-100">
-          {t('rutaNoDisponible', 'Esta ruta no está disponible actualmente')}
-        </div>
-      )}
+      
     </div>
   );
 };
