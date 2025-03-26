@@ -86,7 +86,7 @@ export const Carrusel = () => {
           
           {/* Vignette effect para la imagen en transición */}
           <div 
-            className="absolute inset-0 shadow-[inset_0_0_150px_rgba(0,0,0,0.8)] z-[1]"
+            className="absolute inset-0 shadow-[inset_0_0_150px_rgba(0,0,0,0.1)] z-[1]"
             style={{
               opacity: opacity,
               transition: 'opacity 800ms ease-in-out'

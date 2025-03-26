@@ -25,8 +25,9 @@ export const TituloBuscador = ({ onSearch }) => {
                 0 9px 0 transparent,
                 0 10px 30px rgba(0, 0, 0, 0.8)
               `,
-              filter: 'drop-shadow(0 0 6px rgba(78, 204, 163, 0.6))',
+              
               animation: "float 6s ease-in-out infinite"
+              
             }}
           >
             {t("title", "Explococora")}
@@ -38,20 +39,39 @@ export const TituloBuscador = ({ onSearch }) => {
         {/* Línea decorativa con efecto dinámico */}
         
 
-        {/* Subtítulo con efecto de desplazamiento */}
-        <h2
-          className="text-2xl sm:text-3xl lg:text-4xl font-light mb-16 max-w-3xl"
-          style={{
-            color: 'white',
-            textShadow: "0 2px 15px rgba(0, 0, 0, 0.8)",
-            
-            filter: 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.7))'
-          }}
-        >
-          <span className="font-extrabold">
+        {/* Subtítulo con efecto 3D espectacular */}
+        <div className="relative mb-10 mt-3">
+          <h2
+            className="text-3xl sm:text-4xl lg:text-5xl"
+            style={{
+              color: '#ffffff',
+              background: 'linear-gradient(to bottom, #ffffff, #ffffff)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              textShadow: `
+                0 0 8px rgba(255,255,255,0.8),
+                0 1px 0 rgba(255,255,255,0.9),
+                0 2px 0 rgba(255,255,255,0.8),
+                0 3px 0 rgba(255,255,255,0.7),
+                0 4px 0 rgba(255,255,255,0.6),
+                0 5px 0 rgba(255,255,255,0.5),
+                0 6px 5px rgba(0,0,0,0.5),
+                0 7px 10px rgba(0,0,0,0.25),
+                0 8px 15px rgba(0,0,0,0.2),
+                0 20px 20px rgba(0,0,0,0.15)
+              `,
+              
+            }}
+          >
             {t("slogan", "Disfruta de la naturaleza y la aventura")}
-          </span>
-        </h2>
+          </h2>
+          
+          {/* Efectos de resplandor detrás del texto */}
+          
+          
+          {/* Línea decorativa debajo del texto */}
+         
+        </div>
 
         {/* Tercer texto con efecto de resplandor */}
         <div className="relative mb-12 transform hover:scale-105 transition-transform duration-500">
