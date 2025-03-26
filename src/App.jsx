@@ -5,28 +5,69 @@ import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
 import { motion, AnimatePresence } from "framer-motion";
 
 const App = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 5000);
+    // Función para detectar si es un refresh genuino de página
+    const isRefresh = () => {
+      // Comprobar si el performance navigation type está disponible
+      if (performance && performance.navigation) {
+        return performance.navigation.type === 1; // 1 indica refresh
+      }
+      
+      // Método alternativo usando localStorage
+      const needsLoading = localStorage.getItem("needsLoading") === "true";
+      // Limpiar el flag inmediatamente para evitar falsos positivos en navegación interna
+      if (needsLoading) {
+        localStorage.removeItem("needsLoading");
+      }
+      return needsLoading;
+    };
+    
+    // Configurar el flag justo antes de un refresh
+    const handleBeforeUnload = () => {
+      localStorage.setItem("needsLoading", "true");
+    };
+    
+    // Solo mostrar loading si detectamos un refresh real
+    if (isRefresh()) {
+      setLoading(true);
+      setTimeout(() => {
+        setLoading(false);
+      }, 5000);
+    }
+    
+    // Listener para cuando el usuario refresca o cierra
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
+  // Añadir un listener para interceptar clics en enlaces internos
+  useEffect(() => {
+    const handleLinkClick = (e) => {
+      // Si es un enlace interno, asegurarse de que no se active la pantalla de carga
+      if (e.target.tagName === 'A' && e.target.getAttribute('href')?.startsWith('/')) {
+        localStorage.removeItem("needsLoading");
+      }
+    };
+    
+    document.addEventListener('click', handleLinkClick);
+    
+    return () => {
+      document.removeEventListener('click', handleLinkClick);
+    };
   }, []);
 
   return (
     <AuthProvider>
-      <LoadingScreen isLoading={loading} />
-      <AnimatePresence>
-        {!loading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <RutasExplococora />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {loading ? (
+        <LoadingScreen isLoading={loading} />
+      ) : (
+        <RutasExplococora />
+      )}
     </AuthProvider>
   );
 };
