@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Cocora from "../assets/Images/carrusel1.webp";
 import Cocora1 from "../assets/Images/carrusel2.webp";
 import Cocora3 from "../assets/Images/carrusel3.webp";
 
-export const HooksCarrusel = (autoScrollInterval = 6000) => {
+export const HooksCarrusel = (autoScrollInterval = 9000) => {
   const images = [Cocora, Cocora1, Cocora3];
   const [currentImage, setCurrentImage] = useState(0);
   const [isAutoScrolling, setIsAutoScrolling] = useState(true);
@@ -56,12 +56,12 @@ export const HooksCarrusel = (autoScrollInterval = 6000) => {
   const prevImageWithPause = useCallback(() => {
     pauseAutoScroll();
     prevImage();
-  }, [pauseAutoScroll, prevImage]);
+  }, [prevImage, pauseAutoScroll]);
 
   const nextImageWithPause = useCallback(() => {
     pauseAutoScroll();
     nextImage();
-  }, [pauseAutoScroll, nextImage]);
+  }, [nextImage, pauseAutoScroll]);
 
   return {
     images,
