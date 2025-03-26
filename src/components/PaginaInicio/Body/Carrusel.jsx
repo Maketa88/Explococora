@@ -41,15 +41,18 @@ export const Carrusel = () => {
       <img
         src={images[previousImage]}
         alt={`Slide ${previousImage + 1}`}
-        className="absolute inset-0 w-full h-full object-cover filter brightness-110"
+        className="absolute inset-0 w-full h-full object-cover filter brightness-75"
       />
+      
+      {/* Capa oscura para mejorar contraste con texto */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 z-[1]"></div>
       
       {/* Capa de imagen superior (imagen actual) con transición de opacidad */}
       {isTransitioning && (
         <img
           src={images[currentImage]}
           alt={`Slide ${currentImage + 1}`}
-          className="absolute inset-0 w-full h-full object-cover filter brightness-110"
+          className="absolute inset-0 w-full h-full object-cover filter brightness-75"
           style={{
             opacity: opacity,
             transition: 'opacity 800ms ease-in-out'

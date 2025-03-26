@@ -90,28 +90,37 @@ export const SearchForm = ({ onSearch }) => {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="flex items-center w-full max-w-3xl bg-white rounded-full overflow-hidden shadow-lg">
-        <div className="flex-grow flex items-center pl-4">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+      <form onSubmit={handleSubmit} className="flex items-center w-full max-w-3xl overflow-hidden group">
+        {/* Contenedor principal con efectos visuales */}
+        <div className="flex w-full bg-white/15 backdrop-blur-lg rounded-full border-2 border-teal-300/30 shadow-[0_0_20px_rgba(56,178,172,0.4)] overflow-hidden transition-all duration-500 group-hover:shadow-[0_0_30px_rgba(56,178,172,0.7)]">
+          
+          {/* Icono de búsqueda con animación */}
+          <div className="pl-6 flex items-center text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 group-hover:rotate-12 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          
+          {/* Input de búsqueda con efectos */}
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('searchPlaceholder', '¿Qué tipo de aventura buscas hoy?')}
-            className="w-full py-3 px-4 outline-none text-gray-700"
+            className="w-full py-5 px-4 outline-none text-white font-medium placeholder-white/70 bg-transparent backdrop-blur-lg"
           />
+          
+          {/* Botón de búsqueda con efectos */}
+          <button 
+            type="submit" 
+            className="bg-gradient-to-r from-teal-600 to-teal-800 hover:from-teal-500 hover:to-teal-700 text-white font-medium py-5 px-8 transition-all duration-300 flex items-center shadow-inner min-w-[180px] justify-center group-hover:scale-105"
+          >
+            {t('searchButton', 'BUSCAR AVENTURA')}
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </button>
         </div>
-        <button 
-          type="submit" 
-          className="bg-teal-600 hover:bg-teal-700 text-white font-medium py-3 px-6 transition-colors duration-300 flex items-center"
-        >
-          {t('searchButton', 'BUSCAR AVENTURA')}
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
-        </button>
       </form>
 
       {/* Renderizar el modal en un portal */}
