@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Pago from "../../assets/Images/Pago.png";
@@ -24,6 +24,21 @@ export const FormularioReservaRuta = () => {
   // Añadir nuevos estados para manejar opciones de pago
   const [radicado, setRadicado] = useState(null);
   const [mostrarOpcionesPago, setMostrarOpcionesPago] = useState(false);
+
+  // Estado para controlar el dropdown personalizado
+  const [isHoraDropdownOpen, setIsHoraDropdownOpen] = useState(false);
+  const horaDropdownRef = useRef(null);
+
+  // Opciones de hora para el dropdown personalizado
+  const horaOptions = [
+    { value: '08:00', label: '08:00 AM' },
+    { value: '09:00', label: '09:00 AM' },
+    { value: '10:00', label: '10:00 AM' },
+    { value: '11:00', label: '11:00 AM' },
+    { value: '12:00', label: '12:00 PM' },
+    { value: '13:00', label: '01:00 PM' },
+    { value: '14:00', label: '02:00 PM' },
+  ];
 
   // Si no hay información de la ruta en location.state, cargarla desde la API
   useEffect(() => {
@@ -51,6 +66,19 @@ export const FormularioReservaRuta = () => {
   const fechaMaxima = new Date();
   fechaMaxima.setMonth(fechaMaxima.getMonth() + 6);
   const fechaMaximaStr = fechaMaxima.toISOString().split('T')[0];
+
+  // Cerrar el dropdown al hacer clic fuera
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (horaDropdownRef.current && !horaDropdownRef.current.contains(event.target)) {
+        setIsHoraDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Manejar cambios en el formulario
   const handleChange = (e) => {
@@ -83,6 +111,12 @@ export const FormularioReservaRuta = () => {
     }
     
     setFormData({ ...formData, [name]: value });
+  };
+
+  // Manejar selección de hora en dropdown personalizado
+  const handleHoraSelect = (value) => {
+    setFormData({ ...formData, horaInicio: value });
+    setIsHoraDropdownOpen(false);
   };
 
   // Manejar envío del formulario
@@ -288,27 +322,52 @@ export const FormularioReservaRuta = () => {
               )}
             </div>
 
-            {/* Hora de inicio */}
+            {/* Hora de inicio (Dropdown Personalizado) */}
             <div>
               <label htmlFor="horaInicio" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('horaInicio', 'Hora de inicio')} *
               </label>
-              <select
-                id="horaInicio"
-                name="horaInicio"
-                value={formData.horaInicio}
-                onChange={handleChange}
-                className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
-                required
-              >
-                <option value="08:00">08:00 AM</option>
-                <option value="09:00">09:00 AM</option>
-                <option value="10:00">10:00 AM</option>
-                <option value="11:00">11:00 AM</option>
-                <option value="12:00">12:00 PM</option>
-                <option value="13:00">01:00 PM</option>
-                <option value="14:00">02:00 PM</option>
-              </select>
+              <div className="relative" ref={horaDropdownRef}>
+                <button
+                  type="button"
+                  id="horaInicio"
+                  className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 px-3 py-2 text-left bg-white"
+                  onClick={() => setIsHoraDropdownOpen(!isHoraDropdownOpen)}
+                >
+                  {horaOptions.find(option => option.value === formData.horaInicio)?.label || '08:00 AM'}
+                  <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </span>
+                </button>
+                
+                {isHoraDropdownOpen && (
+                  <div className="absolute mt-1 w-full z-10 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                    <ul className="py-1">
+                      {horaOptions.map((option) => (
+                        <li
+                          key={option.value}
+                          className={`cursor-pointer px-3 py-2 hover:bg-teal-700 hover:text-white ${
+                            formData.horaInicio === option.value ? 'bg-teal-600 text-white' : 'text-gray-900'
+                          }`}
+                          onClick={() => handleHoraSelect(option.value)}
+                        >
+                          {option.label}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {/* Campo oculto para mantener compatibilidad con el formulario */}
+                <input
+                  type="hidden"
+                  name="horaInicio"
+                  value={formData.horaInicio}
+                  required
+                />
+              </div>
             </div>
 
             {/* Fecha de inicio */}
