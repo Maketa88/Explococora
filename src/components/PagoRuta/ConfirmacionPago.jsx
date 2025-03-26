@@ -112,7 +112,7 @@ export const ConfirmacionPago = () => {
               </div>
             )}
             
-            <div className="bg-green-100 border-l-4 border-blue-400 p-4 rounded mb-6">
+            <div className="bg-blue-100  p-4 rounded mb-6">
               <div className="flex">
                 <div className="flex-shrink-0">
                   <svg className="h-5 w-5 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">

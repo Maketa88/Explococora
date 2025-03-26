@@ -5,7 +5,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Master from "../../assets/Images/Master.png";
 import Visa from "../../assets/Images/Visa.png";
 import AmericanExpress from "../../assets/Images/american.png";
+import BannerPago from "../../assets/Images/banner.png";
 import Diners from "../../assets/Images/dinner.png";
+import Pago from "../../assets/Images/Pago.png";
 
 export const VistaPagoSimulado = () => {
   const { t } = useTranslation();
@@ -130,21 +132,14 @@ export const VistaPagoSimulado = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        {/* Encabezado de Mercado Libre */}
-        <div className="bg-yellow-400 p-5">
-          <div className="flex items-center">
-            <svg className="w-8 h-8 text-blue-600" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10 20C10 22.2091 8.20914 24 6 24C3.79086 24 2 22.2091 2 20C2 17.7909 3.79086 16 6 16C8.20914 16 10 17.7909 10 20Z" fill="#2D3277"/>
-              <path d="M22 20C22 22.2091 20.2091 24 18 24C15.7909 24 14 22.2091 14 20C14 17.7909 15.7909 16 18 16C20.2091 16 22 17.7909 22 20Z" fill="#2D3277"/>
-              <path d="M34 20C34 22.2091 32.2091 24 30 24C27.7909 24 26 22.2091 26 20C26 17.7909 27.7909 16 30 16C32.2091 16 34 17.7909 34 20Z" fill="#2D3277"/>
-              <path d="M10 8C10 10.2091 8.20914 12 6 12C3.79086 12 2 10.2091 2 8C2 5.79086 3.79086 4 6 4C8.20914 4 10 5.79086 10 8Z" fill="#2D3277"/>
-              <path d="M22 8C22 10.2091 20.2091 12 18 12C15.7909 12 14 10.2091 14 8C14 5.79086 15.7909 4 18 4C20.2091 4 22 5.79086 22 8Z" fill="#2D3277"/>
-              <path d="M34 8C34 10.2091 32.2091 12 30 12C27.7909 12 26 10.2091 26 8C26 5.79086 27.7909 4 30 4C32.2091 4 34 5.79086 34 8Z" fill="#2D3277"/>
-              <path d="M10 32C10 34.2091 8.20914 36 6 36C3.79086 36 2 34.2091 2 32C2 29.7909 3.79086 28 6 28C8.20914 28 10 29.7909 10 32Z" fill="#2D3277"/>
-              <path d="M22 32C22 34.2091 20.2091 36 18 36C15.7909 36 14 34.2091 14 32C14 29.7909 15.7909 28 18 28C20.2091 28 22 29.7909 22 32Z" fill="#2D3277"/>
-              <path d="M34 32C34 34.2091 32.2091 36 30 36C27.7909 36 26 34.2091 26 32C26 29.7909 27.7909 28 30 28C32.2091 28 34 29.7909 34 32Z" fill="#2D3277"/>
-            </svg>
-            <h1 className="text-2xl font-bold text-blue-900 ml-3">Mercado Libre</h1>
+        {/* Encabezado con banner */}
+        <div className="w-full flex justify-center items-center py-4 bg-blue-100">
+          <div className="max-w-xs">
+            <img 
+              src={BannerPago} 
+              alt="Banner de pago" 
+              className="h-20 object-contain mx-auto"
+            />
           </div>
         </div>
 
@@ -375,9 +370,11 @@ export const VistaPagoSimulado = () => {
                     </>
                   ) : (
                     <>
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
+                      <img 
+                        src={Pago} 
+                        alt="Mercado Pago" 
+                        className="h-8 w-8 mr-4"
+                      />
                       {t('confirmarPago', 'Pagar con Mercado Pago')}
                     </>
                   )}
