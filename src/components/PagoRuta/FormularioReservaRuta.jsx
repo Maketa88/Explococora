@@ -253,28 +253,32 @@ export const FormularioReservaRuta = () => {
               <div className="flex">
                 <button 
                   type="button"
-                  className="bg-teal-100 hover:bg-teal-200 text-teal-800 px-3 py-2 rounded-l-lg border border-teal-200"
+                  className="bg-teal-600 hover:bg-teal-700 text-white h-10 w-10 rounded-l-lg flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
                   onClick={() => handleChange({ target: { name: 'cantidadPersonas', value: Math.max(1, formData.cantidadPersonas - 1) } })}
                 >
-                  -
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                  </svg>
                 </button>
                 <input
-                  type="number"
+                  type="text"
                   id="cantidadPersonas"
                   name="cantidadPersonas"
                   value={formData.cantidadPersonas}
                   onChange={handleChange}
                   min="1"
                   max={rutaInfo?.capacidadMaxima || 99}
-                  className="block w-full border-teal-200 focus:ring-teal-500 focus:border-teal-500 text-center"
+                  className="block w-full border-y border-teal-300 focus:ring-teal-500 focus:border-teal-500 text-center h-10 text-lg font-medium"
                   required
                 />
                 <button 
                   type="button"
-                  className="bg-teal-100 hover:bg-teal-200 text-teal-800 px-3 py-2 rounded-r-lg border border-teal-200"
+                  className="bg-teal-600 hover:bg-teal-700 text-white h-10 w-10 rounded-r-lg flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
                   onClick={() => handleChange({ target: { name: 'cantidadPersonas', value: Math.min(parseInt(rutaInfo?.capacidadMaxima || 99), formData.cantidadPersonas + 1) } })}
                 >
-                  +
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                  </svg>
                 </button>
               </div>
               {rutaInfo && (
