@@ -2,12 +2,12 @@ import axios from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Master from "../../assets/Images/Master.png";
-import Visa from "../../assets/Images/Visa.png";
 import AmericanExpress from "../../assets/Images/american.png";
 import BannerPago from "../../assets/Images/banner.png";
 import Diners from "../../assets/Images/dinner.png";
+import Master from "../../assets/Images/Master.png";
 import Pago from "../../assets/Images/Pago.png";
+import Visa from "../../assets/Images/Visa.png";
 
 export const VistaPagoSimulado = () => {
   const { t } = useTranslation();
@@ -173,22 +173,22 @@ export const VistaPagoSimulado = () => {
               {/* Tipos de tarjetas */}
               <div className="flex mb-6 space-x-6 items-center justify-center">
                 {/* Visa */}
-                <div className="bg-white p-3 rounded-md border border-gray-200 hover:shadow-lg transition-shadow w-24 h-16 flex items-center justify-center">
+                <div className="bg-white p-3  w-28 h-20 flex items-center justify-center">
                   <img src={Visa} alt="Visa" className="max-w-full max-h-full object-contain" />
                 </div>
                 
                 {/* Mastercard */}
-                <div className="bg-white p-3 rounded-md border border-gray-200 hover:shadow-lg transition-shadow w-24 h-16 flex items-center justify-center">
+                <div className="bg-white p-3  w-28 h-20 flex items-center justify-center">
                   <img src={Master} alt="Mastercard" className="max-w-full max-h-full object-contain" />
                 </div>
                 
                 {/* American Express */}
-                <div className="bg-white p-3 rounded-md border border-gray-200 hover:shadow-lg transition-shadow w-24 h-16 flex items-center justify-center">
+                <div className="bg-white p-3  w-28 h-20 flex items-center justify-center">
                   <img src={AmericanExpress} alt="American Express" className="max-w-full max-h-full object-contain" />
                 </div>
                 
                 {/* Diners Club */}
-                <div className="bg-white p-3 rounded-md border border-gray-200 hover:shadow-lg transition-shadow w-24 h-16 flex items-center justify-center">
+                <div className="bg-white p-3  w-28 h-20 flex items-center justify-center">
                   <img src={Diners} alt="Diners Club" className="max-w-full max-h-full object-contain" />
                 </div>
                 
