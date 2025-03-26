@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import Pago from "../../assets/Images/Pago.png";
 import { combinarFechaHoraISO, generarTimestampMySQL } from '../../utils/formatUtils';
 
 export const FormularioReservaRuta = () => {
@@ -420,7 +421,7 @@ export const FormularioReservaRuta = () => {
                   type="button"
                   onClick={realizarPagoSimulado}
                   disabled={cargando}
-                  className="w-full py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-medium transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center"
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-medium transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center"
                 >
                   {cargando ? (
                     <>
@@ -432,10 +433,12 @@ export const FormularioReservaRuta = () => {
                     </>
                   ) : (
                     <>
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
-                      </svg>
-                      {t('pagoMercadoLibre', 'Pago Mercado Libre')}
+                      <img 
+                        src={Pago}
+                        alt="Mercado Pago"
+                        className="w-10 h-10 mr-2"
+                      />
+                      {t('pagoMercadoLibre', 'Pago Mercado Pago')}
                     </>
                   )}
                 </button>

@@ -378,7 +378,7 @@ export const VistaPagoSimulado = () => {
                       <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                       </svg>
-                      {t('confirmarPago', 'Pagar con Mercado Libre')}
+                      {t('confirmarPago', 'Pagar con Mercado Pago')}
                     </>
                   )}
                 </button>
@@ -397,7 +397,7 @@ export const VistaPagoSimulado = () => {
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                 </svg>
-                {t('pagoSeguro', 'Pago seguro procesado por Mercado Libre')}
+                {t('pagoSeguro', 'Pago seguro procesado por Mercado Pago')}
               </div>
             </div>
           </div>
