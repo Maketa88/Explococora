@@ -40,6 +40,141 @@ export const FormularioReservaRuta = () => {
     { value: '14:00', label: '02:00 PM' },
   ];
 
+  // Estados para controlar los datepickers personalizados
+  const [isInicioCalendarOpen, setIsInicioCalendarOpen] = useState(false);
+  const [isFinCalendarOpen, setIsFinCalendarOpen] = useState(false);
+  const inicioCalendarRef = useRef(null);
+  const finCalendarRef = useRef(null);
+  
+  // Meses en español
+  const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  const diasSemana = ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"];
+  
+  // Estado para el mes y año actual de cada calendario
+  const [inicioViewDate, setInicioViewDate] = useState(new Date());
+  const [finViewDate, setFinViewDate] = useState(new Date());
+  
+  // Funciones para generar días del calendario
+  const getDiasCalendario = (fecha) => {
+    const year = fecha.getFullYear();
+    const month = fecha.getMonth();
+    
+    // Primer día del mes actual
+    const primerDia = new Date(year, month, 1);
+    // Último día del mes actual
+    const ultimoDia = new Date(year, month + 1, 0);
+    
+    const diasArray = [];
+    
+    // Días del mes anterior para completar la primera semana
+    const diasAntesPrimerDia = primerDia.getDay();
+    for (let i = diasAntesPrimerDia; i > 0; i--) {
+      const dia = new Date(year, month, 1 - i);
+      diasArray.push({
+        date: dia,
+        day: dia.getDate(),
+        month: dia.getMonth(),
+        isCurrentMonth: false,
+        isToday: false,
+        isDisabled: dia < new Date(fechaMinima)
+      });
+    }
+    
+    // Días del mes actual
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    
+    for (let i = 1; i <= ultimoDia.getDate(); i++) {
+      const dia = new Date(year, month, i);
+      diasArray.push({
+        date: dia,
+        day: i,
+        month: month,
+        isCurrentMonth: true,
+        isToday: dia.getTime() === hoy.getTime(),
+        isDisabled: dia < new Date(fechaMinima) || dia > new Date(fechaMaximaStr)
+      });
+    }
+    
+    // Días del mes siguiente para completar la última semana
+    const diasDespuesUltimoDia = 6 - ultimoDia.getDay();
+    for (let i = 1; i <= diasDespuesUltimoDia; i++) {
+      const dia = new Date(year, month + 1, i);
+      diasArray.push({
+        date: dia,
+        day: i,
+        month: dia.getMonth(),
+        isCurrentMonth: false,
+        isToday: false,
+        isDisabled: true
+      });
+    }
+    
+    return diasArray;
+  };
+  
+  // Manejar la selección de fecha
+  const handleDateSelect = (date, tipo) => {
+    // Ajustar fecha para evitar problemas de zona horaria
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const day = date.getDate();
+    
+    // Crear fecha en UTC para evitar desplazamientos por zona horaria
+    const adjustedDate = new Date(Date.UTC(year, month, day));
+    // Formatear fecha en formato ISO y tomar solo la parte de la fecha
+    const formattedDate = adjustedDate.toISOString().slice(0, 10);
+    
+    if (tipo === 'inicio') {
+      if (formData.fechaFin && new Date(formattedDate) > new Date(formData.fechaFin)) {
+        setFormData({
+          ...formData,
+          fechaInicio: formattedDate,
+          fechaFin: formattedDate
+        });
+      } else {
+        setFormData({
+          ...formData,
+          fechaInicio: formattedDate
+        });
+      }
+      setIsInicioCalendarOpen(false);
+    } else {
+      setFormData({
+        ...formData,
+        fechaFin: formattedDate
+      });
+      setIsFinCalendarOpen(false);
+    }
+  };
+  
+  // Funciones para cambiar de mes
+  const cambiarMes = (increment, tipo) => {
+    if (tipo === 'inicio') {
+      const newDate = new Date(inicioViewDate);
+      newDate.setMonth(newDate.getMonth() + increment);
+      setInicioViewDate(newDate);
+    } else {
+      const newDate = new Date(finViewDate);
+      newDate.setMonth(newDate.getMonth() + increment);
+      setFinViewDate(newDate);
+    }
+  };
+  
+  // Formatear fecha para mostrar
+  const formatDisplayDate = (dateString) => {
+    if (!dateString) return '';
+    
+    // Dividir la cadena de fecha en sus componentes
+    const [year, month, day] = dateString.split('-').map(num => parseInt(num, 10));
+    
+    // Crear nueva fecha usando los componentes (asegurar que no hay desplazamiento por zona horaria)
+    const date = new Date(year, month - 1, day);
+    
+    // Formatear para mostrar
+    return `${date.getDate()} ${meses[date.getMonth()].substring(0, 3)} ${date.getFullYear()}`;
+  };
+  
   // Si no hay información de la ruta en location.state, cargarla desde la API
   useEffect(() => {
     if (!rutaInfo && idRuta) {
@@ -67,11 +202,17 @@ export const FormularioReservaRuta = () => {
   fechaMaxima.setMonth(fechaMaxima.getMonth() + 6);
   const fechaMaximaStr = fechaMaxima.toISOString().split('T')[0];
 
-  // Cerrar el dropdown al hacer clic fuera
+  // Cerrar calendarios al hacer clic fuera
   useEffect(() => {
     function handleClickOutside(event) {
       if (horaDropdownRef.current && !horaDropdownRef.current.contains(event.target)) {
         setIsHoraDropdownOpen(false);
+      }
+      if (inicioCalendarRef.current && !inicioCalendarRef.current.contains(event.target)) {
+        setIsInicioCalendarOpen(false);
+      }
+      if (finCalendarRef.current && !finCalendarRef.current.contains(event.target)) {
+        setIsFinCalendarOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -370,41 +511,256 @@ export const FormularioReservaRuta = () => {
               </div>
             </div>
 
-            {/* Fecha de inicio */}
+            {/* Fecha de inicio personalizada */}
             <div>
               <label htmlFor="fechaInicio" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('fechaInicio', 'Fecha de inicio')} *
               </label>
-              <input
-                type="date"
-                id="fechaInicio"
-                name="fechaInicio"
-                value={formData.fechaInicio}
-                onChange={handleChange}
-                min={fechaMinima}
-                max={fechaMaximaStr}
-                className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
-                required
-              />
+              <div className="relative" ref={inicioCalendarRef}>
+                <button
+                  type="button"
+                  className="flex items-center justify-between w-full px-4 py-2.5 text-left border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500 bg-white transition-all duration-300 hover:border-teal-400"
+                  onClick={() => setIsInicioCalendarOpen(!isInicioCalendarOpen)}
+                >
+                  <div className="flex items-center">
+                    <svg className="w-5 h-5 mr-2 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span className="text-gray-700">{formData.fechaInicio ? formatDisplayDate(formData.fechaInicio) : t('seleccioneFecha', 'Seleccione fecha')}</span>
+                  </div>
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </button>
+                
+                {isInicioCalendarOpen && (
+                  <div className="absolute z-20 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 transform transition-all duration-300 origin-top animate-zoom-in">
+                    <div className="p-3 bg-gradient-to-r from-teal-600 to-teal-500 text-white rounded-t-lg">
+                      <div className="flex justify-between items-center mb-2">
+                        <button 
+                          type="button" 
+                          className="p-1 hover:bg-teal-700 rounded-full transition-colors duration-200"
+                          onClick={() => cambiarMes(-1, 'inicio')}
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+                          </svg>
+                        </button>
+                        <h3 className="font-bold text-lg">
+                          {meses[inicioViewDate.getMonth()]} {inicioViewDate.getFullYear()}
+                        </h3>
+                        <button 
+                          type="button" 
+                          className="p-1 hover:bg-teal-700 rounded-full transition-colors duration-200"
+                          onClick={() => cambiarMes(1, 'inicio')}
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                          </svg>
+                        </button>
+                      </div>
+                      
+                      <div className="grid grid-cols-7 gap-1 mt-1">
+                        {diasSemana.map((dia, index) => (
+                          <div key={index} className="text-xs text-center font-medium text-teal-100 py-1">
+                            {dia}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="p-2">
+                      <div className="grid grid-cols-7 gap-1">
+                        {getDiasCalendario(inicioViewDate).map((dia, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            disabled={dia.isDisabled}
+                            onClick={() => !dia.isDisabled && handleDateSelect(dia.date, 'inicio')}
+                            className={`
+                              w-9 h-9 m-0.5 text-sm rounded-full flex items-center justify-center transition-all duration-200
+                              ${!dia.isCurrentMonth ? 'text-gray-400 hover:bg-gray-100' : 'text-gray-800 hover:bg-teal-100'}
+                              ${dia.isToday ? 'bg-teal-100 text-teal-800 font-medium ring-2 ring-teal-400 ring-opacity-50' : ''}
+                              ${formData.fechaInicio && dia.date.toISOString().split('T')[0] === formData.fechaInicio 
+                                ? 'bg-teal-600 text-white hover:bg-teal-700 font-medium shadow-md' 
+                                : ''}
+                              ${!dia.isDisabled 
+                                ? 'hover:shadow-sm' 
+                                : 'opacity-50 cursor-not-allowed bg-gray-50'}
+                            `}
+                          >
+                            {dia.day}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="border-t border-gray-200 p-2 flex justify-between">
+                      <button 
+                        type="button"
+                        className="text-xs text-teal-600 hover:text-teal-800 transition-colors duration-200"
+                        onClick={() => {
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          if (today >= new Date(fechaMinima) && today <= new Date(fechaMaximaStr)) {
+                            handleDateSelect(today, 'inicio');
+                          }
+                        }}
+                      >
+                        {t('hoy', 'Hoy')}
+                      </button>
+                      <button 
+                        type="button"
+                        className="text-xs text-red-500 hover:text-red-700 transition-colors duration-200"
+                        onClick={() => setIsInicioCalendarOpen(false)}
+                      >
+                        {t('cerrar', 'Cerrar')}
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Campo oculto para mantener la compatibilidad con el formulario */}
+                <input
+                  type="hidden"
+                  id="fechaInicio"
+                  name="fechaInicio" 
+                  value={formData.fechaInicio}
+                  required
+                />
+              </div>
             </div>
 
-            {/* Fecha de fin */}
+            {/* Fecha de fin personalizada */}
             <div>
               <label htmlFor="fechaFin" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('fechaFin', 'Fecha de fin')} *
               </label>
-              <input
-                type="date"
-                id="fechaFin"
-                name="fechaFin"
-                value={formData.fechaFin}
-                onChange={handleChange}
-                min={formData.fechaInicio || fechaMinima}
-                max={fechaMaximaStr}
-                className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
-                required
-                disabled={!formData.fechaInicio}
-              />
+              <div className="relative" ref={finCalendarRef}>
+                <button
+                  type="button"
+                  className={`flex items-center justify-between w-full px-4 py-2.5 text-left border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500 bg-white transition-all duration-300 hover:border-teal-400 ${!formData.fechaInicio ? 'opacity-75 cursor-not-allowed' : ''}`}
+                  onClick={() => formData.fechaInicio && setIsFinCalendarOpen(!isFinCalendarOpen)}
+                  disabled={!formData.fechaInicio}
+                >
+                  <div className="flex items-center">
+                    <svg className="w-5 h-5 mr-2 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span className="text-gray-700">{formData.fechaFin ? formatDisplayDate(formData.fechaFin) : t('seleccioneFecha', 'Seleccione fecha')}</span>
+                  </div>
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </button>
+                
+                {isFinCalendarOpen && (
+                  <div className="absolute z-20 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 transform transition-all duration-300 origin-top animate-zoom-in">
+                    <div className="p-3 bg-gradient-to-r from-teal-600 to-teal-500 text-white rounded-t-lg">
+                      <div className="flex justify-between items-center mb-2">
+                        <button 
+                          type="button" 
+                          className="p-1 hover:bg-teal-700 rounded-full transition-colors duration-200"
+                          onClick={() => cambiarMes(-1, 'fin')}
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+                          </svg>
+                        </button>
+                        <h3 className="font-bold text-lg">
+                          {meses[finViewDate.getMonth()]} {finViewDate.getFullYear()}
+                        </h3>
+                        <button 
+                          type="button" 
+                          className="p-1 hover:bg-teal-700 rounded-full transition-colors duration-200"
+                          onClick={() => cambiarMes(1, 'fin')}
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                          </svg>
+                        </button>
+                      </div>
+                      
+                      <div className="grid grid-cols-7 gap-1 mt-1">
+                        {diasSemana.map((dia, index) => (
+                          <div key={index} className="text-xs text-center font-medium text-teal-100 py-1">
+                            {dia}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="p-2">
+                      <div className="grid grid-cols-7 gap-1">
+                        {getDiasCalendario(finViewDate).map((dia, index) => {
+                          // Asegurarse de que no se pueda seleccionar una fecha anterior a fechaInicio
+                          const fechaMinParaFin = formData.fechaInicio || fechaMinima;
+                          const estaDeshabilitado = dia.isDisabled || (!dia.isCurrentMonth) || (dia.date < new Date(fechaMinParaFin));
+                          
+                          return (
+                            <button
+                              key={index}
+                              type="button"
+                              disabled={estaDeshabilitado}
+                              onClick={() => !estaDeshabilitado && handleDateSelect(dia.date, 'fin')}
+                              className={`
+                                w-9 h-9 m-0.5 text-sm rounded-full flex items-center justify-center transition-all duration-200
+                                ${!dia.isCurrentMonth ? 'text-gray-400 hover:bg-gray-100' : 'text-gray-800 hover:bg-teal-100'}
+                                ${dia.isToday ? 'bg-teal-100 text-teal-800 font-medium ring-2 ring-teal-400 ring-opacity-50' : ''}
+                                ${formData.fechaFin && dia.date.toISOString().split('T')[0] === formData.fechaFin 
+                                  ? 'bg-teal-600 text-white hover:bg-teal-700 font-medium shadow-md' 
+                                  : ''}
+                                ${formData.fechaInicio && dia.date.toISOString().split('T')[0] === formData.fechaInicio 
+                                  ? 'bg-teal-200 text-teal-800 ring-1 ring-teal-500' 
+                                  : ''}
+                                ${!estaDeshabilitado 
+                                  ? 'hover:shadow-sm' 
+                                  : 'opacity-50 cursor-not-allowed bg-gray-50'}
+                              `}
+                            >
+                              {dia.day}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    
+                    <div className="border-t border-gray-200 p-2 flex justify-between">
+                      <button 
+                        type="button"
+                        className="text-xs text-teal-600 hover:text-teal-800 transition-colors duration-200"
+                        onClick={() => {
+                          // Seleccionar fecha de inicio si es válida y superior a fecha mínima/inicio
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          const minDate = formData.fechaInicio ? new Date(formData.fechaInicio) : new Date(fechaMinima);
+                          if (today >= minDate && today <= new Date(fechaMaximaStr)) {
+                            handleDateSelect(today, 'fin');
+                          }
+                        }}
+                      >
+                        {t('hoy', 'Hoy')}
+                      </button>
+                      <button 
+                        type="button"
+                        className="text-xs text-red-500 hover:text-red-700 transition-colors duration-200"
+                        onClick={() => setIsFinCalendarOpen(false)}
+                      >
+                        {t('cerrar', 'Cerrar')}
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Campo oculto para mantener la compatibilidad con el formulario */}
+                <input
+                  type="hidden"
+                  id="fechaFin"
+                  name="fechaFin" 
+                  value={formData.fechaFin}
+                  required
+                />
+              </div>
             </div>
           </div>
 
