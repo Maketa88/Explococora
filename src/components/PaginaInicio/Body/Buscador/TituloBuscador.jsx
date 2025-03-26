@@ -7,66 +7,74 @@ export const TituloBuscador = ({ onSearch }) => {
   return (
     <div className="container mx-auto px-4 py-16 sm:py-20 lg:py-16 relative z-10">
       <div className="flex flex-col items-center text-center">
-        {/* Título principal con efecto de neón y glow futurista */}
-        <div className="relative ">
+        {/* Título principal con efecto 3D y resplandor */}
+        <div className="relative mb-2">
           <h1
-            className="text-6xl sm:text-7xl lg:text-8xl font-black mb-2 tracking-tighter"
+            className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tighter"
             style={{
-              background:
-                "linear-gradient(135deg, #ffffff 0%, #ffffff 40%, #ffffff 60%, #ffffff 100%)",
-              backgroundSize: "200% auto",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-
-              animation:
-                "pulseTitle 3s infinite alternate, gradientFlow 6s linear infinite",
+              color: 'white',
+              textShadow: `
+                0 1px 0 #ccc,
+                0 2px 0 #ccc,
+                0 3px 0 #ccc,
+                0 4px 0 #ccc,
+                0 5px 0 #ccc,
+                0 6px 0 transparent,
+                0 7px 0 transparent,
+                0 8px 0 transparent,
+                0 9px 0 transparent,
+                0 10px 30px rgba(0, 0, 0, 0.8)
+              `,
+              filter: 'drop-shadow(0 0 6px rgba(78, 204, 163, 0.6))',
+              animation: "float 6s ease-in-out infinite"
             }}
           >
             {t("title", "Explococora")}
           </h1>
-          {/* Efecto de glow detrás del texto */}
-          <div
-            className="absolute -inset-2 blur-3xl bg-teal-500/20 rounded-full -z-10"
-            style={{ animation: "glowPulse 3s infinite alternate" }}
-          ></div>
+          
+          
         </div>
 
-        {/* Línea decorativa con efecto de brillo */}
-        <div
-          className="w-36 h-1 bg-gradient-to-r from-teal-400 via-white to-teal-600 rounded-full mb-8 
-                        hover:scale-150 transition-all duration-500"
-          style={{ boxShadow: "0 0 15px rgba(56, 178, 172, 0.8)" }}
-        ></div>
+        {/* Línea decorativa con efecto dinámico */}
+        
 
-        {/* Subtítulo con efecto de desvanecimiento */}
+        {/* Subtítulo con efecto de desplazamiento */}
         <h2
-          className="text-xl sm:text-2xl lg:text-4xl text-white font-light mb-12 max-w-3xl leading-relaxed"
+          className="text-2xl sm:text-3xl lg:text-4xl font-light mb-16 max-w-3xl"
           style={{
-           
-            animation: "fadeIn 1.5s ease-out",
+            color: 'white',
+            textShadow: "0 2px 15px rgba(0, 0, 0, 0.8)",
+            
+            filter: 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.7))'
           }}
         >
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-white font-extrabold">
+          <span className="font-extrabold">
             {t("slogan", "Disfruta de la naturaleza y la aventura")}
           </span>
         </h2>
 
-        {/* Tercer texto con efecto de brillo y borde brillante */}
-        <h3
-          className="text-xl sm:text-2xl lg:text-3xl text-white font-semibold mb-12
-                      px-8 py-4 rounded-lg backdrop-filter backdrop-blur-sm bg-teal-800/20
-                      border-2 border-teal-400/40"
-          style={{
-            textShadow: "0 0 10px rgba(255, 255, 255, 0.6)",
-            animation: "shimmer 2.5s infinite",
-            boxShadow:
-              "0 0 25px rgba(56, 178, 172, 0.4), inset 0 0 15px rgba(56, 178, 172, 0.2)",
-          }}
-        >
-          {t("findRoute", "Encuentra Tu Ruta Perfecta")}
-        </h3>
+        {/* Tercer texto con efecto de resplandor */}
+        <div className="relative mb-12 transform hover:scale-105 transition-transform duration-500">
+          <h3
+            className="text-xl sm:text-2xl lg:text-3xl text-white font-bold py-4 px-10 rounded-xl"
+            style={{
+              background: 'linear-gradient(135deg, rgba(20, 184, 166, 0.4) 0%, rgba(17, 94, 89, 0.5) 100%)',
+              backdropFilter: 'blur(8px)',
+              border: '2px solid rgba(255, 255, 255, 0.2)',
+              boxShadow: '0 0 30px rgba(56, 178, 172, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.1)',
+              textShadow: "0 0 15px rgba(255, 255, 255, 0.8), 0 0 5px rgba(255, 255, 255, 0.6)",
+              animation: "pulse 2.5s infinite alternate"
+            }}
+          >
+            {t("findRoute", "Encuentra Tu Ruta Perfecta")}
+          </h3>
+          
+          {/* Efectos de luz en las esquinas */}
+          <div className="absolute -top-1 -left-1 w-4 h-4 rounded-full bg-teal-300 blur-md"></div>
+          <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-teal-300 blur-md"></div>
+        </div>
 
-        {/* Contenedor del buscador con efecto 3D */}
+        {/* Contenedor del buscador - se mantiene sin cambios */}
         <div
           className="w-full max-w-3xl transform hover:scale-[1.02] transition-all duration-300"
           style={{ filter: "drop-shadow(0 20px 30px rgba(8, 112, 112, 0.5))" }}
@@ -75,30 +83,31 @@ export const TituloBuscador = ({ onSearch }) => {
         </div>
       </div>
 
-      {/* Estilos de animación con style normal */}
+      {/* Estilos de animación */}
       <style>
         {`
-          @keyframes pulseTitle {
-            0% { opacity: 0.9; transform: scale(1); }
-            100% { opacity: 1; transform: scale(1.03); }
+          @keyframes pulse {
+            0% { opacity: 0.7; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1.02); }
           }
           @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
           }
-          @keyframes shimmer {
-            0% { box-shadow: 0 0 15px rgba(56, 178, 172, 0.3), inset 0 0 15px rgba(56, 178, 172, 0.2); }
-            50% { box-shadow: 0 0 30px rgba(56, 178, 172, 0.8), inset 0 0 25px rgba(56, 178, 172, 0.4); }
-            100% { box-shadow: 0 0 15px rgba(56, 178, 172, 0.3), inset 0 0 15px rgba(56, 178, 172, 0.2); }
+          @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
           }
-          @keyframes gradientFlow {
-            0% { background-position: 0% 50% }
-            50% { background-position: 100% 50% }
-            100% { background-position: 0% 50% }
+          @keyframes expandWidth {
+            0% { width: 40%; opacity: 0.7; }
+            100% { width: 80%; opacity: 1; }
           }
-          @keyframes glowPulse {
-            0% { opacity: 0.3; transform: scale(0.95); }
-            100% { opacity: 0.5; transform: scale(1.05); }
+          @keyframes moveLight {
+            0% { left: 0; opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { left: 100%; opacity: 0; }
           }
         `}
       </style>
