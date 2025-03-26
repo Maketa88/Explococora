@@ -92,7 +92,7 @@ export const SearchForm = ({ onSearch }) => {
     <>
       <form onSubmit={handleSubmit} className="flex items-center w-full max-w-3xl overflow-hidden group">
         {/* Contenedor principal con efectos visuales */}
-        <div className="flex w-full bg-white/15 backdrop-blur-lg rounded-full border-2 border-teal-300/30 shadow-[0_0_20px_rgba(56,178,172,0.4)] overflow-hidden transition-all duration-500 group-hover:shadow-[0_0_30px_rgba(56,178,172,0.7)]">
+        <div className="flex w-full bg-white/15 backdrop-blur-lg rounded-full border-2  overflow-hidden transition-all duration-500">
           
           {/* Icono de búsqueda con animación */}
           <div className="pl-6 flex items-center text-white">

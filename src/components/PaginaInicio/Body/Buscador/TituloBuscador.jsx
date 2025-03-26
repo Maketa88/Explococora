@@ -12,7 +12,7 @@ export const TituloBuscador = ({ onSearch }) => {
           <h1
             className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tighter"
             style={{
-              color: 'white',
+              color: "white",
               textShadow: `
                 0 1px 0 #ccc,
                 0 2px 0 #ccc,
@@ -25,29 +25,25 @@ export const TituloBuscador = ({ onSearch }) => {
                 0 9px 0 transparent,
                 0 10px 30px rgba(0, 0, 0, 0.8)
               `,
-              
-              animation: "float 6s ease-in-out infinite"
-              
+
+              animation: "float 6s ease-in-out infinite",
             }}
           >
             {t("title", "Explococora")}
           </h1>
-          
-          
         </div>
 
         {/* Línea decorativa con efecto dinámico */}
-        
 
         {/* Subtítulo con efecto 3D espectacular */}
         <div className="relative mb-10 mt-3">
           <h2
             className="text-3xl sm:text-4xl lg:text-5xl"
             style={{
-              color: '#ffffff',
-              background: 'linear-gradient(to bottom, #ffffff, #ffffff)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              color: "#ffffff",
+              background: "linear-gradient(to bottom, #ffffff, #ffffff)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
               textShadow: `
                 0 0 8px rgba(255,255,255,0.8),
                 0 1px 0 rgba(255,255,255,0.9),
@@ -60,43 +56,35 @@ export const TituloBuscador = ({ onSearch }) => {
                 0 8px 15px rgba(0,0,0,0.2),
                 0 20px 20px rgba(0,0,0,0.15)
               `,
-              
             }}
           >
             {t("slogan", "Disfruta de la naturaleza y la aventura")}
           </h2>
-          
+
           {/* Efectos de resplandor detrás del texto */}
-          
-          
+
           {/* Línea decorativa debajo del texto */}
-         
         </div>
 
-        {/* Tercer texto con efecto de resplandor */}
-        <div className="relative mb-12 transform hover:scale-105 transition-transform duration-500">
+        {/* Tercer texto con estilo más limpio y elegante */}
+        <div className="relative mb-3 mt-24">
           <h3
-            className="text-xl sm:text-2xl lg:text-3xl text-white font-bold py-4 px-10 rounded-xl"
+            className="text-2xl sm:text-3xl lg:text-4xl font-medium tracking-wide"
             style={{
-              background: 'linear-gradient(135deg, rgba(20, 184, 166, 0.4) 0%, rgba(17, 94, 89, 0.5) 100%)',
-              backdropFilter: 'blur(8px)',
-              border: '2px solid rgba(255, 255, 255, 0.2)',
-              boxShadow: '0 0 30px rgba(56, 178, 172, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.1)',
-              textShadow: "0 0 15px rgba(255, 255, 255, 0.8), 0 0 5px rgba(255, 255, 255, 0.6)",
-              animation: "pulse 2.5s infinite alternate"
+              color: "white",
+              letterSpacing: "1px",
+              textShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
             }}
           >
             {t("findRoute", "Encuentra Tu Ruta Perfecta")}
           </h3>
-          
-          {/* Efectos de luz en las esquinas */}
-          <div className="absolute -top-1 -left-1 w-4 h-4 rounded-full bg-teal-300 blur-md"></div>
-          <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-teal-300 blur-md"></div>
+
+          {/* Línea decorativa que apunta hacia el buscador */}
         </div>
 
         {/* Contenedor del buscador - se mantiene sin cambios */}
         <div
-          className="w-full max-w-3xl transform hover:scale-[1.02] transition-all duration-300"
+          className="w-full max-w-3xl transform  transition-all duration-300"
           style={{ filter: "drop-shadow(0 20px 30px rgba(8, 112, 112, 0.5))" }}
         >
           <SearchForm onSearch={onSearch} />
