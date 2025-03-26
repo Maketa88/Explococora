@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { formatearFecha } from '../../utils/formatUtils';
+import Pago from "../../assets/Images/Pago.png";
 
 export const ConfirmacionPago = () => {
   const { t } = useTranslation();
@@ -115,9 +116,11 @@ export const ConfirmacionPago = () => {
             <div className="bg-blue-100  p-4 rounded mb-6">
               <div className="flex">
                 <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <img 
+                    className="h-9 w-9 object-cover" 
+                    src={Pago}
+                    alt="Información de pago" 
+                  />
                 </div>
                 <div className="ml-3">
                   <p className="text-sm text-gray-950">
