@@ -143,7 +143,7 @@ export const AutorizacionMenores = () => {
   };
 
   return (
-    <section className="relative py-16 px-4 overflow-hidden">
+    <section className="relative py-10 px-4 overflow-hidden">
       {/* Fondo decorativo inspirado en el Valle del Cocora */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-emerald-50 to-white"></div>
@@ -241,13 +241,16 @@ export const AutorizacionMenores = () => {
       
       {/* Contenido principal */}
       <div className="max-w-4xl mx-auto">
-        {/* Encabezado */}
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-teal-700 mb-2">
+        {/* Encabezado con fondo decorativo */}
+        <div className="relative mb-10 text-center">
+          <div className="absolute inset-0 -z-10">
+            <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-teal-50 to-transparent opacity-70 rounded-3xl"></div>
+          </div>
+          <h1 className="text-4xl font-bold text-teal-800 mb-3">
             {t('reservarRuta', 'Reservar Ruta')}
           </h1>
           {rutaInfo && (
-            <p className="text-xl text-teal-600">
+            <p className="text-2xl text-teal-600 font-semibold">
               {rutaInfo.nombreRuta}
             </p>
           )}
@@ -255,55 +258,73 @@ export const AutorizacionMenores = () => {
 
         {/* Información de la ruta */}
         {rutaInfo && (
-          <div className="bg-gradient-to-r from-teal-700 to-teal-600 text-white p-6 rounded-t-xl">
+          <div className="bg-gradient-to-r from-teal-700 to-teal-600 text-white p-6 rounded-t-xl shadow-lg transform hover:scale-[1.01] transition-transform duration-300">
             <div className="flex flex-wrap items-center justify-between">
               <div className="mb-4 md:mb-0">
                 <h2 className="text-xl font-bold">{rutaInfo.nombreRuta}</h2>
                 <p className="text-teal-100">{rutaInfo.tipo} • {rutaInfo.dificultad}</p>
               </div>
               
-              <div className="flex flex-col items-end">
-                <div className="text-2xl font-bold">
-                  ${Number(rutaInfo.precio).toLocaleString('es-CO')} <span className="text-sm font-normal">COP</span>
+              <div className="transform rotate-12">
+                <div className="w-24 h-24 relative">
+                  <div className="rounded-full bg-teal-50 border-2 border-teal-600 flex items-center justify-center w-full h-full">
+                    <span className="text-xs text-teal-800 font-bold text-center">SEGURIDAD VERIFICADA</span>
+                  </div>
                 </div>
-                <div className="text-sm text-teal-100">{t('porPersona', 'por persona')}</div>
               </div>
             </div>
           </div>
         )}
 
-        <div className="bg-white rounded-b-xl shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            Autorización y Cumplimiento de Políticas de Seguridad para Menores de Edad
-          </h2>
+        <div className="relative bg-white rounded-b-xl shadow-lg p-8 border-t-4 border-teal-500">
+          {/* Líneas decorativas laterales */}
+          <div className="absolute left-0 top-10 bottom-10 w-1 bg-gradient-to-b from-teal-500 via-teal-300 to-teal-500 rounded-r-full"></div>
+          <div className="absolute right-0 top-10 bottom-10 w-1 bg-gradient-to-b from-teal-500 via-teal-300 to-teal-500 rounded-l-full"></div>
+
+          {/* Título con icono */}
+          <div className="flex items-center justify-center gap-3 mb-6 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <h2 className="text-2xl font-bold text-teal-800">
+              Autorización y Cumplimiento de Políticas de Seguridad para Menores de Edad
+            </h2>
+          </div>
           
-          <div className="text-gray-700 space-y-4 mb-6">
-            <p>
-              Como padre, madre o representante legal, autorizo la participación de mi hijo o menor a cargo 
+          {/* Contenido con diseño mejorado */}
+          <div className="text-gray-700 space-y-6 mb-8 px-4 py-6 bg-gradient-to-br from-teal-50 to-white rounded-xl border border-teal-100 shadow-sm text-justify">
+            <p className="leading-relaxed">
+              <span className="text-teal-700 font-semibold">Como padre, madre o representante legal</span>, autorizo la participación de mi hijo o menor a cargo 
               en las actividades de cabalgata o caminata organizadas en el Valle del Cocora, Salento, Quindío, 
               a través del sistema web ExploCocora. Declaro que he leído, comprendido y acepto las políticas 
               de seguridad y restricciones de edad establecidas, las cuales indican que solo pueden participar 
-              menores entre los 4 y 17 años.
+              menores entre los <span className="text-teal-700 font-semibold">4 y 17 años</span>.
             </p>
             
-            <p>
-              Entiendo que estas actividades pueden implicar ciertos riesgos naturales, como senderos irregulares 
-              o resbaladizos, cambios en las condiciones climáticas y el contacto con caballos u otras especies 
-              presentes en la zona. Acepto que es mi responsabilidad asegurarme de que el menor cumpla con las 
-              normas de seguridad establecidas, siga las instrucciones del personal autorizado y se encuentre 
-              en condiciones óptimas de salud para participar.
-            </p>
+            <div className="flex items-start gap-2">
+              
+              <p className="leading-relaxed">
+                Entiendo que estas actividades pueden implicar ciertos riesgos naturales, como senderos irregulares 
+                o resbaladizos, cambios en las condiciones climáticas y el contacto con caballos u otras especies 
+                presentes en la zona. Acepto que es mi responsabilidad asegurarme de que el menor cumpla con las 
+                normas de seguridad establecidas, siga las instrucciones del personal autorizado y se encuentre 
+                en condiciones óptimas de salud para participar.
+              </p>
+            </div>
             
-            <p>
-              Al marcar esta casilla, confirmo que acepto todas las condiciones y términos aquí establecidos. 
-              Asumo la total responsabilidad sobre la participación del menor, sin necesidad de presentar una 
-              firma física o documento adicional.
-            </p>
+            <div className="flex items-start gap-2">
+              
+              <p className="leading-relaxed">
+                Al marcar esta casilla, confirmo que acepto todas las condiciones y términos aquí establecidos. 
+                Asumo la total responsabilidad sobre la participación del menor, sin necesidad de presentar una 
+                firma física o documento adicional.
+              </p>
+            </div>
           </div>
           
           {/* Mensaje de error */}
           {error && (
-            <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
+            <div className="mb-8 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm animate-pulse">
               <div className="flex">
                 <div className="flex-shrink-0">
                   <svg className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -311,60 +332,49 @@ export const AutorizacionMenores = () => {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm text-red-700">{error}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Resumen de la reserva */}
-          {formData.cantidadPersonas > 0 && rutaInfo?.precio && (
-            <div className="mt-8 p-4 bg-teal-50 rounded-lg border border-teal-100">
-              <h3 className="text-lg font-semibold text-teal-800 mb-2">{t('resumenReserva', 'Resumen de la reserva')}</h3>
-              
-              <div className="space-y-2 mb-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">{t('precioUnitario', 'Precio unitario')}:</span>
-                  <span className="font-medium">${Number(rutaInfo.precio).toLocaleString('es-CO')} COP</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">{t('cantidadPersonas', 'Cantidad de personas')}:</span>
-                  <span className="font-medium">{formData.cantidadPersonas}</span>
-                </div>
-                <div className="border-t border-teal-200 my-2"></div>
-                <div className="flex justify-between text-lg font-bold">
-                  <span className="text-teal-800">{t('total', 'Total')}:</span>
-                  <span className="text-teal-800">${(formData.cantidadPersonas * Number(rutaInfo.precio)).toLocaleString('es-CO')} COP</span>
+                  <p className="text-sm text-red-700 font-medium">{error}</p>
                 </div>
               </div>
             </div>
           )}
           
-          <div className="flex items-center mt-6 mb-6">
-            <input
-              type="checkbox"
-              id="aceptaTerminos"
-              checked={aceptaTerminos}
-              onChange={(e) => setAceptaTerminos(e.target.checked)}
-              className="w-5 h-5 text-teal-600 rounded focus:ring-teal-500"
-            />
-            <label htmlFor="aceptaTerminos" className="ml-2 text-gray-700">
+          {/* Checkbox con estilo mejorado */}
+          <div className="flex items-center mt-6 mb-8 p-4 bg-teal-50 rounded-lg border border-teal-200 transition-all duration-200 hover:shadow-md">
+            <div className="relative flex items-center">
+              <input
+                type="checkbox"
+                id="aceptaTerminos"
+                checked={aceptaTerminos}
+                onChange={(e) => setAceptaTerminos(e.target.checked)}
+                className="opacity-0 absolute h-6 w-6 cursor-pointer"
+              />
+              <div className={`bg-white border-2 rounded-md w-6 h-6 flex flex-shrink-0 justify-center items-center mr-2 focus-within:border-teal-500 transition-colors duration-200 ${aceptaTerminos ? 'border-teal-600 bg-teal-50' : 'border-gray-300'}`}>
+                <svg className={`fill-current w-3 h-3 text-teal-600 pointer-events-none ${aceptaTerminos ? 'opacity-100' : 'opacity-0'}`} viewBox="0 0 20 20">
+                  <path d="M0 11l2-2 5 5L18 3l2 2L7 18z" />
+                </svg>
+              </div>
+            </div>
+            <label htmlFor="aceptaTerminos" className="ml-2 text-gray-700 font-medium select-none cursor-pointer">
               {t('aceptoTerminos', 'Acepto los términos y condiciones')}
             </label>
           </div>
           
-          <div className="flex justify-between mt-8">
+          {/* Botones con estilo mejorado */}
+          <div className="flex flex-col sm:flex-row justify-between gap-4 mt-10">
             <button
               onClick={handleCancelar}
-              className="py-3 px-6 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              className="order-2 sm:order-1 py-3 px-6 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors flex items-center justify-center gap-2 border border-gray-300 hover:shadow-md"
             >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
               {t('cancelar', 'Cancelar')}
             </button>
             
             <button
               onClick={handleReservarAhora}
               disabled={!aceptaTerminos || cargando}
-              className={`py-4 px-8 rounded-xl ${
+              className={`order-1 sm:order-2 py-4 px-8 rounded-xl ${
                 aceptaTerminos && !cargando
                   ? 'bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
