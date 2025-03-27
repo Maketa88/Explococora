@@ -2,7 +2,6 @@ import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import Pago from "../../assets/Images/Pago.png";
 import { combinarFechaHoraISO, generarTimestampMySQL } from '../../utils/formatUtils';
 
 export const FormularioReservaRuta = () => {
@@ -20,10 +19,6 @@ export const FormularioReservaRuta = () => {
     fechaFin: '',
     horaInicio: '08:00'
   });
-
-  // Añadir nuevos estados para manejar opciones de pago
-  const [radicado, setRadicado] = useState(null);
-  const [mostrarOpcionesPago, setMostrarOpcionesPago] = useState(false);
 
   // Estado para controlar el dropdown personalizado
   const [isHoraDropdownOpen, setIsHoraDropdownOpen] = useState(false);
@@ -270,93 +265,41 @@ export const FormularioReservaRuta = () => {
       return;
     }
     
-    setCargando(true);
-    setError(null);
-    
-    try {
-      // Obtener token del localStorage
-      const token = localStorage.getItem('token');
-      
-      if (!token) {
-        throw new Error(t('noAutenticado', 'No estás autenticado'));
-      }
-
-      // Usar nuestra utilidad para combinar fecha y hora correctamente
-      const fechaInicioISO = combinarFechaHoraISO(formData.fechaInicio, formData.horaInicio);
-      const fechaFinISO = combinarFechaHoraISO(formData.fechaFin, formData.horaInicio);
-      
-      // Generar el timestamp actual para la fecha de reserva
-      const fechaReservaMySQL = generarTimestampMySQL();
-      
-      console.log('Fecha original seleccionada (inicio):', formData.fechaInicio);
-      console.log('Fecha original seleccionada (fin):', formData.fechaFin);
-      console.log('Fecha procesada para enviar (inicio):', fechaInicioISO);
-      console.log('Fecha procesada para enviar (fin):', fechaFinISO);
-      console.log('Fecha de reserva (MySQL):', fechaReservaMySQL);
-      
-      // Realizar petición al backend
-      const response = await axios.post('http://localhost:10101/pagos-rutas/crear', 
-        {
-          idRuta: parseInt(idRuta),
-          cantidadPersonas: parseInt(formData.cantidadPersonas),
-          fechaInicio: fechaInicioISO,
-          fechaFin: fechaFinISO,
-          horaInicio: formData.horaInicio,
-          fechaReserva: fechaReservaMySQL, // Añadir fecha de reserva en formato MySQL
-          estado: 'pendiente' // Añadir estado pendiente según validación del backend
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
-      
-      // Guardar información en localStorage para recuperarla después
-      if (response.data && response.data.radicado) {
-        localStorage.setItem('reserva_pendiente', JSON.stringify({
-          radicado: response.data.radicado,
-          fechaCreacion: fechaReservaMySQL,
-          guiaAsignado: response.data.guiaAsignado || null
-        }));
-        
-        // Almacenar el radicado en el estado para usarlo en el botón de simulación
-        setRadicado(response.data.radicado);
-        
-        // Mostrar opciones de pago en lugar de redireccionar inmediatamente
-        setMostrarOpcionesPago(true);
-      } else {
-        throw new Error(t('respuestaInvalida', 'La respuesta del servidor no es válida'));
-      }
-    } catch (error) {
-      console.error('Error al procesar la reserva:', error);
-      setError(error.response?.data?.message || error.message || t('errorProcesandoReserva', 'Error al procesar la reserva'));
-    } finally {
-      setCargando(false);
-    }
-  };
-  
-  // Función para realizar pago simulado
-  const realizarPagoSimulado = () => {
-    if (!radicado) {
-      setError(t('datosFaltantes', 'Faltan datos para realizar el pago simulado'));
+    // Obtener token del localStorage para verificar autenticación
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/Ingreso', { 
+        state: { 
+          mensaje: t('debesIniciarSesion', 'Debes iniciar sesión para reservar una ruta'),
+          redireccion: `/NuestrasRutas/${idRuta}`
+        } 
+      });
       return;
     }
+
+    // Usar nuestra utilidad para combinar fecha y hora correctamente
+    const fechaInicioISO = combinarFechaHoraISO(formData.fechaInicio, formData.horaInicio);
+    const fechaFinISO = combinarFechaHoraISO(formData.fechaFin, formData.horaInicio);
     
-    // Redireccionar a la vista de pago simulado
-    navigate('/VistaCliente/reserva/mercado-libre', {
+    // Generar el timestamp actual para la fecha de reserva
+    const fechaReservaMySQL = generarTimestampMySQL();
+    
+    // En lugar de hacer la petición directamente, primero redirigir a la pantalla de autorización
+    // con todos los datos necesarios para procesar la reserva después
+    navigate('/VistaCliente/reserva/autorizacion-menores', {
       state: {
-        radicado: radicado,
-        rutaInfo: {
-          nombreRuta: rutaInfo?.nombreRuta,
-          precio: rutaInfo?.precio,
-          cantidadPersonas: formData.cantidadPersonas
-        }
+        formData: {
+          ...formData,
+          fechaInicioISO,
+          fechaFinISO,
+          fechaReservaMySQL
+        },
+        rutaInfo,
+        idRuta
       }
     });
   };
-
+  
   // Si no hay ruta, mostrar mensaje de carga o error
   if (!rutaInfo && !idRuta) {
     return (
@@ -789,80 +732,32 @@ export const FormularioReservaRuta = () => {
 
           {/* Botones de acción */}
           <div className="mt-8">
-            {!mostrarOpcionesPago ? (
-              <button
-                type="submit"
-                disabled={cargando}
-                className={`w-full py-4 rounded-xl ${
-                  cargando 
-                    ? 'bg-gray-300 cursor-not-allowed' 
-                    : 'bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white'
-                } font-medium transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center`}
-              >
-                {cargando ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    {t('procesando', 'Procesando...')}
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    {t('reservarAhora', 'Reservar Ahora')}
-                  </>
-                )}
-              </button>
-            ) : (
-              <div className="space-y-4">
-                <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded mb-6">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <svg className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm text-green-700">
-                        {t('reservaCreada', 'Reserva creada con éxito. Radicado: ')} {radicado}
-                      </p>
-                      <p className="text-sm text-green-700 mt-1">
-                        {t('procederPagoSimulado', 'Continuar con el pago a través de Mercado Libre:')}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                
-                <button
-                  type="button"
-                  onClick={realizarPagoSimulado}
-                  disabled={cargando}
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-medium transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center"
-                >
-                  {cargando ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      {t('procesando', 'Procesando...')}
-                    </>
-                  ) : (
-                    <>
-                      <img 
-                        src={Pago}
-                        alt="Mercado Pago"
-                        className="w-10 h-10 mr-2"
-                      />
-                      {t('pagoMercadoLibre', 'Pago Mercado Pago')}
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
+            <button
+              type="submit"
+              disabled={cargando}
+              className={`w-full py-4 rounded-xl ${
+                cargando 
+                  ? 'bg-gray-300 cursor-not-allowed' 
+                  : 'bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white'
+              } font-medium transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center`}
+            >
+              {cargando ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  {t('procesando', 'Procesando...')}
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                  </svg>
+                  {t('continuar', 'Continuar')}
+                </>
+              )}
+            </button>
           </div>
         </form>
       </div>
