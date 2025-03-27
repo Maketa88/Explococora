@@ -45,7 +45,7 @@ export const Footer = () => {
             <div className="flex gap-6 items-center">
               <IconoRedes
                 Icon={FaFacebookSquare}
-                href="https://facebook.com/valledelcocora"
+                href="https://www.facebook.com/share/15uWvNG8GT/"
                 label={t("sigueFacebook")}
                 color="#1877F2" // Color oficial de Facebook
               />
@@ -57,7 +57,7 @@ export const Footer = () => {
               />
               <IconoRedes
                 Icon={FaTiktok}
-                href="https://tiktok.com/@valledelcocora"
+                href="https://www.tiktok.com/@explo.cocora?_t=ZS-8v165ddM5Jw&_r=1"
                 label={t("sigueTiktok")}
                 color="#000000" // Color oficial de TikTok
               />

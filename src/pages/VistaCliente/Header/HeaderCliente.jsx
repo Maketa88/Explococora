@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { FaBars, FaTimes } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import Colombia from "../../../assets/Images/Colombia.png";
 import Usa from "../../../assets/Images/Usa.png";
 import Avatar from "../../../assets/Images/avatar.png";
@@ -18,83 +19,96 @@ export const HeaderCliente = () => {
   };
 
   return (
-    <header className="bg-teal-800 shadow-lg z-50">
-      <nav className="container mx-auto px-4 py-8 flex justify-around items-center relative">
-        {/* Logo */}
-        <a href="/" onClick={() => window.location.reload()} className="mx-2">
+    <header className="bg-teal-800 shadow-lg z-50 sticky top-0 bg-opacity-50 backdrop-blur-sm transition-all duration-300">
+      <nav className="container mx-auto px-2 sm:px-3 md:px-4 py-2 sm:py-4 md:py-6 lg:py-8 flex justify-between items-center relative transition-all duration-300">
+        {/* Logo - Smaller on mobile */}
+        <Link to="/VistaCliente" className="mx-1 sm:mx-2 scale-75 sm:scale-90 md:scale-100 origin-left transition-transform duration-300">
           <Logo />
-        </a>
+        </Link>
 
         {/* Enlaces del Menú */}
         <ul
-          className={`lg:flex lg:space-x-6 ${
+          className={`lg:flex lg:space-x-2 xl:space-x-6 ${
             menuAbierto ? "block" : "hidden"
-          } absolute lg:relative bg-teal-800 lg:bg-transparent w-full lg:w-auto top-24 left-0 lg:top-0 lg:flex-row space-y-4 lg:space-y-0 text-center z-50 items-center`}
+          } absolute lg:relative bg-teal-800 lg:bg-transparent w-full lg:w-auto top-16 sm:top-20 md:top-24 left-0 lg:top-0 lg:flex-row space-y-4 lg:space-y-0 text-center z-50 items-center py-4 lg:py-0 px-4 lg:px-0 transition-all duration-300`}
         >
-          <NavItem tipo="enlace" contenido={t("inicio")} to="/VistaCliente" />
+          <NavItem tipo="enlace" contenido={t("inicio")} to="/VistaCliente" className="text-sm sm:text-base" />
           <NavItem
             tipo="enlace"
             contenido={t("historia")}
             to="/VistaCliente/Historia"
+            className="text-sm sm:text-base"
           />
           <NavItem
             tipo="enlace"
-            contenido={t("NuestrasRutas")}
+            contenido={t("Rutas")}
             to="/VistaCliente/NuestrasRutas"
+            className="text-sm sm:text-base"
+          />
+          <NavItem
+            tipo="enlace"
+            contenido={t("paquetesTuristicos")}
+            to="/VistaCliente/PaquetesTuristicos"
+            className="text-sm sm:text-base"
           />
           <NavItem
             tipo="enlace"
             contenido={t("nuestrosGuias")}
             to="/VistaCliente/NuestrosGuias"
+            className="text-sm sm:text-base"
           />
           <NavItem
             tipo="enlace"
             contenido={t("contactanos")}
             to="/VistaCliente/Contacto"
+            className="text-sm sm:text-base"
           />
-          {/* Botones */}
 
-          {/* Banderas */}
-          <div className="flex items-center space-x-4 ">
-            <button
-              onClick={cambiarIdioma}
-              className={`transition-opacity ${
-                i18n.language === "es" ? "opacity-100" : "opacity-50"
-              }`}
-            >
-              <NavItem
-                tipo="imagen"
-                imgSrc={Colombia}
-                alt="Bandera de Colombia"
-              />
-            </button>
-            <span className="text-gray-500">|</span>
-            <button
-              onClick={cambiarIdioma}
-              className={`transition-opacity ${
-                i18n.language === "en" ? "opacity-100" : "opacity-50"
-              }`}
-            >
-              <NavItem tipo="imagen" imgSrc={Usa} alt="USA Flag" />
-            </button>
+          {/* Banderas y Perfil - Responsive */}
+          <div className="flex flex-col lg:flex-row items-center space-y-3 lg:space-y-0 lg:space-x-3 xl:space-x-4 mt-4 lg:mt-0">
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={cambiarIdioma}
+                className={`transition-opacity ${
+                  i18n.language === "es" ? "opacity-100" : "opacity-50"
+                } scale-90 sm:scale-100`}
+              >
+                <NavItem
+                  tipo="imagen"
+                  imgSrc={Colombia}
+                  alt="Bandera de Colombia"
+                  className="w-8 h-8 sm:w-auto sm:h-auto"
+                />
+              </button>
+              <span className="text-gray-500">|</span>
+              <button
+                onClick={cambiarIdioma}
+                className={`transition-opacity ${
+                  i18n.language === "en" ? "opacity-100" : "opacity-50"
+                } scale-90 sm:scale-100`}
+              >
+                <NavItem tipo="imagen" imgSrc={Usa} alt="USA Flag" className="w-8 h-8 sm:w-auto sm:h-auto" />
+              </button>
+            </div>
             <div className="flex items-center">
               <ProfileDropdown
                 imgSrc={Avatar}
                 alt="Perfil de Usuario"
+                className="scale-90 sm:scale-100"
               />
             </div>
           </div>
         </ul>
 
-        {/* Menú Hamburguesa */}
+        {/* Menú Hamburguesa - Smaller on mobile */}
         <button
-          className="lg:hidden flex items-center justify-center p-3 rounded-full border-2 border-transparent hover:border-white focus:outline-none bg-black bg-opacity-50 text-white hover:bg-opacity-80 transition-all duration-300"
+          className="lg:hidden flex items-center justify-center p-2 sm:p-3 rounded-full border-2 border-transparent hover:border-white focus:outline-none bg-black bg-opacity-50 text-white hover:bg-opacity-80 transition-all duration-300"
           onClick={alternarMenu}
         >
           {menuAbierto ? (
-            <FaTimes className="w-8 h-8 text-white border-2 border-transparent hover:border-gray-500 transition-all duration-300" />
+            <FaTimes className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white border-2 border-transparent hover:border-gray-500 transition-all duration-300" />
           ) : (
-            <FaBars className="w-8 h-8 text-white" />
+            <FaBars className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" />
           )}
         </button>
       </nav>

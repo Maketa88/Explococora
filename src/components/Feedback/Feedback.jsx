@@ -54,6 +54,11 @@ const Feedback = () => {
     setVisibleCount(prevCount => prevCount + 5);
   };
 
+  // Función para mostrar menos feedbacks
+  const handleLoadLess = () => {
+    setVisibleCount(5); // Volver a mostrar solo 5 feedbacks
+  };
+
   // Función para formatear la fecha en formato más legible
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -141,9 +146,31 @@ const Feedback = () => {
         <div className="text-center mt-8">
           <button 
             onClick={handleLoadMore}
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="px-6 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 mr-4"
           >
             Ver más opiniones
+          </button>
+          
+          {/* Botón "Ver menos" - solo se muestra si hay más de 5 feedbacks visibles */}
+          {visibleCount > 5 && (
+            <button 
+              onClick={handleLoadLess}
+              className="px-6 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-500 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+            >
+              Ver menos
+            </button>
+          )}
+        </div>
+      )}
+      
+      {/* Si no hay más feedbacks para mostrar pero hay más de 5 visibles, mostrar solo el botón "Ver menos" */}
+      {visibleFeedbacks.length >= filteredFeedbacks.length && visibleCount > 5 && (
+        <div className="text-center mt-8">
+          <button 
+            onClick={handleLoadLess}
+            className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+          >
+            Ver menos
           </button>
         </div>
       )}

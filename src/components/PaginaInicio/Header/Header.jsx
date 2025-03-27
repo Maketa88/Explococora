@@ -18,7 +18,7 @@ export const Header = () => {
   };
 
   return (
-    <header className="bg-teal-800 shadow-lg z-50">
+    <header className="bg-teal-800 shadow-lg z-50 sticky top-0 bg-opacity-50 backdrop-blur-sm">
       <nav className="container mx-auto px-4 py-8 flex justify-between items-center relative">
         {/* Logo */}
         <a href="/" onClick={() => window.location.reload()} className="mx-2">

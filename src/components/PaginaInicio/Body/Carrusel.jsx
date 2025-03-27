@@ -36,7 +36,7 @@ export const Carrusel = () => {
   }, [currentImage, previousImage]);
 
   return (
-    <section className="relative w-full h-[50vh] sm:h-[70vh] lg:h-[85vh] overflow-hidden">
+    <section className="relative w-full h-[50vh] sm:h-[70vh] lg:h-[105vh] overflow-hidden -mt-16 sm:-mt-24 md:-mt-32 -mb-20">
       {/* Capa de imagen inferior (imagen anterior) con filtros mejorados */}
       <img
         src={images[previousImage]}

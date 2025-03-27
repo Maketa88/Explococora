@@ -62,25 +62,25 @@ export const SearchForm = ({ onSearch }) => {
     }
   }
 
-  // Componente Modal que se renderizará en el portal
+  // Modal component with improved responsive design
   const Modal = () => {
     if (!mostrarIA) return null
     
     return (
-      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-start justify-center overflow-y-auto py-3 px-4">
-        <div className="relative w-full max-w-4xl mx-auto mt-2 mb-2 bg-white rounded-2xl shadow-2xl">
-          {/* Botón para cerrar - ahora fuera del contenedor principal para asegurar visibilidad */}
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-start justify-center overflow-y-auto py-3 px-2 sm:px-4">
+        <div className="relative w-full max-w-4xl mx-auto mt-12 sm:mt-8 md:mt-4 lg:mt-2 mb-2 bg-white rounded-2xl shadow-2xl">
+          {/* Botón para cerrar - ahora con posicionamiento responsivo */}
           <button 
             onClick={() => setMostrarIA(false)}
-            className="absolute -top-4 -right-4 bg-teal-600 hover:bg-teal-700 text-white rounded-full p-3 z-[10000] transition-colors duration-300 shadow-lg"
+            className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 bg-teal-600 hover:bg-teal-700 text-white rounded-full p-2 sm:p-3 z-[10000] transition-colors duration-300 shadow-lg"
             aria-label="Cerrar"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
           
-          <div className="p-8 md:p-10 pt-12">
+          <div className="p-6 sm:p-8 md:p-10 pt-10 sm:pt-12">
             <VistaIAGenerandoRuta consulta={consultaActual} />
           </div>
         </div>
@@ -91,12 +91,12 @@ export const SearchForm = ({ onSearch }) => {
   return (
     <>
       <form onSubmit={handleSubmit} className="flex items-center w-full max-w-3xl overflow-hidden group">
-        {/* Contenedor principal con efectos visuales */}
-        <div className="flex w-full bg-white/15 backdrop-blur-lg rounded-full border-2  overflow-hidden transition-all duration-500">
+        {/* Contenedor principal con efectos visuales y mejor responsive */}
+        <div className="flex w-full bg-white/15 backdrop-blur-lg rounded-full border-2 overflow-hidden transition-all duration-500">
           
           {/* Icono de búsqueda con animación */}
-          <div className="pl-6 flex items-center text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 group-hover:rotate-12 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="pl-4 sm:pl-6 flex items-center text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6 group-hover:rotate-12 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
@@ -107,16 +107,17 @@ export const SearchForm = ({ onSearch }) => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('searchPlaceholder', '¿Qué tipo de aventura buscas hoy?')}
-            className="w-full py-5 px-4 outline-none text-white font-medium placeholder-white/70 bg-transparent backdrop-blur-lg"
+            className="w-full py-4 sm:py-5 px-3 sm:px-4 outline-none text-white text-sm sm:text-base font-medium placeholder-white/70 bg-transparent backdrop-blur-lg"
           />
           
-          {/* Botón de búsqueda con efectos */}
+          {/* Botón de búsqueda con efectos y texto responsivo */}
           <button 
             type="submit" 
-            className="bg-gradient-to-r from-teal-600 to-teal-800 hover:from-teal-500 hover:to-teal-700 text-white font-medium py-5 px-8 transition-all duration-300 flex items-center shadow-inner min-w-[180px] justify-center group-hover:scale-105"
+            className="bg-gradient-to-r from-teal-600 to-teal-800 hover:from-teal-500 hover:to-teal-700 text-white font-medium py-4 sm:py-5 px-4 sm:px-8 transition-all duration-300 flex items-center shadow-inner min-w-[120px] sm:min-w-[180px] justify-center group-hover:scale-105"
           >
-            {t('searchButton', 'BUSCAR AVENTURA')}
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <span className="hidden xs:inline">{t('searchButton', 'BUSCAR AVENTURA')}</span>
+            <span className="xs:hidden">BUSCAR</span>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
           </button>

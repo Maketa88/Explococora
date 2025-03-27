@@ -5,12 +5,11 @@ export const TituloBuscador = ({ onSearch }) => {
   const { t } = useTranslation();
 
   return (
-    <div className="container mx-auto px-4 py-16 sm:py-20 lg:py-16 relative z-10">
-      <div className="flex flex-col items-center text-center">
-        {/* Título principal con efecto 3D y resplandor */}
+    <div className="container mx-auto px-2 sm:px-4 py-6 sm:py-8 md:py-12 lg:py-16 relative z-10">
+      <div className="flex flex-col items-center text-center mt-12 sm:mt-32 md:mt-32 lg:mt-32 xl:mt-40">
         <div className="relative mb-2">
           <h1
-            className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tighter"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-black tracking-tighter"
             style={{
               color: "white",
               textShadow: `
@@ -36,9 +35,9 @@ export const TituloBuscador = ({ onSearch }) => {
         {/* Línea decorativa con efecto dinámico */}
 
         {/* Subtítulo con efecto 3D espectacular */}
-        <div className="relative mb-10 mt-3">
+        <div className="relative mb-4 mt-1 sm:mb-6 sm:mt-2 md:mb-8 md:mt-3 lg:mb-10">
           <h2
-            className="text-3xl sm:text-4xl lg:text-5xl"
+            className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl"
             style={{
               color: "#ffffff",
               background: "linear-gradient(to bottom, #ffffff, #ffffff)",
@@ -67,9 +66,9 @@ export const TituloBuscador = ({ onSearch }) => {
         </div>
 
         {/* Tercer texto con estilo más limpio y elegante */}
-        <div className="relative mb-3 mt-24">
+        <div className="relative mb-3 mt-6 sm:mt-10 md:mt-14 lg:mt-20">
           <h3
-            className="text-2xl sm:text-3xl lg:text-4xl font-medium tracking-wide"
+            className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-medium tracking-wide"
             style={{
               color: "white",
               letterSpacing: "1px",
@@ -84,8 +83,8 @@ export const TituloBuscador = ({ onSearch }) => {
 
         {/* Contenedor del buscador - se mantiene sin cambios */}
         <div
-          className="w-full max-w-3xl transform  transition-all duration-300"
-          style={{ filter: "drop-shadow(0 20px 30px rgba(8, 112, 112, 0.5))" }}
+          className="w-full max-w-3xl transform transition-all duration-300 px-2 sm:px-4"
+          style={{ filter: "drop-shadow(0 10px 20px rgba(8, 112, 112, 0.4)) drop-shadow(0 6px 10px rgba(8, 112, 112, 0.3))" }}
         >
           <SearchForm onSearch={onSearch} />
         </div>

@@ -15,7 +15,7 @@ import { FooterCliente } from "../../pages/VistaCliente/Footer/FooterCliente";
 import { HeaderCliente } from "../../pages/VistaCliente/Header/HeaderCliente";
 import PerfilCliente from "../../pages/VistaCliente/PerfilCliente";
 import QuienesSomosCliente from "../../pages/VistaCliente/QuinesSomosCliente";
-
+import GestionPaquetes from "../../components/Paquetes/Paquetes";
 
 
 const RutasCliente = () => {
@@ -50,6 +50,7 @@ const RutasCliente = () => {
         <Route path="/NuestrosGuias" element={<NuestrosGuias />} />
         <Route path="/NuestrasRutas" element={<NuestrasRutas />} />
         <Route path="/NuestrasRutas/:idRuta" element={<NuestrasRutas />} />
+        <Route path="/PaquetesTuristicos" element={<GestionPaquetes />} />
         <Route path="/QuienesSomos" element={<QuienesSomosCliente />} />
         
         {/* Rutas para pagos y reservas */}
