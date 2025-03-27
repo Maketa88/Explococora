@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { FaChild } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import Pago from "../../assets/Images/Pago.png";
@@ -268,7 +269,7 @@ export const AutorizacionMenores = () => {
               <div className="transform rotate-12">
                 <div className="w-24 h-24 relative">
                   <div className="rounded-full bg-teal-50 border-2 border-teal-600 flex items-center justify-center w-full h-full">
-                    <span className="text-xs text-teal-800 font-bold text-center">SEGURIDAD VERIFICADA</span>
+                    <FaChild className="h-12 w-12 text-teal-800" />
                   </div>
                 </div>
               </div>

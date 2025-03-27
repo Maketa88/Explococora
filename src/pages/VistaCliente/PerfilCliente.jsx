@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { FaCamera, FaUserEdit } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import Avatar from "../../assets/Images/avatar.png";
 
 const PerfilCliente = () => {
@@ -331,13 +332,13 @@ const PerfilCliente = () => {
                 </div>
 
                 <div className="flex justify-center sm:justify-end mt-6">
-                  <a
-                    href="/VistaCliente/ActualizarPerfil"
+                  <Link
+                    to="/VistaCliente/ActualizarPerfil"
                     className="py-2 px-4 sm:px-6 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-medium transition-colors duration-200 shadow-lg flex items-center"
                   >
                     <FaUserEdit className="mr-2" />
                     Editar Perfil
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
