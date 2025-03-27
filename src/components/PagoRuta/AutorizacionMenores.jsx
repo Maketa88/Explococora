@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import Pago from "../../assets/Images/Pago.png";
 
 export const AutorizacionMenores = () => {
   const { t } = useTranslation();
@@ -24,6 +25,7 @@ export const AutorizacionMenores = () => {
 
   // Función para mostrar la alerta de confirmación y luego redirigir al pago
   const mostrarConfirmacionYRedirigir = (radicado) => {
+    // Agregar estilos personalizados para el botón de Mercado Pago
     Swal.fire({
       icon: 'success',
       title: t('reservaExitosa', 'Reserva Exitosa'),
@@ -31,10 +33,31 @@ export const AutorizacionMenores = () => {
         <p>${t('reservaCreada', 'Reserva creada con éxito. Radicado:')} <strong>${radicado}</strong></p>
         <p class="mt-3">${t('continuarMercadoPago', 'A continuación debes continuar con el pago a través de Mercado Pago.')}</p>
       `,
-      confirmButtonText: t('continuarPago', 'Continuar al Pago'),
-      confirmButtonColor: '#10B981',
+      background: '#f5f5f5',
+      confirmButtonText: `<div style="display: flex; align-items: center; justify-content: center;">
+        <img src="${Pago}" alt="Mercado Pago" style="height: 25px; margin-right: 10px;">
+        <span>${t('continuarPago', 'Continuar al Pago')}</span>
+      </div>`,
+      confirmButtonColor: '#009ee3', // Color azul de Mercado Pago
       allowOutsideClick: false,
-      allowEscapeKey: false
+      allowEscapeKey: false,
+      buttonsStyling: true,
+      customClass: {
+        confirmButton: 'swal-mercadopago-button'
+      },
+      didOpen: () => {
+        // Agregar estilos personalizados para el botón
+        const style = document.createElement('style');
+        style.innerHTML = `
+          .swal-mercadopago-button {
+            border-radius: 6px !important;
+            font-weight: 600 !important;
+            padding: 12px 24px !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+          }
+        `;
+        document.head.appendChild(style);
+      }
     }).then((result) => {
       if (result.isConfirmed) {
         // Cuando el usuario hace clic en el botón, redirigir a la página de pago
