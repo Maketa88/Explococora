@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 export const AutorizacionMenores = () => {
   const { t } = useTranslation();
@@ -20,6 +21,36 @@ export const AutorizacionMenores = () => {
     navigate('/VistaCliente/reserva-ruta');
     return null;
   }
+
+  // Función para mostrar la alerta de confirmación y luego redirigir al pago
+  const mostrarConfirmacionYRedirigir = (radicado) => {
+    Swal.fire({
+      icon: 'success',
+      title: t('reservaExitosa', 'Reserva Exitosa'),
+      html: `
+        <p>${t('reservaCreada', 'Reserva creada con éxito. Radicado:')} <strong>${radicado}</strong></p>
+        <p class="mt-3">${t('continuarMercadoPago', 'A continuación debes continuar con el pago a través de Mercado Pago.')}</p>
+      `,
+      confirmButtonText: t('continuarPago', 'Continuar al Pago'),
+      confirmButtonColor: '#10B981',
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Cuando el usuario hace clic en el botón, redirigir a la página de pago
+        navigate('/VistaCliente/reserva/mercado-libre', {
+          state: {
+            radicado: radicado,
+            rutaInfo: {
+              nombreRuta: rutaInfo.nombreRuta,
+              precio: rutaInfo.precio,
+              cantidadPersonas: formData.cantidadPersonas
+            }
+          }
+        });
+      }
+    });
+  };
 
   // Función que se ejecuta cuando el usuario hace clic en "Reservar Ahora"
   const handleReservarAhora = async () => {
@@ -63,7 +94,7 @@ export const AutorizacionMenores = () => {
         }
       );
       
-      // Si la respuesta es exitosa, redirigir a la vista de pago simulado
+      // Si la respuesta es exitosa, mostrar confirmación con SweetAlert
       if (response.data && response.data.radicado) {
         localStorage.setItem('reserva_pendiente', JSON.stringify({
           radicado: response.data.radicado,
@@ -71,16 +102,8 @@ export const AutorizacionMenores = () => {
           guiaAsignado: response.data.guiaAsignado || null
         }));
         
-        navigate('/VistaCliente/reserva/mercado-libre', {
-          state: {
-            radicado: response.data.radicado,
-            rutaInfo: {
-              nombreRuta: rutaInfo.nombreRuta,
-              precio: rutaInfo.precio,
-              cantidadPersonas: formData.cantidadPersonas
-            }
-          }
-        });
+        // Mostrar alerta con SweetAlert y luego redirigir
+        mostrarConfirmacionYRedirigir(response.data.radicado);
       } else {
         throw new Error(t('respuestaInvalida', 'La respuesta del servidor no es válida'));
       }

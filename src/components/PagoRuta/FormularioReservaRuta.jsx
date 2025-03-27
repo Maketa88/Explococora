@@ -11,7 +11,7 @@ export const FormularioReservaRuta = () => {
   const location = useLocation();
   const rutaInfo = location.state?.rutaInfo;
   
-  const [cargando, setCargando] = useState(false);
+  const [cargando] = useState(false);
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     cantidadPersonas: 1,
