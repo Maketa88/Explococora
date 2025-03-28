@@ -5,8 +5,9 @@ import ContactForm from "../../components/ContactForm/ContactForm";
 import { HistoriaCultura } from "../../components/HistoriaCultura/Body/HistoriaCultura";
 import NuestrasRutas from "../../components/NuestrasRutas/NuestrasRutas";
 import { NuestrosGuias } from "../../components/NuestrosGuias/NuestrosGuias";
-import { AutorizacionMenores, ConfirmacionPago, FormularioReservaRuta } from "../../components/PagoRuta";
+import { AutorizacionMenores, ConfirmacionPago, FormularioReservaRuta, RecomendacionesVestimenta } from "../../components/PagoRuta";
 import { VistaPagoSimulado } from "../../components/PagoRuta/VistaPagoSimulado";
+import GestionPaquetes from "../../components/Paquetes/Paquetes";
 import { PaginaInicio } from "../../pages/PaginaInicio/PaginaInicio";
 import ActualizarDatosCliente from "../../pages/VistaCliente/ActualizarCliente";
 import { BorrarCuenta } from "../../pages/VistaCliente/BorrarCuenta";
@@ -15,7 +16,6 @@ import { FooterCliente } from "../../pages/VistaCliente/Footer/FooterCliente";
 import { HeaderCliente } from "../../pages/VistaCliente/Header/HeaderCliente";
 import PerfilCliente from "../../pages/VistaCliente/PerfilCliente";
 import QuienesSomosCliente from "../../pages/VistaCliente/QuinesSomosCliente";
-import GestionPaquetes from "../../components/Paquetes/Paquetes";
 
 
 const RutasCliente = () => {
@@ -56,6 +56,7 @@ const RutasCliente = () => {
         {/* Rutas para pagos y reservas */}
         <Route path="reserva-ruta/:idRuta" element={<FormularioReservaRuta />} />
         <Route path="reserva/autorizacion-menores" element={<AutorizacionMenores />} />
+        <Route path="reserva/recomendaciones-vestimenta" element={<RecomendacionesVestimenta />} />
         <Route path="reserva/mercado-libre" element={<VistaPagoSimulado />} />
         <Route path="reserva/confirmacion" element={<ConfirmacionPago />} />
         <Route path="reserva/pendiente" element={<ConfirmacionPago />} />

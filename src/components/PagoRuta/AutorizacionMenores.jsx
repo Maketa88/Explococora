@@ -1,10 +1,7 @@
-import axios from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaChild } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import Pago from "../../assets/Images/Pago.png";
 
 export const AutorizacionMenores = () => {
   const { t } = useTranslation();
@@ -15,7 +12,6 @@ export const AutorizacionMenores = () => {
   const { formData, rutaInfo, idRuta } = location.state || {};
   
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
-  const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
 
   // Si no hay datos suficientes, redirigir al formulario de reserva
@@ -24,119 +20,21 @@ export const AutorizacionMenores = () => {
     return null;
   }
 
-  // Función para mostrar la alerta de confirmación y luego redirigir al pago
-  const mostrarConfirmacionYRedirigir = (radicado) => {
-    // Agregar estilos personalizados para el botón de Mercado Pago
-    Swal.fire({
-      icon: 'success',
-      title: t('reservaExitosa', 'Reserva Exitosa'),
-      html: `
-        <p>${t('reservaCreada', 'Reserva creada con éxito. Radicado:')} <strong>${radicado}</strong></p>
-        <p class="mt-3">${t('continuarMercadoPago', 'A continuación debes continuar con el pago a través de Mercado Pago.')}</p>
-      `,
-      background: '#f5f5f5',
-      confirmButtonText: `<div style="display: flex; align-items: center; justify-content: center;">
-        <img src="${Pago}" alt="Mercado Pago" style="height: 25px; margin-right: 10px;">
-        <span>${t('continuarPago', 'Continuar al Pago')}</span>
-      </div>`,
-      confirmButtonColor: '#009ee3', // Color azul de Mercado Pago
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      buttonsStyling: true,
-      customClass: {
-        confirmButton: 'swal-mercadopago-button'
-      },
-      didOpen: () => {
-        // Agregar estilos personalizados para el botón
-        const style = document.createElement('style');
-        style.innerHTML = `
-          .swal-mercadopago-button {
-            border-radius: 6px !important;
-            font-weight: 600 !important;
-            padding: 12px 24px !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-          }
-        `;
-        document.head.appendChild(style);
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Cuando el usuario hace clic en el botón, redirigir a la página de pago
-        navigate('/VistaCliente/reserva/mercado-libre', {
-          state: {
-            radicado: radicado,
-            rutaInfo: {
-              nombreRuta: rutaInfo.nombreRuta,
-              precio: rutaInfo.precio,
-              cantidadPersonas: formData.cantidadPersonas
-            }
-          }
-        });
-      }
-    });
-  };
-
-  // Función que se ejecuta cuando el usuario hace clic en "Reservar Ahora"
+  // Función que se ejecuta cuando el usuario hace clic en "Continuar"
   const handleReservarAhora = async () => {
     if (!aceptaTerminos) {
       setError(t('debesAceptarTerminos', 'Debes aceptar los términos y condiciones para continuar'));
       return;
     }
 
-    setCargando(true);
-    setError(null);
-    
-    try {
-      // Enviar los mismos datos que se habrían enviado en el FormularioReservaRuta
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/Ingreso', { 
-          state: { 
-            mensaje: t('debesIniciarSesion', 'Debes iniciar sesión para reservar una ruta'),
-            redireccion: `/NuestrasRutas/${idRuta}`
-          } 
-        });
-        return;
+    // Redirigir al componente de recomendaciones de vestimenta
+    navigate('/VistaCliente/reserva/recomendaciones-vestimenta', {
+      state: {
+        formData,
+        rutaInfo,
+        idRuta
       }
-
-      // Realizar la misma petición que haría el formulario original
-      const response = await axios.post('http://localhost:10101/pagos-rutas/crear', 
-        {
-          idRuta: parseInt(idRuta),
-          cantidadPersonas: parseInt(formData.cantidadPersonas),
-          fechaInicio: formData.fechaInicioISO,
-          fechaFin: formData.fechaFinISO,
-          horaInicio: formData.horaInicio,
-          fechaReserva: formData.fechaReservaMySQL,
-          estado: 'pendiente'
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
-      
-      // Si la respuesta es exitosa, mostrar confirmación con SweetAlert
-      if (response.data && response.data.radicado) {
-        localStorage.setItem('reserva_pendiente', JSON.stringify({
-          radicado: response.data.radicado,
-          fechaCreacion: formData.fechaReservaMySQL,
-          guiaAsignado: response.data.guiaAsignado || null
-        }));
-        
-        // Mostrar alerta con SweetAlert y luego redirigir
-        mostrarConfirmacionYRedirigir(response.data.radicado);
-      } else {
-        throw new Error(t('respuestaInvalida', 'La respuesta del servidor no es válida'));
-      }
-    } catch (error) {
-      console.error('Error al procesar la reserva:', error);
-      setError(error.response?.data?.message || error.message || t('errorProcesandoReserva', 'Error al procesar la reserva'));
-    } finally {
-      setCargando(false);
-    }
+    });
   };
   
   const handleCancelar = () => {
@@ -374,29 +272,17 @@ export const AutorizacionMenores = () => {
             
             <button
               onClick={handleReservarAhora}
-              disabled={!aceptaTerminos || cargando}
+              disabled={!aceptaTerminos}
               className={`order-1 sm:order-2 py-4 px-8 rounded-xl ${
-                aceptaTerminos && !cargando
+                aceptaTerminos
                   ? 'bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               } font-medium transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center`}
             >
-              {cargando ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  {t('procesando', 'Procesando...')}
-                </>
-              ) : (
-                <>
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  {t('reservarAhora', 'Reservar Ahora')}
-                </>
-              )}
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              {t('continuar', 'Continuar')}
             </button>
           </div>
         </div>
