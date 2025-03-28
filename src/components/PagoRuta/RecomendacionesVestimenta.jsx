@@ -108,7 +108,7 @@ export const RecomendacionesVestimenta = () => {
   };
   
   const handleCancelar = () => {
-    navigate('/VistaCliente/reserva/autorizacion-menores', {
+    navigate('/VistaCliente/reserva/aceptacion-riesgos', {
       state: { 
         formData, 
         rutaInfo, 
