@@ -11,7 +11,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Settings,
-  Search,
   User,
   Edit,
   Key,
@@ -19,7 +18,8 @@ import {
   Map,
   CreditCard,
   Package,
-  CalendarDays
+  CalendarDays,
+  ChevronDown
 } from 'lucide-react';
 import SelectorEstado from '../pages/VistaOperador/CambioEstadoOpe/Selector_Estado_Ope';
 import axios from 'axios';
@@ -28,13 +28,28 @@ import AlertasEstado from '../components/Alertas/AlertasEstado';
 const DashboardLayout = ({ children }) => {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [fotoPerfil, setFotoPerfil] = useState(localStorage.getItem('fotoPerfilURL') || null);
   const [nombreUsuario, setNombreUsuario] = useState("");
   const [operadorEstado, setOperadorEstado] = useState("disponible");
   
+  // Crear un estado para manejar qué secciones están expandidas
+  const [expandedSections, setExpandedSections] = useState({
+    Dashboard: true,
+    Rutas: true,
+    Guías: true,
+    Informes: true
+  });
+  
+  // Función para alternar el estado de expansión de una sección
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
@@ -289,32 +304,6 @@ const DashboardLayout = ({ children }) => {
 
   const sections = ["Dashboard", "Rutas", "Guías", "Informes"];
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    
-    // Convertir a minúsculas para hacer la búsqueda insensible a mayúsculas/minúsculas
-    const term = searchTerm.toLowerCase();
-    
-    // Mapeo de términos de búsqueda a rutas
-    if (term.includes('ruta') || term.includes('camino')) {
-      navigate('/VistaOperador/Rutas');
-    } else if (term.includes('reporte') || term.includes('informe')) {
-      navigate('/VistaOperador/Reports');
-    } else if (term.includes('cliente') || term.includes('usuario')) {
-      navigate('/VistaOperador/Customers');
-    } else if (term.includes('producto') || term.includes('inventario')) {
-      navigate('/VistaOperador/Products');
-    } else if (term.includes('dashboard') || term.includes('inicio')) {
-      navigate('/VistaOperador/Dashboard');
-    } else {
-      // Si no hay coincidencias, podemos mostrar un mensaje o simplemente no hacer nada
-      alert('No se encontraron resultados para: ' + searchTerm);
-    }
-    
-    // Limpiar el campo de búsqueda
-    setSearchTerm('');
-  };
-
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -430,28 +419,45 @@ const DashboardLayout = ({ children }) => {
         </div>
         
         <nav className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-emerald-200 scrollbar-track-transparent">
-          {sections.map((section) => (
-            <div key={section} className="mb-4">
-              {!collapsed && <h2 className="text-emerald-600 text-sm mb-2">{section}</h2>}
-              {menuItems
-                .filter((item) => item.section === section)
-                .map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className={`flex items-center gap-2 p-2 rounded-lg mb-1 ${
-                      location.pathname === item.path
-                        ? "bg-emerald-600 text-white"
-                        : "text-gray-600 hover:bg-emerald-50"
-                    }`}
-                    title={collapsed ? item.title : ""}
-                  >
-                    {item.icon}
-                    {!collapsed && <span>{item.title}</span>}
-                  </Link>
-                ))}
-            </div>
-          ))}
+          {sections.map((section) => {
+            // Estado para controlar si esta sección está expandida
+            const [isExpanded, setIsExpanded] = useState(true);
+            
+            return (
+              <div key={section} className="mb-4">
+                {!collapsed && (
+                  <div className="flex justify-between items-center mb-2">
+                    <h2 className="text-emerald-600 text-sm">{section}</h2>
+                    <button 
+                      onClick={() => setIsExpanded(!isExpanded)}
+                      className="p-1 rounded-full hover:bg-emerald-50 text-emerald-600"
+                    >
+                      {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                    </button>
+                  </div>
+                )}
+                
+                {/* Solo mostrar los elementos si la sección está expandida o si el menú está colapsado */}
+                {(isExpanded || collapsed) && menuItems
+                  .filter((item) => item.section === section)
+                  .map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={`flex items-center gap-2 p-2 rounded-lg mb-1 ${
+                        location.pathname === item.path
+                          ? "bg-emerald-600 text-white"
+                          : "text-gray-600 hover:bg-emerald-50"
+                      }`}
+                      title={collapsed ? item.title : ""}
+                    >
+                      {item.icon}
+                      {!collapsed && <span>{item.title}</span>}
+                    </Link>
+                  ))}
+              </div>
+            );
+          })}
         </nav>
 
         <div className="border-t border-emerald-100 pt-4 mt-4">
@@ -473,29 +479,10 @@ const DashboardLayout = ({ children }) => {
       <div className="flex-1 flex flex-col overflow-hidden bg-[#f0f9f4]">
         {/* Top Navigation - Mejorado para responsividad */}
         <div className="bg-white sticky top-0 z-10 shadow-sm">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4">
-            {/* Barra de búsqueda adaptativa */}
-            <div className="w-full sm:flex-1 sm:max-w-xl mb-3 sm:mb-0">
-              <form onSubmit={handleSearch} className="flex items-center">
-                <input
-                  type="text"
-                  placeholder="Buscar..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-3 sm:px-4 py-2 rounded-lg bg-emerald-50 text-gray-900 border border-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm sm:text-base"
-                />
-                <button 
-                  type="submit"
-                  className="p-2 rounded-lg text-emerald-600 hover:bg-emerald-50"
-                >
-                  <Search className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
-              </form>
-            </div>
-            
-            {/* Controles de usuario - adaptados para móvil */}
-            <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end">
-              <div className="flex-1 sm:flex-none sm:mr-4">
+          <div className="flex items-center justify-end p-3 sm:p-4">
+            {/* Controles de usuario - alineados a la derecha */}
+            <div className="flex items-center gap-2 sm:gap-4">
+              <div className="sm:mr-4">
                 <SelectorEstado 
                   estadoActual={operadorEstado}
                   onCambioEstado={actualizarEstadoHeader}

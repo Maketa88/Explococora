@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { ChevronDown, CheckCircle, Check, BellRing, Ban } from 'lucide-react';
 
-const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, esAdmin = false, esPropio = true, id }) => {
+const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, esPropio = true, id }) => {
   // IMPORTANTE: Determinar si este selector es del operador principal o de un guía
   const esOperadorPrincipal = esPropio && !id;
   
@@ -30,20 +30,26 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
     { 
       nombre: 'disponible', 
       color: 'bg-green-500 hover:bg-green-600', 
+      textColor: 'text-green-600',
+      borderColor: 'border-green-500',
       notifColor: 'bg-green-50 text-green-700 border-green-200',
-      icon: <Check className="w-4 h-4 text-green-500 mr-2" />
+      icon: <Check className="w-3.5 h-3.5 text-green-500 mr-1.5" />
     },
     { 
       nombre: 'ocupado', 
       color: 'bg-amber-500 hover:bg-amber-600', 
+      textColor: 'text-amber-600',
+      borderColor: 'border-amber-500',
       notifColor: 'bg-amber-50 text-amber-700 border-amber-200',
-      icon: <BellRing className="w-4 h-4 text-amber-500 mr-2" />
+      icon: <BellRing className="w-3.5 h-3.5 text-amber-500 mr-1.5" />
     },
     { 
       nombre: 'inactivo', 
       color: 'bg-red-500 hover:bg-red-600', 
+      textColor: 'text-red-600',
+      borderColor: 'border-red-500',
       notifColor: 'bg-red-50 text-red-700 border-red-200',
-      icon: <Ban className="w-4 h-4 text-red-500 mr-2" />
+      icon: <Ban className="w-3.5 h-3.5 text-red-500 mr-1.5" />
     }
   ];
 
@@ -60,20 +66,16 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
     }
   }, [estado, esOperadorPrincipal, claveStorage]);
 
-  // Obtener el color del estado actual
-  const obtenerColorEstado = (nombreEstado) => {
-    const estadoParaBuscar = nombreEstado && nombreEstado.trim().toLowerCase();
-    
-    if (!estadoParaBuscar) {
-      return 'bg-gray-500 hover:bg-gray-600';
-    }
-    
-    const estadoEncontrado = estados.find(e => e.nombre === estadoParaBuscar);
-    if (estadoEncontrado) {
-      return estadoEncontrado.color;
-    } else {
-      return 'bg-gray-500 hover:bg-gray-600';
-    }
+  // Obtener el color de texto del estado
+  const obtenerTextColorEstado = (nombreEstado) => {
+    const estadoEncontrado = estados.find(e => e.nombre === nombreEstado);
+    return estadoEncontrado ? estadoEncontrado.textColor : 'text-gray-600';
+  };
+
+  // Obtener el color de borde del estado
+  const obtenerBorderColorEstado = (nombreEstado) => {
+    const estadoEncontrado = estados.find(e => e.nombre === nombreEstado);
+    return estadoEncontrado ? estadoEncontrado.borderColor : 'border-gray-500';
   };
 
   // Obtener el icono del estado
@@ -124,13 +126,9 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
       // Verificar y refrescar token si está a punto de expirar
       const token = localStorage.getItem('token');
       if (!token) {
-        console.error("No hay token disponible");
         mostrarToast("Sesión no iniciada", 'inactivo');
         return;
       }
-      
-      // Guardar el estado anterior para posible reversión
-      const estadoAnterior = estado;
       
       // Actualizar UI primero
       setEstado(nuevoEstado);
@@ -141,7 +139,7 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
       const usuarioCedula = cedula || localStorage.getItem('cedula');
       const payload = {
         nuevoEstado: nuevoEstado,
-        rol: esPropio ? 'operador' : 'guia',  // Si no es propio, es un guía
+        rol: esPropio ? 'operador' : 'guia',
         cedula: usuarioCedula
       };
       
@@ -151,20 +149,16 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
         payload.id = id;
       }
       
-      console.log('Enviando al backend:', payload);
-      
       // Enviar con estructura exacta que el backend espera
       const response = await axios({
         method: 'PATCH',
         url: 'http://localhost:10101/usuarios/cambiar-estado',
         headers: {
-          'Authorization': `Bearer ${token}`,  // Asegúrate de que tiene el prefijo "Bearer "
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         data: payload
       });
-      
-      console.log('Respuesta del backend:', response.data);
       
       if (response.status === 200) {
         // Éxito - actualizar UI
@@ -180,69 +174,12 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
         if (typeof onCambioEstado === 'function') {
           onCambioEstado(nuevoEstado);
         }
-        
-        // Verificar el estado en la BD después de un breve tiempo
-        setTimeout(async () => {
-          try {
-            // Construir la URL correcta para consultar el estado
-            const idParam = usuarioCedula ? `cedula/${usuarioCedula}` : `id/${id}`;
-            const rolParam = esPropio ? 'operador' : 'guia';
-            const consultaUrl = `http://localhost:10101/usuarios/consultar-estado/${rolParam}/${idParam}`;
-            
-            console.log('Verificando estado en BD:', consultaUrl);
-            
-            // Usar GET en lugar de POST para consultar
-            const verificacion = await axios.get(consultaUrl, {
-              headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-              }
-            });
-            
-            console.log('Respuesta completa de verificación:', verificacion);
-            
-            // Verificar estructura real de la respuesta
-            if (verificacion.data) {
-              console.log('Estructura de datos recibida:', JSON.stringify(verificacion.data));
-              
-              // Intentar encontrar el estado en diferentes propiedades posibles
-              let estadoActualBD = null;
-              
-              if (verificacion.data.data) {
-                if (Array.isArray(verificacion.data.data) && verificacion.data.data.length > 0) {
-                  estadoActualBD = verificacion.data.data[0].estado;
-                } else if (verificacion.data.data.estado) {
-                  estadoActualBD = verificacion.data.data.estado;
-                }
-              } else if (verificacion.data.estado) {
-                estadoActualBD = verificacion.data.estado;
-              }
-              
-              if (estadoActualBD) {
-                console.log(`Estado recuperado de BD: ${estadoActualBD}`);
-                
-                if (estadoActualBD !== nuevoEstado) {
-                  console.warn(`Inconsistencia: UI=${nuevoEstado}, BD=${estadoActualBD}`);
-                  setEstado(estadoActualBD);
-                  mostrarToast(`Estado sincronizado desde BD: ${formatearEstado(estadoActualBD)}`, estadoActualBD);
-                } else {
-                  console.log('Estado sincronizado correctamente con la BD');
-                }
-              } else {
-                console.warn('No se pudo determinar el estado desde la respuesta del servidor');
-              }
-            }
-          } catch (err) {
-            console.error('Error al verificar estado en BD:', err);
-            console.error('Detalles del error:', err.response ? err.response.data : 'Sin detalles');
-          }
-        }, 1500);
       } else {
         throw new Error(`Respuesta inesperada: ${response.status}`);
       }
     } catch (error) {
       // Si el error es 403, probablemente sea un problema de token
       if (error.response && error.response.status === 403) {
-        console.error("Error de autorización:", error.response.data);
         mostrarToast("No tienes permiso para realizar esta acción", 'inactivo');
         
         // Opcionalmente, puedes intentar redirigir al login
@@ -251,49 +188,9 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
           window.location.href = '/Ingreso';
         }
       } else {
-        console.error('Error al cambiar estado:', error);
-        
-        // Revertir al estado anterior
-        setEstado(estadoAnterior);
-        mostrarToast(`Error: ${error.message || 'No se pudo actualizar el estado'}`, 'inactivo');
-        
-        // Reintento simple después de un momento
-        setTimeout(async () => {
-          try {
-            // Construir payload con estructura exacta
-            const usuarioCedula = cedula || localStorage.getItem('cedula');
-            const retryPayload = {
-              nuevoEstado: nuevoEstado,
-              rol: esPropio ? 'operador' : 'guia'
-            };
-            
-            if (usuarioCedula) {
-              retryPayload.cedula = usuarioCedula;
-            } else if (id) {
-              retryPayload.id = id;
-            }
-            
-            mostrarToast('Reintentando cambio de estado...', 'ocupado');
-            
-            const retryResponse = await axios({
-              method: 'PATCH',
-              url: 'http://localhost:10101/usuarios/cambiar-estado',
-              headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json'
-              },
-              data: retryPayload
-            });
-            
-            if (retryResponse.status === 200) {
-              setEstado(nuevoEstado);
-              mostrarToast('Estado sincronizado con éxito', nuevoEstado);
-            }
-          } catch (retryError) {
-            console.error('Falló el reintento:', retryError);
-            mostrarToast('No se pudo sincronizar. Intente más tarde.', 'inactivo');
-          }
-        }, 3000);
+        // Mostrar mensaje de error sin reintentos
+        setEstado(estado);
+        mostrarToast(`Error al cambiar estado. Intente de nuevo más tarde.`, 'inactivo');
       }
     }
   };
@@ -307,29 +204,31 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
       {/* Botón principal que muestra el estado actual */}
       <button
         onClick={toggleMenu}
-        className={`flex items-center justify-between px-4 py-2 rounded-lg text-white font-medium min-w-[120px] transition-all duration-200 ${obtenerColorEstado(estado)}`}
+        className={`flex items-center justify-between px-3 py-1.5 rounded-lg text-sm font-medium min-w-[110px] transition-all duration-200 
+          bg-white border ${obtenerBorderColorEstado(estado)} ${obtenerTextColorEstado(estado)} 
+          hover:bg-gray-50 shadow-sm`}
       >
         <div className="flex items-center">
           {obtenerIconoEstado(estado)}
           <span>{formatearEstado(estado)}</span>
         </div>
-        <ChevronDown className={`ml-2 w-5 h-5 transition-transform duration-200 ${mostrarMenu ? 'transform rotate-180' : ''}`} />
+        <ChevronDown className={`ml-1.5 w-4 h-4 transition-transform duration-200 ${mostrarMenu ? 'transform rotate-180' : ''}`} />
       </button>
 
       {/* Menú desplegable */}
       {mostrarMenu && (
-        <div className="absolute right-0 mt-1 w-40 rounded-lg shadow-lg z-50 overflow-hidden border border-gray-100 bg-white">
+        <div className="absolute right-0 mt-1 w-36 rounded-lg shadow-lg z-50 overflow-hidden border border-gray-100 bg-white">
           {estados.map((e) => (
             <button
               key={e.nombre}
               onClick={() => cambiarEstado(e.nombre)}
-              className={`w-full text-left py-2 px-4 hover:${e.color.split(' ')[0].replace('bg-', 'bg-')}/10 flex items-center ${
+              className={`w-full text-left py-1.5 px-3 text-sm hover:bg-gray-50 flex items-center ${
                 estado === e.nombre ? 'bg-gray-50' : ''
-              } ${estado === e.nombre ? 'border-l-4 ' + e.color.split(' ')[0].replace('bg-', 'border-') : 'border-l-4 border-transparent'}`}
+              } ${estado === e.nombre ? 'border-l-2 ' + e.borderColor : 'border-l-2 border-transparent'}`}
               disabled={estado === e.nombre}
             >
               {e.icon}
-              <span className={e.color.replace('bg-', 'text-').split(' ')[0]}>{formatearEstado(e.nombre)}</span>
+              <span className={e.textColor}>{formatearEstado(e.nombre)}</span>
             </button>
           ))}
         </div>

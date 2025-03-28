@@ -1,30 +1,36 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Clock, Radio, BellRing, Ban, Check } from 'lucide-react';
+import { Clock, BellRing, Ban, Check } from 'lucide-react';
 import estadoService from '../../../services/estadoService';
 
 // Colores para cada estado - estilo call center
 const ESTADOS_CONFIG = {
   disponible: {
     color: '#10B981',
-    bgColor: '#D1FAE5',
+    bgColor: '#FFFFFF',
     borderColor: '#10B981',
+    textColor: '#10B981',
+    btnHoverBg: '#F0FDF9',
     icon: <Check className="w-5 h-5" />,
     label: 'Disponible',
     description: 'Listo para atender'
   },
   ocupado: {
     color: '#F59E0B',
-    bgColor: '#FEF3C7',
+    bgColor: '#FFFFFF',
     borderColor: '#F59E0B',
+    textColor: '#F59E0B',
+    btnHoverBg: '#FEF9F1',
     icon: <BellRing className="w-5 h-5" />,
     label: 'Ocupado',
     description: 'En servicio'
   },
   inactivo: {
     color: '#EF4444',
-    bgColor: '#FEE2E2',
+    bgColor: '#FFFFFF',
     borderColor: '#EF4444',
+    textColor: '#EF4444',
+    btnHoverBg: '#FEF2F2',
     icon: <Ban className="w-5 h-5" />,
     label: 'Inactivo',
     description: 'No disponible'
@@ -74,7 +80,6 @@ const EstadoOperador = () => {
         throw new Error("No se pudo obtener el estado del servidor");
       }
     } catch (err) {
-      console.error("Error al obtener estado:", err);
       setError(err.message);
       
       // Usar estado guardado
@@ -109,7 +114,7 @@ const EstadoOperador = () => {
       
       setSincronizando(true);
       
-      const response = await axios.patch(
+      await axios.patch(
         'http://localhost:10101/usuarios/cambiar-estado',
         {
           cedula: cedulaOperador,
@@ -128,7 +133,6 @@ const EstadoOperador = () => {
       
       return true;
     } catch (err) {
-      console.error("Error al cambiar estado:", err);
       setError(`Error: ${err.message}`);
       
       // A pesar del error, mantenemos el estado visual
@@ -174,7 +178,6 @@ const EstadoOperador = () => {
         }, 500);
         
       } catch (err) {
-        console.error("Error al iniciar sincronización:", err);
         setError(err.message);
       } finally {
         setCargando(false);
@@ -235,19 +238,24 @@ const EstadoOperador = () => {
     <div className="flex flex-col w-full">
       {/* Panel principal de estado */}
       <div 
-        className={`p-4 rounded-lg shadow-md transition-all duration-300 ${transicion ? 'scale-105' : ''}`}
+        className={`p-4 rounded-lg shadow-sm border transition-all duration-300 ${transicion ? 'scale-105' : ''}`}
         style={{
           backgroundColor: config.bgColor,
-          borderLeft: `6px solid ${config.borderColor}`
+          borderColor: config.borderColor,
+          borderWidth: '2px'
         }}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div 
-              className="flex items-center justify-center w-12 h-12 rounded-full mr-4"
-              style={{ backgroundColor: config.borderColor }}
+              className="flex items-center justify-center w-12 h-12 rounded-full mr-4 border-2"
+              style={{ 
+                backgroundColor: 'white', 
+                borderColor: config.borderColor,
+                color: config.color 
+              }}
             >
-              {React.cloneElement(config.icon, { color: 'white' })}
+              {React.cloneElement(config.icon, { color: config.color })}
             </div>
             
             <div>
@@ -284,14 +292,15 @@ const EstadoOperador = () => {
             onClick={() => cambiarEstado(estado)}
             disabled={sincronizando || estadoActual === estado}
             className={`
-              p-4 rounded-lg border-2 transition-all duration-200
-              ${estadoActual === estado ? 'ring-2 ring-offset-2' : 'hover:shadow-md'}
+              p-4 rounded-lg border-2 transition-all duration-200 shadow-sm
+              ${estadoActual === estado ? 'ring-2 ring-offset-2' : 'hover:shadow'} 
               ${sincronizando ? 'opacity-50 cursor-not-allowed' : ''}
             `}
             style={{
-              backgroundColor: estadoActual === estado ? config.bgColor : 'white',
+              backgroundColor: 'white',
               borderColor: config.borderColor,
-              color: config.color
+              color: config.color,
+              boxShadow: estadoActual === estado ? `0 0 0 1px ${config.color}` : 'none'
             }}
           >
             <div className="flex flex-col items-center">
