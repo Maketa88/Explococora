@@ -193,30 +193,42 @@ export const AutorizacionMenores = () => {
           {/* Contenido con diseño mejorado */}
           <div className="text-gray-700 space-y-6 mb-8 px-4 py-6 bg-gradient-to-br from-teal-50 to-white rounded-xl border border-teal-100 shadow-sm text-justify">
             <p className="leading-relaxed">
-              <span className="text-teal-700 font-semibold">Como padre, madre o representante legal</span>, autorizo la participación de mi hijo o menor a cargo 
-              en las actividades de cabalgata o caminata organizadas en el Valle del Cocora, Salento, Quindío, 
-              a través del sistema web ExploCocora. Declaro que he leído, comprendido y acepto las políticas 
-              de seguridad y restricciones de edad establecidas, las cuales indican que solo pueden participar 
-              menores entre los <span className="text-teal-700 font-semibold">4 y 17 años</span>.
+              <span className="text-teal-700 font-semibold">Como padre, madre o representante legal</span>, autorizo la participación de mi hijo/a o menor a cargo en la actividad de cabalgata organizada en el Valle del Cocora, Salento, Quindío, a través de la Pagina Web Explococora Declaro que he sido informado/a sobre los riesgos inherentes a esta actividad y acepto las normas de seguridad establecidas, incluyendo las restricciones de edad aplicables a menores entre 12 y 18 años, según la Norma Técnica Sectorial AV 014.
             </p>
             
             <div className="flex items-start gap-2">
-              
               <p className="leading-relaxed">
-                Entiendo que estas actividades pueden implicar ciertos riesgos naturales, como senderos irregulares 
-                o resbaladizos, cambios en las condiciones climáticas y el contacto con caballos u otras especies 
-                presentes en la zona. Acepto que es mi responsabilidad asegurarme de que el menor cumpla con las 
-                normas de seguridad establecidas, siga las instrucciones del personal autorizado y se encuentre 
-                en condiciones óptimas de salud para participar.
+                Entiendo que la cabalgata puede implicar ciertos riesgos naturales, como terrenos irregulares, cambios climáticos inesperados y la interacción con caballos u otros animales presentes en la zona. La operadora turística ha explicado de manera clara y suficiente las medidas de seguridad implementadas, incluyendo su plan de prevención, atención y respuesta ante emergencias.
               </p>
             </div>
             
             <div className="flex items-start gap-2">
-              
               <p className="leading-relaxed">
-                Al marcar esta casilla, confirmo que acepto todas las condiciones y términos aquí establecidos. 
-                Asumo la total responsabilidad sobre la participación del menor, sin necesidad de presentar una 
-                firma física o documento adicional.
+                Declaro que el menor se encuentra en condiciones óptimas de salud y no presenta contraindicaciones médicas para participar en la actividad. Asimismo, comprendo y acepto las normas reguladoras de la cabalgata, y asumo la total responsabilidad por cualquier eventualidad que pueda ocurrirle al menor durante el recorrido, exceptuando aquellas derivadas de negligencia por parte de la organización.
+              </p>
+            </div>
+            
+            <div className="flex items-start gap-2">
+              <p className="leading-relaxed">
+                Confirmo que la operadora turística no proporciona alimentos y no se hace responsable por los alimentos consumidos durante la actividad.
+              </p>
+            </div>
+            
+            <div className="flex items-start gap-2">
+              <p className="leading-relaxed">
+                La actividad cuenta con cobertura de seguro de accidentes personales a través de la Compañía Suramericana de Seguros, bajo las pólizas N° 0844000581780 y 90000647859.
+              </p>
+            </div>
+            
+            <div className="flex items-start gap-2">
+              <p className="leading-relaxed">
+                Autorizo el uso de imágenes capturadas durante la cabalgata para su posible publicación en la página web, redes sociales o boletín informativo de Explococora.
+              </p>
+            </div>
+            
+            <div className="flex items-start gap-2">
+              <p className="leading-relaxed">
+                Al marcar esta casilla, autorizo la participación del menor en el recorrido y confirmo que acepto todas las condiciones y términos aquí establecidos. Asumo la total responsabilidad sobre la participación del menor, sin necesidad de presentar una firma física o documento adicional.
               </p>
             </div>
           </div>
