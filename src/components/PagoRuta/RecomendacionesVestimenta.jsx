@@ -108,7 +108,14 @@ export const RecomendacionesVestimenta = () => {
   };
   
   const handleCancelar = () => {
-    navigate(`/VistaCliente/reserva-ruta/${idRuta}`, { state: { rutaInfo } });
+    navigate('/VistaCliente/reserva/autorizacion-menores', {
+      state: { 
+        formData, 
+        rutaInfo, 
+        idRuta, 
+        radicado 
+      }
+    });
   };
 
   return (
