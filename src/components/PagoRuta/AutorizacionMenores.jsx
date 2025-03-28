@@ -193,18 +193,18 @@ export const AutorizacionMenores = () => {
           {/* Contenido con diseño mejorado */}
           <div className="text-gray-700 space-y-6 mb-8 px-4 py-6 bg-gradient-to-br from-teal-50 to-white rounded-xl border border-teal-100 shadow-sm text-justify">
             <p className="leading-relaxed">
-              <span className="text-teal-700 font-semibold">Como padre, madre o representante legal</span>, autorizo la participación de mi hijo/a o menor a cargo en la actividad de cabalgata organizada en el Valle del Cocora, Salento, Quindío, a través de la Pagina Web Explococora Declaro que he sido informado/a sobre los riesgos inherentes a esta actividad y acepto las normas de seguridad establecidas, incluyendo las restricciones de edad aplicables a menores entre 12 y 18 años, según la Norma Técnica Sectorial AV 014.
+              <span className="text-teal-700 font-semibold">Como padre, madre o representante legal</span>, autorizo la participación de mi hijo/a o menor a cargo en la actividad de cabalgata o caminata organizada en el Valle del Cocora, Salento, Quindío, a través de la Pagina Web Explococora Declaro que he sido informado/a sobre los riesgos inherentes a esta actividad y acepto las normas de seguridad establecidas, incluyendo las restricciones de edad aplicables a menores entre 12 y 18 años, según la Norma Técnica Sectorial AV 014.
             </p>
             
             <div className="flex items-start gap-2">
               <p className="leading-relaxed">
-                Entiendo que la cabalgata puede implicar ciertos riesgos naturales, como terrenos irregulares, cambios climáticos inesperados y la interacción con caballos u otros animales presentes en la zona. La operadora turística ha explicado de manera clara y suficiente las medidas de seguridad implementadas, incluyendo su plan de prevención, atención y respuesta ante emergencias.
+                Entiendo que la cabalgata o caminata puede implicar ciertos riesgos naturales, como terrenos irregulares, cambios climáticos inesperados y la interacción con caballos u otros animales presentes en la zona. La operadora turística ha explicado de manera clara y suficiente las medidas de seguridad implementadas, incluyendo su plan de prevención, atención y respuesta ante emergencias.
               </p>
             </div>
             
             <div className="flex items-start gap-2">
               <p className="leading-relaxed">
-                Declaro que el menor se encuentra en condiciones óptimas de salud y no presenta contraindicaciones médicas para participar en la actividad. Asimismo, comprendo y acepto las normas reguladoras de la cabalgata, y asumo la total responsabilidad por cualquier eventualidad que pueda ocurrirle al menor durante el recorrido, exceptuando aquellas derivadas de negligencia por parte de la organización.
+                Declaro que el menor se encuentra en condiciones óptimas de salud y no presenta contraindicaciones médicas para participar en la actividad. Asimismo, comprendo y acepto las normas reguladoras de la cabalgata o caminata, y asumo la total responsabilidad por cualquier eventualidad que pueda ocurrirle al menor durante el recorrido, exceptuando aquellas derivadas de negligencia por parte de la organización.
               </p>
             </div>
             
@@ -222,7 +222,7 @@ export const AutorizacionMenores = () => {
             
             <div className="flex items-start gap-2">
               <p className="leading-relaxed">
-                Autorizo el uso de imágenes capturadas durante la cabalgata para su posible publicación en la página web, redes sociales o boletín informativo de Explococora.
+                Autorizo el uso de imágenes capturadas durante la cabalgata o caminata para su posible publicación en la página web, redes sociales o boletín informativo de Explococora.
               </p>
             </div>
             
