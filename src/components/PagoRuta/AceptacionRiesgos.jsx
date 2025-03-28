@@ -199,7 +199,7 @@ export const AceptacionRiesgos = () => {
           {/* Contenido con diseño mejorado */}
           <div className="text-gray-700 space-y-6 mb-8 px-4 py-6 bg-gradient-to-br from-teal-50 to-white rounded-xl border border-teal-100 shadow-sm text-justify">
             <p className="leading-relaxed">
-              <span className="text-teal-700 font-semibold">Yo, como usuario y participante</span>, declaro haber leído y comprendido las condiciones y riesgos inherentes a la actividad de cabalgata o caminata organizada en el Valle del Cocora, Salento, Quindío, a través de la Pagina Web Explococora, y acepto participar bajo mi propia responsabilidad.
+              <span className="text-teal-700 font-semibold">Yo, como usuario y participante</span>, declaro haber leído y comprendido las condiciones y riesgos inherentes a la actividad de cabalgata o caminata organizada en el Valle del Cocora, Salento, Quindío, a través de la Pagina Web Explococora, acepto participar bajo mi propia responsabilidad.
             </p>
             
             <div className="flex items-start gap-2">
@@ -222,7 +222,7 @@ export const AceptacionRiesgos = () => {
             
             <div className="flex items-start gap-2">
               <p className="leading-relaxed">
-                Eximo a la operadora Ascamusa S.A.S., así como a sus organizadores y guías, de cualquier responsabilidad contractual o extracontractual por accidentes que puedan ocurrir durante el trayecto, comprometiéndome a asumir cualquier eventualidad que se derive de mi participación.
+                Eximo a Explococora, así como a sus organizadores y guías, de cualquier responsabilidad contractual o extracontractual por accidentes que puedan ocurrir durante el trayecto, comprometiéndome a asumir cualquier eventualidad que se derive de mi participación.
               </p>
             </div>
             
