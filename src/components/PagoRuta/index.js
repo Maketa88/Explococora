@@ -1,3 +1,4 @@
+export { AceptacionRiesgos } from './AceptacionRiesgos';
 export { AutorizacionMenores } from './AutorizacionMenores';
 export { BotonPagoRuta } from './BotonPagoRuta';
 export { ConfirmacionPago } from './ConfirmacionPago';

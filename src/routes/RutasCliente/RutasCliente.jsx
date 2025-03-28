@@ -5,7 +5,7 @@ import ContactForm from "../../components/ContactForm/ContactForm";
 import { HistoriaCultura } from "../../components/HistoriaCultura/Body/HistoriaCultura";
 import NuestrasRutas from "../../components/NuestrasRutas/NuestrasRutas";
 import { NuestrosGuias } from "../../components/NuestrosGuias/NuestrosGuias";
-import { AutorizacionMenores, ConfirmacionPago, FormularioReservaRuta, RecomendacionesVestimenta } from "../../components/PagoRuta";
+import { AceptacionRiesgos, AutorizacionMenores, ConfirmacionPago, FormularioReservaRuta, RecomendacionesVestimenta } from "../../components/PagoRuta";
 import { VistaPagoSimulado } from "../../components/PagoRuta/VistaPagoSimulado";
 import GestionPaquetes from "../../components/Paquetes/Paquetes";
 import { PaginaInicio } from "../../pages/PaginaInicio/PaginaInicio";
@@ -56,6 +56,7 @@ const RutasCliente = () => {
         {/* Rutas para pagos y reservas */}
         <Route path="reserva-ruta/:idRuta" element={<FormularioReservaRuta />} />
         <Route path="reserva/autorizacion-menores" element={<AutorizacionMenores />} />
+        <Route path="reserva/aceptacion-riesgos" element={<AceptacionRiesgos />} />
         <Route path="reserva/recomendaciones-vestimenta" element={<RecomendacionesVestimenta />} />
         <Route path="reserva/mercado-libre" element={<VistaPagoSimulado />} />
         <Route path="reserva/confirmacion" element={<ConfirmacionPago />} />
