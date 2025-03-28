@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FaHiking, FaHorse, FaTshirt } from 'react-icons/fa';
+import { FaHiking, FaTshirt } from 'react-icons/fa';
+import { GiHorseHead } from 'react-icons/gi';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 export const RecomendacionesVestimenta = () => {
@@ -171,7 +172,7 @@ export const RecomendacionesVestimenta = () => {
                   <FaHiking className="h-6 w-6 text-teal-600" />
                 </div>
                 <div className="w-12 h-12 bg-teal-50 rounded-full flex items-center justify-center">
-                  <FaHorse className="h-6 w-6 text-teal-600" />
+                  <GiHorseHead className="h-7 w-7 text-teal-600" />
                 </div>
                 <div className="w-12 h-12 bg-teal-50 rounded-full flex items-center justify-center">
                   <FaTshirt className="h-6 w-6 text-teal-600" />
@@ -190,7 +191,7 @@ export const RecomendacionesVestimenta = () => {
           <div className="flex items-center justify-center gap-3 mb-6 text-center">
             <FaTshirt className="h-8 w-8 text-teal-600" />
             <h2 className="text-2xl font-bold text-teal-800">
-              Recomendaciones de Vestimenta para Caminatas y Cabalgatas en el Valle del Cocora
+            Ropa Ideal para Explorar el Valle del Cocora
             </h2>
           </div>
           
@@ -239,7 +240,7 @@ export const RecomendacionesVestimenta = () => {
           {/* Recomendaciones de vestimenta para cabalgatas */}
           <div className="mb-8">
             <div className="flex items-center gap-2 bg-teal-600 text-white px-4 py-3 rounded-t-lg">
-              <FaHorse className="h-6 w-6" />
+              <GiHorseHead className="h-6 w-6" />
               <h3 className="text-xl font-bold">2. Vestimenta Recomendada para Cabalgatas</h3>
             </div>
             <div className="border border-t-0 border-teal-200 rounded-b-lg p-4 bg-white">
