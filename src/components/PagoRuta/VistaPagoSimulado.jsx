@@ -15,6 +15,7 @@ export const VistaPagoSimulado = () => {
   const location = useLocation();
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
+  const [metodoPago, setMetodoPago] = useState('tarjeta'); // Nuevo estado para el método de pago
   
   // Estado para los campos simulados del formulario de pago
   const [formPago, setFormPago] = useState({
@@ -24,6 +25,13 @@ export const VistaPagoSimulado = () => {
     anioExpiracion: '',
     codigoSeguridad: '',
     cuotas: '1'
+  });
+
+  // Estado para los campos de pago en efectivo
+  const [formEfectivo, setFormEfectivo] = useState({
+    nombres: '',
+    apellidos: '',
+    cedula: ''
   });
   
   // Obtener los datos de la reserva pasados por navigate
@@ -61,6 +69,27 @@ export const VistaPagoSimulado = () => {
     setFormPago({ ...formPago, [name]: value });
   };
 
+  // Función para manejar cambios en el formulario de efectivo
+  const handleChangeEfectivo = (e) => {
+    const { name, value } = e.target;
+    
+    // Validación para cédula (solo números)
+    if (name === 'cedula') {
+      const soloNumeros = value.replace(/\D/g, '');
+      setFormEfectivo({ ...formEfectivo, [name]: soloNumeros });
+      return;
+    }
+    
+    // Para el resto de campos, actualizar normalmente
+    setFormEfectivo({ ...formEfectivo, [name]: value });
+  };
+
+  // Función para cambiar el método de pago
+  const cambiarMetodoPago = (metodo) => {
+    setMetodoPago(metodo);
+    setError(null); // Limpiar errores al cambiar método
+  };
+
   // Función para procesar el pago simulado
   const procesarPagoSimulado = async () => {
     try {
@@ -85,12 +114,20 @@ export const VistaPagoSimulado = () => {
       if (response.data && response.data.success) {
         console.log(`Simulación exitosa. ID de pago: ${response.data.idPago}`);
         
+        // Mensaje personalizado según método de pago
+        let mensajeExtra = metodoPago === 'efectivo' 
+          ? 'Pago en efectivo registrado correctamente'
+          : 'Pago con tarjeta procesado correctamente';
+        
+        console.log(mensajeExtra);
+        
         // Redireccionar a página de confirmación
         navigate('/VistaCliente/reserva/confirmacion', {
           state: {
             pagoSimulado: true,
             radicado: radicado,
-            idPago: response.data.idPago
+            idPago: response.data.idPago,
+            metodoPago: metodoPago
           }
         });
       } else {
@@ -121,13 +158,16 @@ export const VistaPagoSimulado = () => {
     navigate(-1); // Volver a la página anterior
   };
 
-  // Verificar si los campos requeridos están completos (solo visual)
-  const camposCompletos = 
-    formPago.numeroTarjeta.length === 16 && 
-    formPago.nombreTitular.trim() !== '' && 
-    formPago.mesExpiracion !== '' &&
-    formPago.anioExpiracion !== '' &&
-    formPago.codigoSeguridad.length >= 3;
+  // Verificar si los campos requeridos están completos según el método de pago
+  const camposCompletos = metodoPago === 'tarjeta'
+    ? (formPago.numeroTarjeta.length === 16 && 
+       formPago.nombreTitular.trim() !== '' && 
+       formPago.mesExpiracion !== '' &&
+       formPago.anioExpiracion !== '' &&
+       formPago.codigoSeguridad.length >= 3)
+    : (formEfectivo.nombres.trim() !== '' &&
+       formEfectivo.apellidos.trim() !== '' &&
+       formEfectivo.cedula.length >= 5);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
@@ -148,11 +188,36 @@ export const VistaPagoSimulado = () => {
           <div className="flex flex-col md:flex-row gap-8">
             {/* Columna izquierda: Formulario de pago */}
             <div className="md:w-7/12">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">
-                {t('pagoConTarjeta', 'Pago con tarjeta')}
-              </h2>
-
-              
+              {/* Selector de método de pago */}
+              <div className="mb-6">
+                <h2 className="text-xl font-bold text-gray-800 mb-4">
+                  {t('metodoPago', 'Método de pago')}
+                </h2>
+                <div className="flex space-x-4">
+                  <button
+                    type="button"
+                    onClick={() => cambiarMetodoPago('tarjeta')}
+                    className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
+                      metodoPago === 'tarjeta' 
+                        ? 'border-blue-500 bg-blue-50 text-blue-700' 
+                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {t('tarjeta', 'Tarjeta')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => cambiarMetodoPago('efectivo')}
+                    className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
+                      metodoPago === 'efectivo' 
+                        ? 'border-green-500 bg-green-50 text-green-700' 
+                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {t('efectivo', 'Efectivo')}
+                  </button>
+                </div>
+              </div>
 
               {/* Mensaje de error */}
               {error && (
@@ -170,134 +235,206 @@ export const VistaPagoSimulado = () => {
                 </div>
               )}
 
-              {/* Tipos de tarjetas */}
-              <div className="flex mb-6 space-x-6 items-center justify-center">
-                {/* Visa */}
-                <div className="bg-white p-3  w-28 h-20 flex items-center justify-center">
-                  <img src={Visa} alt="Visa" className="max-w-full max-h-full object-contain" />
-                </div>
-                
-                {/* Mastercard */}
-                <div className="bg-white p-3  w-28 h-20 flex items-center justify-center">
-                  <img src={Master} alt="Mastercard" className="max-w-full max-h-full object-contain" />
-                </div>
-                
-                {/* American Express */}
-                <div className="bg-white p-3  w-28 h-20 flex items-center justify-center">
-                  <img src={AmericanExpress} alt="American Express" className="max-w-full max-h-full object-contain" />
-                </div>
-                
-                {/* Diners Club */}
-                <div className="bg-white p-3  w-28 h-20 flex items-center justify-center">
-                  <img src={Diners} alt="Diners Club" className="max-w-full max-h-full object-contain" />
-                </div>
-                
-                
-              </div>
+              {metodoPago === 'tarjeta' ? (
+                <>
+                  <h2 className="text-xl font-bold text-gray-800 mb-4">
+                    {t('pagoConTarjeta', 'Pago con tarjeta')}
+                  </h2>
 
-              {/* Formulario de tarjeta */}
-              <form className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('numeroTarjeta', 'Número de tarjeta')}
-                  </label>
-                  <input
-                    type="text"
-                    name="numeroTarjeta"
-                    value={formPago.numeroTarjeta}
-                    onChange={handleChange}
-                    placeholder="1234 5678 9012 3456"
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('nombreTitular', 'Nombre y apellido del titular')}
-                  </label>
-                  <input
-                    type="text"
-                    name="nombreTitular"
-                    value={formPago.nombreTitular}
-                    onChange={handleChange}
-                    placeholder="Como figura en la tarjeta"
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t('fechaExpiracion', 'Fecha de expiración')}
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
+                  {/* Tipos de tarjetas */}
+                  <div className="flex mb-6 space-x-6 items-center justify-center">
+                    {/* Visa */}
+                    <div className="bg-white p-3  w-28 h-20 flex items-center justify-center">
+                      <img src={Visa} alt="Visa" className="max-w-full max-h-full object-contain" />
+                    </div>
+                    
+                    {/* Mastercard */}
+                    <div className="bg-white p-3  w-28 h-20 flex items-center justify-center">
+                      <img src={Master} alt="Mastercard" className="max-w-full max-h-full object-contain" />
+                    </div>
+                    
+                    {/* American Express */}
+                    <div className="bg-white p-3  w-28 h-20 flex items-center justify-center">
+                      <img src={AmericanExpress} alt="American Express" className="max-w-full max-h-full object-contain" />
+                    </div>
+                    
+                    {/* Diners Club */}
+                    <div className="bg-white p-3  w-28 h-20 flex items-center justify-center">
+                      <img src={Diners} alt="Diners Club" className="max-w-full max-h-full object-contain" />
+                    </div>
+                  </div>
+
+                  {/* Formulario de tarjeta */}
+                  <form className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t('numeroTarjeta', 'Número de tarjeta')}
+                      </label>
+                      <input
+                        type="text"
+                        name="numeroTarjeta"
+                        value={formPago.numeroTarjeta}
+                        onChange={handleChange}
+                        placeholder="1234 5678 9012 3456"
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t('nombreTitular', 'Nombre y apellido del titular')}
+                      </label>
+                      <input
+                        type="text"
+                        name="nombreTitular"
+                        value={formPago.nombreTitular}
+                        onChange={handleChange}
+                        placeholder="Como figura en la tarjeta"
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {t('fechaExpiracion', 'Fecha de expiración')}
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <select
+                            name="mesExpiracion"
+                            value={formPago.mesExpiracion}
+                            onChange={handleChange}
+                            className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          >
+                            <option value="">{t('mes', 'Mes')}</option>
+                            {Array.from({ length: 12 }, (_, i) => {
+                              const mes = (i + 1).toString().padStart(2, '0');
+                              return (
+                                <option key={mes} value={mes}>
+                                  {mes}
+                                </option>
+                              );
+                            })}
+                          </select>
+                          <select
+                            name="anioExpiracion"
+                            value={formPago.anioExpiracion}
+                            onChange={handleChange}
+                            className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          >
+                            <option value="">{t('año', 'Año')}</option>
+                            {Array.from({ length: 10 }, (_, i) => {
+                              const anio = (new Date().getFullYear() + i).toString();
+                              return (
+                                <option key={anio} value={anio}>
+                                  {anio}
+                                </option>
+                              );
+                            })}
+                          </select>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {t('codigoSeguridad', 'Código de seguridad')}
+                        </label>
+                        <input
+                          type="password"
+                          name="codigoSeguridad"
+                          value={formPago.codigoSeguridad}
+                          onChange={handleChange}
+                          placeholder="CVV"
+                          className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t('cuotas', 'Cuotas')}
+                      </label>
                       <select
-                        name="mesExpiracion"
-                        value={formPago.mesExpiracion}
+                        name="cuotas"
+                        value={formPago.cuotas}
                         onChange={handleChange}
                         className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                       >
-                        <option value="">{t('mes', 'Mes')}</option>
-                        {Array.from({ length: 12 }, (_, i) => {
-                          const mes = (i + 1).toString().padStart(2, '0');
-                          return (
-                            <option key={mes} value={mes}>
-                              {mes}
-                            </option>
-                          );
-                        })}
+                        <option value="1">1 cuota de ${rutaInfo ? (rutaInfo.precio * (rutaInfo.cantidadPersonas || 1)).toLocaleString('es-CO') : 0} COP</option>
+                        <option value="3">3 cuotas sin interés</option>
+                        <option value="6">6 cuotas sin interés</option>
+                        <option value="12">12 cuotas sin interés</option>
                       </select>
-                      <select
-                        name="anioExpiracion"
-                        value={formPago.anioExpiracion}
-                        onChange={handleChange}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="">{t('año', 'Año')}</option>
-                        {Array.from({ length: 10 }, (_, i) => {
-                          const anio = (new Date().getFullYear() + i).toString();
-                          return (
-                            <option key={anio} value={anio}>
-                              {anio}
-                            </option>
-                          );
-                        })}
-                      </select>
+                    </div>
+                  </form>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-xl font-bold text-gray-800 mb-4">
+                    {t('pagoEnEfectivo', 'Pago en efectivo')}
+                  </h2>
+                  
+                  <div className="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm text-green-700">
+                          {t('mensajeEfectivo', 'Al seleccionar esta opción, podrás pagar en efectivo al momento de tomar la ruta.')}
+                        </p>
+                      </div>
                     </div>
                   </div>
                   
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t('codigoSeguridad', 'Código de seguridad')}
-                    </label>
-                    <input
-                      type="password"
-                      name="codigoSeguridad"
-                      value={formPago.codigoSeguridad}
-                      onChange={handleChange}
-                      placeholder="CVV"
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('cuotas', 'Cuotas')}
-                  </label>
-                  <select
-                    name="cuotas"
-                    value={formPago.cuotas}
-                    onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="1">1 cuota de ${rutaInfo ? (rutaInfo.precio * (rutaInfo.cantidadPersonas || 1)).toLocaleString('es-CO') : 0} COP</option>
-                    <option value="3">3 cuotas sin interés</option>
-                    <option value="6">6 cuotas sin interés</option>
-                    <option value="12">12 cuotas sin interés</option>
-                  </select>
-                </div>
-              </form>
+                  {/* Formulario de pago en efectivo */}
+                  <form className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t('nombres', 'Nombres')}
+                      </label>
+                      <input
+                        type="text"
+                        name="nombres"
+                        value={formEfectivo.nombres}
+                        onChange={handleChangeEfectivo}
+                        placeholder="Nombres completos"
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t('apellidos', 'Apellidos')}
+                      </label>
+                      <input
+                        type="text"
+                        name="apellidos"
+                        value={formEfectivo.apellidos}
+                        onChange={handleChangeEfectivo}
+                        placeholder="Apellidos completos"
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t('cedula', 'Cédula')}
+                      </label>
+                      <input
+                        type="text"
+                        name="cedula"
+                        value={formEfectivo.cedula}
+                        onChange={handleChangeEfectivo}
+                        placeholder="Número de identificación"
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                  </form>
+                </>
+              )}
             </div>
             
             {/* Columna derecha: Resumen */}
@@ -357,7 +494,9 @@ export const VistaPagoSimulado = () => {
                   className={`w-full py-3 rounded-lg ${
                     cargando || !camposCompletos
                       ? 'bg-gray-300 cursor-not-allowed' 
-                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : metodoPago === 'efectivo'
+                        ? 'bg-green-600 hover:bg-green-700 text-white'
+                        : 'bg-blue-600 hover:bg-blue-700 text-white'
                   } font-medium transition-all duration-300 flex items-center justify-center`}
                 >
                   {cargando ? (
@@ -368,6 +507,8 @@ export const VistaPagoSimulado = () => {
                       </svg>
                       {t('procesando', 'Procesando...')}
                     </>
+                  ) : metodoPago === 'efectivo' ? (
+                    t('confirmarPagoEfectivo', 'Pagar con pago en efectivo')
                   ) : (
                     <>
                       <img 
@@ -389,18 +530,18 @@ export const VistaPagoSimulado = () => {
                 </button>
               </div>
               
-              {/* Nota de seguridad */}
-              <div className="mt-4 flex items-center justify-center text-xs text-gray-500">
-                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                </svg>
-                {t('pagoSeguro', 'Pago seguro procesado por Mercado Pago')}
-              </div>
+              {/* Nota de seguridad (solo para pago con tarjeta) */}
+              {metodoPago === 'tarjeta' && (
+                <div className="mt-4 flex items-center justify-center text-xs text-gray-500">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                  </svg>
+                  {t('pagoSeguro', 'Pago seguro procesado por Mercado Pago')}
+                </div>
+              )}
             </div>
           </div>
         </div>
-
-        
       </div>
     </div>
   );
