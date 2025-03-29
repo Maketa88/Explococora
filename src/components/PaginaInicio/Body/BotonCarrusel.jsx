@@ -8,7 +8,7 @@ export const BotonCarrusel = ({ direction, onClick }) => {
   return (
     <button
       onClick={onClick}
-      className={`absolute top-1/2 transform -translate-y-1/2 bg-teal-700 bg-opacity-70 text-white p-0 sm:p-2 rounded-full hover:bg-opacity-80 z-[20] ${
+      className={`absolute top-1/2 transform -translate-y-1/1 bg-teal-700 bg-opacity-70 text-white p-0 sm:p-2 rounded-full hover:bg-opacity-80 z-[20] ${
         direction === "left" 
           ? "left-1 sm:left-2 md:left-4 lg:left-6" 
           : "right-1 sm:right-2 md:right-4 lg:right-6"
