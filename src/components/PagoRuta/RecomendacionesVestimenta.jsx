@@ -31,7 +31,8 @@ export const RecomendacionesVestimenta = () => {
         rutaInfo: {
           nombreRuta: rutaInfo.nombreRuta,
           precio: rutaInfo.precio,
-          cantidadPersonas: formData.cantidadPersonas
+          cantidadPersonas: formData.cantidadPersonas,
+          fechaInicio: formData.fechaInicioISO
         }
       }
     });
@@ -111,6 +112,7 @@ export const RecomendacionesVestimenta = () => {
         localStorage.setItem('reserva_pendiente', JSON.stringify({
           radicado: response.data.radicado,
           fechaCreacion: formData.fechaReservaMySQL,
+          fechaInicio: formData.fechaInicioISO,
           guiaAsignado: guiaAsignadoInfo
         }));
         

@@ -29,6 +29,7 @@ export const ConfirmacionPago = () => {
         mensajeConfirmacion: location.state.mensajeConfirmacion,
         informacionPago: location.state.informacionPago,
         datosContacto: location.state.datosContacto,
+        fechaInicio: location.state.rutaInfo?.fechaInicio || null,
         guiaAsignado: location.state.guiaAsignado || obtenerGuiaAsignadoDelLocalStorage()
       });
       
@@ -41,16 +42,21 @@ export const ConfirmacionPago = () => {
     const reservaPendiente = localStorage.getItem('reserva_pendiente');
     
     if (reservaPendiente) {
-      setReservaInfo(JSON.parse(reservaPendiente));
+      const reservaData = JSON.parse(reservaPendiente);
+      // Asegurarnos de que se incluya la fechaInicio si está disponible en localStorage
+      setReservaInfo({
+        ...reservaData,
+        fechaInicio: reservaData.fechaInicio || null
+      });
       // Verificar el estado de pago
-      if (reservaInfo?.radicado) {
-        verificarEstadoPago(reservaInfo.radicado);
+      if (reservaData?.radicado) {
+        verificarEstadoPago(reservaData.radicado);
       }
     } else {
       setError(t('noReservaInfo', 'No se encontró información de la reserva'));
     }
     
-  }, [location, reservaInfo?.radicado, t]);
+  }, [location, t]);
 
   // Función para obtener el guía asignado del localStorage
   const obtenerGuiaAsignadoDelLocalStorage = () => {
@@ -102,6 +108,11 @@ export const ConfirmacionPago = () => {
           
           // Actualizar la información del guía
           reservaActualizada.guiaAsignado = response.data.guiaAsignado;
+          
+          // Conservar la fechaInicio si existe
+          if (response.data.fechaInicio) {
+            reservaActualizada.fechaInicio = response.data.fechaInicio;
+          }
           
           // Actualizar el estado
           setReservaInfo(reservaActualizada);
@@ -163,6 +174,15 @@ export const ConfirmacionPago = () => {
                     {reservaInfo.fechaReserva || formatearFecha(reservaInfo.fechaCreacion)}
                   </span>
                 </p>
+                
+                {/* Mostrar la fecha de inicio de la ruta */}
+                {reservaInfo.fechaInicio && (
+                  <p className="text-gray-700 font-medium mt-2">
+                    {t('fechaRuta', 'Fecha de Ruta')}: <span className={`font-bold ${esEfectivo ? 'text-green-700' : 'text-teal-700'}`}>
+                      {formatearFecha(reservaInfo.fechaInicio)}
+                    </span>
+                  </p>
+                )}
                 
                 {/* Datos de contacto para pago en efectivo */}
                 {esEfectivo && reservaInfo.datosContacto && (
@@ -237,7 +257,7 @@ export const ConfirmacionPago = () => {
               </button>
               <button 
                 onClick={() => navigate('/VistaCliente/NuestrasRutas')}
-                className={`${esEfectivo ? 'bg-green-600 hover:bg-green-700' : 'bg-teal-600 hover:bg-teal-700'} text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-300`}
+                className={`${esEfectivo ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-100 hover:bg-blue-200'} text-black font-semibold py-2 px-6 rounded-lg transition-colors duration-300`}
               >
                 {t('verRutas', 'Ver Más Rutas')}
               </button>
