@@ -2,7 +2,8 @@ import axios from 'axios';
 import {
   Clock, DollarSign,
   Map,
-  Package
+  Package,
+  ShoppingCart
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -367,7 +368,7 @@ const GestionPaquetes = () => {
           <div className="relative z-10 text-center">
             <h1 className="text-5xl font-black tracking-tight relative inline-block">
               <span className="relative bg-clip-text text-transparent bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 drop-shadow-sm">
-                Paquetes Turísticos
+                <ShoppingCart className="inline-block h-10 w-10 mr-2 mb-1" /> Paquetes Turísticos
               </span>
             </h1>
 
@@ -586,9 +587,9 @@ const GestionPaquetes = () => {
                         onClick={() => {}}
                         className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-2 px-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center"
                       >
-                        <DollarSign className="h-3 w-3 mr-1" />
+                        <ShoppingCart className="h-3 w-3 mr-1" />
                         <span className="text-xs font-medium tracking-wide">
-                          Reservar Ahora
+                          Reservar Paquete
                         </span>
                       </button>
 
