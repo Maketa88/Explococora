@@ -274,9 +274,9 @@ const GestionPaquetes = () => {
   // Función para navegar a la página completa de paquetes
   const navegarAPaginaCompleta = () => {
     navigate('/paquetes');
-  };
+    };
 
-  return (
+    return (
     <section className="relative py-16 px-4 overflow-hidden">
       {/* Fondo decorativo */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
@@ -328,8 +328,8 @@ const GestionPaquetes = () => {
               <circle cx="770" cy="500" r="10" fill="#047857" />
             </g>
           </svg>
-        </div>
-      </div>
+                      </div>
+                    </div>
       <div className="container mx-auto px-4 py-8">
         <div className="relative py-8 mb-10">
           {/* Bolitas decorativas a los lados */}
@@ -358,8 +358,8 @@ const GestionPaquetes = () => {
               className="absolute bottom-1/3 right-16 w-4 h-4 bg-emerald-500 rounded-full opacity-25 animate-pulse"
               style={{ animationDelay: "2s" }}
             ></div>
-          </div>
-
+                    </div>
+                    
           {/* Líneas decorativas */}
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-600 to-transparent"></div>
           <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-600 to-transparent"></div>
@@ -369,7 +369,7 @@ const GestionPaquetes = () => {
             <h1 className="text-5xl font-black tracking-tight relative inline-block">
               <span className="relative bg-clip-text text-transparent bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 drop-shadow-sm">
                 <ShoppingCart className="inline-block h-10 w-10 mr-2 mb-1" /> Paquetes Turísticos
-              </span>
+                            </span>
             </h1>
 
             {/* Subtítulo o decoración */}
@@ -377,17 +377,17 @@ const GestionPaquetes = () => {
               <span className="inline-block mx-2">✦</span>
               <span>Descubre nuestras experiencias más completas</span>
               <span className="inline-block mx-2">✦</span>
-            </div>
-
+                    </div>
+                    
             {/* Líneas decorativas bajo el título */}
             <div className="mt-3 flex justify-center space-x-1">
               <div className="w-12 h-1 bg-gradient-to-r from-transparent to-emerald-600 rounded-full"></div>
               <div className="w-24 h-1 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-full"></div>
               <div className="w-12 h-1 bg-gradient-to-r from-emerald-700 to-transparent rounded-full"></div>
-            </div>
-          </div>
-        </div>
-
+                  </div>
+                </div>
+              </div>
+              
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-lg shadow-sm max-w-4xl mx-auto">
             <div className="flex items-center">
@@ -404,12 +404,12 @@ const GestionPaquetes = () => {
                   strokeWidth={2}
                   d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
-              </svg>
+                                  </svg>
               <p className="text-red-700">{error}</p>
-            </div>
-          </div>
-        )}
-
+                  </div>
+                </div>
+              )}
+              
         {loading ? (
           <div className="flex justify-center items-center py-12">
             <div className="animate-pulse flex space-x-1">
@@ -431,8 +431,8 @@ const GestionPaquetes = () => {
                     <span className="text-white text-xs tracking-wider uppercase">
                       Paquete
                     </span>
-                  </div>
-
+        </div>
+        
                   {/* Encabezado de la carta */}
                   <div className="bg-gradient-to-r from-emerald-800 to-emerald-700 text-white p-2 relative overflow-hidden h-16 flex flex-col justify-center">
                     <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-5 rounded-full -mt-6 -mr-6"></div>
@@ -450,9 +450,9 @@ const GestionPaquetes = () => {
                           {paquete.descuento}% desc
                         </span>
                       )}
-                    </div>
-                  </div>
-
+        </div>
+      </div>
+      
                   {/* Galería de imágenes */}
                   <div className="relative h-32 overflow-hidden">
                     {cargandoFotos[paquete.idPaquete] ? (
@@ -483,30 +483,12 @@ const GestionPaquetes = () => {
                         />
                       </div>
                     ) : (
-                      <div className="flex justify-center items-center h-full bg-gray-100">
-                        <div className="text-center">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-6 w-6 mx-auto text-emerald-300 mb-1"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={1}
-                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                            />
-                          </svg>
-                          <p className="text-xs text-gray-500 italic">
-                            No hay fotos disponibles
-                          </p>
-                        </div>
+                      <div className="w-full h-full flex items-center justify-center bg-emerald-50">
+                        <Package size={32} className="text-emerald-600" />
                       </div>
                     )}
                   </div>
-
+                  
                   {/* Contenido de la carta */}
                   <div className="p-2 relative flex-grow flex flex-col">
                     {/* Elementos decorativos */}
@@ -532,8 +514,8 @@ const GestionPaquetes = () => {
                           {mostrarPrecio(paquete.precio)}
                         </span>
                       </div>
-                    </div>
-
+                      </div>
+                      
                     {/* Descripción */}
                     <div className="mb-3 relative z-10 h-16">
                       <h3 className="text-emerald-800 text-xs font-semibold mb-1 flex items-center">
@@ -569,7 +551,7 @@ const GestionPaquetes = () => {
                           {paquete.rutasAsociadas?.length || 0} incluidas
                         </span>
                       </div>
-                      {paquete.descuento > 0 && (
+                        {paquete.descuento > 0 && (
                         <div className="flex items-center bg-white bg-opacity-70 p-1.5 rounded-lg transform transition-transform duration-300 group-hover:translate-x-1">
                           <DollarSign className="h-3 w-3 text-emerald-700 mr-1" />
                           <span className="text-gray-700 text-xs">
@@ -577,18 +559,18 @@ const GestionPaquetes = () => {
                             ${(paquete.precio * (1 - paquete.descuento / 100)).toFixed(0)}
                           </span>
                         </div>
-                      )}
-                    </div>
-
+                        )}
+                      </div>
+                      
                     {/* Botones de acción */}
                     <div className="relative z-10 mt-auto flex flex-col space-y-2">
                       {/* Botón para reservar */}
                       <button
                         onClick={() => {}}
-                        className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-2 px-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center"
+                        className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-3 px-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center"
                       >
-                        <ShoppingCart className="h-3 w-3 mr-1" />
-                        <span className="text-xs font-medium tracking-wide">
+                        <ShoppingCart className="h-5 w-5 mr-3" />
+                        <span className="text-base font-medium tracking-wide">
                           Reservar Paquete
                         </span>
                       </button>
@@ -657,16 +639,16 @@ const GestionPaquetes = () => {
               </div>
             )}
           </>
-        ) : (
-          <div className="bg-emerald-50 text-center p-8 rounded-lg border border-emerald-100">
-            <div className="flex justify-center mb-4">
-              {getPackageIcon()}
+          ) : (
+            <div className="bg-emerald-50 text-center p-8 rounded-lg border border-emerald-100">
+              <div className="flex justify-center mb-4">
+                {getPackageIcon()}
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">No hay paquetes disponibles</h3>
+              <p className="text-emerald-700">No se encontraron paquetes turísticos.</p>
             </div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">No hay paquetes disponibles</h3>
-            <p className="text-emerald-700">No se encontraron paquetes turísticos.</p>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
     </section>
   );
 };
