@@ -2,6 +2,7 @@ import NuestrasRutasInicio from "../../components/NuestrasRutas/NuestrasRutasIni
 import { GuiasDestacados } from "../../components/NuestrosGuias/GuiasDestacados";
 import { TituloBuscador } from "../../components/PaginaInicio/Body/Buscador/TituloBuscador";
 import { Carrusel } from "../../components/PaginaInicio/Body/Carrusel";
+import PaquetesInicio from "../../components/Paquetes/PaquetesInicio";
 
 export const PaginaInicio = () => {
   const handleSearch = (searchData) => {
@@ -24,6 +25,7 @@ export const PaginaInicio = () => {
         {/* Sección de guías destacados */}
         <GuiasDestacados />
         <NuestrasRutasInicio />
+        <PaquetesInicio />
       </div>
     </div>
   );
