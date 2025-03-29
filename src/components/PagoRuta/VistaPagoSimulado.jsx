@@ -127,7 +127,15 @@ export const VistaPagoSimulado = () => {
             pagoSimulado: true,
             radicado: radicado,
             idPago: response.data.idPago,
-            metodoPago: metodoPago
+            metodoPago: metodoPago,
+            // Agregar datos de contacto cuando el método de pago es efectivo
+            ...(metodoPago === 'efectivo' && {
+              datosContacto: {
+                nombres: formEfectivo.nombres,
+                apellidos: formEfectivo.apellidos,
+                cedula: formEfectivo.cedula
+              }
+            })
           }
         });
       } else {
