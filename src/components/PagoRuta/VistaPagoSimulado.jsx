@@ -121,6 +121,18 @@ export const VistaPagoSimulado = () => {
         
         console.log(mensajeExtra);
         
+        // Obtener información del guía desde localStorage
+        let guiaAsignado = null;
+        try {
+          const reservaPendiente = localStorage.getItem('reserva_pendiente');
+          if (reservaPendiente) {
+            const datos = JSON.parse(reservaPendiente);
+            guiaAsignado = datos.guiaAsignado || null;
+          }
+        } catch (error) {
+          console.error('Error al obtener guía del localStorage:', error);
+        }
+        
         // Redireccionar a página de confirmación
         navigate('/VistaCliente/reserva/confirmacion', {
           state: {
@@ -128,6 +140,7 @@ export const VistaPagoSimulado = () => {
             radicado: radicado,
             idPago: response.data.idPago,
             metodoPago: metodoPago,
+            guiaAsignado: guiaAsignado,
             // Agregar datos de contacto cuando el método de pago es efectivo
             ...(metodoPago === 'efectivo' && {
               datosContacto: {

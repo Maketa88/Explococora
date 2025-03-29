@@ -88,10 +88,26 @@ export const RecomendacionesVestimenta = () => {
       
       // Si la respuesta es exitosa, guardamos la información en localStorage y redirigimos
       if (response.data && response.data.radicado) {
+        // Verificar y procesar la información del guía asignado
+        let guiaAsignadoInfo = null;
+        
+        if (response.data.guiaAsignado) {
+          // Si el backend devuelve un objeto con la información del guía
+          if (typeof response.data.guiaAsignado === 'object') {
+            guiaAsignadoInfo = response.data.guiaAsignado;
+          } 
+          // Si el backend devuelve solo el nombre del guía como string
+          else if (typeof response.data.guiaAsignado === 'string') {
+            guiaAsignadoInfo = { nombre: response.data.guiaAsignado };
+          }
+          
+          console.log('Guía asignado:', guiaAsignadoInfo);
+        }
+        
         localStorage.setItem('reserva_pendiente', JSON.stringify({
           radicado: response.data.radicado,
           fechaCreacion: formData.fechaReservaMySQL,
-          guiaAsignado: response.data.guiaAsignado || null
+          guiaAsignado: guiaAsignadoInfo
         }));
         
         // Redirigir directamente a la página de pago

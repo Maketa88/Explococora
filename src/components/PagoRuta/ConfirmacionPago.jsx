@@ -28,7 +28,8 @@ export const ConfirmacionPago = () => {
         tituloConfirmacion: location.state.tituloConfirmacion,
         mensajeConfirmacion: location.state.mensajeConfirmacion,
         informacionPago: location.state.informacionPago,
-        datosContacto: location.state.datosContacto
+        datosContacto: location.state.datosContacto,
+        guiaAsignado: location.state.guiaAsignado || obtenerGuiaAsignadoDelLocalStorage()
       });
       
       // Si el pago fue exitoso, eliminamos la reserva pendiente
@@ -51,6 +52,21 @@ export const ConfirmacionPago = () => {
     
   }, [location, reservaInfo?.radicado, t]);
 
+  // Función para obtener el guía asignado del localStorage
+  const obtenerGuiaAsignadoDelLocalStorage = () => {
+    try {
+      const reservaPendiente = localStorage.getItem('reserva_pendiente');
+      if (reservaPendiente) {
+        const datos = JSON.parse(reservaPendiente);
+        return datos.guiaAsignado || null;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error al obtener guía del localStorage:', error);
+      return null;
+    }
+  };
+
   // Función para verificar el estado del pago
   const verificarEstadoPago = async (radicado) => {
     try {
@@ -67,13 +83,30 @@ export const ConfirmacionPago = () => {
         }
       });
       
-      if (response.data?.estado) {
-        if (response.data.estado === 'confirmada') {
-          setEstado('exitoso');
-        } else if (response.data.estado === 'cancelada') {
-          setEstado('rechazado');
-        } else {
-          setEstado('procesando');
+      if (response.data) {
+        // Actualizar estado del pago
+        if (response.data.estado) {
+          if (response.data.estado === 'confirmada') {
+            setEstado('exitoso');
+          } else if (response.data.estado === 'cancelada') {
+            setEstado('rechazado');
+          } else {
+            setEstado('procesando');
+          }
+        }
+        
+        // Actualizar información del guía si está disponible
+        if (response.data.guiaAsignado && reservaInfo) {
+          // Crear una copia del estado actual
+          const reservaActualizada = {...reservaInfo};
+          
+          // Actualizar la información del guía
+          reservaActualizada.guiaAsignado = response.data.guiaAsignado;
+          
+          // Actualizar el estado
+          setReservaInfo(reservaActualizada);
+          
+          console.log('Información del guía actualizada:', response.data.guiaAsignado);
         }
       }
       
@@ -151,7 +184,11 @@ export const ConfirmacionPago = () => {
                 {reservaInfo.guiaAsignado && (
                   <p className="text-gray-700 font-medium mt-2">
                     {t('guiaAsignado', 'Guía Asignado')}: <span className={`font-bold ${esEfectivo ? 'text-green-700' : 'text-teal-700'}`}>
-                      {reservaInfo.guiaAsignado.nombre || `${reservaInfo.guiaAsignado.primerNombre} ${reservaInfo.guiaAsignado.primerApellido}`}
+                      {reservaInfo.guiaAsignado.nombre || 
+                       reservaInfo.guiaAsignado.primerNombre && reservaInfo.guiaAsignado.primerApellido ? 
+                       `${reservaInfo.guiaAsignado.primerNombre} ${reservaInfo.guiaAsignado.primerApellido}` : 
+                       reservaInfo.guiaAsignado.name || 
+                       typeof reservaInfo.guiaAsignado === 'string' ? reservaInfo.guiaAsignado : t('noAsignado', 'No asignado')}
                     </span>
                   </p>
                 )}
