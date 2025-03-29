@@ -5,7 +5,7 @@ export const TituloBuscador = ({ onSearch }) => {
   const { t } = useTranslation();
 
   return (
-    <div className="container mx-auto px-2 sm:px-4 py-6 sm:py-8 md:py-12 lg:py-16 relative z-10">
+    <div className="container mx-auto px-2 sm:px-4 py-24 sm:py-8 md:py-12 lg:py-16 relative z-10 ">
       <div className="flex flex-col items-center text-center mt-12 sm:mt-32 md:mt-32 lg:mt-32 xl:mt-40">
         <div className="relative mb-2">
           <h1
