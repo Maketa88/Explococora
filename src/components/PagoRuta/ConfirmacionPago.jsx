@@ -257,7 +257,7 @@ export const ConfirmacionPago = () => {
               </button>
               <button 
                 onClick={() => navigate('/VistaCliente/NuestrasRutas')}
-                className={`${esEfectivo ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-100 hover:bg-blue-200'} text-black font-semibold py-2 px-6 rounded-lg transition-colors duration-300`}
+                className={`${esEfectivo ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-100 hover:bg-blue-200'} text-black font-semibold py-2 px-6 rounded-lg transition-colors duration-300`}
               >
                 {t('verRutas', 'Ver Más Rutas')}
               </button>
