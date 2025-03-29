@@ -2,8 +2,8 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { formatearFecha } from '../../utils/formatUtils';
 import Pago from "../../assets/Images/Pago.png";
+import { formatearFecha } from '../../utils/formatUtils';
 
 export const ConfirmacionPago = () => {
   const { t } = useTranslation();
@@ -19,8 +19,16 @@ export const ConfirmacionPago = () => {
       setEstado('exitoso');
       setReservaInfo({
         radicado: location.state.radicado,
-        fechaCreacion: new Date().toISOString(),
-        idPago: location.state.idPago
+        fechaCreacion: location.state.fechaReserva || new Date().toISOString(),
+        idPago: location.state.idPago,
+        metodoPago: location.state.metodoPago || 'tarjeta',
+        numeroReserva: location.state.numeroReserva,
+        numeroPago: location.state.numeroPago,
+        rutaInfo: location.state.rutaInfo,
+        tituloConfirmacion: location.state.tituloConfirmacion,
+        mensajeConfirmacion: location.state.mensajeConfirmacion,
+        informacionPago: location.state.informacionPago,
+        datosContacto: location.state.datosContacto
       });
       
       // Si el pago fue exitoso, eliminamos la reserva pendiente
@@ -77,54 +85,97 @@ export const ConfirmacionPago = () => {
 
   // Renderizar contenido según el estado
   const renderContenido = () => {
+    // Verificar si es pago en efectivo o con tarjeta (fuera del switch)
+    const esEfectivo = reservaInfo?.metodoPago === 'efectivo';
+    
     switch (estado) {
       case 'exitoso':
         return (
           <div className="text-center">
-            <div className="bg-green-100 p-4 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-              <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <div className={`${esEfectivo ? 'bg-green-100' : 'bg-blue-100'} p-4 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4`}>
+              <svg className={`w-10 h-10 ${esEfectivo ? 'text-green-600' : 'text-blue-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('pagoExitoso', '¡Pago Exitoso!')}</h2>
+            
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              {reservaInfo?.tituloConfirmacion || (esEfectivo ? t('reservaConfirmada', '¡Reserva Confirmada!') : t('pagoExitoso', '¡Pago Exitoso!'))}
+            </h2>
+            
             <p className="text-gray-600 mb-6">
-              {t('reservaConfirmadaSimulada', 'Tu reserva ha sido confirmada con el método de pago Mercado Libre.')}
+              {reservaInfo?.mensajeConfirmacion || (esEfectivo 
+                ? t('reservaConfirmadaEfectivo', 'Tu reserva ha sido confirmada con el método de pago en efectivo.') 
+                : t('reservaConfirmadaSimulada', 'Tu reserva ha sido confirmada con el método de pago Mercado Pago.'))}
             </p>
             
             {reservaInfo && (
               <div className="bg-white p-6 rounded-lg shadow-md mb-6 mx-auto max-w-md">
                 <p className="text-gray-700 font-medium">
-                  {t('radicado', 'Número de Reserva')}: <span className="font-bold text-teal-700">{reservaInfo.radicado}</span>
+                  {t('radicado', 'Número de Reserva')}: <span className={`font-bold ${esEfectivo ? 'text-green-700' : 'text-teal-700'}`}>
+                    {reservaInfo.numeroReserva || reservaInfo.radicado}
+                  </span>
                 </p>
+                
                 <p className="text-gray-700 font-medium mt-2">
-                  {t('numeroPago', 'Número de pago')}: <span className="font-bold text-teal-700">184841580058</span>
+                  {t('numeroPago', 'Número de pago')}: <span className={`font-bold ${esEfectivo ? 'text-green-700' : 'text-teal-700'}`}>
+                    {reservaInfo.numeroPago || '184841580058'}
+                  </span>
                 </p>
                
-                {reservaInfo.fechaCreacion && (
-                  <p className="text-gray-700 font-medium mt-2">
-                    {t('fechaReserva', 'Fecha de Reserva')}: <span className="font-bold text-teal-700">{formatearFecha(reservaInfo.fechaCreacion)}</span>
-                  </p>
+                <p className="text-gray-700 font-medium mt-2">
+                  {t('fechaReserva', 'Fecha de Reserva')}: <span className={`font-bold ${esEfectivo ? 'text-green-700' : 'text-teal-700'}`}>
+                    {reservaInfo.fechaReserva || formatearFecha(reservaInfo.fechaCreacion)}
+                  </span>
+                </p>
+                
+                {/* Datos de contacto para pago en efectivo */}
+                {esEfectivo && reservaInfo.datosContacto && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <h3 className="text-gray-800 font-semibold mb-2">{t('datosContacto', 'Datos de contacto:')}</h3>
+                    <p className="text-gray-700">
+                      <span className="font-medium">{t('nombres', 'Nombres')}:</span> {reservaInfo.datosContacto.nombres}
+                    </p>
+                    <p className="text-gray-700">
+                      <span className="font-medium">{t('apellidos', 'Apellidos')}:</span> {reservaInfo.datosContacto.apellidos}
+                    </p>
+                    <p className="text-gray-700">
+                      <span className="font-medium">{t('cedula', 'Cédula')}:</span> {reservaInfo.datosContacto.cedula}
+                    </p>
+                  </div>
                 )}
+                
+                {/* Guía asignado (si existe) */}
                 {reservaInfo.guiaAsignado && (
                   <p className="text-gray-700 font-medium mt-2">
-                    {t('guiaAsignado', 'Guía Asignado')}: <span className="font-bold text-teal-700">{reservaInfo.guiaAsignado.nombre || `${reservaInfo.guiaAsignado.primerNombre} ${reservaInfo.guiaAsignado.primerApellido}`}</span>
+                    {t('guiaAsignado', 'Guía Asignado')}: <span className={`font-bold ${esEfectivo ? 'text-green-700' : 'text-teal-700'}`}>
+                      {reservaInfo.guiaAsignado.nombre || `${reservaInfo.guiaAsignado.primerNombre} ${reservaInfo.guiaAsignado.primerApellido}`}
+                    </span>
                   </p>
                 )}
               </div>
             )}
             
-            <div className="bg-blue-100  p-4 rounded mb-6">
+            {/* Información del método de pago */}
+            <div className={`${esEfectivo ? 'bg-green-50' : 'bg-blue-100'} p-4 rounded mb-6`}>
               <div className="flex">
                 <div className="flex-shrink-0">
-                  <img 
-                    className="h-9 w-9 object-cover" 
-                    src={Pago}
-                    alt="Información de pago" 
-                  />
+                  {esEfectivo ? (
+                    <svg className="h-9 w-9 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  ) : (
+                    <img 
+                      className="h-9 w-9 object-cover" 
+                      src={Pago}
+                      alt="Información de pago" 
+                    />
+                  )}
                 </div>
                 <div className="ml-3">
                   <p className="text-sm text-gray-950">
-                    {t('notaSimulacion', 'Este es un pago Mercado Pago.Si tienes alguna duda o necesitas asistencia, por favor, contacta al administrador del sistema.')}
+                    {reservaInfo?.informacionPago || (esEfectivo
+                      ? t('notaEfectivo', 'Recuerda que deberás pagar en efectivo al momento de tomar la ruta. Ten lista la cantidad exacta para facilitar el proceso.')
+                      : t('notaSimulacion', 'Este es un pago Mercado Pago. Si tienes alguna duda o necesitas asistencia, por favor, contacta al administrador del sistema.'))}
                   </p>
                 </div>
               </div>
@@ -139,7 +190,7 @@ export const ConfirmacionPago = () => {
               </button>
               <button 
                 onClick={() => navigate('/VistaCliente/NuestrasRutas')}
-                className="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-300"
+                className={`${esEfectivo ? 'bg-green-600 hover:bg-green-700' : 'bg-teal-600 hover:bg-teal-700'} text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-300`}
               >
                 {t('verRutas', 'Ver Más Rutas')}
               </button>
@@ -186,7 +237,7 @@ export const ConfirmacionPago = () => {
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('pagoRechazado', 'Pago Rechazado')}</h2>
-            <p className="text-gray-600 mb-6">{t('pagoRechazadoMensaje', 'El pago con Mercado Libre no pudo completarse. Por favor intenta nuevamente.')}</p>
+            <p className="text-gray-600 mb-6">{t('pagoRechazadoMensaje', 'El pago no pudo completarse. Por favor intenta nuevamente.')}</p>
             
             {error && <p className="text-red-600 mb-6">{error}</p>}
             
@@ -209,7 +260,7 @@ export const ConfirmacionPago = () => {
             </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('cargando', 'Cargando...')}</h2>
             <p className="text-gray-600">
-              {t('verificandoEstado', 'Verificando el estado de tu pago con Mercado Libre...')}
+              {t('verificandoEstado', 'Verificando el estado de tu pago...')}
             </p>
           </div>
         );
