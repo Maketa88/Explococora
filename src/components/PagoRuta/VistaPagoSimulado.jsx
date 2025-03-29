@@ -148,6 +148,7 @@ export const VistaPagoSimulado = () => {
             idPago: response.data.idPago,
             metodoPago: metodoPago,
             guiaAsignado: guiaAsignado,
+            rutaInfo: rutaInfo,
             // Agregar datos de contacto cuando el método de pago es efectivo
             ...(metodoPago === 'efectivo' && {
               datosContacto: {

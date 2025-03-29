@@ -177,6 +177,12 @@ export const ConfirmacionPago = () => {
                     <p className="text-gray-700 mt-2">
                       <span className="font-medium">{t('cedula', 'Cédula')}:</span> <span className="text-green-700 font-bold">{reservaInfo.datosContacto.cedula}</span>
                     </p>
+                    {/* Agregar total a pagar para pagos en efectivo */}
+                    <p className="text-gray-700 mt-2">
+                      <span className="font-medium">{t('totalPagar', 'Total a pagar')}:</span> <span className="text-green-700 font-bold">
+                        ${reservaInfo.rutaInfo ? (reservaInfo.rutaInfo.precio * (reservaInfo.rutaInfo.cantidadPersonas || 1)).toLocaleString('es-CO') : 0} COP
+                      </span>
+                    </p>
                   </div>
                 )}
                 
