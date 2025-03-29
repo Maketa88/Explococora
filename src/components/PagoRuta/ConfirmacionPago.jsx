@@ -116,11 +116,14 @@ export const ConfirmacionPago = () => {
                   </span>
                 </p>
                 
-                <p className="text-gray-700 font-medium mt-2">
-                  {t('numeroPago', 'Número de pago')}: <span className={`font-bold ${esEfectivo ? 'text-green-700' : 'text-teal-700'}`}>
-                    {reservaInfo.numeroPago || '184841580058'}
-                  </span>
-                </p>
+                {/* Mostrar número de pago solo para pagos que no son en efectivo */}
+                {!esEfectivo && (
+                  <p className="text-gray-700 font-medium mt-2">
+                    {t('numeroPago', 'Número de pago')}: <span className="font-bold text-teal-700">
+                      {reservaInfo.numeroPago || '184841580058'}
+                    </span>
+                  </p>
+                )}
                
                 <p className="text-gray-700 font-medium mt-2">
                   {t('fechaReserva', 'Fecha de Reserva')}: <span className={`font-bold ${esEfectivo ? 'text-green-700' : 'text-teal-700'}`}>
@@ -130,16 +133,16 @@ export const ConfirmacionPago = () => {
                 
                 {/* Datos de contacto para pago en efectivo */}
                 {esEfectivo && reservaInfo.datosContacto && (
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <h3 className="text-gray-800 font-semibold mb-2">{t('datosContacto', 'Datos de contacto:')}</h3>
+                  <div className="mt-1 pt-1  ">
+                    
                     <p className="text-gray-700">
-                      <span className="font-medium">{t('nombres', 'Nombres')}:</span> {reservaInfo.datosContacto.nombres}
+                      <span className="font-medium">{t('nombres', 'Nombres')}:</span> <span className="text-green-700 font-bold">{reservaInfo.datosContacto.nombres}</span>
                     </p>
-                    <p className="text-gray-700">
-                      <span className="font-medium">{t('apellidos', 'Apellidos')}:</span> {reservaInfo.datosContacto.apellidos}
+                    <p className="text-gray-700 mt-2">
+                      <span className="font-medium">{t('apellidos', 'Apellidos')}:</span> <span className="text-green-700 font-bold">{reservaInfo.datosContacto.apellidos}</span>
                     </p>
-                    <p className="text-gray-700">
-                      <span className="font-medium">{t('cedula', 'Cédula')}:</span> {reservaInfo.datosContacto.cedula}
+                    <p className="text-gray-700 mt-2">
+                      <span className="font-medium">{t('cedula', 'Cédula')}:</span> <span className="text-green-700 font-bold">{reservaInfo.datosContacto.cedula}</span>
                     </p>
                   </div>
                 )}
