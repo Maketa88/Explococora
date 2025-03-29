@@ -184,11 +184,12 @@ export const ConfirmacionPago = () => {
                 {reservaInfo.guiaAsignado && (
                   <p className="text-gray-700 font-medium mt-2">
                     {t('guiaAsignado', 'Guía Asignado')}: <span className={`font-bold ${esEfectivo ? 'text-green-700' : 'text-teal-700'}`}>
-                      {reservaInfo.guiaAsignado.nombre || 
-                       reservaInfo.guiaAsignado.primerNombre && reservaInfo.guiaAsignado.primerApellido ? 
-                       `${reservaInfo.guiaAsignado.primerNombre} ${reservaInfo.guiaAsignado.primerApellido}` : 
-                       reservaInfo.guiaAsignado.name || 
-                       typeof reservaInfo.guiaAsignado === 'string' ? reservaInfo.guiaAsignado : t('noAsignado', 'No asignado')}
+                      {reservaInfo.guiaAsignado.nombre ? reservaInfo.guiaAsignado.nombre.trim() : 
+                        (reservaInfo.guiaAsignado.primerNombre && reservaInfo.guiaAsignado.primerApellido) ? 
+                          `${reservaInfo.guiaAsignado.primerNombre} ${reservaInfo.guiaAsignado.primerApellido}` : 
+                          reservaInfo.guiaAsignado.name ? reservaInfo.guiaAsignado.name : 
+                            typeof reservaInfo.guiaAsignado === 'string' ? reservaInfo.guiaAsignado : 
+                              t('noAsignado', 'No asignado')}
                     </span>
                   </p>
                 )}

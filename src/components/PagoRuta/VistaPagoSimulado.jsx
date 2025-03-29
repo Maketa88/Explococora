@@ -128,6 +128,13 @@ export const VistaPagoSimulado = () => {
           if (reservaPendiente) {
             const datos = JSON.parse(reservaPendiente);
             guiaAsignado = datos.guiaAsignado || null;
+            
+            // Limpiar espacios en blanco en el nombre del guía si existe
+            if (guiaAsignado && typeof guiaAsignado === 'object' && guiaAsignado.nombre) {
+              guiaAsignado.nombre = guiaAsignado.nombre.trim();
+            }
+            
+            console.log('Guía asignado para el pago:', guiaAsignado);
           }
         } catch (error) {
           console.error('Error al obtener guía del localStorage:', error);

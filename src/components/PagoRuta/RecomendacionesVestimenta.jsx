@@ -94,14 +94,18 @@ export const RecomendacionesVestimenta = () => {
         if (response.data.guiaAsignado) {
           // Si el backend devuelve un objeto con la información del guía
           if (typeof response.data.guiaAsignado === 'object') {
-            guiaAsignadoInfo = response.data.guiaAsignado;
+            guiaAsignadoInfo = {...response.data.guiaAsignado};
+            // Limpiar espacios en blanco en el nombre si existe
+            if (guiaAsignadoInfo.nombre) {
+              guiaAsignadoInfo.nombre = guiaAsignadoInfo.nombre.trim();
+            }
           } 
           // Si el backend devuelve solo el nombre del guía como string
           else if (typeof response.data.guiaAsignado === 'string') {
-            guiaAsignadoInfo = { nombre: response.data.guiaAsignado };
+            guiaAsignadoInfo = { nombre: response.data.guiaAsignado.trim() };
           }
           
-          console.log('Guía asignado:', guiaAsignadoInfo);
+          console.log('Guía asignado (procesado):', guiaAsignadoInfo);
         }
         
         localStorage.setItem('reserva_pendiente', JSON.stringify({
