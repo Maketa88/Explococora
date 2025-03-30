@@ -1,33 +1,30 @@
 import axios from 'axios';
 import {
   Clock, DollarSign,
-  Eye,
   Map,
   Package,
   RefreshCw,
   Search,
   X
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const GestionPaquetes = () => {
   // Estados para la gestión de paquetes
   const [paquetes, setPaquetes] = useState([]);
-  const [paquetesFiltrados, setPaquetesFiltrados] = useState([]);
   const [loading, setLoading] = useState(true);
-
-
   const [error, setError] = useState(null);
   const [terminoBusqueda, setTerminoBusqueda] = useState('');
   
-  // Estados para las imágenes y vista detallada
+  // Estados para las imágenes y carousel
   const [paquetesConFotos, setPaquetesConFotos] = useState({});
   const [cargandoFotos, setCargandoFotos] = useState({});
-  const [isDetailView, setIsDetailView] = useState(false);
-  const [activePaquete, setActivePaquete] = useState(null);
+  const [paqueteActual, setPaqueteActual] = useState(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [imagenesPreview, setImagenesPreview] = useState([]);
+  const [desplazando, setDesplazando] = useState(false);
+  const carouselRef = useRef(null);
 
   // Función para obtener la lista de paquetes
   const fetchPaquetes = async () => {
@@ -62,7 +59,11 @@ const GestionPaquetes = () => {
       );
       
       setPaquetes(paquetesConRutas);
-      setPaquetesFiltrados(paquetesConRutas);
+      
+      // Establecer el paquete actual al primero de la lista
+      if (paquetesConRutas.length > 0) {
+        setPaqueteActual(paquetesConRutas[0]);
+      }
       
       // Obtener fotos para cada paquete
       if (Array.isArray(paquetesConRutas)) {
@@ -129,6 +130,11 @@ const GestionPaquetes = () => {
           ...prev,
           [idPaquete]: fotosFormateadas
         }));
+        
+        // Resetear la posición del scroll cuando cambian las fotos
+        if (carouselRef.current) {
+          carouselRef.current.scrollLeft = 0;
+        }
       } else {
         setPaquetesConFotos(prev => ({
           ...prev,
@@ -217,8 +223,44 @@ const GestionPaquetes = () => {
     }
   };
 
+  // Función para cambiar entre paquetes
+  const cambiarPaquete = async (direccion) => {
+    const indiceActual = paquetes.findIndex(p => p.idPaquete === paqueteActual.idPaquete);
+    const nuevoIndice = direccion === 'siguiente'
+      ? (indiceActual + 1) % paquetes.length
+      : (indiceActual - 1 + paquetes.length) % paquetes.length;
+    
+    setPaqueteActual(paquetes[nuevoIndice]);
+    
+    // Si no tenemos fotos de este paquete, las obtenemos
+    if (!paquetesConFotos[paquetes[nuevoIndice].idPaquete]) {
+      obtenerFotosPaquete(paquetes[nuevoIndice].idPaquete);
+    }
+  };
+
+  // Función para desplazar el carousel
+  const desplazarCarousel = (direccion) => {
+    if (desplazando || !carouselRef.current) return;
+    
+    setDesplazando(true);
+    
+    const carousel = carouselRef.current;
+    const scrollAmount = carousel.clientWidth * 0.5;
+    const newScrollLeft = direccion === 'derecha' 
+      ? carousel.scrollLeft + scrollAmount 
+      : carousel.scrollLeft - scrollAmount;
+    
+    carousel.scrollTo({
+      left: newScrollLeft,
+      behavior: 'smooth'
+    });
+    
+    setTimeout(() => setDesplazando(false), 500);
+  };
+
   // Cargar paquetes al montar el componente
   useEffect(() => {
+    window.scrollTo(0, 0);
     fetchPaquetes();
   }, []);
 
@@ -227,75 +269,33 @@ const GestionPaquetes = () => {
     setTerminoBusqueda(e.target.value);
     
     if (e.target.value.trim() === '') {
-      setPaquetesFiltrados(paquetes);
+      // Si la búsqueda está vacía, restaurar todos los paquetes
+      if (paquetes.length > 0) {
+        setPaqueteActual(paquetes[0]);
+      }
     } else {
       const termino = e.target.value.toLowerCase().trim();
       const resultados = paquetes.filter(paquete => 
-        paquete.nombrePaquete.toLowerCase().includes(termino) ||
-        paquete.descripcion.toLowerCase().includes(termino)
+        paquete.nombrePaquete?.toLowerCase().includes(termino) ||
+        paquete.descripcion?.toLowerCase().includes(termino)
       );
-      setPaquetesFiltrados(resultados);
+      
+      // Si hay resultados, actualizar el paquete actual al primer resultado
+      if (resultados.length > 0) {
+        setPaqueteActual(resultados[0]);
+      }
     }
   };
-
-  // Función para formatear fechas
- 
 
   // Función para mostrar precio formateado
   const mostrarPrecio = (precio) => {
     if (!precio) return '$0';
     return `$${parseInt(precio).toLocaleString('es-CO')}`;
   };
-
-  // Función para obtener un ícono según el tipo de paquete
-  const getPackageIcon = () => {
-    return <Package className="w-16 h-16 text-emerald-600" />;
-  };
-
-  // Función para abrir la vista detallada
-  const openDetailView = async (paquete) => {
-    setActivePaquete(paquete);
-    setIsDetailView(true);
-    
-    // Si no tenemos fotos de este paquete, las obtenemos
-    if (!paquetesConFotos[paquete.idPaquete]) {
-      obtenerFotosPaquete(paquete.idPaquete);
-    }
-    
-    // Obtener rutas asociadas al paquete
-    const rutas = await obtenerRutasAsociadas(paquete.idPaquete);
-    
-    // Actualizar el paquete activo con las rutas obtenidas
-    setActivePaquete(prevPaquete => ({
-      ...prevPaquete,
-      rutasAsociadas: rutas
-    }));
-  };
-
-  // Función para cerrar la vista detallada
-  const closeDetailView = () => {
-    setIsDetailView(false);
-    setActivePaquete(null);
-  };
-
-  // Función para abrir el lightbox
-  const handleLightbox = (imagenes, index) => {
-    setImagenesPreview(imagenes);
-    setLightboxIndex(index);
-    setLightboxOpen(true);
-  };
-
-  // Función para navegar entre imágenes en el lightbox
-  const navigateLightbox = (direction) => {
-    const newIndex = lightboxIndex + direction;
-    if (newIndex >= 0 && newIndex < imagenesPreview.length) {
-      setLightboxIndex(newIndex);
-    }
-  };
-
+  
   // Función para calcular la duración total de las rutas de un paquete
   const calcularDuracionTotalPaquete = (paquete) => {
-    if (!paquete.rutasAsociadas || !paquete.rutasAsociadas.length) return paquete.duracion || 'No especificada';
+    if (!paquete?.rutasAsociadas || !paquete.rutasAsociadas.length) return paquete?.duracion || 'No especificada';
     
     let horasTotales = 0;
     let minutosTotales = 0;
@@ -331,367 +331,550 @@ const GestionPaquetes = () => {
     return duracionTotal || paquete.duracion || 'No especificada';
   };
 
-  // Componente para renderizar la vista detallada
-  const DetallePaquete = ({ paquete, onClose, imagenes = [] }) => {
-    // Obtener nombres de rutas
-    const getNombresRutas = () => {
-      if (!paquete.rutasAsociadas || !paquete.rutasAsociadas.length) return 'Ninguna ruta asociada';
-      
+  // Función para abrir el lightbox
+  const handleLightbox = (imagenes, index) => {
+    setImagenesPreview(imagenes);
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
+
+  // Función para navegar entre imágenes en el lightbox
+  const navigateLightbox = (direction) => {
+    const newIndex = lightboxIndex + direction;
+    if (newIndex >= 0 && newIndex < imagenesPreview.length) {
+      setLightboxIndex(newIndex);
+    }
+  };
+  
+  // Renderizado del slider
+  const renderSlider = () => {
+    const fotos = paqueteActual && paquetesConFotos[paqueteActual.idPaquete] 
+      ? paquetesConFotos[paqueteActual.idPaquete] 
+      : [];
+    
+    if (cargandoFotos[paqueteActual?.idPaquete]) {
       return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-          {paquete.rutasAsociadas.map((ruta, index) => (
-            <div key={index} className="flex items-center gap-2 bg-emerald-50  p-2 rounded">
-              <Map size={16} className="text-emerald-400" />
-              <div>
-                <span>{ruta.nombreRuta}</span>
-                {ruta.tiempoEstimado && (
-                  <div className="text-xs text-emerald-600 flex items-center mt-1">
-                    <Clock size={12} className="mr-1" />
-                    <span>{ruta.tiempoEstimado}</span>
-                  </div>
-                )}
+        <div className="max-w-[1360px] mx-auto relative mb-8 h-96 bg-emerald-50 rounded-lg flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-600"></div>
+        </div>
+      );
+    }
+    
+    if (fotos.length === 0) {
+      return (
+        <div className="max-w-[1360px] mx-auto relative mb-8 h-96 bg-emerald-50 rounded-lg flex items-center justify-center">
+          <Package size={64} className="text-emerald-600/70" />
+          <p className="mt-4 text-emerald-700 font-medium">No hay imágenes disponibles</p>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="max-w-[1360px] mx-auto relative mb-8">
+        {/* Áreas clickeables para navegar */}
+        <div 
+          className="absolute left-0 top-0 w-16 h-full z-10 cursor-pointer hover:bg-gradient-to-r from-black/20 to-transparent transition-all duration-300"
+          onClick={() => desplazarCarousel('izquierda')}
+        ></div>
+        <div 
+          className="absolute right-0 top-0 w-16 h-full z-10 cursor-pointer hover:bg-gradient-to-l from-black/20 to-transparent transition-all duration-300"
+          onClick={() => desplazarCarousel('derecha')}
+        ></div>
+        
+        {/* Contenedor del carousel */}
+        <div 
+          ref={carouselRef}
+          className="flex overflow-x-auto h-96 rounded-lg shadow-lg scroll-smooth"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
+        >
+          {fotos.map((foto, index) => (
+            <div 
+              key={index} 
+              className="flex-shrink-0 w-1/2 p-1 relative"
+            >
+              <div 
+                className="w-full h-full relative rounded-lg overflow-hidden cursor-pointer group"
+                onClick={() => handleLightbox(fotos.map(img => img.url), index)}
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
+                <img
+                  src={foto.url}
+                  alt={`Foto ${index + 1} de ${paqueteActual?.nombrePaquete}`}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.parentNode.innerHTML = `
+                      <div class="w-full h-full flex items-center justify-center bg-emerald-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <rect x="2" y="6" width="20" height="12" rx="2"/>
+                          <circle cx="12" cy="12" r="2"/>
+                        </svg>
+                      </div>
+                    `;
+                  }}
+                />
+                <div className="absolute bottom-0 left-0 right-0 text-white p-3 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0 z-20">
+                  <p className="text-sm font-medium">{paqueteActual?.nombrePaquete} • Foto {index + 1}</p>
+                </div>
               </div>
             </div>
           ))}
         </div>
-      );
-    };
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 overflow-y-auto">
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl text-gray-800 animate-fadeIn max-h-[90vh] overflow-y-auto">
-          <div className="relative">
-            {/* Encabezado con fondo de imagen (si hay imágenes) */}
-            <div className="h-48 bg-emerald-900 rounded-t-lg overflow-hidden relative">
-              {imagenes && imagenes.length > 0 ? (
-                <div className="w-full h-full overflow-hidden">
-                  <img 
-                    src={imagenes[0].url} 
-                    alt={paquete.nombrePaquete}
-                    className="w-full h-full object-cover object-center opacity-60 cursor-pointer"
-                    onClick={() => handleLightbox(imagenes.map(img => img.url), 0)}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.parentNode.classList.add('flex', 'items-center', 'justify-center');
-                      const placeholder = document.createElement('div');
-                      placeholder.innerHTML = `
-                        <div class="text-emerald-400 text-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2">
-                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                          </svg>
-                          <p>Imagen no disponible</p>
-                        </div>
-                      `;
-                      e.target.parentNode.appendChild(placeholder);
-                    }}
-                  />
-                </div>
-              ) : (
-                <div className="flex items-center justify-center h-full">
-                  <Package size={64} className="text-emerald-600" />
-                </div>
-              )}
-              
-              {/* Botón de cierre */}
-              <button
-                onClick={onClose}
-                className="absolute top-4 right-4 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
-              >
-                <X size={24} />
-              </button>
-              
-              {/* Nombre del paquete */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-emerald-900 to-transparent">
-                <h2 className="text-3xl font-bold text-white">{paquete.nombrePaquete}</h2>
-              </div>
-            </div>
-            
-            <div className="p-6">
-              {/* Información principal */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="col-span-2">
-                  <h3 className="text-xl font-semibold mb-2 text-emerald-700">Descripción</h3>
-                  <p className="text-gray-700 mb-6">{paquete.descripcion}</p>
-                  
-                  <h3 className="text-xl font-semibold mb-2 text-emerald-700">Rutas incluidas</h3>
-                  {getNombresRutas()}
-                </div>
-                
-                <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="text-emerald-700 font-medium mb-1">Duración</h4>
-                      <div className="flex items-center gap-2">
-                        <Clock size={18} className="text-emerald-600" />
-                        <span className="text-lg text-gray-800">{calcularDuracionTotalPaquete(paquete)}</span>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-emerald-700 font-medium mb-1">Tipo</h4>
-                      <div className="flex items-center gap-2">
-                        <Map size={18} className="text-emerald-600" />
-                        <span className="text-lg text-gray-800">Cabalgata y Caminata</span>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-emerald-700 font-medium mb-1">Precio</h4>
-                      <div className="flex items-center gap-2">
-                        <DollarSign size={18} className="text-emerald-600" />
-                        <div className="flex items-center">
-                          <span className="text-2xl font-bold text-gray-800">${paquete.precio}</span>
-                          {paquete.descuento > 0 && (
-                            <span className="ml-2 bg-emerald-600 text-white text-xs px-2 py-1 rounded-full">
-                              {paquete.descuento}% desc.
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      {paquete.descuento > 0 && (
-                        <div className="text-emerald-700 mt-1 text-sm">
-                          Precio final: ${(paquete.precio * (1 - paquete.descuento / 100)).toFixed(2)}
-                        </div>
-                      )}
-                    </div>
-                    
-                   
-                  </div>
-                </div>
-              </div>
-              
-              {/* Galería de imágenes */}
-              {imagenes && imagenes.length > 0 && (
-                <div className="mt-8">
-                  <h3 className="text-xl font-semibold mb-3 text-emerald-700">Galería de imágenes</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                    {imagenes.map((imagen, index) => (
-                      <div 
-                        key={index} 
-                        className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
-                        onClick={() => handleLightbox(imagenes.map(img => img.url), index)}
-                      >
-                        <div className="w-full h-full overflow-hidden">
-                          <img 
-                            src={imagen.url} 
-                            alt={`Imagen ${index + 1} del paquete`}
-                            className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-300"
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.parentNode.innerHTML = `
-                                <div class="w-full h-full flex items-center justify-center bg-emerald-50">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="2" y="6" width="20" height="12" rx="2"/>
-                                    <circle cx="12" cy="12" r="2"/>
-                                  </svg>
-                                </div>
-                              `;
-                            }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              {/* Botón de acción */}
-              <div className="mt-8 flex justify-end space-x-4">
-                <button
-                  onClick={onClose}
-                  className="px-6 py-2 bg-emerald-200 hover:bg-emerald-400 text-gray-950 rounded-lg transition-colors shadow-md"
-                >
-                  Cerrar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        
+        {/* Botones de navegación fotos */}
+        <button
+          onClick={() => desplazarCarousel('izquierda')}
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2.5 rounded-full transition-all duration-300 ease-in-out shadow-lg hover:scale-110 group z-20"
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className="h-5 w-5 transform group-hover:-translate-x-1 transition-transform duration-300" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button
+          onClick={() => desplazarCarousel('derecha')}
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2.5 rounded-full transition-all duration-300 ease-in-out shadow-lg hover:scale-110 group z-20"
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className="h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
       </div>
     );
   };
 
+  // Renderizado principal
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-red-600 text-center p-4">
+        Error al cargar los paquetes: {error}
+      </div>
+    );
+  }
+
+  if (!paqueteActual) {
+    return (
+      <div className="text-center p-4">
+        No hay paquetes disponibles
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen text-gray-800 container mx-auto px-4 py-8">
-      <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800">Paquetes Turísticos</h1>
-          <p className="text-emerald-700 mt-1">Descubre nuestras experiencias más completas</p>
+    <>
+      <section className="relative py-16 px-4 overflow-hidden">
+        {/* Fondo decorativo inspirado en el Valle del Cocora */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-emerald-50 to-white"></div>
+
+          {/* Siluetas de palmeras y elementos decorativos */}
+          <div className="absolute top-0 left-0 w-full h-full opacity-10">
+            <svg
+              viewBox="0 0 1200 600"
+              className="w-full h-full"
+              preserveAspectRatio="xMidYMid slice"
+            >
+              {/* Silueta de montaña con árboles */}
+              <path
+                d="M0,600 L300,200 L400,300 L500,150 L600,250 L800,100 L1000,300 L1200,200 L1200,600 Z"
+                fill="#047857"
+                opacity="0.3"
+              />
+              
+              {/* Arroyo serpenteante */}
+              <path
+                d="M0,450 C100,430 150,470 250,440 C350,410 400,450 500,430 C600,410 650,450 750,430 C850,410 900,450 1000,430 C1100,410 1150,450 1200,430 L1200,500 C1100,520 1050,480 950,500 C850,520 800,480 700,500 C600,520 550,480 450,500 C350,520 300,480 200,500 C100,520 50,480 0,500 Z"
+                fill="#047857"
+                opacity="0.4"
+              />
+              
+              {/* Siluetas de árboles y elementos decorativos */}
+              <path
+                d="M200,600 L200,400 L150,400 L200,350 L170,350 L220,300 L190,300 L240,250 L210,250 L250,200 L230,200 L270,150 L250,150 L280,100 L310,150 L290,150 L330,200 L310,200 L350,250 L320,250 L370,300 L340,300 L390,350 L360,350 L410,400 L360,400 L360,600 Z"
+                fill="#047857"
+                opacity="0.7"
+              />
+              
+              {/* Más elementos decorativos del paisaje */}
+              <path
+                d="M600,600 L600,350 C600,350 550,300 570,250 C590,200 630,220 650,180 C670,140 700,160 720,130 C740,100 780,120 800,150 C820,180 850,160 870,200 C890,240 930,220 950,270 C970,320 920,350 920,350 L920,600 Z"
+                fill="#047857"
+                opacity="0.7"
+              />
+              
+              <path
+                d="M1000,600 L1000,400 C1000,400 950,380 960,340 C970,300 1000,320 1010,280 C1020,240 1050,260 1060,220 C1070,180 1100,200 1110,240 C1120,280 1150,260 1160,300 C1170,340 1200,320 1200,360 C1200,400 1150,400 1150,400 L1150,600 Z"
+                fill="#047857"
+                opacity="0.7"
+              />
+            </svg>
+          </div>
         </div>
         
-        <div className="flex flex-wrap gap-2">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Buscar paquetes..."
-              value={terminoBusqueda}
-              onChange={handleSearchChange}
-              className="w-full md:w-64 px-4 py-2 bg-emerald-50 rounded text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400 placeholder-emerald-700"
-            />
-            <Search className="absolute right-3 top-2.5 text-emerald-700 w-5 h-5" />
-          </div>
+        {/* Encabezado con estilo mejorado */}
+        <div className="relative py-6 mb-4">
+          {/* Líneas decorativas */}
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-600 to-transparent"></div>
+          <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-600 to-transparent"></div>
           
+          {/* Título principal con efectos */}
+          <div className="relative z-10 text-center">
+            <h1 className="text-5xl font-black tracking-tight relative inline-block">
+              <span className="relative bg-clip-text text-transparent bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 drop-shadow-sm">
+                Paquetes Turísticos
+              </span>
+            </h1>
+            
+            {/* Subtítulo o decoración */}
+            <div className="mt-2 text-xs font-medium uppercase tracking-widest text-emerald-600 group relative">
+              <span className="inline-block mx-2">✦</span>
+              <span className="relative inline-block">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-emerald-700 font-semibold text-2xl">
+                  {paqueteActual?.nombrePaquete}
+                </span>
+              </span>
+              <span className="inline-block mx-2">✦</span>
+            </div>
+          </div>
+        </div>
+        
+        {/* Búsqueda y filtros con diseño mejorado */}
+        <div className="max-w-[1360px] mx-auto mb-8">
+          <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md border border-emerald-100">
+            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+              <div className="relative w-full md:w-64">
+                <input
+                  type="text"
+                  placeholder="Buscar paquetes..."
+                  value={terminoBusqueda}
+                  onChange={handleSearchChange}
+                  className="w-full px-4 py-2.5 pl-10 bg-emerald-50 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400 placeholder-emerald-700/70 border border-emerald-100"
+                />
+                <Search className="absolute left-3 top-2.5 text-emerald-700 w-5 h-5" />
+              </div>
+              
+              <button
+                onClick={fetchPaquetes}
+                className="flex items-center gap-2 px-5 py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg transition-colors shadow-md group"
+                title="Recargar paquetes"
+              >
+                <RefreshCw size={18} className="group-hover:rotate-180 transition-transform duration-500" />
+                <span>Actualizar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Botones de navegación entre paquetes */}
+        <div className="fixed left-4 right-4 top-[63%] -translate-y-1/2 flex justify-between z-10">
           <button
-            onClick={fetchPaquetes}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-800 hover:bg-emerald-700 text-white rounded transition-colors"
-            title="Recargar paquetes"
+            onClick={() => cambiarPaquete('anterior')}
+            className="bg-emerald-600 text-white p-3 rounded-full hover:bg-emerald-700 transition-all duration-300 shadow-lg hover:scale-110 group"
+            aria-label="Paquete anterior"
           >
-            <RefreshCw size={18} />
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-6 w-6 transform group-hover:-translate-x-1 transition-transform duration-300" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button
+            onClick={() => cambiarPaquete('siguiente')}
+            className="bg-emerald-600 text-white p-3 rounded-full hover:bg-emerald-700 transition-all duration-300 shadow-lg hover:scale-110 group"
+            aria-label="Siguiente paquete"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-6 w-6 transform group-hover:translate-x-1 transition-transform duration-300" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+            </svg>
           </button>
         </div>
-      </div>
-      
-      {/* Vista detallada o lista de paquetes */}
-      {isDetailView ? (
-        <DetallePaquete
-          paquete={activePaquete}
-          onClose={closeDetailView}
-          imagenes={paquetesConFotos[activePaquete.idPaquete] || []}
-        />
-      ) : (
-        <div>
-          {loading ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="animate-spin w-12 h-12 border-4 border-emerald-400 border-t-transparent rounded-full"></div>
-            </div>
-          ) : error ? (
-            <div className="bg-rose-900 bg-opacity-30 text-white p-4 rounded-lg">
-              <p className="text-center">{error}</p>
-            </div>
-          ) : paquetesFiltrados.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {paquetesFiltrados.map((paquete, index) => (
-                <div 
-                  key={`paquete-${paquete.idPaquete || paquete.id || index}`} 
-                  className="bg-emerald-50 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-emerald-900/30 transition-all"
-                >
-                  <div className="h-48 bg-emerald-950 relative overflow-hidden">
-                    {cargandoFotos[paquete.idPaquete] ? (
-                      <div className="flex justify-center items-center h-full bg-emerald-950">
-                        <div className="animate-spin w-8 h-8 border-2 border-emerald-300 border-t-transparent rounded-full"></div>
-                      </div>
-                    ) : paquetesConFotos[paquete.idPaquete] && paquetesConFotos[paquete.idPaquete].length > 0 ? (
-                      <div className="w-full h-full overflow-hidden">
-                        <img
-                          src={paquetesConFotos[paquete.idPaquete][0].url}
-                          alt={paquete.nombrePaquete}
-                          className="w-full h-full object-cover object-center transform hover:scale-105 transition-transform duration-300"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.parentNode.innerHTML = `
-                              <div class="w-full h-full flex items-center justify-center bg-emerald-950">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                  <rect x="2" y="6" width="20" height="12" rx="2"/>
-                                  <circle cx="12" cy="12" r="2"/>
-                                  <path d="M14.5 12l2.5 -2.5"/>
-                                  <path d="M14.5 12l2.5 2.5"/>
-                                </svg>
-                              </div>
-                            `;
-                          }}
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Package size={64} className="text-emerald-600" />
-                      </div>
-                    )}
+        
+        {/* Slider de Fotos */}
+        {renderSlider()}
+        
+        {/* Información del Paquete */}
+        <div className="max-w-[1360px] mx-auto mb-10">
+          <div className="relative">
+            {/* Textura sutil de fondo */}
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] opacity-20"></div>
+            
+            {/* Contenido principal */}
+            <div>
+              {/* Descripción estilo notas de explorador */}
+              <div className="mb-10 mx-4">
+                <div className="relative pl-4 py-2">
+                  <div className="absolute -left-3 top-1/2 -translate-y-1/2 h-10 w-1 bg-gradient-to-b from-emerald-400 via-emerald-500 to-emerald-600 rounded-full shadow-sm"></div>
+                  <p className="text-gray-900 text-lg font-medium">{paqueteActual.descripcion}</p>
+                  <p className="mt-2 text-gray-700 text-base font-normal">
+                    &ldquo;Este paquete ofrece una experiencia completa que te permitirá disfrutar 
+                    de las mejores atracciones del Valle del Cocora, combinando aventura y 
+                    naturaleza durante tu visita.&rdquo;
+                  </p>
+                </div>
+              </div>
+              
+              {/* Detalles del paquete */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Columna izquierda */}
+                <div>
+                  {/* Panel con estilo premium */}
+                  <div className="bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/70 p-6 rounded-2xl border border-emerald-100 h-full flex flex-col shadow-[0_10px_25px_-12px_rgba(13,148,136,0.25)] relative overflow-hidden backdrop-blur-sm">
+                    {/* Patrones decorativos */}
+                    <div className="absolute -top-12 -right-12 w-56 h-56 opacity-[0.03] rotate-12">
+                      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="40" stroke="#0d9488" strokeWidth="0.6" />
+                        <circle cx="50" cy="50" r="30" stroke="#0d9488" strokeWidth="0.6" />
+                        <circle cx="50" cy="50" r="20" stroke="#0d9488" strokeWidth="0.6" />
+                        <path d="M50 10V90M10 50H90M26 26L74 74M26 74L74 26" stroke="#0d9488" strokeWidth="0.4" />
+                      </svg>
+                    </div>
                     
-                    <div className="absolute top-2 right-2 flex gap-1">
-                      <button
-                        onClick={() => openDetailView(paquete)}
-                        className="p-2 bg-emerald-800 bg-opacity-80 hover:bg-emerald-700 text-white rounded-full"
-                        title="Ver detalles"
+                    {/* Título con estilo exquisito */}
+                    <div className="relative mb-4">
+                      <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-1 h-10 bg-gradient-to-b from-emerald-400 via-emerald-500 to-emerald-600 rounded-full shadow-sm"></div>
+                      <h2 className="pl-4 text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 to-emerald-900 text-xl font-medium tracking-wide">
+                        Detalles del Paquete
+                      </h2>
+                    </div>
+                    
+                    {/* Tarjetas de información */}
+                    <div className="flex-grow grid grid-cols-1 gap-3">
+                      {/* Duración */}
+                      <div className="bg-gradient-to-br from-white to-emerald-50/50 p-3 rounded-xl border border-emerald-100/80 hover:shadow-md group transition-all duration-300 transform hover:-translate-y-0.5 hover:border-emerald-200">
+                        <div className="flex items-center justify-between relative z-10">
+                          <div className="flex items-center">
+                            <div className="relative">
+                              <div className="absolute inset-0 bg-emerald-500/10 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-500"></div>
+                              <div className="relative bg-gradient-to-br from-emerald-50 to-white p-2.5 rounded-lg shadow-sm group-hover:shadow transition-all duration-500 flex items-center justify-center">
+                                <Clock className="w-5 h-5 text-emerald-700" />
+                              </div>
+                            </div>
+                            <div className="ml-3">
+                              <span className="text-emerald-600 text-xs font-medium block leading-tight">Duración</span>
+                              <span className="text-gray-800 text-base tracking-wide block group-hover:text-emerald-800 transition-colors duration-500">
+                                {calcularDuracionTotalPaquete(paqueteActual)}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-emerald-400 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-2 group-hover:translate-x-0">
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M9 5l7 7-7 7" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-500 group-hover:w-2/3 transition-all duration-700"></div>
+                      </div>
+                      
+                      {/* Precio */}
+                      <div className="bg-gradient-to-br from-white to-emerald-50/50 p-3 rounded-xl border border-emerald-100/80 hover:shadow-md group transition-all duration-300 transform hover:-translate-y-0.5 hover:border-emerald-200">
+                        <div className="flex items-center justify-between relative z-10">
+                          <div className="flex items-center">
+                            <div className="relative">
+                              <div className="absolute inset-0 bg-emerald-500/10 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-500"></div>
+                              <div className="relative bg-gradient-to-br from-emerald-50 to-white p-2.5 rounded-lg shadow-sm group-hover:shadow transition-all duration-500 flex items-center justify-center">
+                                <DollarSign className="w-5 h-5 text-emerald-700" />
+                              </div>
+                            </div>
+                            <div className="ml-3">
+                              <span className="text-emerald-600 text-xs font-medium block leading-tight">Precio</span>
+                              <span className="text-gray-800 text-base tracking-wide block group-hover:text-emerald-800 transition-colors duration-500">
+                                {mostrarPrecio(paqueteActual.precio)}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-emerald-400 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-2 group-hover:translate-x-0">
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M9 5l7 7-7 7" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-500 group-hover:w-2/3 transition-all duration-700"></div>
+                      </div>
+                      
+                      {/* Rutas incluidas */}
+                      <div className="bg-gradient-to-br from-white to-emerald-50/50 p-3 rounded-xl border border-emerald-100/80 hover:shadow-md group transition-all duration-300 transform hover:-translate-y-0.5 hover:border-emerald-200">
+                        <div className="flex items-center justify-between relative z-10">
+                          <div className="flex items-center">
+                            <div className="relative">
+                              <div className="absolute inset-0 bg-emerald-500/10 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-500"></div>
+                              <div className="relative bg-gradient-to-br from-emerald-50 to-white p-2.5 rounded-lg shadow-sm group-hover:shadow transition-all duration-500 flex items-center justify-center">
+                                <Map className="w-5 h-5 text-emerald-700" />
+                              </div>
+                            </div>
+                            <div className="ml-3">
+                              <span className="text-emerald-600 text-xs font-medium block leading-tight">Rutas Incluidas</span>
+                              <span className="text-gray-800 text-base tracking-wide block group-hover:text-emerald-800 transition-colors duration-500">
+                                {paqueteActual.rutasAsociadas?.length || 0} rutas
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-emerald-400 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-2 group-hover:translate-x-0">
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M9 5l7 7-7 7" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-500 group-hover:w-2/3 transition-all duration-700"></div>
+                      </div>
+                    </div>
+                    
+                    {/* Separador elegante */}
+                    <div className="my-4 w-full h-px bg-gradient-to-r from-transparent via-emerald-200 to-transparent opacity-70"></div>
+                    
+                    {/* Botones */}
+                    <div className="flex flex-col gap-4">
+                      {/* Botón de reserva */}
+                      <button 
+                        className="w-full py-3 rounded-xl text-white relative overflow-hidden group shadow-md transition-all duration-500 bg-gradient-to-br from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600"
                       >
-                        <Eye size={16} />
+                        <div className="absolute inset-0 w-full h-full">
+                          <div className="absolute -inset-[100%] bg-gradient-to-r from-white/0 via-white/20 to-white/0 animate-[shimmer_2s_infinite] transition-all"></div>
+                        </div>
+                        <span className="relative z-10 font-medium">Reservar Paquete</span>
                       </button>
                     </div>
                   </div>
-                  
-                  <div className="p-4">
-                    <h3 className="text-lg font-bold text-gray-800 truncate">{paquete.nombrePaquete}</h3>
+                </div>
+                
+                {/* Columna derecha - Rutas incluidas */}
+                <div>
+                  <div className="bg-emerald-50 p-6 rounded-lg border border-emerald-200 shadow-md h-full">
+                    <div className="relative mb-4">
+                      <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-1 h-10 bg-gradient-to-b from-emerald-400 via-emerald-500 to-emerald-600 rounded-full shadow-sm"></div>
+                      <h2 className="pl-4 text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 to-emerald-900 text-xl font-medium tracking-wide">
+                        Rutas Incluidas
+                      </h2>
+                    </div>
                     
-                    <div className="mt-2 space-y-2">
-                      <div className="flex items-center gap-2 text-emerald-700">
-                        <Clock size={16} />
-                        <span>{calcularDuracionTotalPaquete(paquete)}</span>
-                      </div>
-                      
-                      
-                      
-                      <div className="flex items-center gap-2 text-emerald-700">
-                        <DollarSign size={16} />
-                        <span>{mostrarPrecio(paquete.precio)}</span>
-                        {paquete.descuento > 0 && (
-                          <span className="bg-emerald-600 text-white text-xs px-1 rounded">
-                            {paquete.descuento}% desc.
-                          </span>
-                        )}
-                      </div>
-                      
-                      <div className="flex items-center gap-2 text-emerald-700">
-                        <Map size={16} />
-                        <span>{paquete.rutasAsociadas?.length || 0} rutas incluidas</span>
-                      </div>
+                    <div className="space-y-4">
+                      {paqueteActual.rutasAsociadas && paqueteActual.rutasAsociadas.length > 0 ? (
+                        paqueteActual.rutasAsociadas.map((ruta, index) => (
+                          <div key={index} className="flex items-start">
+                            <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-2 bg-emerald-100/50 rounded-lg">
+                              <Map className="text-emerald-700 w-5 h-5" />
+                            </div>
+                            <div>
+                              <p className="text-emerald-800 text-sm font-medium">{ruta.nombreRuta}</p>
+                              {ruta.tiempoEstimado && (
+                                <div className="flex items-center text-gray-700 text-sm mt-1">
+                                  <Clock className="w-3.5 h-3.5 mr-1 text-emerald-600" />
+                                  <span>{ruta.tiempoEstimado}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="flex items-center justify-center p-6 text-emerald-700">
+                          <p>No hay rutas asociadas a este paquete</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="bg-emerald-50 text-center p-8 rounded-lg border border-emerald-100">
-              <div className="flex justify-center mb-4">
-                {getPackageIcon()}
               </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">No hay paquetes disponibles</h3>
-              <p className="text-emerald-700">No se encontraron paquetes turísticos.</p>
             </div>
-          )}
-        </div>
-      )}
-      
-      {/* Lightbox para imágenes */}
-      {lightboxOpen && (
-        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <img 
-              src={imagenesPreview[lightboxIndex]} 
-              alt="Vista ampliada"
-              className="max-h-[90vh] max-w-[90vw] object-contain"
-            />
           </div>
           
-          <button
-            onClick={() => setLightboxOpen(false)}
-            className="absolute top-4 right-4 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
-          >
-            <X size={24} />
-          </button>
-          
-          <button
-            onClick={() => navigateLightbox(-1)}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-          </button>
-          
-          <button
-            onClick={() => navigateLightbox(1)}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </button>
-          
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-4 py-2 rounded-full">
-            {lightboxIndex + 1} de {imagenesPreview.length}
+          {/* Pie de página */}
+          <div className="bg-emerald-800 text-white p-4 rounded-lg shadow-md relative overflow-hidden mt-8">
+            <div className="absolute inset-0 opacity-10">
+              <svg viewBox="0 0 200 100" preserveAspectRatio="none" className="h-full w-full">
+                <path d="M0,0 L200,0 L200,100 L0,100 Z" fill="none" stroke="white" strokeWidth="1"/>
+                <path d="M0,50 Q50,30 100,50 T200,50" stroke="white" fill="none" strokeWidth="1"/>
+                <path d="M0,60 Q50,40 100,60 T200,60" stroke="white" fill="none" strokeWidth="1"/>
+                <path d="M0,70 Q50,50 100,70 T200,70" stroke="white" fill="none" strokeWidth="1"/>
+                <path d="M0,80 Q50,60 100,80 T200,80" stroke="white" fill="none" strokeWidth="1"/>
+                <path d="M0,90 Q50,70 100,90 T200,90" stroke="white" fill="none" strokeWidth="1"/>
+              </svg>
+            </div>
+            
+            <div className="relative z-10 flex flex-col md:flex-row justify-between items-center">
+              <div>
+                <p className="font-serif text-white text-lg">
+                  &ldquo;Descubre la belleza natural del Valle del Cocora con nuestros paquetes turísticos&rdquo;
+                </p>
+              </div>
+              
+              <div className="mt-4 md:mt-0 flex items-center">
+                <span className="font-serif italic mr-3">Explococora</span>
+              </div>
+            </div>
           </div>
         </div>
-      )}
-    </div>
+        
+        {/* Lightbox para imágenes */}
+        {lightboxOpen && (
+          <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <img 
+                src={imagenesPreview[lightboxIndex]} 
+                alt="Vista ampliada"
+                className="max-h-[90vh] max-w-[90vw] object-contain"
+              />
+            </div>
+            
+            <button
+              onClick={() => setLightboxOpen(false)}
+              className="absolute top-4 right-4 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
+            >
+              <X size={24} />
+            </button>
+            
+            <button
+              onClick={() => navigateLightbox(-1)}
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
+            
+            <button
+              onClick={() => navigateLightbox(1)}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+            
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-4 py-2 rounded-full">
+              {lightboxIndex + 1} de {imagenesPreview.length}
+            </div>
+          </div>
+        )}
+      </section>
+    </>
   );
 };
 
