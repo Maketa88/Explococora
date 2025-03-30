@@ -409,7 +409,7 @@ export const InicioSesion = () => {
       </div>
 
       {/* Responsive adjustments for different screen sizes */}
-      <style jsx>{`
+      <style>{`
         /* Mobile adjustments */
         @media (max-width: 640px) {
           .min-h-screen {
