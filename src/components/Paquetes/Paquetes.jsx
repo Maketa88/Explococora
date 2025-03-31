@@ -8,6 +8,7 @@ import {
   X
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { GiHorseHead } from 'react-icons/gi';
 
 const GestionPaquetes = () => {
   // Estados para la gestión de paquetes
@@ -745,7 +746,7 @@ const GestionPaquetes = () => {
                         </div>
                         
                         {/* Lista detallada de rutas incluidas */}
-                        <div className="mt-3 max-h-44 overflow-y-auto pr-1 space-y-2">
+                        <div className="mt-3 pr-1 space-y-2">
                           {paqueteActual.rutasAsociadas && paqueteActual.rutasAsociadas.length > 0 ? (
                             paqueteActual.rutasAsociadas.map((ruta, index) => (
                               <div key={index} className="flex items-start bg-white/70 p-2 rounded-lg">
@@ -795,14 +796,14 @@ const GestionPaquetes = () => {
                 {/* Columna derecha - Información del Valle del Cocora */}
                 <div>
                   <div className="bg-emerald-50/90 p-6 rounded-lg border border-emerald-200 shadow-md h-full">
-                    <div className="relative mb-6">
+                    <div className="relative mb-2">
                       <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-1 h-10 bg-gradient-to-b from-emerald-400 via-emerald-500 to-emerald-600 rounded-full shadow-sm"></div>
-                      <h2 className="pl-4 text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 to-emerald-900 text-xl font-medium tracking-wide">
+                      <h2 className="pl-4 text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 to-emerald-900 text-2xl font-medium tracking-wide">
                         Valle del Cocora
                       </h2>
                     </div>
                     
-                    <div className="space-y-6 max-h-[440px] overflow-y-auto pr-2">
+                    <div className="space-y-6 pr-2">
                       {/* Palmas de Cera */}
                       <div className="flex items-start bg-white/70 p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
                         <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center mr-3 bg-emerald-100/60 rounded-lg">
@@ -834,7 +835,7 @@ const GestionPaquetes = () => {
                       {/* Cabalgatas */}
                       <div className="flex items-start bg-white/70 p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
                         <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center mr-3 bg-emerald-100/60 rounded-lg">
-                          <span className="text-2xl">🐎</span>
+                          <GiHorseHead className="text-amber-700 w-7 h-7 drop-shadow-sm" />
                         </div>
                         <div>
                           <p className="text-emerald-800 text-base font-medium">Cabalgatas</p>
@@ -859,20 +860,7 @@ const GestionPaquetes = () => {
                         </div>
                       </div>
                       
-                      {/* Avistamiento de Aves */}
-                      <div className="flex items-start bg-white/70 p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                        <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center mr-3 bg-emerald-100/60 rounded-lg">
-                          <span className="text-2xl">🦜</span>
-                        </div>
-                        <div>
-                          <p className="text-emerald-800 text-base font-medium">Avistamiento de Aves</p>
-                          <p className="text-gray-700 text-sm mt-1">
-                            El Valle del Cocora es un paraíso para los amantes de las aves. Con más de 200 especies registradas, 
-                            podrás observar colibríes, tucanes esmeralda y el majestuoso cóndor andino en su hábitat natural. 
-                            Lleva binoculares y disfruta de la biodiversidad única de la región.
-                          </p>
-                        </div>
-                      </div>
+                      
                     </div>
                   </div>
                 </div>
