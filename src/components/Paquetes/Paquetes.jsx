@@ -9,8 +9,13 @@ import {
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { GiHorseHead } from 'react-icons/gi';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const GestionPaquetes = () => {
+  // Añadir parámetro de URL y navegación
+  const { idPaquete } = useParams();
+  const navigate = useNavigate();
+
   // Estados para la gestión de paquetes
   const [paquetes, setPaquetes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -61,9 +66,27 @@ const GestionPaquetes = () => {
       
       setPaquetes(paquetesConRutas);
       
-      // Establecer el paquete actual al primero de la lista
+      // Buscar el paquete específico por ID en la URL, o usar el primero como fallback
       if (paquetesConRutas.length > 0) {
-        setPaqueteActual(paquetesConRutas[0]);
+        if (idPaquete) {
+          // Buscar el paquete con el ID de la URL (probando tanto como string y como número)
+          const paqueteSeleccionado = paquetesConRutas.find(p => 
+            p.idPaquete === parseInt(idPaquete) || 
+            p.idPaquete === idPaquete ||
+            p.idPaquete.toString() === idPaquete.toString()
+          );
+          
+          if (paqueteSeleccionado) {
+            console.log(`Paquete encontrado con ID ${idPaquete}:`, paqueteSeleccionado);
+            setPaqueteActual(paqueteSeleccionado);
+          } else {
+            console.warn(`No se encontró paquete con ID ${idPaquete}, usando el primero disponible`);
+            setPaqueteActual(paquetesConRutas[0]);
+          }
+        } else {
+          // Si no hay ID en la URL, usar el primer paquete
+          setPaqueteActual(paquetesConRutas[0]);
+        }
       }
       
       // Obtener fotos para cada paquete
@@ -76,10 +99,12 @@ const GestionPaquetes = () => {
       }
       
       setLoading(false);
+      return paquetesConRutas; // Retornar los paquetes para uso en useEffect
     } catch (err) {
       console.error('Error al cargar paquetes:', err);
       setError('No se pudieron cargar los paquetes. Por favor, intente de nuevo más tarde.');
       setLoading(false);
+      return [];
     }
   };
 
@@ -224,6 +249,12 @@ const GestionPaquetes = () => {
     }
   };
 
+  // Función para determinar si estamos en la vista de cliente
+  const esVistaCliente = () => {
+    const currentPath = window.location.pathname;
+    return currentPath.includes("/VistaCliente");
+  };
+
   // Función para cambiar entre paquetes
   const cambiarPaquete = async (direccion) => {
     const indiceActual = paquetes.findIndex(p => p.idPaquete === paqueteActual.idPaquete);
@@ -231,12 +262,21 @@ const GestionPaquetes = () => {
       ? (indiceActual + 1) % paquetes.length
       : (indiceActual - 1 + paquetes.length) % paquetes.length;
     
-    setPaqueteActual(paquetes[nuevoIndice]);
+    const nuevoPaquete = paquetes[nuevoIndice];
+    setPaqueteActual(nuevoPaquete);
     
     // Si no tenemos fotos de este paquete, las obtenemos
-    if (!paquetesConFotos[paquetes[nuevoIndice].idPaquete]) {
-      obtenerFotosPaquete(paquetes[nuevoIndice].idPaquete);
+    if (!paquetesConFotos[nuevoPaquete.idPaquete]) {
+      obtenerFotosPaquete(nuevoPaquete.idPaquete);
     }
+    
+    // Actualizar la URL manteniendo el contexto de navegación
+    const isClientView = esVistaCliente();
+    const nuevaRuta = isClientView 
+      ? `/VistaCliente/PaquetesTuristicos/${nuevoPaquete.idPaquete}`
+      : `/PaquetesTuristicos/${nuevoPaquete.idPaquete}`;
+      
+    navigate(nuevaRuta);
   };
 
   // Función para desplazar el carousel
@@ -259,11 +299,11 @@ const GestionPaquetes = () => {
     setTimeout(() => setDesplazando(false), 500);
   };
 
-  // Cargar paquetes al montar el componente
+  // Cargar paquetes al montar el componente o cuando cambia el ID en la URL
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchPaquetes();
-  }, []);
+  }, [idPaquete]);
 
   // Función para manejar búsqueda
   const handleSearchChange = (e) => {
