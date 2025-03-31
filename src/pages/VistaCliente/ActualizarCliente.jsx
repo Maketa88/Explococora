@@ -1,10 +1,12 @@
 import axios from "axios";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FaCamera, FaEnvelope, FaSave, FaUser } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import Avatar from "../../assets/Images/avatar.png";
 
 const ActualizarDatosCliente = () => {
+  const navigate = useNavigate();
   const [cliente, setCliente] = useState({
     cedula: "",
     nombre_del_cliente: "",
@@ -443,56 +445,39 @@ const ActualizarDatosCliente = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="text-center text-gray-500 mt-10">Cargando datos...</div>
-    );
-  }
-
-  if (error && !cliente.cedula) {
-    return <div className="text-center text-red-500 mt-10">{error}</div>;
-  }
-
   return (
-    <section className="relative py-16 px-4 overflow-hidden">
+    <div className="min-h-screen py-8 px-4 relative overflow-hidden">
       {/* Fondo decorativo inspirado en el Valle del Cocora */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-emerald-50 to-white"></div>
 
-        {/* Paisaje montañoso estilizado */}
+        {/* Siluetas de palmeras de cera */}
         <div className="absolute top-0 left-0 w-full h-full opacity-10">
           <svg
             viewBox="0 0 1200 600"
             className="w-full h-full"
             preserveAspectRatio="xMidYMid slice"
           >
-            {/* Montañas en el horizonte */}
             <path
-              d="M0,600 L0,350 L100,300 L200,350 L300,280 L400,350 L500,250 L600,320 L700,280 L800,350 L900,300 L1000,350 L1100,280 L1200,320 L1200,600 Z"
+              d="M100,600 C100,400 150,300 200,100 C220,300 240,400 260,600"
               fill="none"
               stroke="#047857"
               strokeWidth="8"
             />
-
-            {/* Nubes estilizadas */}
             <path
-              d="M100,200 C130,180 160,190 180,170 C200,150 230,160 250,180 C270,200 300,190 320,170"
+              d="M400,600 C400,350 450,250 500,50 C520,250 540,350 560,600"
               fill="none"
               stroke="#047857"
               strokeWidth="8"
             />
-
-            {/* Más nubes */}
             <path
-              d="M500,150 C530,130 560,140 580,120 C600,100 630,110 650,130 C670,150 700,140 720,120"
+              d="M700,600 C700,400 750,300 800,100 C820,300 840,400 860,600"
               fill="none"
               stroke="#047857"
               strokeWidth="8"
             />
-
-            {/* Río serpenteante */}
             <path
-              d="M0,450 C100,470 200,430 300,450 C400,470 500,430 600,450 C700,470 800,430 900,450 C1000,470 1100,430 1200,450"
+              d="M1000,600 C1000,350 1050,250 1100,50 C1120,250 1140,350 1160,600"
               fill="none"
               stroke="#047857"
               strokeWidth="8"
@@ -500,239 +485,219 @@ const ActualizarDatosCliente = () => {
           </svg>
         </div>
       </div>
-      <div className="min-h-screen py-6 sm:py-8 md:py-12 px-3 sm:px-4 md:px-6 lg:px-8 flex items-center justify-center">
-        <div className="max-w-5xl w-full space-y-4 sm:space-y-6 bg-teal-800/70 rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl p-4 sm:p-6 md:p-8">
-          <div className="text-center">
-            <div className="mx-auto h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 bg-teal-600 rounded-full flex items-center justify-center mb-3 sm:mb-4 shadow-lg">
-              <FaUser className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-white" />
-            </div>
-            <h2 className="text-2xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight">
-              Actualizar Perfil
-            </h2>
-            <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-white">
-              Mantén tu información personal actualizada
-            </p>
+
+      <div className="container mx-auto max-w-4xl">
+        {/* Título de la página con estilo mejorado */}
+        <h1 className="text-2xl sm:text-3xl font-bold text-emerald-700 mb-6 text-center">
+          Actualizar Información de Perfil
+        </h1>
+
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-600"></div>
           </div>
-
-          {error && (
-            <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-red-100 text-red-700 text-sm rounded-lg border border-red-400 shadow-sm">
-              {error}
+        ) : error ? (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg shadow-md">
+            {error}
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl shadow-xl overflow-hidden">
+            {/* Cabecera */}
+            <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+              <div className="flex items-center gap-4">
+                <div 
+                  className="relative group cursor-pointer"
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-full opacity-70 blur-sm group-hover:opacity-100 transition duration-300"></div>
+                  <div className="relative h-20 w-20 sm:h-24 sm:w-24 bg-white rounded-full overflow-hidden border-4 border-white">
+                    <img
+                      src={previewFoto || cliente.foto_perfil || Avatar}
+                      alt="Foto de perfil"
+                      className="h-full w-full object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = Avatar;
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <FaCamera className="text-white text-xl" />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <h2 className="text-white text-xl font-semibold">
+                    {cliente.nombre_del_cliente}
+                  </h2>
+                  <p className="text-emerald-100 flex items-center gap-1">
+                    <FaEnvelope className="text-xs" /> {cliente.email}
+                  </p>
+                </div>
+              </div>
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
             </div>
-          )}
 
-          {fotoError && (
-            <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-red-100 text-red-700 text-sm rounded-lg border border-red-400 shadow-sm">
-              {fotoError}
-            </div>
-          )}
+            {/* Formulario con estilos mejorados */}
+            <form onSubmit={handleSubmit} className="p-6">
+              {fotoError && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+                  {fotoError}
+                </div>
+              )}
 
-          <form
-            onSubmit={handleSubmit}
-            className="mt-4 sm:mt-6 space-y-4 sm:space-y-6"
-          >
-            <div className="flex justify-center mb-4 sm:mb-6 md:mb-8">
-              <div className="relative">
-                <div className="p-2 sm:p-3 bg-white rounded-full shadow-lg ring-2 sm:ring-4 ring-teal-100">
-                  <img
-                    src={
-                      previewFoto ||
-                      (cliente.foto_perfil ? cliente.foto_perfil : Avatar)
-                    }
-                    alt="Foto de perfil"
-                    className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full object-cover cursor-pointer hover:opacity-90 transition-all duration-300 transform hover:scale-105 border-2 sm:border-4 border-teal-50"
-                    onError={(e) => {
-                      console.error("Error al cargar la imagen");
-                      e.target.src = Avatar;
-                    }}
-                  />
-                  <label
-                    htmlFor="upload-photo"
-                    className="absolute -bottom-2 -right-2 sm:-bottom-3 sm:-right-3 bg-teal-600 text-white p-1.5 sm:p-2.5 rounded-full shadow-lg transform hover:rotate-12 hover:scale-110 transition-transform duration-300 cursor-pointer"
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <label 
+                    htmlFor="primerNombre"
+                    className="block text-sm font-medium text-emerald-700 mb-1"
                   >
-                    <FaCamera className="h-4 w-4 sm:h-5 sm:w-5" />
+                    Primer Nombre *
                   </label>
                   <input
-                    type="file"
-                    id="upload-photo"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className="hidden"
-                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    id="primerNombre"
+                    name="primerNombre"
+                    type="text"
+                    required
+                    value={formData.primerNombre}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 bg-emerald-100/70 border border-emerald-200/50 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300"
+                  />
+                </div>
+                
+                <div>
+                  <label 
+                    htmlFor="segundoNombre"
+                    className="block text-sm font-medium text-emerald-700 mb-1"
+                  >
+                    Segundo Nombre
+                  </label>
+                  <input
+                    id="segundoNombre"
+                    name="segundoNombre"
+                    type="text"
+                    value={formData.segundoNombre}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 bg-emerald-100/70 border border-emerald-200/50 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300"
+                  />
+                </div>
+                
+                <div>
+                  <label 
+                    htmlFor="primerApellido"
+                    className="block text-sm font-medium text-emerald-700 mb-1"
+                  >
+                    Primer Apellido *
+                  </label>
+                  <input
+                    id="primerApellido"
+                    name="primerApellido"
+                    type="text"
+                    required
+                    value={formData.primerApellido}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 bg-emerald-100/70 border border-emerald-200/50 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300"
+                  />
+                </div>
+                
+                <div>
+                  <label 
+                    htmlFor="segundoApellido"
+                    className="block text-sm font-medium text-emerald-700 mb-1"
+                  >
+                    Segundo Apellido
+                  </label>
+                  <input
+                    id="segundoApellido"
+                    name="segundoApellido"
+                    type="text"
+                    value={formData.segundoApellido}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 bg-emerald-100/70 border border-emerald-200/50 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300"
+                  />
+                </div>
+                
+                <div>
+                  <label 
+                    htmlFor="email"
+                    className="block text-sm font-medium text-emerald-700 mb-1"
+                  >
+                    Correo Electrónico *
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 bg-emerald-100/70 border border-emerald-200/50 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300"
+                  />
+                </div>
+                
+                <div>
+                  <label 
+                    htmlFor="numeroCelular"
+                    className="block text-sm font-medium text-emerald-700 mb-1"
+                  >
+                    Número de Celular *
+                  </label>
+                  <input
+                    id="numeroCelular"
+                    name="numeroCelular"
+                    type="tel"
+                    required
+                    value={formData.numeroCelular}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 bg-emerald-100/70 border border-emerald-200/50 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300"
                   />
                 </div>
               </div>
-            </div>
 
-            <div className="bg-teal-700/50 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 shadow-inner">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-                <div className="relative group">
-                  <label className="block text-white text-xs sm:text-sm font-medium mb-1">
-                    Primer Nombre
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
-                      <FaUser className="h-4 w-4 sm:h-5 sm:w-5 text-teal-300" />
-                    </div>
-                    <input
-                      type="text"
-                      name="primerNombre"
-                      value={formData.primerNombre}
-                      onChange={handleInputChange}
-                      className="pl-8 sm:pl-10 w-full px-3 sm:px-4 py-2 sm:py-3 border border-teal-600 rounded-lg sm:rounded-xl text-white bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm sm:text-base"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="relative group">
-                  <label className="block text-white text-xs sm:text-sm font-medium mb-1">
-                    Segundo Nombre
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
-                      <FaUser className="h-4 w-4 sm:h-5 sm:w-5 text-teal-300" />
-                    </div>
-                    <input
-                      type="text"
-                      name="segundoNombre"
-                      value={formData.segundoNombre}
-                      onChange={handleInputChange}
-                      className="pl-8 sm:pl-10 w-full px-3 sm:px-4 py-2 sm:py-3 border border-teal-600 rounded-lg sm:rounded-xl text-white bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm sm:text-base"
-                    />
-                  </div>
-                </div>
-
-                <div className="relative group">
-                  <label className="block text-white text-xs sm:text-sm font-medium mb-1">
-                    Primer Apellido
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
-                      <FaUser className="h-4 w-4 sm:h-5 sm:w-5 text-teal-300" />
-                    </div>
-                    <input
-                      type="text"
-                      name="primerApellido"
-                      value={formData.primerApellido}
-                      onChange={handleInputChange}
-                      className="pl-8 sm:pl-10 w-full px-3 sm:px-4 py-2 sm:py-3 border border-teal-600 rounded-lg sm:rounded-xl text-white bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm sm:text-base"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="relative group">
-                  <label className="block text-white text-xs sm:text-sm font-medium mb-1">
-                    Segundo Apellido
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
-                      <FaUser className="h-4 w-4 sm:h-5 sm:w-5 text-teal-300" />
-                    </div>
-                    <input
-                      type="text"
-                      name="segundoApellido"
-                      value={formData.segundoApellido}
-                      onChange={handleInputChange}
-                      className="pl-8 sm:pl-10 w-full px-3 sm:px-4 py-2 sm:py-3 border border-teal-600 rounded-lg sm:rounded-xl text-white bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm sm:text-base"
-                    />
-                  </div>
-                </div>
-
-                <div className="relative group">
-                  <label className="block text-white text-xs sm:text-sm font-medium mb-1">
-                    Email
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
-                      <FaEnvelope className="h-4 w-4 sm:h-5 sm:w-5 text-teal-300" />
-                    </div>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="pl-8 sm:pl-10 w-full px-3 sm:px-4 py-2 sm:py-3 border border-teal-600 rounded-lg sm:rounded-xl text-white bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm sm:text-base"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="relative group">
-                  <label className="block text-white text-xs sm:text-sm font-medium mb-1">
-                    Celular
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 sm:h-5 sm:w-5 text-teal-300"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-                        />
-                      </svg>
-                    </div>
-                    <input
-                      type="tel"
-                      name="numeroCelular"
-                      value={formData.numeroCelular || ""}
-                      onChange={handleInputChange}
-                      placeholder="Ej: 3001234567"
-                      pattern="[0-9]{10}"
-                      title="Ingresa un número de 10 dígitos sin espacios ni guiones"
-                      className="pl-8 sm:pl-10 w-full px-3 sm:px-4 py-2 sm:py-3 border border-teal-600 rounded-lg sm:rounded-xl text-white bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm sm:text-base"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-4 sm:pt-6 flex justify-center">
-              <button
-                type="submit"
-                className="py-2 sm:py-3 px-6 sm:px-8 border border-transparent text-xs sm:text-sm font-medium rounded-lg sm:rounded-xl text-white bg-teal-600 hover:bg-teal-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transform hover:scale-[1.02] transition-all duration-300 shadow-md sm:shadow-lg hover:shadow-xl"
-                disabled={updating}
-              >
-                <span className="flex items-center">
+              <div className="flex justify-between mt-6">
+                <button
+                  type="button"
+                  onClick={() => navigate("/VistaCliente/PerfilCliente")}
+                  className="px-5 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors duration-300"
+                >
+                  Cancelar
+                </button>
+                
+                <button
+                  type="submit"
+                  disabled={updating}
+                  className={`px-5 py-2 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-lg flex items-center gap-2 ${
+                    updating 
+                      ? "opacity-70 cursor-not-allowed" 
+                      : "hover:from-emerald-700 hover:to-emerald-600 shadow-lg hover:shadow-emerald-200/50"
+                  } transition-all duration-300`}
+                >
                   {updating ? (
-                    <svg
-                      className="animate-spin h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
+                    <>
+                      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Actualizando...
+                    </>
                   ) : (
-                    <FaSave className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
+                    <>
+                      <FaSave />
+                      Guardar Cambios
+                    </>
                   )}
-                  {updating ? "Actualizando..." : "Guardar Cambios"}
-                </span>
-              </button>
-            </div>
-          </form>
-        </div>
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
       </div>
-    </section>
+    </div>
   );
 };
 

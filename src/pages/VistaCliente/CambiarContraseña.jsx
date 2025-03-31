@@ -2,8 +2,10 @@ import axios from 'axios';
 import { useState } from 'react';
 import { FaKey, FaLock, FaUserShield } from 'react-icons/fa';
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 
 const CambiarContraseña = () => {
+  const navigate = useNavigate();
   const [cedula, setCedula] = useState('');
   const [contrasenia, setContrasenia] = useState('');
   const [confirmarContrasenia, setConfirmarContrasenia] = useState('');
@@ -50,79 +52,11 @@ const CambiarContraseña = () => {
 
   const mostrarAlertaExito = () => {
     Swal.fire({
-      html: `
-        <div style="
-          display: flex; 
-          flex-direction: column; 
-          align-items: center;
-          border: 4px solid #004d40;
-          border-radius: 12px;
-          padding: 20px;
-          background-color: #ffffff;
-          box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-          max-width: 100%;
-        ">
-          <div style="
-            display: flex; 
-            flex-direction: column; 
-            align-items: center;
-            border-radius: 8px;
-            padding: 10px;
-            width: 100%;
-          ">
-            <img src="https://i.pinimg.com/originals/bf/fc/c2/bffcc2de14a013a2e7a795668846cae5.gif" 
-                alt="Caballo corriendo" 
-                width="150" 
-                style="margin-bottom: 10px; border-radius: 8px; max-width: 100%;">
-            <img src="https://i.pinimg.com/736x/10/3e/44/103e4418d4a3675326fbc9273f9af62a.jpg" 
-                alt="Logo ExploCocora" 
-                width="120" 
-                style="border-radius: 8px; max-width: 100%;">
-          </div>
-          <h2 style="
-            font-size: clamp(20px, 5vw, 28px); 
-            font-weight: bold; 
-            font-family: Arial, Helvetica, sans-serif; 
-            color: #004d40; 
-            margin-top: 15px;
-            text-align: center;
-            width: 100%;
-          ">
-            ¡Contraseña Actualizada!
-          </h2>
-          <p style="
-            font-size: clamp(14px, 4vw, 18px); 
-            font-family: Arial, Helvetica, sans-serif; 
-            color: #004d40; 
-            text-align: center; 
-            margin-top: 10px;
-            width: 100%;
-          ">
-            Tu contraseña ha sido cambiada exitosamente
-          </p>
-          <button id="cerrarAlerta" style="
-            margin-top: 15px;
-            padding: 10px 20px;
-            background-color: #38a169;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: clamp(14px, 4vw, 16px);
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-          ">
-            OK
-          </button>
-        </div>
-      `,
-      showConfirmButton: false,
-      width: 'auto',
-      didOpen: () => {
-        document.getElementById("cerrarAlerta").addEventListener("click", () => {
-          Swal.close();
-        });
-      }
+      title: '¡Éxito!',
+      text: 'Contraseña actualizada correctamente',
+      icon: 'success',
+      confirmButtonColor: '#059669',
+      confirmButtonText: 'Aceptar',
     });
   };
 
@@ -185,7 +119,7 @@ const CambiarContraseña = () => {
   };
 
   return (
-    <section className="relative py-16 px-4 overflow-hidden">
+    <section className="relative px-4 overflow-hidden bg-emerald-50/50">
         {/* Fondo decorativo inspirado en el Valle del Cocora */}
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-emerald-50 to-white"></div>
@@ -437,8 +371,9 @@ const CambiarContraseña = () => {
           </div>
         </div>
     <div className="min-h-screen  flex items-center justify-center w-full py-6 px-4">
+      
       <div className="w-full max-w-4xl mx-auto">
-        <div className="bg-teal-800/70 rounded-xl shadow-xl p-4 sm:p-6 md:p-8 backdrop-blur-sm">
+        <div className="bg-emerald-600/70 rounded-xl shadow-xl p-4 sm:p-6 md:p-8 backdrop-blur-sm">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 text-center sm:text-left">
             Cambiar Contraseña
           </h2>
@@ -447,7 +382,7 @@ const CambiarContraseña = () => {
             {/* Columna izquierda - Icono */}
             <div className="w-full lg:w-1/3 flex flex-col items-center mb-6 lg:mb-0">
               <div className="relative mb-4">
-                <div className="h-28 w-28 sm:h-36 sm:w-36 md:h-40 md:w-40 rounded-full bg-teal-700 flex items-center justify-center shadow-xl ring-4 ring-teal-500/30 mx-auto transform transition-transform hover:scale-105 duration-300">
+                <div className="h-28 w-28 sm:h-36 sm:w-36 md:h-40 md:w-40 rounded-full bg-emerald-700 flex items-center justify-center shadow-xl ring-4 ring-emerald-500/30 mx-auto transform transition-transform hover:scale-105 duration-300">
                   <FaLock className="h-14 w-14 sm:h-16 sm:w-16 md:h-20 md:w-20 text-white opacity-80" />
                 </div>
               </div>
@@ -458,7 +393,7 @@ const CambiarContraseña = () => {
             <div className="w-full lg:w-2/3">
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="space-y-4">
-                  <div className="bg-teal-700/0 p-0">
+                  <div className="bg-emerald-700/0 p-0">
                     <h3 className="text-xs sm:text-sm uppercase mb-2 text-white flex items-center">
                       <FaUserShield className="mr-2" />
                       CÉDULA
@@ -470,12 +405,12 @@ const CambiarContraseña = () => {
                       required
                       value={cedula}
                       onChange={(e) => setCedula(e.target.value)}
-                      className="w-full px-4 py-3 border-0 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all duration-300 bg-teal-800 placeholder-teal-200/70"
+                      className="w-full px-4 py-3 border-0 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all duration-300 bg-emerald-700 placeholder-emerald-200/70"
                       placeholder="Ingrese su cédula"
                     />
                   </div>
                   
-                  <div className="bg-teal-700/0 p-0 mt-4">
+                  <div className="bg-emerald-700/0 p-0 mt-4">
                     <h3 className="text-xs sm:text-sm uppercase mb-2 text-white flex items-center">
                       <FaKey className="mr-2" />
                       NUEVA CONTRASEÑA
@@ -487,7 +422,7 @@ const CambiarContraseña = () => {
                       required
                       value={contrasenia}
                       onChange={handleContraseniaChange}
-                      className={`w-full px-4 py-3 border-0 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all duration-300 bg-teal-800 placeholder-teal-200/70 ${
+                      className={`w-full px-4 py-3 border-0 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all duration-300 bg-emerald-700 placeholder-emerald-200/70 ${
                         erroresValidacion.length > 0 ? 'ring-2 ring-red-400' : ''
                       }`}
                       placeholder="Ingrese su nueva contraseña"
@@ -507,7 +442,7 @@ const CambiarContraseña = () => {
                     </div>
                   )}
                   
-                  <div className="bg-teal-700/0 p-0 mt-4">
+                  <div className="bg-emerald-700/0 p-0 mt-4">
                     <h3 className="text-xs sm:text-sm uppercase mb-2 text-white flex items-center">
                       <FaKey className="mr-2" />
                       CONFIRMAR CONTRASEÑA
@@ -519,7 +454,7 @@ const CambiarContraseña = () => {
                       required
                       value={confirmarContrasenia}
                       onChange={(e) => setConfirmarContrasenia(e.target.value)}
-                      className={`w-full px-4 py-3 border-0 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all duration-300 bg-teal-800 placeholder-teal-200/70 ${
+                      className={`w-full px-4 py-3 border-0 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all duration-300 bg-emerald-700 placeholder-emerald-200/70 ${
                         contrasenia !== confirmarContrasenia && confirmarContrasenia 
                           ? 'ring-2 ring-red-400' 
                           : ''
@@ -533,21 +468,29 @@ const CambiarContraseña = () => {
                   <div className={`rounded-lg p-4 ${
                     mensaje.tipo === 'error' 
                       ? 'bg-red-100 text-red-700 border border-red-300' 
-                      : 'bg-teal-100 text-teal-700 border border-teal-300'
+                      : 'bg-emerald-100 text-emerald-700 border border-emerald-300'
                   } shadow-md mt-4 animate-fadeIn`}>
                     {mensaje.texto}
                   </div>
                 )}
 
-                <div className="flex justify-center sm:justify-end mt-6">
+                <div className="flex justify-between mt-6">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/VistaCliente/PerfilCliente')}
+                    className="py-3 px-6 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white font-medium transition-all duration-200 shadow-lg flex items-center justify-center w-auto min-w-[180px]"
+                  >
+                    Cancelar
+                  </button>
+                  
                   <button
                     type="submit"
                     disabled={cargando || erroresValidacion.length > 0}
                     className={`py-3 px-6 rounded-lg ${
                       cargando || erroresValidacion.length > 0
-                        ? 'bg-teal-500 cursor-not-allowed opacity-70' 
-                        : 'bg-teal-600 hover:bg-teal-500 hover:shadow-lg active:bg-teal-700'
-                    } text-white font-medium transition-all duration-200 shadow-lg flex items-center justify-center w-full sm:w-auto min-w-[180px]`}
+                        ? 'bg-emerald-500 cursor-not-allowed opacity-70' 
+                        : 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600'
+                    } text-white font-medium transition-all duration-200 shadow-lg flex items-center justify-center w-auto min-w-[180px]`}
                   >
                     {cargando ? (
                       <>
