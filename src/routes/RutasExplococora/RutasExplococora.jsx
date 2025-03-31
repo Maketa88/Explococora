@@ -13,6 +13,7 @@ import { Header } from "../../components/PaginaInicio/Header/Header";
 import GestionPaquetes from "../../components/Paquetes/Paquetes";
 import ProtectedRoute from "../../components/ProtectedRoute/ProtectedRoute";
 import QuienesSomos from "../../components/QuienesSomos/QuienesSomos";
+import RecuperarContrasena from "../../components/RecuperarContrasena/RecuperarContrasena";
 import { Registro } from "../../components/Registro/Registro";
 import { VerificacionOTP } from '../../components/VerificacionOTP/VerificacionOTP';
 import { PaginaInicio } from "../../pages/PaginaInicio/PaginaInicio";
@@ -20,7 +21,6 @@ import VistaAdmin from "../../pages/VistaAdmin/VistaAdmin";
 import VistaCliente from "../../pages/VistaCliente/VistaCliente";
 import VistaGuia from "../../pages/VistaGuia/VistaGuia";
 import VistaOperador from "../../pages/VistaOperador/VistaOperador";
-import RecuperarContrasena from "../../components/RecuperarContrasena/RecuperarContrasena";
 
 export const RutasExplococora = () => {
   const location = useLocation();
@@ -47,6 +47,7 @@ export const RutasExplococora = () => {
         <Route path="/NuestrasRutas" element={<NuestrasRutas />} />
         <Route path="/NuestrasRutas/:idRuta" element={<NuestrasRutas />} />
         <Route path="/PaquetesTuristicos" element={<GestionPaquetes />} />
+        <Route path="/PaquetesTuristicos/:idPaquete" element={<GestionPaquetes />} />
         <Route path="/Ingreso" element={<InicioSesion />} />
         <Route path="/Registro" element={<Registro />} />
         <Route path="/ContactForm" element={<ContactForm />} />

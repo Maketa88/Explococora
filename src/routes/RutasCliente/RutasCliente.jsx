@@ -51,6 +51,7 @@ const RutasCliente = () => {
         <Route path="/NuestrasRutas" element={<NuestrasRutas />} />
         <Route path="/NuestrasRutas/:idRuta" element={<NuestrasRutas />} />
         <Route path="/PaquetesTuristicos" element={<GestionPaquetes />} />
+        <Route path="/PaquetesTuristicos/:idPaquete" element={<GestionPaquetes />} />
         <Route path="/QuienesSomos" element={<QuienesSomosCliente />} />
         
         {/* Rutas para pagos y reservas */}

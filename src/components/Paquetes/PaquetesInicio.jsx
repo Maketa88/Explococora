@@ -261,9 +261,29 @@ const GestionPaquetes = () => {
     return duracionTotal || paquete.duracion || 'No especificada';
   };
 
+  // Función para determinar si estamos en la vista de cliente
+  const esVistaCliente = () => {
+    const currentPath = window.location.pathname;
+    return currentPath.includes("/VistaCliente");
+  };
+
   // Función para ver los detalles de un paquete
   const verDetallesPaquete = (idPaquete) => {
-    navigate(`/paquetes/${idPaquete}`);
+    // Asegurarse de que el ID sea un número si es posible
+    const paqueteId = !isNaN(parseInt(idPaquete)) ? parseInt(idPaquete) : idPaquete;
+    
+    // Verificar si estamos en la vista de cliente
+    const isClientView = esVistaCliente();
+    
+    console.log(`Navegando al paquete con ID: ${paqueteId}, desde vista cliente: ${isClientView}`);
+    
+    if (isClientView) {
+      // Si estamos en la vista de cliente, mantener el contexto de cliente
+      navigate(`/VistaCliente/PaquetesTuristicos/${paqueteId}`);
+    } else {
+      // Si no, usar la ruta normal
+      navigate(`/PaquetesTuristicos/${paqueteId}`);
+    }
   };
 
   // Función para obtener los tres primeros paquetes
@@ -273,8 +293,15 @@ const GestionPaquetes = () => {
 
   // Función para navegar a la página completa de paquetes
   const navegarAPaginaCompleta = () => {
-    navigate('/paquetes');
-    };
+    // Verificar si estamos en la vista de cliente
+    const isClientView = esVistaCliente();
+    
+    if (isClientView) {
+      navigate('/VistaCliente/PaquetesTuristicos');
+    } else {
+      navigate('/PaquetesTuristicos');
+    }
+  };
 
     return (
     <section className="relative py-16 px-4 overflow-hidden">
