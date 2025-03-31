@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FaCompass, FaHiking } from 'react-icons/fa';
+import { FaCompass, FaDove, FaHiking } from 'react-icons/fa';
 import { GiHorseHead, GiMountainClimbing, GiPalmTree, GiPathDistance } from 'react-icons/gi';
 import { IoTrailSignSharp } from 'react-icons/io5';
 import { RiTimerFlashFill } from 'react-icons/ri';
@@ -396,7 +396,7 @@ export const NuestrasRutas = () => {
               </div>
               
               {/* Detalles de la ruta en estilo guía de senderismo */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6">
                 {/* Columna izquierda */}
                 <div>
                   {/* Panel con estilo ultra premium de tarjetas con tema teal */}
@@ -628,6 +628,17 @@ export const NuestrasRutas = () => {
                         <div>
                           <p className="text-teal-800 text-sm font-medium">Consejos Prácticos</p>
                           <p className="text-gray-700 text-sm">Programa tu visita temprano (antes de las 9 a.m.) para evitar la neblina y lluvias de la tarde. Lleva calzado impermeable, ropa abrigada, y repelente.</p>
+                        </div>
+                      </div>
+                      
+                      {/* Avistamiento de Aves */}
+                      <div className="flex items-start">
+                        <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-2 bg-teal-100/50 rounded-lg">
+                          <FaDove className="text-teal-700 w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="text-teal-800 text-sm font-medium">Avistamiento de Aves</p>
+                          <p className="text-gray-700 text-sm">El Valle del Cocora es un paraíso para los amantes de las aves. Con más de 200 especies registradas, podrás observar colibríes, tucanes esmeralda y el majestuoso cóndor andino en su hábitat natural. Lleva binoculares y disfruta de la biodiversidad única de la región.</p>
                         </div>
                       </div>
                     </div>
