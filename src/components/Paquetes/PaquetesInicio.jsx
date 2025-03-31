@@ -26,7 +26,7 @@ const GestionPaquetes = () => {
     setError(null);
     try {
       const response = await axios.get('http://localhost:10101/paquete/lista-paquetes');
-      console.log('Paquetes cargados:', response.data);
+      
       
       // Verificar la estructura de la respuesta
       const paquetesData = response.data.result || [];
@@ -139,11 +139,11 @@ const GestionPaquetes = () => {
   // Función para obtener información de las rutas asociadas
   const obtenerRutasAsociadas = async (idPaquete) => {
     try {
-      console.log('Obteniendo rutas para el paquete:', idPaquete);
+      
       
       // Intentar obtener el paquete directamente por ID
       const response = await axios.get(`http://localhost:10101/paquete/obtener-paquete/${idPaquete}`);
-      console.log('Respuesta de obtener-paquete:', response.data);
+      
       
       // Verificar si la respuesta es un array
       if (response.data && Array.isArray(response.data)) {
@@ -160,7 +160,7 @@ const GestionPaquetes = () => {
           });
         });
         
-        console.log('Rutas encontradas:', rutasInfo);
+       
         return rutasInfo;
       } else if (response.data && typeof response.data === 'object') {
         // Si la respuesta es un objeto único, buscar rutas en él
@@ -190,15 +190,15 @@ const GestionPaquetes = () => {
         
         // Si encontramos rutas, retornar el array
         if (rutasInfo.length > 0) {
-          console.log('Rutas encontradas:', rutasInfo);
+         
           return rutasInfo;
         } else {
           // Si no hay rutas en la respuesta, mostrar mensaje
-          console.log('No se encontraron rutas en la respuesta');
+          
           return [];
         }
       } else {
-        console.log('Formato de respuesta no reconocido');
+        
         return [];
       }
     } catch (err) {
@@ -275,7 +275,7 @@ const GestionPaquetes = () => {
     // Verificar si estamos en la vista de cliente
     const isClientView = esVistaCliente();
     
-    console.log(`Navegando al paquete con ID: ${paqueteId}, desde vista cliente: ${isClientView}`);
+    
     
     if (isClientView) {
       // Si estamos en la vista de cliente, mantener el contexto de cliente

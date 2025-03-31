@@ -224,39 +224,7 @@ const CardGuia = ({ guia }) => {
                 </div>
               )}
               
-              <div className="space-y-2 sm:space-y-3 md:space-y-4 mt-2 sm:mt-3 md:mt-4">
-                {guia.email && (
-                  <div className="flex items-start text-xs sm:text-sm">
-                    {/* Icono para el email */}
-                    <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-green-400 to-green-600 mr-2 sm:mr-3 md:mr-4 shadow-lg transform transition-all duration-300 hover:scale-110 hover:rotate-6 shrink-0">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-6 sm:w-6 md:h-7 md:w-7 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                        <polyline points="22,6 12,13 2,6"></polyline>
-                      </svg>
-                    </div>
-                    <div className="flex flex-col max-w-[calc(100%-50px)] sm:max-w-[calc(100%-60px)]">
-                      <span className="text-xs font-semibold text-black">Email:</span>
-                      <span className="truncate text-gray-950 break-words text-xs sm:text-sm font-semibold">{guia.email}</span>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Mostrar teléfono/celular si está disponible */}
-                {guia.telefono && (
-                  <div className="flex items-start text-xs sm:text-sm">
-                    {/* Icono para el teléfono */}
-                    <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 mr-2 sm:mr-3 md:mr-4 shadow-lg transform transition-all duration-300 hover:scale-110 hover:rotate-6 shrink-0">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-6 sm:w-6 md:h-7 md:w-7 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                      </svg>
-                    </div>
-                    <div className="flex flex-col max-w-[calc(100%-50px)] sm:max-w-[calc(100%-60px)]">
-                      <span className="text-xs font-semibold text-black">Teléfono:</span>
-                      <span className="truncate text-gray-700 font-medium text-xs sm:text-sm">{guia.telefono}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
+              
             </div>
             
             {/* 5 estrellas al final */}

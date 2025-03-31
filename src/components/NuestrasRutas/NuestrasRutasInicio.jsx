@@ -121,9 +121,7 @@ export const NuestrasRutasInicio = () => {
     // Verificar si estamos en la vista de cliente
     const isClientView = esVistaCliente();
 
-    console.log(
-      `Navegando a la ruta con ID: ${rutaId}, desde vista cliente: ${isClientView}`
-    );
+    
 
     if (isClientView) {
       // Si estamos en la vista de cliente, mantener el contexto de cliente
