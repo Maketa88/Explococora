@@ -792,28 +792,87 @@ const GestionPaquetes = () => {
                   </div>
                 </div>
                 
-                {/* Columna derecha - Contenido adicional */}
+                {/* Columna derecha - Información del Valle del Cocora */}
                 <div>
-                  <div className="bg-emerald-50 p-6 rounded-lg border border-emerald-200 shadow-md h-full">
-                    <div className="relative mb-4">
+                  <div className="bg-emerald-50/90 p-6 rounded-lg border border-emerald-200 shadow-md h-full">
+                    <div className="relative mb-6">
                       <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-1 h-10 bg-gradient-to-b from-emerald-400 via-emerald-500 to-emerald-600 rounded-full shadow-sm"></div>
                       <h2 className="pl-4 text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 to-emerald-900 text-xl font-medium tracking-wide">
-                        Descripción
+                        Valle del Cocora
                       </h2>
                     </div>
                     
-                    <div className="space-y-4">
-                      <p className="text-gray-700">
-                        Descubre la belleza natural del Valle del Cocora con este paquete especial. Recorre senderos ecológicos, 
-                        admira las majestuosas palmas de cera y vive una experiencia única en contacto con la naturaleza. 
-                        Nuestros guías expertos te llevarán a conocer los lugares más emblemáticos de esta reserva natural.
-                      </p>
+                    <div className="space-y-6 max-h-[440px] overflow-y-auto pr-2">
+                      {/* Palmas de Cera */}
+                      <div className="flex items-start bg-white/70 p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
+                        <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center mr-3 bg-emerald-100/60 rounded-lg">
+                          <span className="text-2xl">🌴</span>
+                        </div>
+                        <div>
+                          <p className="text-emerald-800 text-base font-medium">Palmas de Cera</p>
+                          <p className="text-gray-700 text-sm mt-1">
+                            Hogar del árbol nacional de Colombia, la majestuosa Palma de Cera puede alcanzar hasta 
+                            60 metros de altura. Estas imponentes palmas crean un paisaje surrealista durante los recorridos.
+                          </p>
+                        </div>
+                      </div>
                       
-                      <p className="text-gray-700">
-                        El paquete incluye transporte, refrigerio y acceso a todas las rutas mencionadas. 
-                        Recomendamos llevar ropa cómoda, protector solar y cámara fotográfica para capturar 
-                        los paisajes impresionantes que ofrece el Valle del Cocora.
-                      </p>
+                      {/* Caminatas */}
+                      <div className="flex items-start bg-white/70 p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
+                        <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center mr-3 bg-emerald-100/60 rounded-lg">
+                          <span className="text-2xl">🥾</span>
+                        </div>
+                        <div>
+                          <p className="text-emerald-800 text-base font-medium">Caminatas</p>
+                          <p className="text-gray-700 text-sm mt-1">
+                            Recorre senderos ecológicos de diferentes niveles de dificultad. El circuito principal 5 km 
+                            cruza ríos con puentes colgantes y te lleva a miradores con vistas panorámicas espectaculares.
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Cabalgatas */}
+                      <div className="flex items-start bg-white/70 p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
+                        <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center mr-3 bg-emerald-100/60 rounded-lg">
+                          <span className="text-2xl">🐎</span>
+                        </div>
+                        <div>
+                          <p className="text-emerald-800 text-base font-medium">Cabalgatas</p>
+                          <p className="text-gray-700 text-sm mt-1">
+                            Explora el valle a lomos de caballos criollos dóciles y entrenados. Las cabalgatas duran entre 1 y 3 horas 
+                            y permiten acceder a zonas que serían difíciles a pie mientras disfrutas del paisaje.
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Consejos Prácticos */}
+                      <div className="flex items-start bg-white/70 p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
+                        <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center mr-3 bg-emerald-100/60 rounded-lg">
+                          <span className="text-2xl">🧭</span>
+                        </div>
+                        <div>
+                          <p className="text-emerald-800 text-base font-medium">Consejos Prácticos</p>
+                          <p className="text-gray-700 text-sm mt-1">
+                            Programa tu visita temprano (antes de las 9 a.m.) para evitar la neblina y lluvias de la tarde. 
+                            Lleva calzado impermeable, ropa abrigada, y repelente.
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Avistamiento de Aves */}
+                      <div className="flex items-start bg-white/70 p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
+                        <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center mr-3 bg-emerald-100/60 rounded-lg">
+                          <span className="text-2xl">🦜</span>
+                        </div>
+                        <div>
+                          <p className="text-emerald-800 text-base font-medium">Avistamiento de Aves</p>
+                          <p className="text-gray-700 text-sm mt-1">
+                            El Valle del Cocora es un paraíso para los amantes de las aves. Con más de 200 especies registradas, 
+                            podrás observar colibríes, tucanes esmeralda y el majestuoso cóndor andino en su hábitat natural. 
+                            Lleva binoculares y disfruta de la biodiversidad única de la región.
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
