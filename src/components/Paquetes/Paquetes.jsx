@@ -722,7 +722,7 @@ const GestionPaquetes = () => {
                       
                       {/* Rutas incluidas */}
                       <div className="bg-gradient-to-br from-white to-emerald-50/50 p-3 rounded-xl border border-emerald-100/80 hover:shadow-md group transition-all duration-300 transform hover:-translate-y-0.5 hover:border-emerald-200">
-                        <div className="flex items-center justify-between relative z-10">
+                        <div className="flex items-center justify-between relative z-10 mb-2">
                           <div className="flex items-center">
                             <div className="relative">
                               <div className="absolute inset-0 bg-emerald-500/10 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-500"></div>
@@ -743,6 +743,33 @@ const GestionPaquetes = () => {
                             </svg>
                           </div>
                         </div>
+                        
+                        {/* Lista detallada de rutas incluidas */}
+                        <div className="mt-3 max-h-44 overflow-y-auto pr-1 space-y-2">
+                          {paqueteActual.rutasAsociadas && paqueteActual.rutasAsociadas.length > 0 ? (
+                            paqueteActual.rutasAsociadas.map((ruta, index) => (
+                              <div key={index} className="flex items-start bg-white/70 p-2 rounded-lg">
+                                <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center mr-2 bg-emerald-100/50 rounded-lg">
+                                  <Map className="text-emerald-700 w-4 h-4" />
+                                </div>
+                                <div>
+                                  <p className="text-emerald-800 text-sm font-medium">{ruta.nombreRuta}</p>
+                                  {ruta.tiempoEstimado && (
+                                    <div className="flex items-center text-gray-700 text-xs mt-0.5">
+                                      <Clock className="w-3 h-3 mr-1 text-emerald-600" />
+                                      <span>{ruta.tiempoEstimado}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="flex items-center justify-center p-3 text-emerald-700 text-sm">
+                              <p>No hay rutas asociadas a este paquete</p>
+                            </div>
+                          )}
+                        </div>
+                        
                         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-500 group-hover:w-2/3 transition-all duration-700"></div>
                       </div>
                     </div>
@@ -765,39 +792,28 @@ const GestionPaquetes = () => {
                   </div>
                 </div>
                 
-                {/* Columna derecha - Rutas incluidas */}
+                {/* Columna derecha - Contenido adicional */}
                 <div>
                   <div className="bg-emerald-50 p-6 rounded-lg border border-emerald-200 shadow-md h-full">
                     <div className="relative mb-4">
                       <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-1 h-10 bg-gradient-to-b from-emerald-400 via-emerald-500 to-emerald-600 rounded-full shadow-sm"></div>
                       <h2 className="pl-4 text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 to-emerald-900 text-xl font-medium tracking-wide">
-                        Rutas Incluidas
+                        Descripción
                       </h2>
                     </div>
                     
                     <div className="space-y-4">
-                      {paqueteActual.rutasAsociadas && paqueteActual.rutasAsociadas.length > 0 ? (
-                        paqueteActual.rutasAsociadas.map((ruta, index) => (
-                          <div key={index} className="flex items-start">
-                            <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-2 bg-emerald-100/50 rounded-lg">
-                              <Map className="text-emerald-700 w-5 h-5" />
-                            </div>
-                            <div>
-                              <p className="text-emerald-800 text-sm font-medium">{ruta.nombreRuta}</p>
-                              {ruta.tiempoEstimado && (
-                                <div className="flex items-center text-gray-700 text-sm mt-1">
-                                  <Clock className="w-3.5 h-3.5 mr-1 text-emerald-600" />
-                                  <span>{ruta.tiempoEstimado}</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="flex items-center justify-center p-6 text-emerald-700">
-                          <p>No hay rutas asociadas a este paquete</p>
-                        </div>
-                      )}
+                      <p className="text-gray-700">
+                        Descubre la belleza natural del Valle del Cocora con este paquete especial. Recorre senderos ecológicos, 
+                        admira las majestuosas palmas de cera y vive una experiencia única en contacto con la naturaleza. 
+                        Nuestros guías expertos te llevarán a conocer los lugares más emblemáticos de esta reserva natural.
+                      </p>
+                      
+                      <p className="text-gray-700">
+                        El paquete incluye transporte, refrigerio y acceso a todas las rutas mencionadas. 
+                        Recomendamos llevar ropa cómoda, protector solar y cámara fotográfica para capturar 
+                        los paisajes impresionantes que ofrece el Valle del Cocora.
+                      </p>
                     </div>
                   </div>
                 </div>
