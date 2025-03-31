@@ -50,7 +50,9 @@
         "ni muy fácil ni muy difícil",
         "medio",
         "nivel intermedio",
-        "moderada"
+        "moderada",
+        "moderado",
+        "nivel medio"
       ],
       "filtros": {
         "dificultad": "Moderada"
@@ -88,7 +90,11 @@
         "muy corta",
         "corto",
         "muy corto",
-        "planchon"
+        "planchon",
+        "mas facil",
+        "la mas facil",
+        "mas fácil",
+        "la mas fácil"
       ],
       "filtros": {
         "duracion": "30 Min"

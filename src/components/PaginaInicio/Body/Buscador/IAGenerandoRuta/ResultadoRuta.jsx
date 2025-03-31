@@ -13,6 +13,7 @@ import {
 } from "react-icons/fi";
 import { GiMountainRoad } from "react-icons/gi";
 import MapaRutaIntegracion from "../../../../../components/MapaRuta/components/MapaRutaIntegracion";
+import { BotonPagoRuta } from "../../../../../components/PagoRuta";
 import {
   obtenerFotosRuta,
   obtenerRutas,
@@ -506,6 +507,31 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
             <p className="text-gray-700">{rutaPrincipal?.descripcion}</p>
           </div>
 
+          {/* Botón de Reserva */}
+          <div className="mb-8 px-4">
+            <div className="text-center mb-3">
+              <h3 className="text-xl font-semibold text-teal-700">
+                {t("reservaAhora", "¿Te gusta esta ruta?")}
+              </h3>
+              <p className="text-gray-600">
+                {t("puedesReservarla", "Puedes reservarla ahora mismo con un solo clic")}
+              </p>
+            </div>
+            <div className="flex justify-center">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5, duration: 0.3 }}
+                className="w-full max-w-sm"
+              >
+                <BotonPagoRuta 
+                  ruta={rutaPrincipal} 
+                  className="w-full py-3 px-6 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center"
+                />
+              </motion.div>
+            </div>
+          </div>
+
           {/* Nuevo componente de Mapa de Mapbox*/}
           {rutaPrincipal && (
             <MapaRutaIntegracion rutaPrincipal={rutaPrincipal} altura="400px" />
@@ -680,6 +706,15 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
                 <p className="text-gray-600 text-sm line-clamp-3">
                   {ruta.descripcion}
                 </p>
+              </div>
+              <div className="p-3 border-t border-gray-100">
+                <p className="text-xs text-teal-600 text-center mb-2 font-medium">
+                  {t("tambienTeGustara", "¡También te encantará esta experiencia!")}
+                </p>
+                <BotonPagoRuta 
+                  ruta={ruta} 
+                  className="w-full py-2 text-sm bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 flex items-center justify-center"
+                />
               </div>
             </motion.div>
           ))}
