@@ -1,7 +1,8 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+// Comentar el import de navigate ya que no se está utilizando
+// import { useNavigate } from "react-router-dom";
 import { BotonPagoRuta } from "../PagoRuta";
 
 export const NuestrasRutasTarjeta = () => {
@@ -12,7 +13,8 @@ export const NuestrasRutasTarjeta = () => {
   const [cargandoFotos, setCargandoFotos] = useState({});
   const [desplazamiento, setDesplazamiento] = useState(0);
   const sliderRef = useRef(null);
-  const navigate = useNavigate();
+  // Comentar navigate ya que no se está utilizando
+  // const navigate = useNavigate();
 
   // Estados para los filtros
 
@@ -101,46 +103,33 @@ export const NuestrasRutasTarjeta = () => {
     }
   };
 
-  // Función para determinar si estamos en la vista de cliente
-  const esVistaCliente = () => {
-    const currentPath = window.location.pathname;
-    return currentPath.includes("/VistaCliente");
-  };
-
-  const verDetallesRuta = (idRuta) => {
-    // Asegurarse de que el ID sea un número si es posible
-    const rutaId = !isNaN(parseInt(idRuta)) ? parseInt(idRuta) : idRuta;
-
-    // Verificar si estamos en la vista de cliente
-    const isClientView = esVistaCliente();
-
-    
-
-    if (isClientView) {
-      // Si estamos en la vista de cliente, mantener el contexto de cliente
-      navigate(`/VistaCliente/NuestrasRutas/${rutaId}`);
-    } else {
-      // Si no, usar la ruta normal
-      navigate(`/NuestrasRutas/${rutaId}`);
-    }
-  };
-
   // Función para desplazar el slider a la izquierda o derecha
   const desplazarSlider = (direccion) => {
     if (!sliderRef.current) return;
     
     const containerWidth = sliderRef.current.clientWidth;
-    const tarjetaWidth = containerWidth / 5; // 5 tarjetas visibles
+    // Calcular el ancho real de una tarjeta incluyendo su padding y gap
+    const tarjetaElement = sliderRef.current.querySelector('div[class*="flex-shrink-0"]');
+    let tarjetaWidth = containerWidth / 5; // Valor por defecto
+    
+    if (tarjetaElement) {
+      // Obtener el ancho real de la tarjeta incluyendo margin/padding
+      const tarjetaRect = tarjetaElement.getBoundingClientRect();
+      tarjetaWidth = tarjetaRect.width;
+    }
     
     let nuevoDesplazamiento;
     if (direccion === 'derecha') {
-      nuevoDesplazamiento = desplazamiento + 5; // Avanzar 5 tarjetas
+      // Avanzar solo 1 tarjeta para un desplazamiento más suave
+      nuevoDesplazamiento = desplazamiento + 1;
       // Asegurarse de no desplazarse más allá del límite
-      if (nuevoDesplazamiento > rutas.length - 5) {
-        nuevoDesplazamiento = rutas.length - 5;
+      // Permitir ver hasta la última tarjeta completamente
+      if (nuevoDesplazamiento > rutas.length - 4) {
+        nuevoDesplazamiento = rutas.length - 4;
       }
     } else {
-      nuevoDesplazamiento = desplazamiento - 5; // Retroceder 5 tarjetas
+      // Retroceder solo 1 tarjeta
+      nuevoDesplazamiento = desplazamiento - 1;
       // Asegurarse de no desplazarse a un valor negativo
       if (nuevoDesplazamiento < 0) {
         nuevoDesplazamiento = 0;
@@ -149,7 +138,7 @@ export const NuestrasRutasTarjeta = () => {
     
     setDesplazamiento(nuevoDesplazamiento);
     
-    // Desplazar suavemente
+    // Desplazar suavemente al inicio de la tarjeta
     sliderRef.current.scrollTo({
       left: nuevoDesplazamiento * tarjetaWidth,
       behavior: 'smooth'
@@ -340,42 +329,38 @@ export const NuestrasRutasTarjeta = () => {
           {Array.isArray(rutas) && rutas.length > 0 ? (
             <>
               <div className="relative max-w-7xl mx-auto">
-                {/* Botón de desplazamiento izquierdo */}
-                {desplazamiento > 0 && (
-                  <button
-                    onClick={() => desplazarSlider('izquierda')}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-teal-600/80 hover:bg-teal-700 text-white p-2 rounded-r-lg shadow-md transition-all duration-300"
-                    aria-label="Desplazar a la izquierda"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                )}
+                {/* Botón de desplazamiento izquierdo - siempre visible */}
+                <button
+                  onClick={() => desplazamiento > 0 && desplazarSlider('izquierda')}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-teal-600/80 hover:bg-teal-700 text-white p-2 rounded-r-lg shadow-md transition-all duration-300"
+                  aria-label="Desplazar a la izquierda"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
                 
-                {/* Botón de desplazamiento derecho */}
-                {rutas.length > 5 && desplazamiento < rutas.length - 5 && (
-                  <button
-                    onClick={() => desplazarSlider('derecha')}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-teal-600/80 hover:bg-teal-700 text-white p-2 rounded-l-lg shadow-md transition-all duration-300"
-                    aria-label="Desplazar a la derecha"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                )}
+                {/* Botón de desplazamiento derecho - siempre visible */}
+                <button
+                  onClick={() => desplazamiento < rutas.length - 4 && desplazarSlider('derecha')}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-teal-600/80 hover:bg-teal-700 text-white p-2 rounded-l-lg shadow-md transition-all duration-300"
+                  aria-label="Desplazar a la derecha"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
                 
-                {/* Contenedor de slider con scroll oculto */}
+                {/* Contenedor de slider con scroll oculto - ajustado para ver la última tarjeta completa */}
                 <div 
                   ref={sliderRef}
-                  className="flex overflow-x-auto gap-3 pb-4 scrollbar-hide"
+                  className="flex overflow-x-auto gap-4 pb-6 pt-2 px-6 scrollbar-hide snap-x snap-mandatory"
                   style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
-                  {rutas.map((ruta) => (
+                  {rutas.map((ruta, index) => (
                     <div
-                      key={`${ruta.idRuta}-${ruta.nombreRuta}`}
-                      className="flex-shrink-0 flex-grow-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 px-1"
+                      key={`${ruta.idRuta || index}-${ruta.nombreRuta}`}
+                      className="flex-shrink-0 flex-grow-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 px-1 snap-start"
                     >
                       <div
                         className="group bg-gradient-to-br from-white to-teal-50 rounded-lg shadow-sm overflow-hidden transform transition-all duration-300 hover:shadow-md hover:-translate-y-1 border border-teal-100 relative flex flex-col h-full w-full"
@@ -584,43 +569,12 @@ export const NuestrasRutasTarjeta = () => {
                               ruta={ruta}
                               className="flex-1 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white py-1 rounded-lg transition-all duration-300 text-[10px] flex items-center justify-center p-2"
                             />
-
-                            {/* Botón para ver detalles */}
-                            
                           </div>
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
-                
-                {/* Indicadores de paginación */}
-                {rutas.length > 5 && (
-                  <div className="flex justify-center mt-4 space-x-1">
-                    {Array.from({ length: Math.ceil(rutas.length / 5) }).map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => {
-                          setDesplazamiento(index * 5);
-                          if (sliderRef.current) {
-                            const containerWidth = sliderRef.current.clientWidth;
-                            const tarjetaWidth = containerWidth / 5;
-                            sliderRef.current.scrollTo({
-                              left: index * 5 * tarjetaWidth,
-                              behavior: 'smooth'
-                            });
-                          }
-                        }}
-                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                          Math.floor(desplazamiento / 5) === index 
-                            ? 'bg-teal-600 w-4' 
-                            : 'bg-teal-200'
-                        }`}
-                        aria-label={`Ir a página ${index + 1}`}
-                      />
-                    ))}
-                  </div>
-                )}
               </div>
             </>
           ) : (
