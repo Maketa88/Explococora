@@ -5,7 +5,7 @@ import {
   Package,
   ShoppingBag
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const PaquetesTarjeta = ({ onPaqueteSeleccionado, paqueteActualId }) => {
   // Estados para la gestión de paquetes
@@ -16,14 +16,18 @@ const PaquetesTarjeta = ({ onPaqueteSeleccionado, paqueteActualId }) => {
   // Estados para las imágenes
   const [paquetesConFotos, setPaquetesConFotos] = useState({});
   const [cargandoFotos, setCargandoFotos] = useState({});
+  
+  // Referencia para evitar recargas innecesarias
+  const inicializadoRef = useRef(false);
 
   // Función para obtener la lista de paquetes
   const fetchPaquetes = async () => {
-    setLoading(true);
+    // Si ya está cargando, no hacer nada
+    if (!loading) setLoading(true);
     setError(null);
+    
     try {
       const response = await axios.get('http://localhost:10101/paquete/lista-paquetes');
-      
       
       // Verificar la estructura de la respuesta
       const paquetesData = response.data.result || [];
@@ -61,6 +65,7 @@ const PaquetesTarjeta = ({ onPaqueteSeleccionado, paqueteActualId }) => {
       }
       
       setLoading(false);
+      inicializadoRef.current = true;
     } catch (err) {
       console.error('Error al cargar paquetes:', err);
       setError('No se pudieron cargar los paquetes. Por favor, intente de nuevo más tarde.');
@@ -68,8 +73,13 @@ const PaquetesTarjeta = ({ onPaqueteSeleccionado, paqueteActualId }) => {
     }
   };
 
-  // Función para obtener las fotos de un paquete
+  // Optimizar la función de obtención de fotos
   const obtenerFotosPaquete = async (idPaquete) => {
+    // Evitar cargar las mismas fotos múltiples veces
+    if (paquetesConFotos[idPaquete] || cargandoFotos[idPaquete]) {
+      return;
+    }
+    
     try {
       setCargandoFotos(prev => ({ ...prev, [idPaquete]: true }));
       
@@ -204,9 +214,11 @@ const PaquetesTarjeta = ({ onPaqueteSeleccionado, paqueteActualId }) => {
     }
   };
 
-  // Cargar paquetes al montar el componente
+  // Cargar paquetes solo una vez al montar el componente
   useEffect(() => {
-    fetchPaquetes();
+    if (!inicializadoRef.current) {
+      fetchPaquetes();
+    }
   }, []);
 
   // Función para manejar el clic en un paquete

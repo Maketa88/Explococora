@@ -73,7 +73,7 @@ const GestionPaquetes = () => {
       // Buscar el paquete específico por ID en la URL, o usar el primero como fallback
       if (paquetesConRutas.length > 0) {
         if (idPaquete) {
-          // Buscar el paquete con el ID de la URL (probando tanto como string y como número)
+          // Buscar el paquete con el ID de la URL
           const paqueteSeleccionado = paquetesConRutas.find(
             (p) =>
               p.idPaquete === parseInt(idPaquete) ||
@@ -105,20 +105,19 @@ const GestionPaquetes = () => {
       }
 
       setLoading(false);
-      return paquetesConRutas; // Retornar los paquetes para uso en useEffect
     } catch (err) {
       console.error("Error al cargar paquetes:", err);
       setError(
         "No se pudieron cargar los paquetes. Por favor, intente de nuevo más tarde."
       );
       setLoading(false);
-      return [];
     }
   };
 
   // Función para obtener las fotos de un paquete
   const obtenerFotosPaquete = async (idPaquete) => {
     try {
+      // Usar un estado de carga específico para este paquete
       setCargandoFotos((prev) => ({ ...prev, [idPaquete]: true }));
 
       const response = await axios.get(
@@ -188,6 +187,7 @@ const GestionPaquetes = () => {
         [idPaquete]: [],
       }));
     } finally {
+      // Asegurarnos de marcar este paquete como ya no cargando
       setCargandoFotos((prev) => ({ ...prev, [idPaquete]: false }));
     }
   };
@@ -317,12 +317,35 @@ const GestionPaquetes = () => {
 
   // Cargar paquetes al montar el componente o cuando cambia el ID en la URL
   useEffect(() => {
-    window.scrollTo(0, 0);
-    fetchPaquetes();
-  }, [idPaquete]);
-
-  // Función para manejar búsqueda
-  
+    // Revisar si la navegación viene de una selección directa
+    const state = window.history.state?.usr;
+    const esSeleccionDirecta = state?.seleccionDirecta === true;
+    
+    // Solo hacer scroll al inicio si no es selección directa
+    if (!esSeleccionDirecta) {
+      window.scrollTo(0, 0);
+    }
+    
+    // Solo hacer una carga inicial completa (con loading) si no es selección directa
+    // o si no tenemos paquetes cargados aún
+    if ((!esSeleccionDirecta && idPaquete) || paquetes.length === 0) {
+      fetchPaquetes();
+    } else if (idPaquete && paquetes.length > 0) {
+      // Si ya tenemos paquetes, solo actualizamos el paquete actual sin mostrar loading
+      const paqueteSeleccionado = paquetes.find(
+        (p) => p.idPaquete == idPaquete || p.idPaquete == parseInt(idPaquete)
+      );
+      
+      if (paqueteSeleccionado) {
+        setPaqueteActual(paqueteSeleccionado);
+        
+        // Verificar si ya tenemos fotos, si no, obtenerlas
+        if (!paquetesConFotos[paqueteSeleccionado.idPaquete]) {
+          obtenerFotosPaquete(paqueteSeleccionado.idPaquete);
+        }
+      }
+    }
+  }, [idPaquete, paquetes.length]);
 
   // Función para mostrar precio formateado
   const mostrarPrecio = (precio) => {
@@ -389,21 +412,29 @@ const GestionPaquetes = () => {
 
   // Función para manejar la selección de paquete desde las tarjetas
   const handlePaqueteSeleccionado = (paquete) => {
+    // Actualizar el estado sin causar recarga completa
     setPaqueteActual(paquete);
-    // Verificar si ya tenemos fotos, si no, obtenerlas
+    
+    // Verificar si ya tenemos fotos, si no, obtenerlas sin mostrar loader global
     if (!paquetesConFotos[paquete.idPaquete]) {
       obtenerFotosPaquete(paquete.idPaquete);
     }
-    // Actualizar la URL
+    
+    // Actualizar la URL sin recargar (reemplazando la entrada del historial)
     const isClientView = esVistaCliente();
     const nuevaRuta = isClientView
       ? `/VistaCliente/PaquetesTuristicos/${paquete.idPaquete}`
       : `/PaquetesTuristicos/${paquete.idPaquete}`;
-    navigate(nuevaRuta);
     
-    // Desplazar la página hacia los detalles del paquete
+    // Usamos replace para evitar agregar entradas al historial
+    navigate(nuevaRuta, { 
+      replace: true, 
+      state: { seleccionDirecta: true }
+    });
+    
+    // Desplazar la página hacia los detalles del paquete suavemente
     window.scrollTo({
-      top: document.querySelector('.container').offsetTop,
+      top: document.querySelector('.container')?.offsetTop || 0,
       behavior: 'smooth'
     });
   };
