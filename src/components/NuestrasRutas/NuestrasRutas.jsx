@@ -8,6 +8,8 @@ import { RiTimerFlashFill } from 'react-icons/ri';
 import { useParams } from 'react-router-dom';
 import { BotonPagoRuta } from '../PagoRuta';
 import { Paisaje } from './Paisaje';
+import NuestrasRutasTarjeta from './NuestrasRutasTarjeta';
+
 
 export const NuestrasRutas = () => {
   const { t } = useTranslation();
@@ -196,7 +198,7 @@ export const NuestrasRutas = () => {
 
   return (
     <>
-    <section className="relative py-16 px-4 overflow-hidden">
+    <section className="relative mb-10 overflow-hidden">
         {/* Fondo decorativo inspirado en el Valle del Cocora */}
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-emerald-50 to-white"></div>
@@ -291,24 +293,16 @@ export const NuestrasRutas = () => {
             </svg>
           </div>
         </div>
-    <div className="relative py-6 mb-4">
-        {/* Bolitas decorativas a los lados */}
-       
-        
-        {/* Líneas decorativas */}
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-teal-600 to-transparent"></div>
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-teal-600 to-transparent"></div>
-        
-        {/* Título principal con efectos */}
-        <div className="relative z-10 text-center">
-          <h1 className="text-5xl font-black tracking-tight relative inline-block">
-            <span className="relative bg-clip-text text-transparent bg-gradient-to-br from-teal-600 via-teal-700 to-teal-800 drop-shadow-sm">
-              {t('tituloRutas', 'Nuestras Rutas')}
-            </span>
-          </h1>
+   
+          <NuestrasRutasTarjeta />
           
           {/* Subtítulo o decoración */}
-          <div className="mt-2 text-xs font-medium uppercase tracking-widest text-teal-600 group relative">
+         
+          {/* Líneas decorativas bajo el título */}
+          
+      
+    <div className="container mx-auto px-4">
+    <div className="mt-2 text-xs font-medium uppercase tracking-widest text-teal-600 group relative text-center p-4">
             <span className="inline-block mx-2">✦</span>
             <span className="relative inline-block">
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-teal-700 font-semibold text-2xl">
@@ -319,11 +313,6 @@ export const NuestrasRutas = () => {
             <span className="inline-block mx-2">✦</span>
           </div>
           
-          {/* Líneas decorativas bajo el título */}
-          
-        </div>
-      </div>
-    <div className="container mx-auto px-4 py-8">
       {/* Botones de navegación entre rutas */}
       <div className="fixed left-4 right-4 top-[63%] -translate-y-1/2 flex justify-between z-10">
         <button
