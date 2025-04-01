@@ -547,7 +547,7 @@ export const NuestrasRutasTarjeta = ({ onRutaSeleccionada, rutaActualId }) => {
                           </div>
 
                           {/* Detalles adicionales - Una sola línea con dos elementos juntos */}
-                          <div className="flex items-center justify- mb-1 relative z-10">
+                          <div className=" mb-1 relative z-10">
                             <div className="flex items-center bg-white bg-opacity-70 p-1 rounded-lg text-[9px]">
                               <span className="text-gray-700">
                                 <span className="font-medium mr-1">
