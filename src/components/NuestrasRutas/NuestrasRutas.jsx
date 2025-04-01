@@ -7,8 +7,8 @@ import { IoTrailSignSharp } from 'react-icons/io5';
 import { RiTimerFlashFill } from 'react-icons/ri';
 import { useParams } from 'react-router-dom';
 import { BotonPagoRuta } from '../PagoRuta';
-import { Paisaje } from './Paisaje';
 import NuestrasRutasTarjeta from './NuestrasRutasTarjeta';
+import { Paisaje } from './Paisaje';
 
 
 export const NuestrasRutas = () => {
@@ -95,6 +95,17 @@ export const NuestrasRutas = () => {
     });
     
     setTimeout(() => setDesplazando(false), 500);
+  };
+
+  // Función para manejar la selección de ruta desde las tarjetas
+  const handleRutaSeleccionada = (ruta) => {
+    setRutaActual(ruta);
+    obtenerFotosRuta(ruta.idRuta);
+    // Desplazar la página hacia los detalles de la ruta
+    window.scrollTo({
+      top: document.querySelector('.container').offsetTop,
+      behavior: 'smooth'
+    });
   };
 
   if (cargando) {
@@ -294,7 +305,10 @@ export const NuestrasRutas = () => {
           </div>
         </div>
    
-          <NuestrasRutasTarjeta />
+          <NuestrasRutasTarjeta 
+            onRutaSeleccionada={handleRutaSeleccionada}
+            rutaActualId={rutaActual?.idRuta}
+          />
           
           {/* Subtítulo o decoración */}
          

@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 // import { useNavigate } from "react-router-dom";
 import { BotonPagoRuta } from "../PagoRuta";
 
-export const NuestrasRutasTarjeta = () => {
+export const NuestrasRutasTarjeta = ({ onRutaSeleccionada, rutaActualId }) => {
   const { t } = useTranslation();
   const [rutas, setRutas] = useState([]);
   const [rutasConFotos, setRutasConFotos] = useState({});
@@ -100,6 +100,13 @@ export const NuestrasRutasTarjeta = () => {
     } catch (error) {
       console.error(`Error al obtener fotos para la ruta ${idRuta}:`, error);
       setCargandoFotos((prev) => ({ ...prev, [idRuta]: false }));
+    }
+  };
+
+  // Función para manejar el clic en una ruta
+  const handleRutaClick = (ruta) => {
+    if (onRutaSeleccionada) {
+      onRutaSeleccionada(ruta);
     }
   };
 
@@ -361,9 +368,10 @@ export const NuestrasRutasTarjeta = () => {
                     <div
                       key={`${ruta.idRuta || index}-${ruta.nombreRuta}`}
                       className="flex-shrink-0 flex-grow-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 px-1 snap-start"
+                      onClick={() => handleRutaClick(ruta)}
                     >
                       <div
-                        className="group bg-gradient-to-br from-white to-teal-50 rounded-lg shadow-sm overflow-hidden transform transition-all duration-300 hover:shadow-md hover:-translate-y-1 border border-teal-100 relative flex flex-col h-full w-full"
+                        className={`group bg-gradient-to-br from-white to-teal-50 rounded-lg shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:shadow-teal-200 border border-teal-100 relative flex flex-col h-full w-full cursor-pointer ${rutaActualId === ruta.idRuta ? 'ring-2 ring-teal-500 scale-[1.02] shadow-lg shadow-teal-200/50 z-10' : ''}`}
                       >
                         {/* Cinta decorativa en la esquina */}
                         <div className="absolute -right-6 -top-1 w-20 h-6 bg-teal-600 text-white text-[10px] font-bold px-0 py-0.5 shadow-md transform rotate-45 z-10 flex items-center justify-center">
@@ -569,6 +577,9 @@ export const NuestrasRutasTarjeta = () => {
                               ruta={ruta}
                               className="flex-1 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white py-1 rounded-lg transition-all duration-300 text-[10px] flex items-center justify-center p-2"
                             />
+
+                            {/* Botón para ver detalles */}
+                            
                           </div>
                         </div>
                       </div>
