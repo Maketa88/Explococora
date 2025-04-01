@@ -111,12 +111,9 @@ const CardGuia = ({ guia }) => {
     setImagenCargada(true); // Consideramos que la carga ha terminado aunque sea con error
   };
 
-  // Altura fija para mantener consistencia en las cartas
-  const alturaFija = 'min-h-[auto] sm:min-h-[600px]';
-
   return (
     <div 
-      className={`relative w-full h-full flex flex-col rounded-xl overflow-hidden shadow-2xl bg-white flex-grow ${alturaFija} transition-all duration-1000 ease-out ${
+      className={`relative w-full h-full flex flex-col rounded-xl overflow-hidden shadow-2xl bg-white flex-grow transition-all duration-1000 ease-out ${
         animacionIniciada 
           ? 'opacity-100 transform translate-y-0 rotate-0 scale-100' 
           : 'opacity-0 transform -translate-y-16 rotate-3 scale-95'
@@ -125,17 +122,17 @@ const CardGuia = ({ guia }) => {
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
       }}
     >
-      {/* Contenedor principal simplificado (sin animación de volteo) */}
-      <div className="w-full h-full">
-        {/* Contenedor de la imagen con fondo - Ahora con altura responsiva */}
+      {/* Contenedor principal simplificado */}
+      <div className="w-full h-full flex flex-col">
+        {/* Contenedor de la imagen con fondo - Altura adaptativa */}
         <div 
           className="relative w-full bg-gray-100 flex items-center justify-center pt-2 sm:pt-4 px-2 sm:px-4"
-          style={{ height: 'min(35vh, 250px)' }}
+          style={{ height: 'clamp(150px, 30vw, 250px)' }}
         >
           {/* Indicador de carga */}
           {!imagenCargada && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-              <svg className="animate-spin h-8 w-8 sm:h-10 sm:w-10 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin h-6 w-6 xs:h-8 xs:w-8 sm:h-10 sm:w-10 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
@@ -151,36 +148,36 @@ const CardGuia = ({ guia }) => {
               onLoad={() => setImagenCargada(true)}
               onError={handleImageError}
               loading="lazy"
-              style={{ maxHeight: 'min(30vh, 230px)' }}
+              style={{ maxHeight: 'clamp(130px, 25vw, 230px)' }}
             />
           </div>
         </div>
         
-        {/* Contenido - Ahora con altura automática y flex-grow para ocupar espacio disponible */}
-        <div className="p-3 sm:p-4 md:p-6 z-20 bg-teal-50 relative shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)] flex-grow flex flex-col justify-between">
+        {/* Contenido - Altura adaptativa y flex-grow para ocupar espacio disponible */}
+        <div className="p-2 xs:p-3 sm:p-4 md:p-6 z-20 bg-teal-50 relative shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)] flex-grow flex flex-col justify-between">
           {/* Información del guía */}
           <div className="space-y-1 sm:space-y-2 md:space-y-3 text-gray-800">
-            <div className="flex items-center mb-2 sm:mb-3">
+            <div className="flex items-center mb-1 xs:mb-2 sm:mb-3">
               {/* Icono para el nombre - Persona/Guía */}
-              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 mr-2 sm:mr-3 md:mr-4 shadow-lg transform transition-all duration-300 hover:scale-110 hover:rotate-6">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-6 sm:w-6 md:h-7 md:w-7 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <div className="flex items-center justify-center w-7 h-7 xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 mr-1 xs:mr-2 sm:mr-3 md:mr-4 shadow-lg transform transition-all duration-300 hover:scale-110 hover:rotate-6">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 xs:h-4 xs:w-4 sm:h-6 sm:w-6 md:h-6 md:w-6 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                   <circle cx="12" cy="7" r="4"></circle>
                 </svg>
               </div>
               <div className="flex flex-col">
-                <span className="text-xs font-semibold text-gray-700">Nombres:</span>
-                <h3 className="font-semibold text-base sm:text-lg md:text-xl text-gray-950">
+                <span className="text-xs font-semibold text-teal-800">Nombres:</span>
+                <h3 className="text-xs xs:text-sm sm:text-lg md:text-xl text-gray-700 break-words max-w-[calc(100vw-80px)] sm:max-w-none">
                   {nombres}
                 </h3>
               </div>
             </div>
             
             {apellidos && (
-              <div className="flex items-center mb-2 sm:mb-3 md:mb-4">
+              <div className="flex items-center mb-1 xs:mb-2 sm:mb-3 md:mb-4">
                 {/* Icono para el apellido - Familia */}
-                <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 mr-2 sm:mr-3 md:mr-4 shadow-lg transform transition-all duration-300 hover:scale-110 hover:rotate-6">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-6 sm:w-6 md:h-7 md:w-7 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <div className="flex items-center justify-center w-7 h-7 xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 mr-1 xs:mr-2 sm:mr-3 md:mr-4 shadow-lg transform transition-all duration-300 hover:scale-110 hover:rotate-6">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 xs:h-4 xs:w-4 sm:h-6 sm:w-6 md:h-6 md:w-6 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                     <circle cx="9" cy="7" r="4"></circle>
                     <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -188,40 +185,38 @@ const CardGuia = ({ guia }) => {
                   </svg>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-black">Apellidos:</span>
-                  <h4 className="font-semibold text-sm sm:text-base md:text-lg text-gray-950">
+                  <span className="text-xs font-semibold text-teal-800">Apellidos:</span>
+                  <h4 className="text-xs xs:text-sm sm:text-base md:text-lg text-gray-700 break-words max-w-[calc(100vw-80px)] sm:max-w-none">
                     {apellidos}
                   </h4>
                 </div>
               </div>
             )}
             
-            {/* Descripción del guía (movida desde la cara trasera) */}
-            <div className="mt-2 mb-4">
-              <div className="flex items-center mb-2">
+            {/* Descripción del guía */}
+            <div className="mt-1 xs:mt-2 mb-2 xs:mb-3 sm:mb-4">
+              <div className="flex items-start mb-1 xs:mb-2">
                 {/* Icono para la descripción */}
-                <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 mr-2 sm:mr-3 md:mr-4 shadow-lg transform transition-all duration-300 hover:scale-110 hover:rotate-6">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-6 sm:w-6 md:h-7 md:w-7 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <div className="flex items-center justify-center w-7 h-7 xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 mr-1 xs:mr-2 sm:mr-3 md:mr-4 shadow-lg transform transition-all duration-300 hover:scale-110 hover:rotate-6 mt-[2px]">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 xs:h-4 xs:w-4 sm:h-6 sm:w-6 md:h-6 md:w-6 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                   </svg>
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-gray-700">Sobre mí:</span>
+                <div className="flex flex-col flex-1">
+                  <span className="text-xs font-semibold text-teal-800">Sobre mí:</span>
+                  <p className="text-xs xs:text-sm text-gray-700 leading-relaxed max-h-[20vh] overflow-y-auto pr-1 xs:pr-2 break-words mt-1">
+                    {guia.descripcion || "Este guía aún no tiene una descripción disponible. ¡Pero seguro tiene mucho que compartir sobre el Valle del Cocora y sus maravillosos paisajes!"}
+                  </p>
                 </div>
-              </div>
-              <div className="ml-12 sm:ml-14 md:ml-16">
-                <p className="text-sm text-gray-700 leading-relaxed max-h-[15vh] overflow-y-auto pr-2">
-                  {guia.descripcion || "Este guía aún no tiene una descripción disponible. ¡Pero seguro tiene mucho que compartir sobre el Valle del Cocora y sus maravillosos paisajes!"}
-                </p>
               </div>
             </div>
           </div>
           
           {/* 5 estrellas al final */}
-          <div className="flex items-center justify-center pt-2 sm:pt-3 md:pt-5 relative">
+          <div className="flex items-center justify-center pt-1 xs:pt-2 sm:pt-3 md:pt-5 relative">
             <div className="relative flex items-center justify-center py-1 sm:py-2 md:py-3 px-1 sm:px-2 md:px-4">
               {/* Estrellas con efecto de rotación y brillo al hover */}
-              <div className="flex items-center relative z-10">
+              <div className="flex items-center justify-center relative z-10 flex-wrap">
                 {[...Array(5)].map((_, index) => (
                   <div 
                     key={index} 
@@ -229,7 +224,7 @@ const CardGuia = ({ guia }) => {
                   >
                     <svg 
                       xmlns="http://www.w3.org/2000/svg" 
-                      className="h-4 w-4 sm:h-6 sm:w-6 md:h-8 md:w-8 mx-0.5 drop-shadow-lg filter hover:drop-shadow-xl transition-all duration-300" 
+                      className="h-3 w-3 xs:h-4 xs:w-4 sm:h-6 sm:w-6 md:h-8 md:w-8 mx-0.5 drop-shadow-lg filter hover:drop-shadow-xl transition-all duration-300" 
                       viewBox="0 0 24 24" 
                       fill="url(#starGradient)"
                       stroke="none"
