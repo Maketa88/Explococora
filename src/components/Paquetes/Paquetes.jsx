@@ -11,6 +11,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { GiHorseHead } from "react-icons/gi";
 import { useNavigate, useParams } from "react-router-dom";
+import PaquetesTarjeta from "./PaquetesTarjeta";
 
 const GestionPaquetes = () => {
   // Añadir parámetro de URL y navegación
@@ -561,7 +562,7 @@ const GestionPaquetes = () => {
 
   return (
     <>
-      <section className="relative py-10 px-4 overflow-hidden">
+      <section className="relative  px-4 overflow-hidden">
         {/* Fondo decorativo inspirado en el Valle del Cocora */}
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-emerald-50 to-white"></div>
@@ -611,52 +612,11 @@ const GestionPaquetes = () => {
         </div>
 
         {/* Encabezado con estilo mejorado */}
-        <div className="relative py-6 mb-4">
-          {/* Líneas decorativas */}
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-600 to-transparent"></div>
-          <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-600 to-transparent"></div>
-
-          {/* Título principal con efectos */}
-          <div className="relative z-10 text-center">
-            <h1 className="text-5xl font-black tracking-tight relative inline-block">
-              <span className="relative bg-clip-text text-transparent bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 drop-shadow-sm">
-                Paquetes Turísticos
-              </span>
-            </h1>
-
-            {/* Subtítulo o decoración */}
-          </div>
-        </div>
+      
+        <PaquetesTarjeta />
 
         {/* Búsqueda y filtros con diseño mejorado */}
-        <div className="max-w-[1360px] mx-auto mb-4 tex">
-          <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md border border-emerald-100">
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-              <div className="relative w-full md:w-64">
-                <input
-                  type="text"
-                  placeholder="Buscar paquetes..."
-                  value={terminoBusqueda}
-                  onChange={handleSearchChange}
-                  className="w-full px-4 py-2.5 pl-10 bg-emerald-50 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400 placeholder-emerald-700/70 border border-emerald-100"
-                />
-                <Search className="absolute left-3 top-2.5 text-emerald-700 w-5 h-5" />
-              </div>
-
-              <button
-                onClick={fetchPaquetes}
-                className="flex items-center gap-2 px-5 py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg transition-colors shadow-md group"
-                title="Recargar paquetes"
-              >
-                <RefreshCw
-                  size={18}
-                  className="group-hover:rotate-180 transition-transform duration-500"
-                />
-                <span>Actualizar</span>
-              </button>
-            </div>
-          </div>
-        </div>
+        
         <div className="mt-2 text-xs font-medium uppercase tracking-widest text-emerald-600 group relative text-center p-4">
           <span className="inline-block mx-2">✦</span>
           <span className="relative inline-block">

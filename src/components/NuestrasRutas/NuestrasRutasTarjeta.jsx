@@ -157,7 +157,7 @@ export const NuestrasRutasTarjeta = ({ onRutaSeleccionada, rutaActualId }) => {
       <section className="relative  overflow-hidden ">
         {/* Fondo decorativo inspirado en el Valle del Cocora */}
         <div className="absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-emerald-50 to-white"></div>
+          
 
           {/* Siluetas de palmeras de cera */}
           <div className="absolute top-0 left-0 w-full h-full opacity-10">
@@ -285,7 +285,7 @@ export const NuestrasRutasTarjeta = ({ onRutaSeleccionada, rutaActualId }) => {
 
             {/* Título principal con efectos */}
             <div className="relative z-10 text-center">
-              <h1 className="text-5xl font-black tracking-tight relative inline-block">
+              <h1 className="text-4xl font-black tracking-tight relative inline-block">
                 <span className="relative bg-clip-text text-transparent bg-gradient-to-br from-teal-600 via-teal-700 to-teal-800 drop-shadow-sm">
                   {t("tituloRutas", "Nuestras Rutas")}
                 </span>
@@ -299,11 +299,7 @@ export const NuestrasRutasTarjeta = ({ onRutaSeleccionada, rutaActualId }) => {
               </div>
 
               {/* Líneas decorativas bajo el título */}
-              <div className="mt-3 flex justify-center space-x-1">
-                <div className="w-12 h-1 bg-gradient-to-r from-transparent to-teal-600 rounded-full"></div>
-                <div className="w-24 h-1 bg-gradient-to-r from-teal-600 to-teal-700 rounded-full"></div>
-                <div className="w-12 h-1 bg-gradient-to-r from-teal-700 to-transparent rounded-full"></div>
-              </div>
+             
             </div>
           </div>
 
@@ -551,7 +547,7 @@ export const NuestrasRutasTarjeta = ({ onRutaSeleccionada, rutaActualId }) => {
                           </div>
 
                           {/* Detalles adicionales - Una sola línea con dos elementos juntos */}
-                          <div className="flex items-center justify-between mb-1 relative z-10">
+                          <div className="flex items-center justify- mb-1 relative z-10">
                             <div className="flex items-center bg-white bg-opacity-70 p-1 rounded-lg text-[9px]">
                               <span className="text-gray-700">
                                 <span className="font-medium mr-1">
