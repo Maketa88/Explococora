@@ -337,7 +337,7 @@ export const NuestrasRutas = () => {
           
 
           {/* Sendero ilustrativo con estilo más natural */}
-          <div className="relative overflow-hidden mb-10 border-4 border-teal-800/20 rounded-lg shadow-xl">
+          <div className="relative overflow-hidden mb-8 border-4 border-teal-800/20 rounded-lg shadow-xl">
             <Paisaje />
           </div>
           
@@ -347,7 +347,7 @@ export const NuestrasRutas = () => {
             {/* Contenido principal */}
             <div>
               {/* Descripción estilo notas de explorador */}
-              <div className="mb-10 mx-4">
+              <div className="mb-8 mx-0">
                 <div className="relative pl-4 py-2">
                   <div className="absolute -left-3 top-1/2 -translate-y-1/2 h-10 w-1 bg-gradient-to-b from-teal-400 via-teal-500 to-teal-600 rounded-full shadow-sm"></div>
                   <p className="text-gray-900 text-lg font-medium">{rutaActual.descripcion}</p>
@@ -360,7 +360,7 @@ export const NuestrasRutas = () => {
               </div>
               
               {/* Detalles de la ruta en estilo guía de senderismo */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-0 mb-6">
                 {/* Columna izquierda */}
                 <div>
                   {/* Panel con estilo ultra premium de tarjetas con tema teal */}
@@ -541,68 +541,102 @@ export const NuestrasRutas = () => {
                 {/* Columna derecha */}
                 <div>
                   {/* Información añadida creativamente - Vegetación y consejos */}
-                  <div className="bg-teal-50 p-6 rounded-lg border border-teal-200 shadow-md h-full">
+                  <div className="bg-gradient-to-br from-teal-50/90 via-white to-teal-50/70 p-6 rounded-2xl border border-teal-100 h-full flex flex-col shadow-[0_10px_25px_-12px_rgba(13,148,136,0.25)] relative overflow-hidden backdrop-blur-sm">
+                    {/* Patrones decorativos elegantes */}
+                    <div className="absolute -top-12 -right-12 w-56 h-56 opacity-[0.03] rotate-12">
+                      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="40" stroke="#0d9488" strokeWidth="0.6" />
+                        <circle cx="50" cy="50" r="30" stroke="#0d9488" strokeWidth="0.6" />
+                        <circle cx="50" cy="50" r="20" stroke="#0d9488" strokeWidth="0.6" />
+                        <path d="M50 10V90M10 50H90M26 26L74 74M26 74L74 26" stroke="#0d9488" strokeWidth="0.4" />
+                      </svg>
+                    </div>
+                    
                     <div className="relative mb-4">
                       <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-1 h-10 bg-gradient-to-b from-teal-400 via-teal-500 to-teal-600 rounded-full shadow-sm"></div>
                       <h2 className="pl-4 text-transparent bg-clip-text bg-gradient-to-r from-teal-700 to-teal-900 text-xl font-medium tracking-wide">
                         Valle del Cocora
                       </h2>
-            
                     </div>
                     
-                    <div className="space-y-4">
+                    <div className="flex-grow space-y-4">
                       {/* Palmas de cera */}
-                      <div className="flex items-start">
-                        <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-2 bg-teal-100/50 rounded-lg">
-                          <GiPalmTree className="text-teal-700 w-6 h-6" />
-                        </div>
-                        <div>
-                          <p className="text-teal-800 text-sm font-medium">Palmas de Cera</p>
-                          <p className="text-gray-700 text-sm">Hogar del árbol nacional de Colombia, la majestuosa Palma de Cera puede alcanzar hasta 60 metros de altura. Estas imponentes palmas crean un paisaje surrealista durante los recorridos.</p>
+                      <div className="bg-gradient-to-br from-white to-teal-50/50 p-3 rounded-xl border border-teal-100/80 hover:shadow-md group transition-all duration-300 transform hover:-translate-y-0.5 hover:border-teal-200">
+                        <div className="flex items-start">
+                          <div className="relative">
+                            <div className="absolute inset-0 bg-teal-500/10 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-500"></div>
+                            <div className="relative bg-gradient-to-br from-teal-50 to-white p-2.5 rounded-lg shadow-sm group-hover:shadow transition-all duration-500 flex items-center justify-center">
+                              <GiPalmTree className="text-teal-700 w-6 h-6" />
+                            </div>
+                          </div>
+                          <div className="ml-3 flex-1">
+                            <span className="text-teal-600 text-xs font-medium block leading-tight">Palmas de Cera</span>
+                            <span className="text-gray-700 text-sm block">Hogar del árbol nacional de Colombia, la majestuosa Palma de Cera puede alcanzar hasta 60 metros de altura. Estas imponentes palmas crean un paisaje surrealista durante los recorridos.</span>
+                          </div>
                         </div>
                       </div>
                       
                       {/* Caminatas */}
-                      <div className="flex items-start">
-                        <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-2 bg-teal-100/50 rounded-lg">
-                          <FaHiking className="text-teal-700 w-5 h-5" />
-                        </div>
-                        <div>
-                          <p className="text-teal-800 text-sm font-medium">Caminatas</p>
-                          <p className="text-gray-700 text-sm">Recorre senderos ecológicos de diferentes niveles de dificultad. El circuito principal 5 km cruza ríos con puentes colgantes y te lleva a miradores con vistas panorámicas espectaculares.</p>
+                      <div className="bg-gradient-to-br from-white to-teal-50/50 p-3 rounded-xl border border-teal-100/80 hover:shadow-md group transition-all duration-300 transform hover:-translate-y-0.5 hover:border-teal-200">
+                        <div className="flex items-start">
+                          <div className="relative">
+                            <div className="absolute inset-0 bg-teal-500/10 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-500"></div>
+                            <div className="relative bg-gradient-to-br from-teal-50 to-white p-2.5 rounded-lg shadow-sm group-hover:shadow transition-all duration-500 flex items-center justify-center">
+                              <FaHiking className="text-teal-700 w-5 h-5" />
+                            </div>
+                          </div>
+                          <div className="ml-3 flex-1">
+                            <span className="text-teal-600 text-xs font-medium block leading-tight">Caminatas</span>
+                            <span className="text-gray-700 text-sm block">Recorre senderos ecológicos de diferentes niveles de dificultad. El circuito principal 5 km cruza ríos con puentes colgantes y te lleva a miradores con vistas panorámicas espectaculares.</span>
+                          </div>
                         </div>
                       </div>
                       
                       {/* Cabalgatas */}
-                      <div className="flex items-start">
-                        <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-2 bg-teal-100/50 rounded-lg">
-                          <GiHorseHead className="text-teal-700 w-6 h-6" />
-                        </div>
-                        <div>
-                          <p className="text-teal-800 text-sm font-medium">Cabalgatas</p>
-                          <p className="text-gray-700 text-sm">Explora el valle a lomos de caballos criollos dóciles y entrenados. Las cabalgatas duran entre 1 y 3 horas y permiten acceder a zonas que serían difíciles a pie mientras disfrutas del paisaje.</p>
+                      <div className="bg-gradient-to-br from-white to-teal-50/50 p-3 rounded-xl border border-teal-100/80 hover:shadow-md group transition-all duration-300 transform hover:-translate-y-0.5 hover:border-teal-200">
+                        <div className="flex items-start">
+                          <div className="relative">
+                            <div className="absolute inset-0 bg-teal-500/10 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-500"></div>
+                            <div className="relative bg-gradient-to-br from-teal-50 to-white p-2.5 rounded-lg shadow-sm group-hover:shadow transition-all duration-500 flex items-center justify-center">
+                              <GiHorseHead className="text-teal-700 w-6 h-6" />
+                            </div>
+                          </div>
+                          <div className="ml-3 flex-1">
+                            <span className="text-teal-600 text-xs font-medium block leading-tight">Cabalgatas</span>
+                            <span className="text-gray-700 text-sm block">Explora el valle a lomos de caballos criollos dóciles y entrenados. Las cabalgatas duran entre 1 y 3 horas y permiten acceder a zonas que serían difíciles a pie mientras disfrutas del paisaje.</span>
+                          </div>
                         </div>
                       </div>
                       
                       {/* Recomendaciones */}
-                      <div className="flex items-start">
-                        <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-2 bg-teal-100/50 rounded-lg">
-                          <FaCompass className="text-teal-700 w-5 h-5" />
-                        </div>
-                        <div>
-                          <p className="text-teal-800 text-sm font-medium">Consejos Prácticos</p>
-                          <p className="text-gray-700 text-sm">Programa tu visita temprano (antes de las 9 a.m.) para evitar la neblina y lluvias de la tarde. Lleva calzado impermeable, ropa abrigada, y repelente.</p>
+                      <div className="bg-gradient-to-br from-white to-teal-50/50 p-3 rounded-xl border border-teal-100/80 hover:shadow-md group transition-all duration-300 transform hover:-translate-y-0.5 hover:border-teal-200">
+                        <div className="flex items-start">
+                          <div className="relative">
+                            <div className="absolute inset-0 bg-teal-500/10 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-500"></div>
+                            <div className="relative bg-gradient-to-br from-teal-50 to-white p-2.5 rounded-lg shadow-sm group-hover:shadow transition-all duration-500 flex items-center justify-center">
+                              <FaCompass className="text-teal-700 w-5 h-5" />
+                            </div>
+                          </div>
+                          <div className="ml-3 flex-1">
+                            <span className="text-teal-600 text-xs font-medium block leading-tight">Consejos Prácticos</span>
+                            <span className="text-gray-700 text-sm block">Programa tu visita temprano (antes de las 9 a.m.) para evitar la neblina y lluvias de la tarde. Lleva calzado impermeable, ropa abrigada, y repelente.</span>
+                          </div>
                         </div>
                       </div>
                       
                       {/* Avistamiento de Aves */}
-                      <div className="flex items-start">
-                        <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center mr-2 bg-teal-100/50 rounded-lg">
-                          <FaDove className="text-teal-700 w-5 h-5" />
-                        </div>
-                        <div>
-                          <p className="text-teal-800 text-sm font-medium">Avistamiento de Aves</p>
-                          <p className="text-gray-700 text-sm">El Valle del Cocora es un paraíso para los amantes de las aves. Con más de 200 especies registradas, podrás observar colibríes, tucanes esmeralda y el majestuoso cóndor andino en su hábitat natural. Lleva binoculares y disfruta de la biodiversidad única de la región.</p>
+                      <div className="bg-gradient-to-br from-white to-teal-50/50 p-3 rounded-xl border border-teal-100/80 hover:shadow-md group transition-all duration-300 transform hover:-translate-y-0.5 hover:border-teal-200">
+                        <div className="flex items-start">
+                          <div className="relative">
+                            <div className="absolute inset-0 bg-teal-500/10 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-500"></div>
+                            <div className="relative bg-gradient-to-br from-teal-50 to-white p-2.5 rounded-lg shadow-sm group-hover:shadow transition-all duration-500 flex items-center justify-center">
+                              <FaDove className="text-teal-700 w-5 h-5" />
+                            </div>
+                          </div>
+                          <div className="ml-3 flex-1">
+                            <span className="text-teal-600 text-xs font-medium block leading-tight">Avistamiento de Aves</span>
+                            <span className="text-gray-700 text-sm block">El Valle del Cocora es un paraíso para los amantes de las aves. Con más de 200 especies registradas, podrás observar colibríes, tucanes esmeralda y el majestuoso cóndor andino en su hábitat natural. Lleva binoculares y disfruta de la biodiversidad única de la región.</span>
+                          </div>
                         </div>
                       </div>
                     </div>
