@@ -387,6 +387,27 @@ const GestionPaquetes = () => {
     }
   };
 
+  // Función para manejar la selección de paquete desde las tarjetas
+  const handlePaqueteSeleccionado = (paquete) => {
+    setPaqueteActual(paquete);
+    // Verificar si ya tenemos fotos, si no, obtenerlas
+    if (!paquetesConFotos[paquete.idPaquete]) {
+      obtenerFotosPaquete(paquete.idPaquete);
+    }
+    // Actualizar la URL
+    const isClientView = esVistaCliente();
+    const nuevaRuta = isClientView
+      ? `/VistaCliente/PaquetesTuristicos/${paquete.idPaquete}`
+      : `/PaquetesTuristicos/${paquete.idPaquete}`;
+    navigate(nuevaRuta);
+    
+    // Desplazar la página hacia los detalles del paquete
+    window.scrollTo({
+      top: document.querySelector('.container').offsetTop,
+      behavior: 'smooth'
+    });
+  };
+
   // Renderizado del slider
   const renderSlider = () => {
     const fotos =
@@ -590,7 +611,10 @@ const GestionPaquetes = () => {
 
         {/* Encabezado con estilo mejorado */}
       
-        <PaquetesTarjeta />
+        <PaquetesTarjeta 
+          onPaqueteSeleccionado={handlePaqueteSeleccionado}
+          paqueteActualId={paqueteActual?.idPaquete}
+        />
 
         {/* Búsqueda y filtros con diseño mejorado */}
         

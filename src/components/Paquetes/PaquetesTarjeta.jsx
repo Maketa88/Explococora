@@ -1,13 +1,13 @@
 import axios from 'axios';
 import {
-    Clock, DollarSign,
-    Map,
-    Package,
-    ShoppingBag
+  Clock, DollarSign,
+  Map,
+  Package,
+  ShoppingBag
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-const PaquetesTarjeta = () => {
+const PaquetesTarjeta = ({ onPaqueteSeleccionado, paqueteActualId }) => {
   // Estados para la gestión de paquetes
   const [paquetes, setPaquetes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -209,6 +209,13 @@ const PaquetesTarjeta = () => {
     fetchPaquetes();
   }, []);
 
+  // Función para manejar el clic en un paquete
+  const handlePaqueteClick = (paquete) => {
+    if (onPaqueteSeleccionado) {
+      onPaqueteSeleccionado(paquete);
+    }
+  };
+
   // Función para mostrar precio formateado
   const mostrarPrecio = (precio) => {
     if (!precio) return '$0';
@@ -353,7 +360,10 @@ const PaquetesTarjeta = () => {
             {paquetes.map((paquete, index) => (
               <div
                 key={`paquete-${paquete.idPaquete || paquete.id || index}`}
-                className="group bg-white rounded-lg shadow-sm overflow-hidden border border-emerald-100 hover:shadow-md hover:-translate-y-1 transition-all duration-300 relative flex flex-col h-full w-full max-w-[200px]"
+                className={`group bg-white rounded-lg shadow-sm overflow-hidden border border-emerald-100 hover:shadow-md hover:-translate-y-1 transition-all duration-300 relative flex flex-col h-full w-full max-w-[200px] cursor-pointer ${
+                  paqueteActualId === paquete.idPaquete ? 'ring-2 ring-emerald-500 scale-[1.02] shadow-lg shadow-emerald-200/50 z-10' : ''
+                }`}
+                onClick={() => handlePaqueteClick(paquete)}
               >
                 {/* Cinta decorativa en la esquina */}
                 <div className="absolute -right-6 -top-1 w-20 h-6 bg-emerald-600 text-white text-[10px] font-bold px-0 py-1 shadow-md transform rotate-45 z-10 flex items-center justify-center">
@@ -481,7 +491,6 @@ const PaquetesTarjeta = () => {
                       
                   {/* Botón para reservar */}
                   <button
-                    onClick={() => {}}
                     className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-1.5 px-2 rounded-md transition-all duration-300 shadow-sm hover:shadow flex items-center justify-center mt-auto"
                   >
                     <ShoppingBag className="h-3.5 w-3.5 mr-1.5" strokeWidth={2.5} />
