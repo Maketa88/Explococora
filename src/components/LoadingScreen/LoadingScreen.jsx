@@ -36,16 +36,17 @@ const LoadingScreen = ({ isLoading }) => {
             >
               {/* Título Explococora como marca de agua en el fondo */}
               <text
-                x="600"
-                y="300"
+                x="50%"
+                y="50%"
                 textAnchor="middle"
+                dominantBaseline="middle"
                 className="text-5xl font-bold"
                 fill="#047857"
-                fontSize="120"
+                fontSize="3%"
                 fontWeight="bold"
                 fontFamily="Arial, sans-serif"
                 opacity="0.15"
-                letterSpacing="40"
+                letterSpacing="0.05em"
               >
                 EXPLOCOCORA
               </text>
@@ -70,10 +71,10 @@ const LoadingScreen = ({ isLoading }) => {
           </div>
           
           {/* Contenido principal - Ahora sin fondo blanco */}
-          <div className="flex flex-col items-center z-10">
+          <div className="flex flex-col items-center z-10 w-full max-w-screen-md mx-auto px-4 sm:px-6">
             {/* Logo */}
             <motion.img
-              className="w-48 h-auto mb-6"
+              className="w-28 sm:w-32 md:w-48 h-auto mb-3 sm:mb-4 md:mb-6"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5 }}
@@ -81,7 +82,7 @@ const LoadingScreen = ({ isLoading }) => {
             
             {/* GIF de caballo corriendo */}
             <motion.div
-              className="relative w-48 h-48 mb-4"
+              className="relative w-28 sm:w-32 md:w-48 h-28 sm:h-32 md:h-48 mb-2 sm:mb-3 md:mb-4"
               animate={{ 
                 x: [0, 20, 0, -20, 0],
               }}
@@ -98,7 +99,7 @@ const LoadingScreen = ({ isLoading }) => {
             </motion.div>
 
             {/* Barra de progreso */}
-            <div className="w-64 h-2 bg-gray-200 rounded-full mt-2 mb-4">
+            <div className="w-full max-w-xs sm:max-w-sm md:max-w-md h-1.5 sm:h-2 bg-gray-200 rounded-full mt-2 mb-2 sm:mb-3 md:mb-4">
               <motion.div 
                 className="h-full bg-teal-500 rounded-full"
                 initial={{ width: 0 }}
@@ -109,7 +110,7 @@ const LoadingScreen = ({ isLoading }) => {
 
             {/* Texto de carga */}
             <motion.h1 
-              className="text-2xl font-semibold text-teal-800"
+              className="text-lg sm:text-xl md:text-2xl font-semibold text-teal-800"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
@@ -118,7 +119,7 @@ const LoadingScreen = ({ isLoading }) => {
             </motion.h1>
             
             <motion.p 
-              className="text-sm text-teal-600 mt-2"
+              className="text-xs sm:text-sm text-teal-600 mt-1 md:mt-2 text-center"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.4 }}

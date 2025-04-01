@@ -42,10 +42,6 @@ const DashboardLayoutGuia = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-  const [showResults, setShowResults] = useState(false);
-  
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   
   const [previewFoto, setPreviewFoto] = useState(null);
@@ -547,9 +543,6 @@ const DashboardLayoutGuia = ({ children }) => {
         loadGuiaData();
       }
     },
-    { label: "Actualizar perfil", path: "/VistaGuia/ActualizarGuia" },
-    { label: "Cambiar contraseña", path: "/VistaGuia/CambiarContraseña" },
-    { label: "Eliminar cuenta", path: "/VistaGuia/EliminarCuentaGuia" },
     { label: "Cerrar sesión", path: "/" },
   ];
 
@@ -708,89 +701,33 @@ const DashboardLayoutGuia = ({ children }) => {
     );
   };
 
-  // Mapa de términos de búsqueda y sus rutas correspondientes
-  const searchMapping = [
-    { terms: ['dashboard', 'inicio', 'principal', 'panel'], path: '/VistaGuia', title: 'Dashboard' },
-    { terms: ['ruta', 'visualizar rutas', 'ver rutas'], path: '/VistaGuia/VisualizarRutas', title: 'Visualizar Rutas' },
-    { terms: ['asignadas', 'rutas asignadas', 'mis rutas'], path: '/VistaGuia/RutasAsignadas', title: 'Rutas Asignadas' },
-    { terms: ['cliente', 'clientes', 'usuarios'], path: '/VistaGuia/customers', title: 'Clientes' },
-    { terms: ['nuevo cliente', 'agregar cliente'], path: '/VistaGuia/new-customer', title: 'Nuevo Cliente' },
-    { terms: ['verificados', 'clientes verificados'], path: '/VistaGuia/verified-customers', title: 'Clientes Verificados' },
-    { terms: ['producto', 'productos'], path: '/VistaGuia/products', title: 'Productos' },
-    { terms: ['nuevo producto', 'agregar producto'], path: '/VistaGuia/new-product', title: 'Nuevo Producto' },
-    { terms: ['inventario', 'stock'], path: '/VistaGuia/inventory', title: 'Inventario' },
-    { terms: ['contraseña', 'cambiar contraseña', 'password'], path: '/VistaGuia/CambiarContraseña', title: 'Cambiar Contraseña' },
-    { terms: ['perfil', 'mi perfil', 'datos personales'], path: '/VistaGuia/PerfilGuia', title: 'Perfil Guía' },
-    { terms: ['actualizar', 'actualizar guia', 'editar perfil'], path: '/VistaGuia/ActualizarGuia', title: 'Actualizar Guía' }
-  ];
-
-  // Función para buscar coincidencias mientras el usuario escribe
-  const handleSearchChange = (e) => {
-    const term = e.target.value.toLowerCase();
-    setSearchTerm(term);
-    
-    if (term.length < 2) {
-      setShowResults(false);
-      return;
+  // Add this function to get estado indicator styles
+  const getEstadoStyles = () => {
+    switch (estado) {
+      case 'disponible':
+        return 'bg-green-100 text-green-800 border-green-300';
+      case 'ocupado':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      case 'inactivo':
+        return 'bg-red-100 text-red-800 border-red-300';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-300';
     }
-    
-    // Filtrar resultados basados en el término de búsqueda
-    const results = searchMapping
-      .filter(item => {
-        return item.terms.some(t => t.includes(term)) || 
-               item.title.toLowerCase().includes(term);
-      })
-      .slice(0, 5); // Limitar a 5 resultados
-    
-    setSearchResults(results);
-    setShowResults(results.length > 0);
   };
-
-  // Función para navegar al resultado seleccionado
-  const handleResultClick = (path) => {
-    navigate(path);
-    setSearchTerm('');
-    setShowResults(false);
-    setShowProfile(false); // Ocultar el perfil al navegar
-  };
-
-  // Función para manejar el envío del formulario
-  const handleSearch = (e) => {
-    e.preventDefault();
-    
-    if (searchTerm.length < 2) return;
-    
-    // Buscar la mejor coincidencia
-    for (const item of searchMapping) {
-      if (item.terms.some(t => t.includes(searchTerm.toLowerCase())) || 
-          item.title.toLowerCase().includes(searchTerm.toLowerCase())) {
-        navigate(item.path);
-        setSearchTerm('');
-        setShowResults(false);
-        setShowProfile(false); // Ocultar el perfil al navegar
-        return;
-      }
+  
+  // Add this function for the dot indicator styles
+  const getEstadoDotStyles = () => {
+    switch (estado) {
+      case 'disponible':
+        return 'bg-green-500';
+      case 'ocupado':
+        return 'bg-yellow-500';
+      case 'inactivo':
+        return 'bg-red-500';
+      default:
+        return 'bg-gray-500';
     }
-    
-    // Si no hay coincidencias
-    alert('No se encontraron resultados para: ' + searchTerm);
-    setSearchTerm('');
-    setShowResults(false);
   };
-
-  // Función para cerrar los resultados si se hace clic fuera
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest('.search-container')) {
-        setShowResults(false);
-      }
-    };
-    
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, []);
 
   // Actualizar el SelectorEstado para que use estadoServiceGuia
   const handleCambioEstado = (nuevoEstado) => {
@@ -876,7 +813,7 @@ const DashboardLayoutGuia = ({ children }) => {
             }`}
           >
             <Settings className="w-5 h-5" />
-            {!collapsed && <span>Settings</span>}
+            {!collapsed && <span>Configuración</span>}
           </Link>
         </div>
       </div>
@@ -886,58 +823,7 @@ const DashboardLayoutGuia = ({ children }) => {
         {/* Top Navigation */}
         <div className="bg-white sticky top-0 z-10 shadow-sm">
           <div className="flex items-center justify-between p-4">
-            <div className="flex-1 max-w-xl relative search-container">
-              <form onSubmit={handleSearch} className="flex items-center">
-                <input
-                  type="text"
-                  placeholder="Buscar..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (searchResults.length > 0) setShowResults(true);
-                  }}
-                  className="w-full px-4 py-2 rounded-lg bg-emerald-50 text-gray-900 border border-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm sm:text-base"
-                />
-                <button 
-                  type="submit"
-                  className="p-2 rounded-lg text-emerald-600 hover:bg-emerald-50"
-                >
-                  <Search className="w-5 h-5" />
-                </button>
-              </form>
-              
-              {/* Resultados de búsqueda */}
-              {showResults && (
-                <div 
-                  className="absolute top-full left-0 w-full mt-1 rounded-lg shadow-lg z-50 bg-white text-gray-900"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {searchResults.map((result, index) => (
-                    <div
-                      key={index}
-                      onClick={() => handleResultClick(result.path)}
-                      className={`p-3 cursor-pointer flex items-center gap-2 hover:bg-emerald-50 border-b border-emerald-100 ${index === searchResults.length - 1 ? 'border-b-0 rounded-b-lg' : ''}`}
-                    >
-                      {/* Icono basado en el título */}
-                      {result.title === 'Dashboard' && <LayoutDashboard className="w-4 h-4" />}
-                      {result.title === 'Visualizar Rutas' && <BarChart2 className="w-4 h-4" />}
-                      {result.title === 'Rutas Asignadas' && <FileText className="w-4 h-4" />}
-                      {result.title === 'Clientes' && <Users className="w-4 h-4" />}
-                      {result.title === 'Nuevo Cliente' && <UserPlus className="w-4 h-4" />}
-                      {result.title === 'Clientes Verificados' && <UserCheck className="w-4 h-4" />}
-                      {result.title === 'Productos' && <Package className="w-4 h-4" />}
-                      {result.title === 'Nuevo Producto' && <PackagePlus className="w-4 h-4" />}
-                      {result.title === 'Inventario' && <PackageSearch className="w-4 h-4" />}
-                      {result.title === 'Cambiar Contraseña' && <Settings className="w-4 h-4" />}
-                      {result.title === 'Perfil Guía' && <User className="w-4 h-4" />}
-                      {result.title === 'Actualizar Guía' && <UserPlus className="w-4 h-4" />}
-                      <span>{result.title}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <div className="flex-1"></div> {/* Empty div to maintain layout */}
             <div className="flex items-center gap-4">
               {localStorage.getItem('cedula') && (
                 <SelectorEstado 
@@ -1051,27 +937,6 @@ const DashboardLayoutGuia = ({ children }) => {
                     >
                       <User className="w-4 h-4" />
                       Ver Perfil
-                    </div>
-                    <div 
-                      onClick={() => handleOptionClick("/VistaGuia/ActualizarGuia")}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 flex items-center gap-2 cursor-pointer"
-                    >
-                      <Edit className="w-4 h-4" />
-                      Actualizar Información
-                    </div>
-                    <div 
-                      onClick={() => handleOptionClick("/VistaGuia/CambiarContraseña")}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 flex items-center gap-2 cursor-pointer"
-                    >
-                      <Key className="w-4 h-4" />
-                      Cambiar Contraseña
-                    </div>
-                    <div 
-                      onClick={() => handleOptionClick("/VistaGuia/EliminarCuentaGuia")}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 flex items-center gap-2 cursor-pointer"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Eliminar Cuenta
                     </div>
                     <div 
                       onClick={() => handleOptionClick("/")}

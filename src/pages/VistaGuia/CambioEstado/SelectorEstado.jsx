@@ -17,11 +17,26 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
   const [mensajeNotificacion, setMensajeNotificacion] = useState('');
   const [colorNotificacion, setColorNotificacion] = useState('');
 
-  // Definimos los estados disponibles y sus colores
+  // Actualizar el array de estados con los nuevos estilos
   const estados = [
-    { nombre: 'disponible', color: 'bg-blue-500 hover:bg-blue-600', notifColor: 'bg-blue-100 text-blue-800 border-blue-300' },
-    { nombre: 'ocupado', color: 'bg-yellow-500 hover:bg-yellow-600', notifColor: 'bg-yellow-100 text-yellow-800 border-yellow-300' },
-    { nombre: 'inactivo', color: 'bg-red-500 hover:bg-red-600', notifColor: 'bg-red-100 text-red-800 border-red-300' }
+    { 
+      nombre: 'disponible', 
+      color: 'bg-green-100 text-green-800 border border-green-300 hover:bg-green-200', 
+      dotColor: 'bg-green-500',
+      notifColor: 'bg-green-100 text-green-800 border-green-300' 
+    },
+    { 
+      nombre: 'ocupado', 
+      color: 'bg-yellow-100 text-yellow-800 border border-yellow-300 hover:bg-yellow-200', 
+      dotColor: 'bg-yellow-500',
+      notifColor: 'bg-yellow-100 text-yellow-800 border-yellow-300' 
+    },
+    { 
+      nombre: 'inactivo', 
+      color: 'bg-red-100 text-red-800 border border-red-300 hover:bg-red-200', 
+      dotColor: 'bg-red-500',
+      notifColor: 'bg-red-100 text-red-800 border-red-300' 
+    }
   ];
 
   // Actualizar estado interno cuando cambia estadoActual prop
@@ -37,14 +52,14 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
     const estadoParaBuscar = nombreEstado && nombreEstado.trim().toLowerCase();
     
     if (!estadoParaBuscar) {
-      return 'bg-gray-500 hover:bg-gray-600';
+      return 'bg-gray-100 text-gray-800 border border-gray-300 hover:bg-gray-200';
     }
     
     const estadoEncontrado = estados.find(e => e.nombre === estadoParaBuscar);
     if (estadoEncontrado) {
       return estadoEncontrado.color;
     } else {
-      return 'bg-gray-500 hover:bg-gray-600';
+      return 'bg-gray-100 text-gray-800 border border-gray-300 hover:bg-gray-200';
     }
   };
   
@@ -52,6 +67,12 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
   const obtenerColorNotificacion = (nombreEstado) => {
     const estadoEncontrado = estados.find(e => e.nombre === nombreEstado);
     return estadoEncontrado ? estadoEncontrado.notifColor : 'bg-gray-100 text-gray-800 border-gray-300';
+  };
+
+  // Obtener el color del indicador dot
+  const obtenerDotColor = (nombreEstado) => {
+    const estadoEncontrado = estados.find(e => e.nombre === nombreEstado);
+    return estadoEncontrado ? estadoEncontrado.dotColor : 'bg-gray-500';
   };
 
   // Cerrar el menú cuando se hace clic fuera
@@ -150,9 +171,12 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
       {/* Botón principal que muestra el estado actual */}
       <button
         onClick={toggleMenu}
-        className={`flex items-center justify-between px-4 py-2 rounded-lg text-white font-medium min-w-[120px] transition-all duration-200 ${obtenerColorEstado(estado)}`}
+        className={`flex items-center justify-between px-4 py-2 rounded-lg font-medium min-w-[120px] transition-all duration-200 ${obtenerColorEstado(estado)}`}
       >
-        <span>{formatearEstado(estado)}</span>
+        <div className="flex items-center">
+          <div className={`w-3 h-3 rounded-full mr-2 animate-pulse ${obtenerDotColor(estado)}`}></div>
+          <span>{formatearEstado(estado)}</span>
+        </div>
         <ChevronDown className={`ml-2 w-5 h-5 transition-transform duration-200 ${mostrarMenu ? 'transform rotate-180' : ''}`} />
       </button>
 
@@ -163,9 +187,10 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
             <button
               key={e.nombre}
               onClick={() => cambiarEstado(e.nombre)}
-              className={`w-full text-center py-2 px-4 text-white font-medium ${e.color} ${estado === e.nombre ? 'opacity-70' : ''}`}
+              className={`w-full text-left py-2 px-4 font-medium ${e.color} ${estado === e.nombre ? 'opacity-70' : ''} flex items-center`}
               disabled={estado === e.nombre}
             >
+              <div className={`w-3 h-3 rounded-full mr-2 ${e.dotColor}`}></div>
               {formatearEstado(e.nombre)}
             </button>
           ))}
