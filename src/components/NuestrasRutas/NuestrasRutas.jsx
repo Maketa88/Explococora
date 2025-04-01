@@ -68,15 +68,7 @@ export const NuestrasRutas = () => {
     }
   };
 
-  const cambiarRuta = async (direccion) => {
-    const indiceActual = rutas.findIndex(r => r.idRuta === rutaActual.idRuta);
-    const nuevoIndice = direccion === 'siguiente'
-      ? (indiceActual + 1) % rutas.length
-      : (indiceActual - 1 + rutas.length) % rutas.length;
-    
-    setRutaActual(rutas[nuevoIndice]);
-    await obtenerFotosRuta(rutas[nuevoIndice].idRuta);
-  };
+  
 
   const desplazarCarousel = (direccion) => {
     if (desplazando || !carouselRef.current) return;
@@ -328,38 +320,7 @@ export const NuestrasRutas = () => {
           </div>
           
       {/* Botones de navegación entre rutas */}
-      <div className="fixed left-4 right-4 top-[63%] -translate-y-1/2 flex justify-between z-10">
-        <button
-          onClick={() => cambiarRuta('anterior')}
-          className="bg-teal-600 text-white p-3 rounded-full hover:bg-teal-700 transition-all duration-300 shadow-lg hover:scale-110 group"
-          aria-label="Ruta anterior"
-        >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            className="h-6 w-6 transform group-hover:-translate-x-1 transition-transform duration-300" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <button
-          onClick={() => cambiarRuta('siguiente')}
-          className="bg-teal-600 text-white p-3 rounded-full hover:bg-teal-700 transition-all duration-300 shadow-lg hover:scale-110 group"
-          aria-label="Siguiente ruta"
-        >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            className="h-6 w-6 transform group-hover:translate-x-1 transition-transform duration-300" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-      </div>
+      
 
       {/* Slider de Fotos */}
       {renderSlider()}
