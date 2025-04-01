@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { BotonPagoRuta } from "../PagoRuta";
@@ -10,6 +10,8 @@ export const NuestrasRutasTarjeta = () => {
   const [rutasConFotos, setRutasConFotos] = useState({});
   const [error, setError] = useState(null);
   const [cargandoFotos, setCargandoFotos] = useState({});
+  const [desplazamiento, setDesplazamiento] = useState(0);
+  const sliderRef = useRef(null);
   const navigate = useNavigate();
 
   // Estados para los filtros
@@ -121,6 +123,37 @@ export const NuestrasRutasTarjeta = () => {
       // Si no, usar la ruta normal
       navigate(`/NuestrasRutas/${rutaId}`);
     }
+  };
+
+  // Función para desplazar el slider a la izquierda o derecha
+  const desplazarSlider = (direccion) => {
+    if (!sliderRef.current) return;
+    
+    const containerWidth = sliderRef.current.clientWidth;
+    const tarjetaWidth = containerWidth / 5; // 5 tarjetas visibles
+    
+    let nuevoDesplazamiento;
+    if (direccion === 'derecha') {
+      nuevoDesplazamiento = desplazamiento + 5; // Avanzar 5 tarjetas
+      // Asegurarse de no desplazarse más allá del límite
+      if (nuevoDesplazamiento > rutas.length - 5) {
+        nuevoDesplazamiento = rutas.length - 5;
+      }
+    } else {
+      nuevoDesplazamiento = desplazamiento - 5; // Retroceder 5 tarjetas
+      // Asegurarse de no desplazarse a un valor negativo
+      if (nuevoDesplazamiento < 0) {
+        nuevoDesplazamiento = 0;
+      }
+    }
+    
+    setDesplazamiento(nuevoDesplazamiento);
+    
+    // Desplazar suavemente
+    sliderRef.current.scrollTo({
+      left: nuevoDesplazamiento * tarjetaWidth,
+      behavior: 'smooth'
+    });
   };
 
   return (
@@ -306,223 +339,288 @@ export const NuestrasRutasTarjeta = () => {
 
           {Array.isArray(rutas) && rutas.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 justify-items-center mx-auto max-w-7xl">
-                {rutas.map((ruta) => (
-                  <div
-                    key={`${ruta.idRuta}-${ruta.nombreRuta}`}
-                    className="group bg-gradient-to-br from-white to-teal-50 rounded-lg shadow-sm overflow-hidden transform transition-all duration-300 hover:shadow-md hover:-translate-y-1 border border-teal-100 relative flex flex-col h-full w-full max-w-xs"
+              <div className="relative max-w-7xl mx-auto">
+                {/* Botón de desplazamiento izquierdo */}
+                {desplazamiento > 0 && (
+                  <button
+                    onClick={() => desplazarSlider('izquierda')}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-teal-600/80 hover:bg-teal-700 text-white p-2 rounded-r-lg shadow-md transition-all duration-300"
+                    aria-label="Desplazar a la izquierda"
                   >
-                    {/* Cinta decorativa en la esquina */}
-                    <div className="absolute -right-6 -top-1 w-20 h-6 bg-teal-600 text-white text-[10px] font-bold px-0 py-0.5 shadow-md transform rotate-45 z-10 flex items-center justify-center">
-                      <span className="text-white text-[10px] tracking-wider uppercase">
-                        {ruta.tipo}
-                      </span>
-                    </div>
-
-                    {/* Encabezado de la carta */}
-                    <div className="bg-gradient-to-r from-teal-800 to-teal-700 text-white p-1.5 relative overflow-hidden h-12 flex flex-col justify-center">
-                      <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-5 rounded-full -mt-6 -mr-6"></div>
-                      <div className="absolute bottom-0 left-0 w-10 h-10 bg-white opacity-5 rounded-full -mb-5 -ml-5"></div>
-
-                      <h2 className="text-sm font-bold mb-0.5 relative z-10 group-hover:text-teal-200 transition-colors duration-300 line-clamp-1">
-                        {ruta.nombreRuta}
-                      </h2>
-                      <div className="flex items-center space-x-1 relative z-10">
-                        <span
-                          className={`inline-block px-1 py-0 rounded-full text-[9px] font-semibold ${
-                            ruta.dificultad === "Facil"
-                              ? "bg-gradient-to-r from-green-200 to-green-300 text-green-800"
-                              : ruta.dificultad === "Moderada"
-                              ? "bg-gradient-to-r from-yellow-200 to-yellow-300 text-yellow-800"
-                              : "bg-gradient-to-r from-red-200 to-red-300 text-red-800"
-                          }`}
-                        >
-                          {ruta.dificultad}
-                        </span>
-                        <span
-                          className={`inline-block px-1 py-0 rounded-full text-[9px] font-semibold ${
-                            ruta.estado === "Activa"
-                              ? "bg-gradient-to-r from-green-200 to-green-300 text-green-800"
-                              : "bg-gradient-to-r from-gray-200 to-gray-300 text-gray-800"
-                          }`}
-                        >
-                          {ruta.estado}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Galería de imágenes */}
-                    <div className="relative h-24 overflow-hidden">
-                      {cargandoFotos[ruta.idRuta] ? (
-                        <div className="flex justify-center items-center h-full bg-gray-100">
-                          <div className="animate-pulse flex space-x-1">
-                            <div className="h-1.5 w-1.5 bg-teal-600 rounded-full animate-bounce"></div>
-                            <div
-                              className="h-1.5 w-1.5 bg-teal-600 rounded-full animate-bounce"
-                              style={{ animationDelay: "0.2s" }}
-                            ></div>
-                            <div
-                              className="h-1.5 w-1.5 bg-teal-600 rounded-full animate-bounce"
-                              style={{ animationDelay: "0.4s" }}
-                            ></div>
-                          </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                )}
+                
+                {/* Botón de desplazamiento derecho */}
+                {rutas.length > 5 && desplazamiento < rutas.length - 5 && (
+                  <button
+                    onClick={() => desplazarSlider('derecha')}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-teal-600/80 hover:bg-teal-700 text-white p-2 rounded-l-lg shadow-md transition-all duration-300"
+                    aria-label="Desplazar a la derecha"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                )}
+                
+                {/* Contenedor de slider con scroll oculto */}
+                <div 
+                  ref={sliderRef}
+                  className="flex overflow-x-auto gap-3 pb-4 scrollbar-hide"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                >
+                  {rutas.map((ruta) => (
+                    <div
+                      key={`${ruta.idRuta}-${ruta.nombreRuta}`}
+                      className="flex-shrink-0 flex-grow-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 px-1"
+                    >
+                      <div
+                        className="group bg-gradient-to-br from-white to-teal-50 rounded-lg shadow-sm overflow-hidden transform transition-all duration-300 hover:shadow-md hover:-translate-y-1 border border-teal-100 relative flex flex-col h-full w-full"
+                      >
+                        {/* Cinta decorativa en la esquina */}
+                        <div className="absolute -right-6 -top-1 w-20 h-6 bg-teal-600 text-white text-[10px] font-bold px-0 py-0.5 shadow-md transform rotate-45 z-10 flex items-center justify-center">
+                          <span className="text-white text-[10px] tracking-wider uppercase">
+                            {ruta.tipo}
+                          </span>
                         </div>
-                      ) : rutasConFotos[ruta.idRuta] &&
-                        rutasConFotos[ruta.idRuta].length > 0 ? (
-                        <div className="h-full relative">
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10"></div>
-                          {rutasConFotos[ruta.idRuta].map((foto, index) => (
-                            <img
-                              key={index}
-                              src={foto}
-                              alt={`Foto de ${ruta.nombreRuta}`}
-                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                              onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src =
-                                  "https://via.placeholder.com/300x200?text=Imagen+no+disponible";
-                              }}
-                            />
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="flex justify-center items-center h-full bg-gray-100">
-                          <div className="text-center">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-4 w-4 mx-auto text-teal-300 mb-0.5"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
+
+                        {/* Encabezado de la carta */}
+                        <div className="bg-gradient-to-r from-teal-800 to-teal-700 text-white p-1.5 relative overflow-hidden h-12 flex flex-col justify-center">
+                          <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-5 rounded-full -mt-6 -mr-6"></div>
+                          <div className="absolute bottom-0 left-0 w-10 h-10 bg-white opacity-5 rounded-full -mb-5 -ml-5"></div>
+
+                          <h2 className="text-sm font-bold mb-0.5 relative z-10 group-hover:text-teal-200 transition-colors duration-300 line-clamp-1">
+                            {ruta.nombreRuta}
+                          </h2>
+                          <div className="flex items-center space-x-1 relative z-10">
+                            <span
+                              className={`inline-block px-1 py-0 rounded-full text-[9px] font-semibold ${
+                                ruta.dificultad === "Facil"
+                                  ? "bg-gradient-to-r from-green-200 to-green-300 text-green-800"
+                                  : ruta.dificultad === "Moderada"
+                                  ? "bg-gradient-to-r from-yellow-200 to-yellow-300 text-yellow-800"
+                                  : "bg-gradient-to-r from-red-200 to-red-300 text-red-800"
+                              }`}
                             >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={1}
-                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                              />
-                            </svg>
-                            <p className="text-[9px] text-gray-500 italic">
-                              {t("sinFotos", "No hay fotos disponibles")}
-                            </p>
+                              {ruta.dificultad}
+                            </span>
+                            <span
+                              className={`inline-block px-1 py-0 rounded-full text-[9px] font-semibold ${
+                                ruta.estado === "Activa"
+                                  ? "bg-gradient-to-r from-green-200 to-green-300 text-green-800"
+                                  : "bg-gradient-to-r from-gray-200 to-gray-300 text-gray-800"
+                              }`}
+                            >
+                              {ruta.estado}
+                            </span>
                           </div>
                         </div>
-                      )}
+
+                        {/* Galería de imágenes */}
+                        <div className="relative h-24 overflow-hidden">
+                          {cargandoFotos[ruta.idRuta] ? (
+                            <div className="flex justify-center items-center h-full bg-gray-100">
+                              <div className="animate-pulse flex space-x-1">
+                                <div className="h-1.5 w-1.5 bg-teal-600 rounded-full animate-bounce"></div>
+                                <div
+                                  className="h-1.5 w-1.5 bg-teal-600 rounded-full animate-bounce"
+                                  style={{ animationDelay: "0.2s" }}
+                                ></div>
+                                <div
+                                  className="h-1.5 w-1.5 bg-teal-600 rounded-full animate-bounce"
+                                  style={{ animationDelay: "0.4s" }}
+                                ></div>
+                              </div>
+                            </div>
+                          ) : rutasConFotos[ruta.idRuta] &&
+                            rutasConFotos[ruta.idRuta].length > 0 ? (
+                            <div className="h-full relative">
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10"></div>
+                              {rutasConFotos[ruta.idRuta].map((foto, index) => (
+                                <img
+                                  key={index}
+                                  src={foto}
+                                  alt={`Foto de ${ruta.nombreRuta}`}
+                                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                  onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src =
+                                      "https://via.placeholder.com/300x200?text=Imagen+no+disponible";
+                                  }}
+                                />
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="flex justify-center items-center h-full bg-gray-100">
+                              <div className="text-center">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-4 w-4 mx-auto text-teal-300 mb-0.5"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={1}
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                  />
+                                </svg>
+                                <p className="text-[9px] text-gray-500 italic">
+                                  {t("sinFotos", "No hay fotos disponibles")}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Contenido de la carta */}
+                        <div className="p-1.5 relative flex-grow flex flex-col">
+                          {/* Elementos decorativos */}
+                          <div className="absolute top-0 right-0 w-20 h-20 bg-teal-50 rounded-full -mt-10 -mr-10 opacity-30"></div>
+
+                          {/* Información destacada */}
+                          <div className="grid grid-cols-2 gap-1 mb-1 relative z-10">
+                            <div className="flex flex-col items-center p-1 bg-gradient-to-br from-teal-50 to-teal-100 rounded-lg shadow-sm">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-2.5 w-2.5 text-teal-700 mb-0.5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                              </svg>
+                              <span className="text-teal-800 text-[9px] font-medium uppercase tracking-wider">
+                                {t("duracion", "Duración")}
+                              </span>
+                              <span className="text-teal-900 text-[9px] font-bold">
+                                {ruta.duracion}
+                              </span>
+                            </div>
+                            <div className="flex flex-col items-center p-1 bg-gradient-to-br from-teal-50 to-teal-100 rounded-lg shadow-sm">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-2.5 w-2.5 text-teal-700 mb-0.5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                                />
+                              </svg>
+                              <span className="text-teal-800 text-[9px] font-medium uppercase tracking-wider">
+                                {t("distancia", "Distancia")}
+                              </span>
+                              <span className="text-teal-900 text-[9px] font-bold">
+                                {ruta.distancia} km
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Descripción - Reducida en altura */}
+                          <div className="mb-1 relative z-10 h-10">
+                            <h3 className="text-teal-800 text-[9px] font-semibold mb-0.5 flex items-center">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-2.5 w-2.5 mr-0.5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                              </svg>
+                              {t("descripcion", "Descripción")}
+                            </h3>
+                            <div className="bg-white bg-opacity-70 p-1 rounded-lg shadow-inner h-full">
+                              <p className="text-gray-700 text-[9px] line-clamp-1 italic">
+                                {ruta.descripcion}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Detalles adicionales - Una sola línea con dos elementos juntos */}
+                          <div className="flex items-center justify-between mb-1 relative z-10">
+                            <div className="flex items-center bg-white bg-opacity-70 p-1 rounded-lg text-[9px]">
+                              <span className="text-gray-700">
+                                <span className="font-medium mr-1">
+                                  {t("capacidadMaxima", "Cap")}:
+                                </span>
+                                {ruta.capacidadMaxima}
+                              </span>
+                            </div>
+                            <div className="flex items-center bg-white bg-opacity-70 p-1 rounded-lg text-[9px]">
+                              <span className="text-gray-700">
+                                <span className="font-medium mr-1">
+                                  {t("precio", "Precio")}:
+                                </span>
+                                {ruta.precio} COP
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Botones de acción - En línea */}
+                          <div className="relative z-10 mt-auto flex space-x-1 justify-center">
+                            {/* Botón para reservar */}
+                            <BotonPagoRuta
+                              ruta={ruta}
+                              className="flex-1 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white py-1 rounded-lg transition-all duration-300 text-[10px] flex items-center justify-center p-2"
+                            />
+
+                            {/* Botón para ver detalles */}
+                            
+                          </div>
+                        </div>
+                      </div>
                     </div>
-
-                    {/* Contenido de la carta */}
-                    <div className="p-1.5 relative flex-grow flex flex-col">
-                      {/* Elementos decorativos */}
-                      <div className="absolute top-0 right-0 w-20 h-20 bg-teal-50 rounded-full -mt-10 -mr-10 opacity-30"></div>
-
-                      {/* Información destacada */}
-                      <div className="grid grid-cols-2 gap-1 mb-1 relative z-10">
-                        <div className="flex flex-col items-center p-1 bg-gradient-to-br from-teal-50 to-teal-100 rounded-lg shadow-sm">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-2.5 w-2.5 text-teal-700 mb-0.5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                          <span className="text-teal-800 text-[9px] font-medium uppercase tracking-wider">
-                            {t("duracion", "Duración")}
-                          </span>
-                          <span className="text-teal-900 text-[9px] font-bold">
-                            {ruta.duracion}
-                          </span>
-                        </div>
-                        <div className="flex flex-col items-center p-1 bg-gradient-to-br from-teal-50 to-teal-100 rounded-lg shadow-sm">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-2.5 w-2.5 text-teal-700 mb-0.5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                            />
-                          </svg>
-                          <span className="text-teal-800 text-[9px] font-medium uppercase tracking-wider">
-                            {t("distancia", "Distancia")}
-                          </span>
-                          <span className="text-teal-900 text-[9px] font-bold">
-                            {ruta.distancia} km
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Descripción - Reducida en altura */}
-                      <div className="mb-1 relative z-10 h-10">
-                        <h3 className="text-teal-800 text-[9px] font-semibold mb-0.5 flex items-center">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-2.5 w-2.5 mr-0.5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                          {t("descripcion", "Descripción")}
-                        </h3>
-                        <div className="bg-white bg-opacity-70 p-1 rounded-lg shadow-inner h-full">
-                          <p className="text-gray-700 text-[9px] line-clamp-1 italic">
-                            {ruta.descripcion}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Detalles adicionales - Una sola línea con dos elementos juntos */}
-                      <div className="flex items-center justify-between mb-1 relative z-10">
-                        <div className="flex items-center bg-white bg-opacity-70 p-1 rounded-lg text-[9px]">
-                          <span className="text-gray-700">
-                            <span className="font-medium mr-1">
-                              {t("capacidadMaxima", "Cap")}:
-                            </span>
-                            {ruta.capacidadMaxima}
-                          </span>
-                        </div>
-                        <div className="flex items-center bg-white bg-opacity-70 p-1 rounded-lg text-[9px]">
-                          <span className="text-gray-700">
-                            <span className="font-medium mr-1">
-                              {t("precio", "Precio")}:
-                            </span>
-                            {ruta.precio} COP
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Botones de acción - En línea */}
-                      <div className="relative z-10 mt-auto flex space-x-1 justify-center">
-                        {/* Botón para reservar */}
-                        <BotonPagoRuta
-                          ruta={ruta}
-                          className="flex-1 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white py-1 rounded-lg transition-all duration-300 text-[10px] flex items-center justify-center p-6"
-                        />
-
-                        {/* Botón para ver detalles */}
-                        
-                      </div>
-                    </div>
+                  ))}
+                </div>
+                
+                {/* Indicadores de paginación */}
+                {rutas.length > 5 && (
+                  <div className="flex justify-center mt-4 space-x-1">
+                    {Array.from({ length: Math.ceil(rutas.length / 5) }).map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          setDesplazamiento(index * 5);
+                          if (sliderRef.current) {
+                            const containerWidth = sliderRef.current.clientWidth;
+                            const tarjetaWidth = containerWidth / 5;
+                            sliderRef.current.scrollTo({
+                              left: index * 5 * tarjetaWidth,
+                              behavior: 'smooth'
+                            });
+                          }
+                        }}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                          Math.floor(desplazamiento / 5) === index 
+                            ? 'bg-teal-600 w-4' 
+                            : 'bg-teal-200'
+                        }`}
+                        aria-label={`Ir a página ${index + 1}`}
+                      />
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
             </>
           ) : (
