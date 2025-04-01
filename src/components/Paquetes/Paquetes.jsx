@@ -4,8 +4,6 @@ import {
   DollarSign,
   Map,
   Package,
-  RefreshCw,
-  Search,
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -22,7 +20,7 @@ const GestionPaquetes = () => {
   const [paquetes, setPaquetes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [terminoBusqueda, setTerminoBusqueda] = useState("");
+  
 
   // Estados para las imágenes y carousel
   const [paquetesConFotos, setPaquetesConFotos] = useState({});
@@ -324,28 +322,7 @@ const GestionPaquetes = () => {
   }, [idPaquete]);
 
   // Función para manejar búsqueda
-  const handleSearchChange = (e) => {
-    setTerminoBusqueda(e.target.value);
-
-    if (e.target.value.trim() === "") {
-      // Si la búsqueda está vacía, restaurar todos los paquetes
-      if (paquetes.length > 0) {
-        setPaqueteActual(paquetes[0]);
-      }
-    } else {
-      const termino = e.target.value.toLowerCase().trim();
-      const resultados = paquetes.filter(
-        (paquete) =>
-          paquete.nombrePaquete?.toLowerCase().includes(termino) ||
-          paquete.descripcion?.toLowerCase().includes(termino)
-      );
-
-      // Si hay resultados, actualizar el paquete actual al primer resultado
-      if (resultados.length > 0) {
-        setPaqueteActual(resultados[0]);
-      }
-    }
-  };
+  
 
   // Función para mostrar precio formateado
   const mostrarPrecio = (precio) => {
