@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaBars, FaTimes } from "react-icons/fa";
@@ -21,6 +22,50 @@ export const HeaderCliente = () => {
     if (fotoGuardada) {
       setFotoPerfil(fotoGuardada);
     }
+
+    // NUEVO: Obtener la foto actualizada del servidor al iniciar
+    const obtenerFotoActualizada = async () => {
+      try {
+        const cedula = localStorage.getItem("cedula");
+        const token = localStorage.getItem("token");
+        
+        if (!cedula || !token) return;
+        
+        const response = await axios.get(
+          `http://localhost:10101/cliente/perfil-completo/${cedula}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        
+        const clienteData = Array.isArray(response.data) ? response.data[0] : response.data;
+        
+        // Procesar la foto recibida del servidor
+        if (clienteData.foto_perfil || clienteData.foto) {
+          let fotoUrl = clienteData.foto_perfil || clienteData.foto;
+          
+          if (!fotoUrl.startsWith("http")) {
+            if (fotoUrl.includes("/uploads/images/")) {
+              fotoUrl = `http://localhost:10101${fotoUrl}`;
+            } else {
+              fotoUrl = `http://localhost:10101/uploads/images/${fotoUrl}`;
+            }
+          }
+          
+          console.log("HeaderCliente: Foto obtenida del servidor:", fotoUrl);
+          // Actualizar estado y localStorage
+          setFotoPerfil(fotoUrl);
+          localStorage.setItem("foto_perfil_cliente", fotoUrl);
+        }
+      } catch (error) {
+        console.error("Error al obtener foto actualizada:", error);
+      }
+    };
+    
+    // Ejecutar al montar el componente
+    obtenerFotoActualizada();
 
     // Escuchar el evento de actualización de foto
     const manejarActualizacionFoto = (event) => {
