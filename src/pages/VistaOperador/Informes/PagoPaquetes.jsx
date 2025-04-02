@@ -33,7 +33,46 @@ const PagoPaquetes = () => {
   const [paginatedPagos, setPaginatedPagos] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
 
-  // Función para cargar los pagos de paquetes desde la API
+  // Añadir estado para guardar la información de reservas
+  const [datosReservas, setDatosReservas] = useState([]);
+
+  // Cargar los datos directamente del endpoint específico para todas las reservas
+  useEffect(() => {
+    const cargarDatosReservas = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+          console.error('No se encontró token de autenticación');
+          return;
+        }
+        
+        // Usar la ruta para todas las reservas
+        const response = await axios.get('http://localhost:10101/reserva/todas', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        // Guardar los datos, pero filtrando solo los que son paquetes
+        if (response.data && response.data.result) {
+          // Filtrar para incluir solo los que tienen infoPaquete
+          const soloReservasPaquetes = response.data.result.filter(
+            reserva => reserva.infoPaquete !== null
+          );
+          
+          setDatosReservas(soloReservasPaquetes);
+          console.log("Datos de reservas (solo paquetes):", soloReservasPaquetes);
+        }
+      } catch (error) {
+        console.error("Error al cargar datos de reservas:", error);
+      }
+    };
+    
+    cargarDatosReservas();
+  }, []);
+
+  // Update the useEffect that fetches pagos to filter based on datosReservas
   useEffect(() => {
     const fetchPagos = async () => {
       setLoading(true);
@@ -68,20 +107,68 @@ const PagoPaquetes = () => {
           throw new Error('Formato de respuesta inválido desde el servidor.');
         }
         
-        setPagos(pagosList);
-        setFilteredPagos(pagosList);
+        // Mostrar información detallada de cada pago
+        pagosList.forEach((pago, index) => {
+          console.log(`Pago ${index + 1} - Datos completos:`, pago);
+        });
         
-        // Calcular estadísticas
-        const montoTotal = pagosList.reduce((sum, pago) => sum + (pago.montoPagado || pago.monto || 0), 0);
-        const pagosPendientes = pagosList.filter(p => 
+        // Filtrar pagos para que solo incluya los que están en datosReservas
+        const pagosFiltrados = pagosList.filter(pago => {
+          // Si datosReservas está vacío, no filtramos para evitar que no se muestre nada
+          if (datosReservas.length === 0) return true;
+          
+          // Intentar encontrar una reserva que coincida con el pago
+          return datosReservas.some(reserva => {
+            // Usar diferentes propiedades para hacer coincidir pago con reserva
+            const nombrePaquetePago = pago.nombrePaquete || (pago.infoPaquete ? pago.infoPaquete.nombrePaquete : '');
+            const nombrePaqueteReserva = reserva.infoPaquete ? reserva.infoPaquete.nombrePaquete : '';
+            
+            // Cliente del pago
+            const clientePago = 
+              pago.nombreCliente ||
+              (pago.infoCliente ? pago.infoCliente.nombreCompleto : '') ||
+              (pago.cliente ? (typeof pago.cliente === 'string' ? pago.cliente : pago.cliente.nombre) : '') ||
+              `${pago.primerNombre || ''} ${pago.primerApellido || ''}`.trim() || 
+              `${pago.clienteNombre || ''} ${pago.clienteApellido || ''}`.trim();
+            
+            const clienteReserva = reserva.nombre_cliente || '';
+            
+            // Intentar hacer coincidir por nombre de paquete y cliente
+            const coincidePaqueteYCliente = 
+              nombrePaquetePago && 
+              nombrePaqueteReserva && 
+              clientePago && 
+              clienteReserva &&
+              nombrePaquetePago.toLowerCase() === nombrePaqueteReserva.toLowerCase() && 
+              clientePago.toLowerCase().includes(clienteReserva.toLowerCase());
+            
+            // Intentar hacer coincidir por ID si está disponible
+            const coincideID = 
+              pago.idReserva && 
+              reserva.id && 
+              pago.idReserva.toString() === reserva.id.toString();
+            
+            return coincidePaqueteYCliente || coincideID;
+          });
+        });
+        
+        console.log('Pagos filtrados que coinciden con reservas:', pagosFiltrados);
+        console.log(`Se filtró de ${pagosList.length} pagos a ${pagosFiltrados.length} pagos`);
+        
+        setPagos(pagosFiltrados);
+        setFilteredPagos(pagosFiltrados);
+        
+        // Calcular estadísticas con los pagos filtrados
+        const montoTotal = pagosFiltrados.reduce((sum, pago) => sum + (pago.montoPagado || pago.monto || 0), 0);
+        const pagosPendientes = pagosFiltrados.filter(p => 
           p.estado === 'pendiente' || p.estadoPago === 'pendiente'
         ).length;
-        const pagosCompletados = pagosList.filter(p => 
+        const pagosCompletados = pagosFiltrados.filter(p => 
           p.estado === 'completado' || p.estadoPago === 'completado'
         ).length;
         
         setEstadisticas({
-          totalPagos: pagosList.length,
+          totalPagos: pagosFiltrados.length,
           montoTotal,
           pagosPendientes,
           pagosCompletados
@@ -121,8 +208,11 @@ const PagoPaquetes = () => {
       }
     };
     
-    fetchPagos();
-  }, []);
+    // Only fetch pagos if we have reservas data
+    if (datosReservas.length > 0) {
+      fetchPagos();
+    }
+  }, [datosReservas]); // Add datosReservas as a dependency to re-run when it changes
 
   // Actualizar paginación cuando cambian los datos filtrados
   useEffect(() => {
@@ -174,9 +264,13 @@ const PagoPaquetes = () => {
         // Buscar en diferentes campos dependiendo de la estructura de datos
         const nombrePaquete = pago.nombrePaquete || pago.infoPaquete?.nombrePaquete || '';
         const cliente = 
-          (pago.cliente || '') || 
-          `${pago.primerNombre || ''} ${pago.primerApellido || ''}` || 
-          `${pago.clienteNombre || ''} ${pago.clienteApellido || ''}`;
+          pago.nombreCliente ||
+          pago.infoCliente?.nombreCompleto ||
+          pago.cliente?.nombre ||
+          (pago.cliente && typeof pago.cliente === 'string' ? pago.cliente : '') ||
+          `${pago.primerNombre || ''} ${pago.primerApellido || ''}`.trim() || 
+          `${pago.clienteNombre || ''} ${pago.clienteApellido || ''}`.trim() ||
+          'N/A';
         const metodoPago = pago.metodoPago || '';
         
         return (
@@ -368,14 +462,14 @@ const PagoPaquetes = () => {
       });
       
       // Título principal centrado
-      worksheet.mergeCells('A1:G1');
+      worksheet.mergeCells('A1:L1');
       const titleRow = worksheet.getRow(1);
       titleRow.height = 50;
       titleRow.getCell(1).value = 'REPORTE DE PAGOS DE PAQUETES TURÍSTICOS';
       titleRow.getCell(1).style = titleStyle;
       
       // Subtítulo con fecha
-      worksheet.mergeCells('A2:G2');
+      worksheet.mergeCells('A2:L2');
       const subtitleRow = worksheet.getRow(2);
       subtitleRow.height = 20;
       subtitleRow.getCell(1).value = `Generado el: ${new Date().toLocaleDateString('es-ES', {
@@ -388,7 +482,7 @@ const PagoPaquetes = () => {
       subtitleRow.getCell(1).style = subtitleStyle;
       
       // Línea divisoria verde
-      worksheet.mergeCells('A3:G3');
+      worksheet.mergeCells('A3:L3');
       const dividerRow = worksheet.getRow(3);
       dividerRow.height = 6;
       dividerRow.getCell(1).fill = { 
@@ -398,7 +492,7 @@ const PagoPaquetes = () => {
       };
       
       // Encabezado del resumen estadístico
-      worksheet.mergeCells('A4:G4');
+      worksheet.mergeCells('A4:L4');
       const statsHeaderRow = worksheet.getRow(4);
       statsHeaderRow.height = 25;
       statsHeaderRow.getCell(1).value = 'RESUMEN ESTADÍSTICO';
@@ -427,7 +521,7 @@ const PagoPaquetes = () => {
       statLabelsRow.getCell(5).font = { bold: true };
       
       // Monto Total
-      worksheet.mergeCells('G5:G5');
+      worksheet.mergeCells('G5:H5');
       statLabelsRow.getCell(7).value = 'Monto Total';
       statLabelsRow.getCell(7).alignment = { horizontal: 'center', vertical: 'middle' };
       statLabelsRow.getCell(7).font = { bold: true };
@@ -452,7 +546,7 @@ const PagoPaquetes = () => {
       statValuesRow.getCell(5).style = pagosPendientesStyle;
       
       // Valor Monto Total
-      worksheet.mergeCells('G6:G6');
+      worksheet.mergeCells('G6:H6');
       statValuesRow.getCell(7).value = estadisticas.montoTotal;
       statValuesRow.getCell(7).style = montoTotalStyle;
       
@@ -461,8 +555,8 @@ const PagoPaquetes = () => {
       spacerRow.height = 10;
       
       // Encabezado de HISTORIAL DE TRANSACCIONES
-      worksheet.mergeCells('A8:G8');
-      const headerRow = worksheet.getRow(8);
+      worksheet.mergeCells('A8:L8');
+      const headerRow = worksheet.getRow(8);  
       headerRow.height = 25;
       headerRow.getCell(1).value = 'HISTORIAL DE TRANSACCIONES';
       headerRow.getCell(1).style = subHeaderStyle;
@@ -470,7 +564,20 @@ const PagoPaquetes = () => {
       // Encabezados de columnas
       const columnHeaderRow = worksheet.getRow(9);
       columnHeaderRow.height = 25;
-      columnHeaderRow.values = ['ID', 'Paquete', 'Cliente', 'Monto', 'Método de Pago', 'Estado', 'Fecha'];
+      columnHeaderRow.values = [
+        'ID Pago', 
+        'Radicado', 
+        'Paquete', 
+        'Cliente', 
+        'Guía', 
+        'Personas', 
+        'Método de Pago', 
+        'Fecha Reserva', 
+        'Fecha Inicio', 
+        'Hora Inicio', 
+        'Monto', 
+        'Estado'
+      ];
       columnHeaderRow.eachCell((cell) => {
         cell.style = headerStyle;
       });
@@ -481,26 +588,85 @@ const PagoPaquetes = () => {
       // Agregar datos de pagos
       filteredPagos.forEach((pago, index) => {
         // Adaptar según la estructura de datos que venga de la API
-        const id = pago.id || pago.idPago || '';
+        const idReserva = pago.idReserva || pago.id || 'N/A';
+        const radicado = pago.radicado || pago.numRadicado || 'N/A';
         const nombrePaquete = pago.nombrePaquete || pago.infoPaquete?.nombrePaquete || 'N/A';
+        
+        // Extraer el nombre del cliente
         const cliente = 
-          (pago.cliente || '') || 
-          `${pago.primerNombre || ''} ${pago.primerApellido || ''}` || 
-          `${pago.clienteNombre || ''} ${pago.clienteApellido || ''}` ||
+          pago.nombreCliente ||
+          pago.infoCliente?.nombreCompleto ||
+          pago.cliente?.nombre ||
+          (pago.cliente && typeof pago.cliente === 'string' ? pago.cliente : '') ||
+          `${pago.primerNombre || ''} ${pago.primerApellido || ''}`.trim() || 
+          `${pago.clienteNombre || ''} ${pago.clienteApellido || ''}`.trim() ||
           'N/A';
+        
+        // Buscar la reserva correspondiente usando nombre de paquete y cliente como criterios
+        const reserva = datosReservas.find(r => {
+          const nombrePaqueteReserva = r.infoPaquete?.nombrePaquete || '';
+          // Solo considerar si es un paquete (tiene infoPaquete)
+          return r.infoPaquete !== null && 
+                 r.nombre_cliente === cliente && 
+                 (nombrePaqueteReserva === nombrePaquete || pago.nombrePaquete === r.infoPaquete?.nombrePaquete);
+        });
+        
+        // Si no encuentra por paquete, intentar por fecha
+        const reservaAlternativa = !reserva ? datosReservas.find(r => 
+          r.nombre_cliente === cliente && 
+          new Date(r.fechaInicio).toDateString() === new Date(pago.fechaInicio || pago.fecha || pago.fechaReserva).toDateString()
+        ) : null;
+        
+        // Usar la reserva encontrada o la alternativa
+        const reservaFinal = reserva || reservaAlternativa;
+        
+        // Usar exactamente los campos que vienen de la API
+        const horaInicio = reservaFinal ? reservaFinal.horaInicio : 'N/A';
+        const fechaInicio = reservaFinal ? formatearFecha(reservaFinal.fechaInicio) : formatearFecha(pago.fechaReserva || pago.createdAt || pago.fecha || pago.fechaPago);
+        const nombreGuia = reservaFinal ? reservaFinal.nombre_guia : 'N/A';
+        
+        // Asegurarse de obtener el número de personas de todos los posibles campos
+        const numPersonas = 
+          pago.numPersonas || 
+          pago.numeroPersonas || 
+          pago.cantidadPersonas || 
+          pago.cantidad_personas || 
+          (pago.personas && typeof pago.personas === 'number' ? pago.personas : null) ||
+          'N/A';
+        
         const monto = pago.monto || pago.montoPagado || 0;
         const metodoPago = pago.metodoPago || 'N/A';
+        
         const estado = pago.estado || pago.estadoPago || 'pendiente';
-        const fecha = formatearFecha(pago.fecha || pago.fechaPago || pago.createdAt);
+        
+        // Obtener la cédula del cliente
+        const cedulaCliente = reservaFinal ? reservaFinal.cedula : 'N/A';
+        
+        // Format only the client with cedula
+        const clienteFormateado = `${cliente}\nCC: ${cedulaCliente !== 'N/A' ? cedulaCliente : 'No disponible'}`;
+        
+        // Keep guide name only, without cedula
+        const guiaFormateado = nombreGuia;
+        
+        // Get the actual fecha_reserva or fechaReserva field from reservation
+        let fechaReserva = 'N/A';
+        if (reservaFinal) {
+          fechaReserva = formatearFecha(reservaFinal.fecha_reserva || reservaFinal.fechaReserva);
+        }
         
         const row = worksheet.addRow([
-          id,
+          idReserva,
+          radicado,
           nombrePaquete,
-          cliente,
-          monto,
+          clienteFormateado,
+          guiaFormateado,
+          numPersonas,
           metodoPago,
-          estado.charAt(0).toUpperCase() + estado.slice(1),
-          fecha
+          fechaReserva,
+          fechaInicio,
+          horaInicio,
+          monto,
+          estado.charAt(0).toUpperCase() + estado.slice(1)
         ]);
         
         // Color de fondo alternado para mejor legibilidad
@@ -514,7 +680,7 @@ const PagoPaquetes = () => {
           };
           
           // Formato especial para la columna de monto
-          if (colNumber === 4) {
+          if (colNumber === 11) {
             cell.style = {
               ...cell.style,
               ...moneyStyle
@@ -523,7 +689,7 @@ const PagoPaquetes = () => {
         });
         
         // Aplicar estilo especial a la columna de estado
-        const estadoCell = row.getCell(6);
+        const estadoCell = row.getCell(12);
         if (estado.toLowerCase() === 'completado') {
           Object.assign(estadoCell.style, completadoCellStyle);
         } else {
@@ -535,7 +701,7 @@ const PagoPaquetes = () => {
       
       // Agregar un footer
       const footerRowIndex = rowIndex + 1;
-      worksheet.mergeCells(`A${footerRowIndex}:G${footerRowIndex}`);
+      worksheet.mergeCells(`A${footerRowIndex}:L${footerRowIndex}`);
       const footerRow = worksheet.getRow(footerRowIndex);
       footerRow.height = 24;
       footerRow.getCell(1).value = 'ExploCocora - Sistema de Gestión de Rutas Turísticas © 2024';
@@ -555,14 +721,19 @@ const PagoPaquetes = () => {
   };
   
   // Formatear fecha
-  const formatearFecha = (fechaStr) => {
-    if (!fechaStr) return 'N/A';
-    const fecha = new Date(fechaStr);
-    return fecha.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
+  const formatearFecha = (fechaString) => {
+    if (!fechaString) return 'N/A';
+    try {
+      const fecha = new Date(fechaString);
+      return fecha.toLocaleDateString('es-CO', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    } catch (error) {
+      console.error("Error al formatear fecha:", error);
+      return 'N/A';
+    }
   };
 
   return (
@@ -760,19 +931,24 @@ const PagoPaquetes = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead>
                 <tr className="bg-gray-50">
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Reserva</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Radicado</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paquete</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Guía</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Personas</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Método de Pago</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Reserva</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Inicio</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hora Inicio</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading ? (
                   <tr>
-                    <td colSpan="7" className="px-6 py-8 text-center">
+                    <td colSpan="12" className="px-6 py-8 text-center">
                       <div className="flex flex-col items-center justify-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
                         <span className="mt-4 text-gray-500">Cargando pagos...</span>
@@ -781,7 +957,7 @@ const PagoPaquetes = () => {
                   </tr>
                 ) : error ? (
                   <tr>
-                    <td colSpan="7" className="px-6 py-8 text-center">
+                    <td colSpan="12" className="px-6 py-8 text-center">
                       <div className="flex flex-col items-center">
                         <svg className="w-16 h-16 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -793,7 +969,7 @@ const PagoPaquetes = () => {
                   </tr>
                 ) : paginatedPagos.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="px-6 py-12 text-center">
+                    <td colSpan="12" className="px-6 py-8 text-center">
                       <div className="flex flex-col items-center">
                         <svg className="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -806,28 +982,98 @@ const PagoPaquetes = () => {
                 ) : (
                   paginatedPagos.map((pago, index) => {
                     // Adaptar según la estructura de datos que venga de la API
-                    const id = pago.id || pago.idPago || index;
+                    const idReserva = pago.idReserva || pago.id || 'N/A';
+                    const radicado = pago.radicado || pago.numRadicado || 'N/A';
                     const nombrePaquete = pago.nombrePaquete || pago.infoPaquete?.nombrePaquete || 'N/A';
+                    
+                    // Extraer el nombre del cliente
                     const cliente = 
-                      (pago.cliente || '') || 
-                      `${pago.primerNombre || ''} ${pago.primerApellido || ''}` || 
-                      `${pago.clienteNombre || ''} ${pago.clienteApellido || ''}` ||
+                      pago.nombreCliente ||
+                      pago.infoCliente?.nombreCompleto ||
+                      pago.cliente?.nombre ||
+                      (pago.cliente && typeof pago.cliente === 'string' ? pago.cliente : '') ||
+                      `${pago.primerNombre || ''} ${pago.primerApellido || ''}`.trim() || 
+                      `${pago.clienteNombre || ''} ${pago.clienteApellido || ''}`.trim() ||
                       'N/A';
+                    
+                    // Buscar la reserva correspondiente usando nombre de paquete y cliente como criterios
+                    const reserva = datosReservas.find(r => {
+                      const nombrePaqueteReserva = r.infoPaquete?.nombrePaquete || '';
+                      // Solo considerar si es un paquete (tiene infoPaquete)
+                      return r.infoPaquete !== null && 
+                             r.nombre_cliente === cliente && 
+                             (nombrePaqueteReserva === nombrePaquete || pago.nombrePaquete === r.infoPaquete?.nombrePaquete);
+                    });
+                    
+                    // Si no encuentra por paquete, intentar por fecha
+                    const reservaAlternativa = !reserva ? datosReservas.find(r => 
+                      r.nombre_cliente === cliente && 
+                      new Date(r.fechaInicio).toDateString() === new Date(pago.fechaInicio || pago.fecha || pago.fechaReserva).toDateString()
+                    ) : null;
+                    
+                    // Usar la reserva encontrada o la alternativa
+                    const reservaFinal = reserva || reservaAlternativa;
+                    
+                    // Usar exactamente los campos que vienen de la API
+                    const horaInicio = reservaFinal ? reservaFinal.horaInicio : 'N/A';
+                    const fechaInicio = reservaFinal ? formatearFecha(reservaFinal.fechaInicio) : formatearFecha(pago.fechaReserva || pago.createdAt || pago.fecha || pago.fechaPago);
+                    const nombreGuia = reservaFinal ? reservaFinal.nombre_guia : 'N/A';
+                    
+                    // Asegurarse de obtener el número de personas de todos los posibles campos
+                    const numPersonas = 
+                      pago.numPersonas || 
+                      pago.numeroPersonas || 
+                      pago.cantidadPersonas || 
+                      pago.cantidad_personas || 
+                      (pago.personas && typeof pago.personas === 'number' ? pago.personas : null) ||
+                      'N/A';
+                    
                     const monto = pago.monto || pago.montoPagado || 0;
                     const metodoPago = pago.metodoPago || 'N/A';
+                    
                     const estado = pago.estado || pago.estadoPago || 'pendiente';
-                    const fecha = pago.fecha || pago.fechaPago || pago.createdAt;
+                    
+                    // Obtener la cédula del cliente
+                    const cedulaCliente = reservaFinal ? reservaFinal.cedula : 'N/A';
+                    
+                    // Format only the client with cedula
+                    const clienteFormateado = `${cliente}\nCC: ${cedulaCliente !== 'N/A' ? cedulaCliente : 'No disponible'}`;
+                    
+                    // Keep guide name only, without cedula
+                    const guiaFormateado = nombreGuia;
+                    
+                    // Get the actual fecha_reserva or fechaReserva field from reservation
+                    let fechaReserva = 'N/A';
+                    if (reservaFinal) {
+                      fechaReserva = formatearFecha(reservaFinal.fecha_reserva || reservaFinal.fechaReserva);
+                    }
+                    
+                    // Solo renderizar si está relacionado con un paquete
+                    if (!nombrePaquete || nombrePaquete === 'N/A') {
+                      return null; // No renderizar esta fila si no es un paquete
+                    }
                     
                     return (
-                      <tr key={id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{id}</td>
+                      <tr key={`${idReserva}-${index}`} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{idReserva}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{radicado}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">{nombrePaquete}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{cliente}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">
-                          ${Number(monto).toLocaleString('es-CO')}
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                          <div className="font-medium">{cliente}</div>
+                          <div className="text-xs text-gray-500">CC: {cedulaCliente !== 'N/A' ? cedulaCliente : 'No disponible'}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                          <div className="font-medium">{nombreGuia}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{numPersonas}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                           <span className="px-2 py-1 bg-gray-100 rounded text-gray-800">{metodoPago}</span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{fechaReserva}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{fechaInicio}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{horaInicio}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">
+                          ${Number(monto).toLocaleString('es-CO')}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -837,9 +1083,6 @@ const PagoPaquetes = () => {
                           }`}>
                             {estado.charAt(0).toUpperCase() + estado.slice(1)}
                           </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                          {formatearFecha(fecha)}
                         </td>
                       </tr>
                     );

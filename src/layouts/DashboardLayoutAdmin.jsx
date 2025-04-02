@@ -728,26 +728,6 @@ const DashboardLayoutAdmin = ({ children }) => {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4">
             {/* Barra de búsqueda */}
             <div className="w-full sm:flex-1 sm:max-w-xl mb-3 sm:mb-0">
-              <form onSubmit={handleSearch} className="flex items-center">
-                <input
-                  type="text"
-                  placeholder="Buscar..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (searchResults.length > 0) setShowResults(true);
-                  }}
-                  className="w-full px-3 sm:px-4 py-2 rounded-lg bg-emerald-50 text-gray-900 border border-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm sm:text-base"
-                />
-                <button 
-                  type="submit"
-                  className="p-2 rounded-lg text-emerald-600 hover:bg-emerald-50"
-                >
-                  <Search className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
-              </form>
-              
               {/* Resultados de búsqueda */}
               {showResults && (
                 <div 
