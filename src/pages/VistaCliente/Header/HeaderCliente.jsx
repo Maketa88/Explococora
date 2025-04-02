@@ -14,22 +14,24 @@ import ProfileDropdown from "../Cliente";
 export const HeaderCliente = () => {
   const { menuAbierto, alternarMenu } = useAlternarMenu();
   const { t, i18n } = useTranslation();
-  const [fotoPerfil, setFotoPerfil] = useState(Avatar);
+  const [fotoPerfil, setFotoPerfil] = useState(null); // Inicialmente null para evitar mostrar cualquier foto
+  const [cargandoFoto, setCargandoFoto] = useState(true);
 
   useEffect(() => {
-    // Cargar la foto del perfil desde localStorage al montar el componente
-    const fotoGuardada = localStorage.getItem("foto_perfil_cliente");
-    if (fotoGuardada) {
-      setFotoPerfil(fotoGuardada);
-    }
-
-    // NUEVO: Obtener la foto actualizada del servidor al iniciar
+    // PRIORIDAD: Obtener la foto actualizada del servidor primero
     const obtenerFotoActualizada = async () => {
       try {
+        setCargandoFoto(true);
         const cedula = localStorage.getItem("cedula");
         const token = localStorage.getItem("token");
         
-        if (!cedula || !token) return;
+        if (!cedula || !token) {
+          // Si no hay credenciales, usar la foto de localStorage o Avatar como fallback
+          const fotoGuardada = localStorage.getItem("foto_perfil_cliente");
+          setFotoPerfil(fotoGuardada || Avatar);
+          setCargandoFoto(false);
+          return;
+        }
         
         const response = await axios.get(
           `http://localhost:10101/cliente/perfil-completo/${cedula}`,
@@ -55,16 +57,26 @@ export const HeaderCliente = () => {
           }
           
           console.log("HeaderCliente: Foto obtenida del servidor:", fotoUrl);
+          
           // Actualizar estado y localStorage
           setFotoPerfil(fotoUrl);
           localStorage.setItem("foto_perfil_cliente", fotoUrl);
+        } else {
+          // Si el servidor no devuelve foto, usar la del localStorage o la imagen por defecto
+          const fotoGuardada = localStorage.getItem("foto_perfil_cliente");
+          setFotoPerfil(fotoGuardada || Avatar);
         }
       } catch (error) {
         console.error("Error al obtener foto actualizada:", error);
+        // En caso de error, usar la foto del localStorage o la imagen por defecto
+        const fotoGuardada = localStorage.getItem("foto_perfil_cliente");
+        setFotoPerfil(fotoGuardada || Avatar);
+      } finally {
+        setCargandoFoto(false);
       }
     };
     
-    // Ejecutar al montar el componente
+    // Ejecutar al montar el componente - prioridad alta
     obtenerFotoActualizada();
 
     // Escuchar el evento de actualización de foto
@@ -161,11 +173,17 @@ export const HeaderCliente = () => {
               </button>
             </div>
             <div className="flex items-center">
-              <ProfileDropdown
-                imgSrc={fotoPerfil}
-                alt="Perfil de Usuario"
-                className="scale-90 sm:scale-100"
-              />
+              {cargandoFoto ? (
+                <div className="h-11 w-11 rounded-full bg-teal-700 animate-pulse flex items-center justify-center">
+                  <div className="h-9 w-9 rounded-full bg-teal-600"></div>
+                </div>
+              ) : (
+                <ProfileDropdown
+                  imgSrc={fotoPerfil || Avatar}
+                  alt="Perfil de Usuario"
+                  className="scale-90 sm:scale-100"
+                />
+              )}
             </div>
           </div>
         </ul>
