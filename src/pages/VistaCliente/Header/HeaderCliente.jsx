@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -12,6 +13,30 @@ import ProfileDropdown from "../Cliente";
 export const HeaderCliente = () => {
   const { menuAbierto, alternarMenu } = useAlternarMenu();
   const { t, i18n } = useTranslation();
+  const [fotoPerfil, setFotoPerfil] = useState(Avatar);
+
+  useEffect(() => {
+    // Cargar la foto del perfil desde localStorage al montar el componente
+    const fotoGuardada = localStorage.getItem("foto_perfil_cliente");
+    if (fotoGuardada) {
+      setFotoPerfil(fotoGuardada);
+    }
+
+    // Escuchar el evento de actualización de foto
+    const manejarActualizacionFoto = (event) => {
+      const nuevaFoto = event.detail.fotoUrl;
+      console.log("HeaderCliente: Foto actualizada recibida:", nuevaFoto);
+      setFotoPerfil(nuevaFoto);
+    };
+
+    // Registrar el evento
+    window.addEventListener("fotoPerfilClienteActualizada", manejarActualizacionFoto);
+
+    // Limpiar el evento al desmontar
+    return () => {
+      window.removeEventListener("fotoPerfilClienteActualizada", manejarActualizacionFoto);
+    };
+  }, []);
 
   const cambiarIdioma = () => {
     const nuevoIdioma = i18n.language === "es" ? "en" : "es";
@@ -92,7 +117,7 @@ export const HeaderCliente = () => {
             </div>
             <div className="flex items-center">
               <ProfileDropdown
-                imgSrc={Avatar}
+                imgSrc={fotoPerfil}
                 alt="Perfil de Usuario"
                 className="scale-90 sm:scale-100"
               />

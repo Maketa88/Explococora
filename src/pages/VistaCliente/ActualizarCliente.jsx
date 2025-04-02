@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FaCamera, FaEnvelope, FaSave, FaUser } from "react-icons/fa";
+import { FaCamera, FaEnvelope, FaSave } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import Avatar from "../../assets/Images/avatar.png";

@@ -9,11 +9,20 @@ const ProfileDropdown = ({ imgSrc, alt }) => {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
+  // Actualizar la imagen cuando cambie la prop imgSrc
+  useEffect(() => {
+    if (imgSrc && imgSrc !== profileImage) {
+      setProfileImage(imgSrc);
+      console.log("ProfileDropdown: Imagen actualizada desde props:", imgSrc);
+    }
+  }, [imgSrc, profileImage]);
+
   // Cargar la imagen de perfil del localStorage
   useEffect(() => {
     const fotoPerfil = localStorage.getItem("foto_perfil_cliente");
     if (fotoPerfil) {
       setProfileImage(fotoPerfil);
+      console.log("ProfileDropdown: Imagen cargada desde localStorage:", fotoPerfil);
     }
 
     // Función para escuchar cambios en localStorage
@@ -21,18 +30,22 @@ const ProfileDropdown = ({ imgSrc, alt }) => {
       const nuevaFotoPerfil = localStorage.getItem("foto_perfil_cliente");
       if (nuevaFotoPerfil && nuevaFotoPerfil !== profileImage) {
         setProfileImage(nuevaFotoPerfil);
+        console.log("ProfileDropdown: Imagen actualizada por cambio en localStorage:", nuevaFotoPerfil);
       }
     };
 
     // Función para escuchar el evento personalizado de actualización de foto
     const handleFotoPerfilActualizada = (event) => {
+      console.log("ProfileDropdown: Evento de actualización recibido:", event.detail);
       if (event.detail && event.detail.fotoUrl) {
         setProfileImage(event.detail.fotoUrl);
+        console.log("ProfileDropdown: Imagen actualizada por evento:", event.detail.fotoUrl);
       } else {
         // Si no hay URL en el evento, intentar obtenerla del localStorage
         const nuevaFotoPerfil = localStorage.getItem("foto_perfil_cliente");
         if (nuevaFotoPerfil) {
           setProfileImage(nuevaFotoPerfil);
+          console.log("ProfileDropdown: Fallback a localStorage:", nuevaFotoPerfil);
         }
       }
     };
@@ -46,7 +59,7 @@ const ProfileDropdown = ({ imgSrc, alt }) => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('fotoPerfilClienteActualizada', handleFotoPerfilActualizada);
     };
-  }, [profileImage]);
+  }, []);  // Eliminamos profileImage de las dependencias para evitar bucles
 
   const cerrarSesion = () => {
     Swal.fire({
