@@ -5,7 +5,7 @@ import { FaHiking, FaTshirt } from 'react-icons/fa';
 import { GiHorseHead } from 'react-icons/gi';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-export const RecomendacionesVestimenta = () => {
+export const RecomendacionesVestimentaPaquete = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -393,4 +393,4 @@ export const RecomendacionesVestimenta = () => {
   );
 };
 
-export default RecomendacionesVestimenta; 
+export default RecomendacionesVestimentaPaquete; 

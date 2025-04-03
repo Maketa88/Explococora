@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FaChild } from 'react-icons/fa';
+import { FaExclamationTriangle } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-export const AutorizacionMenores = () => {
+export const AceptacionRiesgosPaquetes = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -27,8 +27,8 @@ export const AutorizacionMenores = () => {
       return;
     }
 
-    // Redirigir al componente de aceptación de riesgos
-    navigate('/VistaCliente/reserva/aceptacion-riesgos', {
+    // Redirigir al componente de recomendaciones de vestimenta
+    navigate('/VistaCliente/reserva/recomendaciones-vestimenta', {
       state: {
         formData,
         rutaInfo,
@@ -38,7 +38,13 @@ export const AutorizacionMenores = () => {
   };
   
   const handleCancelar = () => {
-    navigate(`/VistaCliente/reserva-ruta/${idRuta}`, { state: { rutaInfo } });
+    navigate('/VistaCliente/reserva/autorizacion-menores', { 
+      state: { 
+        formData, 
+        rutaInfo, 
+        idRuta 
+      } 
+    });
   };
 
   return (
@@ -167,7 +173,7 @@ export const AutorizacionMenores = () => {
               <div className="transform rotate-12">
                 <div className="w-24 h-24 relative">
                   <div className="rounded-full bg-teal-50 border-2 border-teal-600 flex items-center justify-center w-full h-full">
-                    <FaChild className="h-12 w-12 text-teal-800" />
+                    <FaExclamationTriangle className="h-12 w-12 text-teal-800" />
                   </div>
                 </div>
               </div>
@@ -183,52 +189,52 @@ export const AutorizacionMenores = () => {
           {/* Título con icono */}
           <div className="flex items-center justify-center gap-3 mb-6 text-center">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <h2 className="text-2xl font-bold text-teal-800">
-              Autorización y Cumplimiento de Políticas de Seguridad para Menores de Edad
+              Conocimiento y Aceptación de los Riesgos que Involucra la Actividad
             </h2>
           </div>
           
           {/* Contenido con diseño mejorado */}
           <div className="text-gray-700 space-y-6 mb-8 px-4 py-6 bg-gradient-to-br from-teal-50 to-white rounded-xl border border-teal-100 shadow-sm text-justify">
             <p className="leading-relaxed">
-              <span className="text-teal-700 font-semibold">Como padre, madre o representante legal</span>, autorizo la participación de mi hijo/a o menor a cargo en la actividad de cabalgata o caminata organizada en el Valle del Cocora, Salento, Quindío, a través de la Pagina Web Explococora Declaro que he sido informado/a sobre los riesgos inherentes a esta actividad y acepto las normas de seguridad establecidas, incluyendo las restricciones de edad aplicables a menores entre 12 y 18 años, según la Norma Técnica Sectorial AV 014.
+              <span className="text-teal-700 font-semibold">Yo, como usuario y participante</span>, declaro haber leído y comprendido las condiciones y riesgos inherentes a la actividad de cabalgata o caminata organizada en el Valle del Cocora, Salento, Quindío, a través de la Pagina Web Explococora, acepto participar bajo mi propia responsabilidad.
             </p>
             
             <div className="flex items-start gap-2">
               <p className="leading-relaxed">
-                Entiendo que la cabalgata o caminata puede implicar ciertos riesgos naturales, como terrenos irregulares, cambios climáticos inesperados y la interacción con caballos u otros animales presentes en la zona. La operadora turística ha explicado de manera clara y suficiente las medidas de seguridad implementadas, incluyendo su plan de prevención, atención y respuesta ante emergencias.
+                Reconozco que esta actividad implica riesgos derivados de terrenos irregulares, cambios climáticos inesperados y la interacción con caballos u otros animales presentes en la zona, y he sido informado de manera clara sobre las medidas de seguridad implementadas, incluyendo el plan de prevención, atención y respuesta ante emergencias.
               </p>
             </div>
             
             <div className="flex items-start gap-2">
               <p className="leading-relaxed">
-                Declaro que el menor se encuentra en condiciones óptimas de salud y no presenta contraindicaciones médicas para participar en la actividad. Asimismo, comprendo y acepto las normas reguladoras de la cabalgata o caminata, y asumo la total responsabilidad por cualquier eventualidad que pueda ocurrirle al menor durante el recorrido, exceptuando aquellas derivadas de negligencia por parte de la organización.
+                Asimismo, declaro que me encuentro en óptimas condiciones físicas y que no padezco restricciones médicas, ni estoy bajo el efecto de alcohol u otras sustancias psicoactivas; además, se prohíbe el consumo de bebidas en envases de vidrio y se establece que solo un jinete puede montar cada equino durante el recorrido.
               </p>
             </div>
             
             <div className="flex items-start gap-2">
               <p className="leading-relaxed">
-                Confirmo que la operadora turística no proporciona alimentos y no se hace responsable por los alimentos consumidos durante la actividad.
+                Acepto que la actividad cuenta con seguro de accidentes personales y seguros de responsabilidad civil y contractual, garantizados por la Compañía Suramericana de Seguros, bajo las pólizas N° 0844000581780 y 90000647859, y que se ofrece asistencia médica nacional para deportes extremos al teléfono 01-800-0110-422.
               </p>
             </div>
             
             <div className="flex items-start gap-2">
               <p className="leading-relaxed">
-                La actividad cuenta con cobertura de seguro de accidentes personales a través de la Compañía Suramericana de Seguros, bajo las pólizas N° 0844000581780 y 90000647859.
+                Eximo a Explococora, así como a sus organizadores y guías, de cualquier responsabilidad contractual o extracontractual por accidentes que puedan ocurrir durante el trayecto, comprometiéndome a asumir cualquier eventualidad que se derive de mi participación.
               </p>
             </div>
             
             <div className="flex items-start gap-2">
               <p className="leading-relaxed">
-                Autorizo el uso de imágenes capturadas durante la cabalgata o caminata para su posible publicación en la página web, redes sociales o boletín informativo de Explococora.
+                Además, autorizo el uso de las imágenes capturadas durante la actividad para su posible publicación en la página web, redes sociales o boletín informativo de la operadora.
               </p>
             </div>
             
             <div className="flex items-start gap-2">
               <p className="leading-relaxed">
-                Al marcar esta casilla, autorizo la participación del menor en el recorrido y confirmo que acepto todas las condiciones y términos aquí establecidos. Asumo la total responsabilidad sobre la participación del menor, sin necesidad de presentar una firma física o documento adicional.
+                Al marcar esta casilla, acepto de manera irrevocable todas las condiciones, riesgos y responsabilidades aquí expuestas, sin necesidad de firmar o completar información adicional.
               </p>
             </div>
           </div>
@@ -243,7 +249,9 @@ export const AutorizacionMenores = () => {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm text-red-700 font-medium">{error}</p>
+                  <p className="text-sm text-red-600">
+                    {error}
+                  </p>
                 </div>
               </div>
             </div>
@@ -261,7 +269,7 @@ export const AutorizacionMenores = () => {
                   className="mt-1 h-5 w-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
                 />
                 <label htmlFor="aceptarTerminos" className="ml-3 block text-sm text-gray-700">
-                  <span className="font-medium">He leído y comprendo todas las condiciones establecidas para la participación de menores de edad.</span> Como representante legal del menor, autorizo su participación y asumo la responsabilidad que esto conlleva, eximiendo a Explococora y sus guías de cualquier responsabilidad, salvo en casos de negligencia por parte de la organización.
+                  <span className="font-medium">He leído y comprendo todas las condiciones de riesgo.</span> Acepto participar bajo mi propia responsabilidad, eximiendo a Explococora y sus representantes de cualquier responsabilidad por accidentes derivados de mi participación en la actividad.
                 </label>
               </div>
             </div>
@@ -296,4 +304,4 @@ export const AutorizacionMenores = () => {
   );
 };
 
-export default AutorizacionMenores; 
+export default AceptacionRiesgosPaquetes; 

@@ -9,7 +9,7 @@ import Master from "../../assets/Images/Master.png";
 import Pago from "../../assets/Images/Pago.png";
 import Visa from "../../assets/Images/Visa.png";
 
-export const VistaPagoSimulado = () => {
+export const VistaPagoSimuladoPaquete = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -588,4 +588,4 @@ export const VistaPagoSimulado = () => {
   );
 };
 
-export default VistaPagoSimulado; 
+export default VistaPagoSimuladoPaquete; 

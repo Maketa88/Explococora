@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Pago from "../../assets/Images/Pago.png";
 import { formatearFecha } from '../../utils/formatUtils';
 
-export const ConfirmacionPago = () => {
+export const ConfirmacionPagoPaquete = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -408,4 +408,4 @@ export const ConfirmacionPago = () => {
   );
 };
 
-export default ConfirmacionPago; 
+export default ConfirmacionPagoPaquete; 
