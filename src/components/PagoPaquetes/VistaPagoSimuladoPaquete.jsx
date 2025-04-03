@@ -103,7 +103,7 @@ export const VistaPagoSimuladoPaquete = () => {
       }
       
       // Llamar a endpoint de simulación
-      const response = await axios.get(`http://localhost:10101/pagos-paquetes/simular/${radicado}`, {
+      const response = await axios.get(`http://localhost:10101/pago-paquetes/simular/${radicado}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
