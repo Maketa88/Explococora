@@ -1,9 +1,9 @@
 import axios from 'axios';
 import {
-    Clock, DollarSign,
-    Map,
-    Package,
-    ShoppingBag
+  Clock, DollarSign,
+  Map,
+  Package,
+  ShoppingBag
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { BotonPagoPaquete } from '../PagoPaquetes';

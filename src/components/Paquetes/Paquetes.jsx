@@ -926,7 +926,9 @@ const GestionPaquetes = () => {
                     {/* Botones */}
                     <div className="flex flex-col gap-4">
                       {/* Botón de reserva */}
-                      <BotonPagoPaquete paquete={paqueteActual} className="w-full py-3 rounded-xl text-white relative overflow-hidden group shadow-md transition-all duration-500 bg-gradient-to-br from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600" />
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <BotonPagoPaquete paquete={paqueteActual} className="w-full py-3 rounded-xl text-white relative overflow-hidden group shadow-md transition-all duration-500 bg-gradient-to-br from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600" />
+                      </div>
                     </div>
                   </div>
                 </div>
