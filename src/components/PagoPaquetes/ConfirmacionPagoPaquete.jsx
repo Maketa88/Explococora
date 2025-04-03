@@ -219,6 +219,27 @@ export const ConfirmacionPagoPaquete = () => {
                     </span>
                   </p>
                 )}
+
+                {/* Información específica del paquete (cuando está disponible) */}
+                {reservaInfo && reservaInfo.paqueteInfo && (
+                  <div className="bg-white p-4 rounded-lg border border-gray-200 mt-4 mb-4">
+                    <h3 className="font-semibold text-gray-700 mb-2">{t('detallesPaquete', 'Detalles del Paquete')}</h3>
+                    <p className="text-gray-700 font-medium">
+                      {t('nombrePaquete', 'Nombre')}: <span className="text-teal-700">{reservaInfo.paqueteInfo.nombrePaquete}</span>
+                    </p>
+                    {reservaInfo.paqueteInfo.descripcion && (
+                      <p className="text-gray-700 mt-1">
+                        <span className="font-medium">{t('descripcion', 'Descripción')}:</span> <span className="text-teal-700">{reservaInfo.paqueteInfo.descripcion}</span>
+                      </p>
+                    )}
+                    <p className="text-gray-700 mt-1">
+                      <span className="font-medium">{t('costo', 'Costo')}:</span> <span className="text-teal-700 font-bold">${reservaInfo.paqueteInfo.precio?.toLocaleString('es-CO')} COP</span>
+                    </p>
+                    <p className="text-gray-700 mt-1">
+                      <span className="font-medium">{t('personas', 'Personas')}:</span> <span className="text-teal-700">{reservaInfo.paqueteInfo.cantidadPersonas || 1}</span>
+                    </p>
+                  </div>
+                )}
               </div>
             )}
             

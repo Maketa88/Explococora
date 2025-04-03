@@ -30,6 +30,7 @@ export const RecomendacionesVestimentaPaquete = () => {
         radicado: radicadoReserva,
         paqueteInfo: {
           nombrePaquete: paqueteInfo.nombrePaquete,
+          descripcion: paqueteInfo.descripcion,
           precio: paqueteInfo.precio,
           cantidadPersonas: formData.cantidadPersonas,
           fechaInicio: formData.fechaInicioISO
@@ -193,7 +194,10 @@ export const RecomendacionesVestimentaPaquete = () => {
             <div className="flex flex-wrap items-center justify-between">
               <div className="mb-4 md:mb-0">
                 <h2 className="text-xl font-bold">{paqueteInfo.nombrePaquete}</h2>
-                <p className="text-teal-100">{paqueteInfo.tipo} • {paqueteInfo.dificultad}</p>
+                <p className="text-teal-100">{paqueteInfo.descripcion}</p>
+                <p className="mt-2 text-teal-200 font-semibold">
+                  ${paqueteInfo.precio?.toLocaleString('es-CO')} COP
+                </p>
               </div>
               
               <div className="flex items-center gap-4">
