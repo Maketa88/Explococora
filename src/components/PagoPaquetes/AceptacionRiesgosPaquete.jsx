@@ -252,52 +252,57 @@ export const AceptacionRiesgosPaquetes = () => {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm text-red-600">
-                    {error}
-                  </p>
+                  <p className="text-sm text-red-700 font-medium">{error}</p>
                 </div>
               </div>
             </div>
           )}
           
-          {/* Aceptación de términos */}
-          <div className="mb-8">
-            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-              <div className="flex items-start">
-                <input
-                  type="checkbox"
-                  id="aceptarTerminos"
-                  checked={aceptaTerminos}
-                  onChange={(e) => setAceptaTerminos(e.target.checked)}
-                  className="mt-1 h-5 w-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
-                />
-                <label htmlFor="aceptarTerminos" className="ml-3 block text-sm text-gray-700">
-                  <span className="font-medium">He leído y comprendo todas las condiciones de riesgo.</span> Acepto participar bajo mi propia responsabilidad, eximiendo a Explococora y sus representantes de cualquier responsabilidad por accidentes derivados de mi participación en la actividad.
-                </label>
+          {/* Checkbox con estilo mejorado */}
+          <div className="flex items-center mt-6 mb-8 p-4 bg-teal-50 rounded-lg border border-teal-200 transition-all duration-200 hover:shadow-md">
+            <div className="relative flex items-center">
+              <input
+                type="checkbox"
+                id="aceptarTerminos"
+                checked={aceptaTerminos}
+                onChange={(e) => setAceptaTerminos(e.target.checked)}
+                className="opacity-0 absolute h-6 w-6 cursor-pointer"
+              />
+              <div className={`bg-white border-2 rounded-md w-6 h-6 flex flex-shrink-0 justify-center items-center mr-2 focus-within:border-teal-500 transition-colors duration-200 ${aceptaTerminos ? 'border-teal-600 bg-teal-50' : 'border-gray-300'}`}>
+                <svg className={`fill-current w-3 h-3 text-teal-600 pointer-events-none ${aceptaTerminos ? 'opacity-100' : 'opacity-0'}`} viewBox="0 0 20 20">
+                  <path d="M0 11l2-2 5 5L18 3l2 2L7 18z" />
+                </svg>
               </div>
             </div>
+            <label htmlFor="aceptarTerminos" className="ml-2 text-gray-700 font-medium select-none cursor-pointer">
+              {t('aceptoTerminos', 'Acepto los términos y condiciones')}
+            </label>
           </div>
           
-          {/* Botones de acción */}
-          <div className="flex flex-col sm:flex-row justify-between gap-4">
+          {/* Botones con estilo mejorado */}
+          <div className="flex flex-col sm:flex-row justify-between gap-4 mt-10">
             <button
-              type="button"
               onClick={handleCancelar}
-              className="flex-1 py-3 px-6 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors duration-300"
+              className="order-2 sm:order-1 py-3 px-6 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors flex items-center justify-center gap-2 border border-gray-300 hover:shadow-md"
             >
-              {t('volver', 'Volver')}
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              {t('atras', 'Atrás')}
             </button>
             
             <button
-              type="button"
               onClick={handleReservarAhora}
               disabled={!aceptaTerminos}
-              className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all duration-300 ${
+              className={`order-1 sm:order-2 py-4 px-8 rounded-xl ${
                 aceptaTerminos
-                  ? 'bg-teal-600 hover:bg-teal-700 text-white'
+                  ? 'bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
+              } font-medium transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center`}
             >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
               {t('continuar', 'Continuar')}
             </button>
           </div>
