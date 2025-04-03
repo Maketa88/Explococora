@@ -9,6 +9,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { GiHorseHead } from "react-icons/gi";
 import { useNavigate, useParams } from "react-router-dom";
+import BotonPagoPaquete from "../PagoPaquetes/BotonPagoPaquete";
 import PaquetesTarjeta from "./PaquetesTarjeta";
 
 const GestionPaquetes = () => {
@@ -925,14 +926,7 @@ const GestionPaquetes = () => {
                     {/* Botones */}
                     <div className="flex flex-col gap-4">
                       {/* Botón de reserva */}
-                      <button className="w-full py-3 rounded-xl text-white relative overflow-hidden group shadow-md transition-all duration-500 bg-gradient-to-br from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600">
-                        <div className="absolute inset-0 w-full h-full">
-                          <div className="absolute -inset-[100%] bg-gradient-to-r from-white/0 via-white/20 to-white/0 animate-[shimmer_2s_infinite] transition-all"></div>
-                        </div>
-                        <span className="relative z-10 font-medium">
-                          Reservar Paquete
-                        </span>
-                      </button>
+                      <BotonPagoPaquete paquete={paqueteActual} className="w-full py-3 rounded-xl text-white relative overflow-hidden group shadow-md transition-all duration-500 bg-gradient-to-br from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600" />
                     </div>
                   </div>
                 </div>

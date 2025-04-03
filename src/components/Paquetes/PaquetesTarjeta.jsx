@@ -1,11 +1,12 @@
 import axios from 'axios';
 import {
-  Clock, DollarSign,
-  Map,
-  Package,
-  ShoppingBag
+    Clock, DollarSign,
+    Map,
+    Package,
+    ShoppingBag
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { BotonPagoPaquete } from '../PagoPaquetes';
 
 const PaquetesTarjeta = ({ onPaqueteSeleccionado, paqueteActualId }) => {
   // Estados para la gestión de paquetes
@@ -502,14 +503,10 @@ const PaquetesTarjeta = ({ onPaqueteSeleccionado, paqueteActualId }) => {
                   </div>
                       
                   {/* Botón para reservar */}
-                  <button
+                  <BotonPagoPaquete
+                    paquete={paquete}
                     className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-1.5 px-2 rounded-md transition-all duration-300 shadow-sm hover:shadow flex items-center justify-center mt-auto"
-                  >
-                    <ShoppingBag className="h-3.5 w-3.5 mr-1.5" strokeWidth={2.5} />
-                    <span className="text-xs font-medium">
-                      Reservar
-                    </span>
-                  </button>
+                  />
                 </div>
               </div>
             ))}
