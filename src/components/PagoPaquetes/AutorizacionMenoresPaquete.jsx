@@ -146,7 +146,7 @@ export const AutorizacionMenoresPaquetes = () => {
             <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-teal-50 to-transparent opacity-70 rounded-3xl"></div>
           </div>
           <h1 className="text-4xl font-bold text-teal-800 mb-3">
-            {t('reservarRuta', 'Reservar Ruta')}
+            {t('reservarPaquete', 'Reservar Paquete')}
           </h1>
           {paqueteInfo && (
             <p className="text-2xl text-teal-600 font-semibold">
@@ -155,7 +155,7 @@ export const AutorizacionMenoresPaquetes = () => {
           )}
         </div>
 
-        {/* Información de la ruta */}
+        {/* Información del paquete */}
         {paqueteInfo && (
           <div className="bg-gradient-to-r from-teal-700 to-teal-600 text-white p-6 rounded-t-xl shadow-lg transform hover:scale-[1.01] transition-transform duration-300">
             <div className="flex flex-wrap items-center justify-between">

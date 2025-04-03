@@ -175,10 +175,10 @@ export const ConfirmacionPagoPaquete = () => {
                   </span>
                 </p>
                 
-                {/* Mostrar la fecha de inicio de la ruta */}
+                {/* Mostrar la fecha de inicio del paquete */}
                 {reservaInfo.fechaInicio && (
                   <p className="text-gray-700 font-medium mt-2">
-                    {t('fechaRuta', 'Fecha de Ruta')}: <span className={`font-bold ${esEfectivo ? 'text-green-700' : 'text-teal-700'}`}>
+                    {t('fechaPaquete', 'Fecha del Paquete')}: <span className={`font-bold ${esEfectivo ? 'text-green-700' : 'text-teal-700'}`}>
                       {formatearFecha(reservaInfo.fechaInicio)}
                     </span>
                   </p>
@@ -241,7 +241,7 @@ export const ConfirmacionPagoPaquete = () => {
                 <div className="ml-3">
                   <p className="text-sm text-gray-950">
                     {reservaInfo?.informacionPago || (esEfectivo
-                      ? t('notaEfectivo', 'Recuerda que deberás pagar en efectivo al momento de tomar la ruta. Ten lista la cantidad exacta para facilitar el proceso.')
+                      ? t('notaEfectivo', 'Recuerda que deberás pagar en efectivo al momento de tomar el paquete. Ten lista la cantidad exacta para facilitar el proceso.')
                       : t('notaSimulacion', 'Este es un pago Mercado Pago. Si tienes alguna duda o necesitas asistencia, por favor, contacta al administrador del sistema.'))}
                   </p>
                 </div>

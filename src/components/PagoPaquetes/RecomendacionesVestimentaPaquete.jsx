@@ -187,7 +187,7 @@ export const RecomendacionesVestimentaPaquete = () => {
           )}
         </div>
 
-        {/* Información de la ruta */}
+        {/* Información del paquete */}
         {paqueteInfo && (
           <div className="bg-gradient-to-r from-teal-700 to-teal-600 text-white p-6 rounded-t-xl shadow-lg transform hover:scale-[1.01] transition-transform duration-300">
             <div className="flex flex-wrap items-center justify-between">
