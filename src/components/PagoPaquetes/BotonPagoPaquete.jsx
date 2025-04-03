@@ -8,8 +8,8 @@ export const BotonPagoPaquete = ({ paquete, className }) => {
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
 
-  // Verificar si el botón debería estar habilitado
-  const estaHabilitado = paquete?.estado === 'Activa' && paquete?.precio > 0;
+  // Verificar si el botón debería estar habilitado: solo verificamos que el paquete exista y tenga precio
+  const estaHabilitado = paquete && paquete.idPaquete && paquete.precio > 0;
 
   const iniciarProcesoPago = async () => {
     // Verificar si hay un token (usuario autenticado)
