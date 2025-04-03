@@ -35,7 +35,7 @@ export const VistaPagoSimuladoPaquete = () => {
   });
   
   // Obtener los datos de la reserva pasados por navigate
-  const { radicado, rutaInfo } = location.state || {};
+  const { radicado, paqueteInfo } = location.state || {};
   
   // Si no hay radicado, redirigir a la página principal
   if (!radicado) {
@@ -103,7 +103,7 @@ export const VistaPagoSimuladoPaquete = () => {
       }
       
       // Llamar a endpoint de simulación
-      const response = await axios.get(`http://localhost:10101/pagos-rutas/simular/${radicado}`, {
+      const response = await axios.get(`http://localhost:10101/pagos-paquetes/simular/${radicado}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -148,7 +148,7 @@ export const VistaPagoSimuladoPaquete = () => {
             idPago: response.data.idPago,
             metodoPago: metodoPago,
             guiaAsignado: guiaAsignado,
-            rutaInfo: rutaInfo,
+            paqueteInfo: paqueteInfo,
             // Agregar datos de contacto cuando el método de pago es efectivo
             ...(metodoPago === 'efectivo' && {
               datosContacto: {
@@ -197,6 +197,12 @@ export const VistaPagoSimuladoPaquete = () => {
     : (formEfectivo.nombres.trim() !== '' &&
        formEfectivo.apellidos.trim() !== '' &&
        formEfectivo.cedula.length >= 5);
+
+  // Calcular el precio total
+  const calcularPrecioTotal = () => {
+    if (!paqueteInfo?.precio || !paqueteInfo?.cantidadPersonas) return 0;
+    return Number(paqueteInfo.precio) * Number(paqueteInfo.cantidadPersonas);
+  };
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
@@ -391,7 +397,7 @@ export const VistaPagoSimuladoPaquete = () => {
                         onChange={handleChange}
                         className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                       >
-                        <option value="1">1 cuota de ${rutaInfo ? (rutaInfo.precio * (rutaInfo.cantidadPersonas || 1)).toLocaleString('es-CO') : 0} COP</option>
+                        <option value="1">1 cuota de ${calcularPrecioTotal().toLocaleString('es-CO')} COP</option>
                         <option value="3">3 cuotas sin interés</option>
                         <option value="6">6 cuotas sin interés</option>
                         <option value="12">12 cuotas sin interés</option>
@@ -414,7 +420,7 @@ export const VistaPagoSimuladoPaquete = () => {
                       </div>
                       <div className="ml-3">
                         <p className="text-sm text-green-700">
-                          {t('mensajeEfectivo', 'Al seleccionar esta opción, podrás pagar en efectivo al momento de tomar la ruta.')}
+                          {t('mensajeEfectivo', 'Al seleccionar esta opción, podrás pagar en efectivo al momento de tomar el paquete.')}
                         </p>
                       </div>
                     </div>
@@ -479,7 +485,7 @@ export const VistaPagoSimuladoPaquete = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">{t('productoServicio', 'Servicio')}:</span>
-                    <span className="font-medium">{rutaInfo?.nombreRuta || 'Reserva de ruta'}</span>
+                    <span className="font-medium">{paqueteInfo?.nombrePaquete || 'Paquete turístico'}</span>
                   </div>
                   
                   <div className="flex justify-between items-center">
@@ -492,26 +498,22 @@ export const VistaPagoSimuladoPaquete = () => {
                     <span className="font-medium text-gray-800">184841580058</span>
                   </div>
                   
-                  {rutaInfo && (
-                    <>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600">{t('cantidadPersonas', 'Personas')}:</span>
-                        <span className="font-medium">{rutaInfo.cantidadPersonas || 1}</span>
-                      </div>
-                      
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600">{t('precioUnitario', 'Precio unitario')}:</span>
-                        <span className="font-medium">${Number(rutaInfo.precio).toLocaleString('es-CO')} COP</span>
-                      </div>
-                    </>
-                  )}
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">{t('cantidadPersonas', 'Personas')}:</span>
+                    <span className="font-medium">{paqueteInfo?.cantidadPersonas || 1}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">{t('precioUnitario', 'Precio unitario')}:</span>
+                    <span className="font-medium">${paqueteInfo?.precio ? Number(paqueteInfo.precio).toLocaleString('es-CO') : 0} COP</span>
+                  </div>
                   
                   <div className="border-t border-gray-200 my-2 pt-2"></div>
                   
                   <div className="flex justify-between items-center text-lg font-bold">
                     <span className="text-gray-800">{t('total', 'Total')}:</span>
                     <span className="text-blue-600">
-                      ${rutaInfo ? (rutaInfo.precio * (rutaInfo.cantidadPersonas || 1)).toLocaleString('es-CO') : 0} COP
+                      ${calcularPrecioTotal().toLocaleString('es-CO')} COP
                     </span>
                   </div>
                 </div>
