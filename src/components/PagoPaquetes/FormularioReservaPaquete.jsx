@@ -286,7 +286,7 @@ export const FormularioReservaPaquete = () => {
     
     // En lugar de hacer la petición directamente, primero redirigir a la pantalla de autorización
     // con todos los datos necesarios para procesar la reserva después
-    navigate('/VistaCliente/reserva/autorizacion-menores', {
+    navigate('/VistaCliente/reserva/autorizacion-menores-paquete', {
       state: {
         formData: {
           ...formData,

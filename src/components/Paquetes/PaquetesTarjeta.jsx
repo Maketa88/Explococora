@@ -8,6 +8,15 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { BotonPagoPaquete } from '../PagoPaquetes';
 
+// Componente auxiliar para detener la propagación de eventos
+const ButtonWrapper = ({ children }) => {
+  const handleClick = (e) => {
+    e.stopPropagation();
+  };
+
+  return <div onClick={handleClick}>{children}</div>;
+};
+
 const PaquetesTarjeta = ({ onPaqueteSeleccionado, paqueteActualId }) => {
   // Estados para la gestión de paquetes
   const [paquetes, setPaquetes] = useState([]);
@@ -502,11 +511,13 @@ const PaquetesTarjeta = ({ onPaqueteSeleccionado, paqueteActualId }) => {
                     )}
                   </div>
                       
-                  {/* Botón para reservar */}
-                  <BotonPagoPaquete
-                    paquete={paquete}
-                    className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-1.5 px-2 rounded-md transition-all duration-300 shadow-sm hover:shadow flex items-center justify-center mt-auto"
-                  />
+                  {/* Botón para reservar - Envuelto en ButtonWrapper para detener propagación */}
+                  <ButtonWrapper>
+                    <BotonPagoPaquete
+                      paquete={paquete}
+                      className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-1.5 px-2 rounded-md transition-all duration-300 shadow-sm hover:shadow flex items-center justify-center mt-auto"
+                    />
+                  </ButtonWrapper>
                 </div>
               </div>
             ))}
