@@ -24,12 +24,12 @@ export const ConfirmacionPagoPaquete = () => {
         metodoPago: location.state.metodoPago || 'tarjeta',
         numeroReserva: location.state.numeroReserva,
         numeroPago: location.state.numeroPago,
-        rutaInfo: location.state.rutaInfo,
+        paqueteInfo: location.state.paqueteInfo,
         tituloConfirmacion: location.state.tituloConfirmacion,
         mensajeConfirmacion: location.state.mensajeConfirmacion,
         informacionPago: location.state.informacionPago,
         datosContacto: location.state.datosContacto,
-        fechaInicio: location.state.rutaInfo?.fechaInicio || null,
+        fechaInicio: location.state.paqueteInfo?.fechaInicio || null,
         guiaAsignado: location.state.guiaAsignado || obtenerGuiaAsignadoDelLocalStorage()
       });
       
@@ -82,8 +82,8 @@ export const ConfirmacionPagoPaquete = () => {
         throw new Error(t('noAutenticado', 'No estás autenticado'));
       }
       
-      // Este endpoint es hipotético y debe ajustarse a tu API real
-      const response = await axios.get(`http://localhost:10101/reservas/info-reserva?radicado=${radicado}`, {
+      // Endpoint para verificar estado de pago de paquete
+      const response = await axios.get(`http://localhost:10101/pago-paquetes/info-reserva?radicado=${radicado}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -200,7 +200,7 @@ export const ConfirmacionPagoPaquete = () => {
                     {/* Agregar total a pagar para pagos en efectivo */}
                     <p className="text-gray-700 mt-2">
                       <span className="font-medium">{t('totalPagar', 'Total a pagar')}:</span> <span className="text-green-700 font-bold">
-                        ${reservaInfo.rutaInfo ? (reservaInfo.rutaInfo.precio * (reservaInfo.rutaInfo.cantidadPersonas || 1)).toLocaleString('es-CO') : 0} COP
+                        ${reservaInfo.paqueteInfo ? (reservaInfo.paqueteInfo.precio * (reservaInfo.paqueteInfo.cantidadPersonas || 1)).toLocaleString('es-CO') : 0} COP
                       </span>
                     </p>
                   </div>

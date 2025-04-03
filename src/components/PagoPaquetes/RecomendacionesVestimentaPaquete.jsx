@@ -11,26 +11,26 @@ export const RecomendacionesVestimentaPaquete = () => {
   const location = useLocation();
   
   // Obtener datos de la reserva desde el estado de navegación
-  const { formData, rutaInfo, idRuta, radicado } = location.state || {};
+  const { formData, paqueteInfo, idPaquete, radicado } = location.state || {};
   
   const [aceptaRecomendaciones, setAceptaRecomendaciones] = useState(false);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
 
   // Si no hay datos suficientes, redirigir al formulario de reserva
-  if (!formData || !rutaInfo || !idRuta) {
-    navigate('/VistaCliente/reserva-ruta');
+  if (!formData || !paqueteInfo || !idPaquete) {
+    navigate('/VistaCliente/reserva-paquete');
     return null;
   }
 
   // Función para redirigir directamente a la pasarela de pago
   const redirigirAPago = (radicadoReserva) => {
-    navigate('/VistaCliente/reserva/mercado-libre', {
+    navigate('/VistaCliente/reserva/mercado-libre-paquete', {
       state: {
         radicado: radicadoReserva,
-        rutaInfo: {
-          nombreRuta: rutaInfo.nombreRuta,
-          precio: rutaInfo.precio,
+        paqueteInfo: {
+          nombrePaquete: paqueteInfo.nombrePaquete,
+          precio: paqueteInfo.precio,
           cantidadPersonas: formData.cantidadPersonas,
           fechaInicio: formData.fechaInicioISO
         }
@@ -61,17 +61,17 @@ export const RecomendacionesVestimentaPaquete = () => {
       if (!token) {
         navigate('/Ingreso', { 
           state: { 
-            mensaje: t('debesIniciarSesion', 'Debes iniciar sesión para reservar una ruta'),
-            redireccion: `/NuestrasRutas/${idRuta}`
+            mensaje: t('debesIniciarSesion', 'Debes iniciar sesión para reservar un paquete'),
+            redireccion: `/Paquetes/${idPaquete}`
           } 
         });
         return;
       }
 
-      // Realizar la misma petición que haría el formulario original
-      const response = await axios.post('http://localhost:10101/pagos-rutas/crear', 
+      // Realizar la petición para crear el pago del paquete
+      const response = await axios.post('http://localhost:10101/pago-paquetes/crear', 
         {
-          idRuta: parseInt(idRuta),
+          idPaquete: parseInt(idPaquete),
           cantidadPersonas: parseInt(formData.cantidadPersonas),
           fechaInicio: formData.fechaInicioISO,
           fechaFin: formData.fechaFinISO,
@@ -130,11 +130,11 @@ export const RecomendacionesVestimentaPaquete = () => {
   };
   
   const handleCancelar = () => {
-    navigate('/VistaCliente/reserva/aceptacion-riesgos', {
+    navigate('/VistaCliente/reserva/aceptacion-riesgos-paquete', {
       state: { 
         formData, 
-        rutaInfo, 
-        idRuta, 
+        paqueteInfo, 
+        idPaquete, 
         radicado 
       }
     });
@@ -180,20 +180,20 @@ export const RecomendacionesVestimentaPaquete = () => {
           <h1 className="text-4xl font-bold text-teal-800 mb-3">
             {t('recomendacionesVestimenta', 'Recomendaciones de Vestimenta')}
           </h1>
-          {rutaInfo && (
+          {paqueteInfo && (
             <p className="text-2xl text-teal-600 font-semibold">
-              {rutaInfo.nombreRuta}
+              {paqueteInfo.nombrePaquete}
             </p>
           )}
         </div>
 
         {/* Información de la ruta */}
-        {rutaInfo && (
+        {paqueteInfo && (
           <div className="bg-gradient-to-r from-teal-700 to-teal-600 text-white p-6 rounded-t-xl shadow-lg transform hover:scale-[1.01] transition-transform duration-300">
             <div className="flex flex-wrap items-center justify-between">
               <div className="mb-4 md:mb-0">
-                <h2 className="text-xl font-bold">{rutaInfo.nombreRuta}</h2>
-                <p className="text-teal-100">{rutaInfo.tipo} • {rutaInfo.dificultad}</p>
+                <h2 className="text-xl font-bold">{paqueteInfo.nombrePaquete}</h2>
+                <p className="text-teal-100">{paqueteInfo.tipo} • {paqueteInfo.dificultad}</p>
               </div>
               
               <div className="flex items-center gap-4">

@@ -9,14 +9,14 @@ export const AutorizacionMenoresPaquetes = () => {
   const location = useLocation();
   
   // Obtener datos de la reserva desde el estado de navegación
-  const { formData, rutaInfo, idRuta } = location.state || {};
+  const { formData, paqueteInfo, idPaquete } = location.state || {};
   
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
   const [error, setError] = useState(null);
 
   // Si no hay datos suficientes, redirigir al formulario de reserva
-  if (!formData || !rutaInfo || !idRuta) {
-    navigate('/VistaCliente/reserva-ruta');
+  if (!formData || !paqueteInfo || !idPaquete) {
+    navigate('/VistaCliente/reserva-paquete');
     return null;
   }
 
@@ -28,17 +28,17 @@ export const AutorizacionMenoresPaquetes = () => {
     }
 
     // Redirigir al componente de aceptación de riesgos
-    navigate('/VistaCliente/reserva/aceptacion-riesgos', {
+    navigate('/VistaCliente/reserva/aceptacion-riesgos-paquete', {
       state: {
         formData,
-        rutaInfo,
-        idRuta
+        paqueteInfo,
+        idPaquete
       }
     });
   };
   
   const handleCancelar = () => {
-    navigate(`/VistaCliente/reserva-ruta/${idRuta}`, { state: { rutaInfo } });
+    navigate(`/VistaCliente/reserva-paquete/${idPaquete}`, { state: { paqueteInfo } });
   };
 
   return (
@@ -148,20 +148,20 @@ export const AutorizacionMenoresPaquetes = () => {
           <h1 className="text-4xl font-bold text-teal-800 mb-3">
             {t('reservarRuta', 'Reservar Ruta')}
           </h1>
-          {rutaInfo && (
+          {paqueteInfo && (
             <p className="text-2xl text-teal-600 font-semibold">
-              {rutaInfo.nombreRuta}
+              {paqueteInfo.nombrePaquete}
             </p>
           )}
         </div>
 
         {/* Información de la ruta */}
-        {rutaInfo && (
+        {paqueteInfo && (
           <div className="bg-gradient-to-r from-teal-700 to-teal-600 text-white p-6 rounded-t-xl shadow-lg transform hover:scale-[1.01] transition-transform duration-300">
             <div className="flex flex-wrap items-center justify-between">
               <div className="mb-4 md:mb-0">
-                <h2 className="text-xl font-bold">{rutaInfo.nombreRuta}</h2>
-                <p className="text-teal-100">{rutaInfo.tipo} • {rutaInfo.dificultad}</p>
+                <h2 className="text-xl font-bold">{paqueteInfo.nombrePaquete}</h2>
+                <p className="text-teal-100">{paqueteInfo.tipo} • {paqueteInfo.dificultad}</p>
               </div>
               
               <div className="transform rotate-12">
