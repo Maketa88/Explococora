@@ -2,7 +2,8 @@ import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { FaLeaf, FaMapMarkedAlt, FaTree, FaUsers } from "react-icons/fa";
 import { GiHorseHead, GiHorseshoe } from "react-icons/gi";
-import quienes from "../../assets/Images/carrusel1.webp";
+import quienes from "../../assets/Images/carrusel2.webp";
+import './quienesSomos.css';
 
 const QuienesSomos = () => {
   useTranslation();
@@ -15,17 +16,18 @@ const QuienesSomos = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="relative h-[50vh] md:h-96 overflow-hidden">
+      <div className="relative h-[70vh] md:h-[500px] overflow-hidden">
         <div 
-          className="absolute inset-0 bg-cover bg-center" 
+          className="absolute inset-0 bg-cover bg-bottom zoom-effect" 
           style={{ 
             backgroundImage: `url(${quienes})`,
+            backgroundAttachment: "fixed"
           }}
         ></div>
-        <div className="absolute inset-0 bg-teal-900 opacity-60"></div>
+        <div className="absolute inset-0 bg-teal-900 opacity-40"></div>
         <div className="relative flex flex-col items-center justify-center h-full px-4 text-center z-10">
           <motion.h1 
-            className="text-4xl sm:text-5xl md:text-6xl font-bold mb-2 md:mb-4 text-white"
+            className="text-4xl sm:text-5xl md:text-6xl font-bold mb-2 md:mb-4 text-white drop-shadow-lg"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -33,7 +35,7 @@ const QuienesSomos = () => {
             ExploCocora
           </motion.h1>
           <motion.p 
-            className="text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto text-white px-2"
+            className="text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto text-white px-2 drop-shadow-md"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.3 }}
