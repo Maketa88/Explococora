@@ -5,6 +5,7 @@ import ContactForm from "../../components/ContactForm/ContactForm";
 import { HistoriaCultura } from "../../components/HistoriaCultura/Body/HistoriaCultura";
 import NuestrasRutas from "../../components/NuestrasRutas/NuestrasRutas";
 import { NuestrosGuias } from "../../components/NuestrosGuias/NuestrosGuias";
+import { AceptacionRiesgosPaquetes, AutorizacionMenoresPaquetes, ConfirmacionPagoPaquete, FormularioReservaPaquete, RecomendacionesVestimentaPaquete, VistaPagoSimuladoPaquete } from "../../components/PagoPaquetes";
 import { AceptacionRiesgos, AutorizacionMenores, ConfirmacionPago, FormularioReservaRuta, RecomendacionesVestimenta } from "../../components/PagoRuta";
 import { VistaPagoSimulado } from "../../components/PagoRuta/VistaPagoSimulado";
 import GestionPaquetes from "../../components/Paquetes/Paquetes";
@@ -63,6 +64,16 @@ const RutasCliente = () => {
         <Route path="reserva/confirmacion" element={<ConfirmacionPago />} />
         <Route path="reserva/pendiente" element={<ConfirmacionPago />} />
         <Route path="reserva/error" element={<ConfirmacionPago />} />
+        
+        {/* Rutas para pagos y reservas de Paquetes */}
+        <Route path="reserva-paquete/:idPaquete" element={<FormularioReservaPaquete />} />
+        <Route path="reserva/autorizacion-menores-paquete" element={<AutorizacionMenoresPaquetes />} />
+        <Route path="reserva/aceptacion-riesgos-paquete" element={<AceptacionRiesgosPaquetes />} />
+        <Route path="reserva/recomendaciones-vestimenta-paquete" element={<RecomendacionesVestimentaPaquete />} />
+        <Route path="reserva/mercado-libre-paquete" element={<VistaPagoSimuladoPaquete />} />
+        <Route path="reserva/confirmacion-paquete" element={<ConfirmacionPagoPaquete />} />
+        <Route path="reserva/pendiente-paquete" element={<ConfirmacionPagoPaquete />} />
+        <Route path="reserva/error-paquete" element={<ConfirmacionPagoPaquete />} />
       </Routes>
       {!ocultarFooter && <FooterCliente />}
       <ChatBot />

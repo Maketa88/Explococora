@@ -2,64 +2,45 @@ import PropTypes from 'prop-types';
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import Avatar from "../../assets/Images/avatar.png";
 
 const ProfileDropdown = ({ imgSrc, alt }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [profileImage, setProfileImage] = useState(imgSrc);
+  const [profileImage, setProfileImage] = useState(null);
+  const [cargando, setCargando] = useState(!imgSrc);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  // Actualizar la imagen cuando cambie la prop imgSrc
   useEffect(() => {
-    if (imgSrc && imgSrc !== profileImage) {
+    if (imgSrc) {
       setProfileImage(imgSrc);
-      console.log("ProfileDropdown: Imagen actualizada desde props:", imgSrc);
-    }
-  }, [imgSrc, profileImage]);
-
-  // Cargar la imagen de perfil del localStorage
-  useEffect(() => {
-    const fotoPerfil = localStorage.getItem("foto_perfil_cliente");
-    if (fotoPerfil) {
-      setProfileImage(fotoPerfil);
-      console.log("ProfileDropdown: Imagen cargada desde localStorage:", fotoPerfil);
-    }
-
-    // Función para escuchar cambios en localStorage
-    const handleStorageChange = () => {
-      const nuevaFotoPerfil = localStorage.getItem("foto_perfil_cliente");
-      if (nuevaFotoPerfil && nuevaFotoPerfil !== profileImage) {
-        setProfileImage(nuevaFotoPerfil);
-        console.log("ProfileDropdown: Imagen actualizada por cambio en localStorage:", nuevaFotoPerfil);
+      setCargando(false);
+      console.log("ProfileDropdown: Imagen establecida desde props:", imgSrc);
+    } else {
+      const fotoGuardada = localStorage.getItem("foto_perfil_cliente");
+      if (fotoGuardada) {
+        setProfileImage(fotoGuardada);
+        setCargando(false);
+        console.log("ProfileDropdown: Imagen cargada desde localStorage:", fotoGuardada);
+      } else {
+        setProfileImage(Avatar);
+        setCargando(false);
       }
-    };
+    }
 
-    // Función para escuchar el evento personalizado de actualización de foto
     const handleFotoPerfilActualizada = (event) => {
       console.log("ProfileDropdown: Evento de actualización recibido:", event.detail);
       if (event.detail && event.detail.fotoUrl) {
         setProfileImage(event.detail.fotoUrl);
-        console.log("ProfileDropdown: Imagen actualizada por evento:", event.detail.fotoUrl);
-      } else {
-        // Si no hay URL en el evento, intentar obtenerla del localStorage
-        const nuevaFotoPerfil = localStorage.getItem("foto_perfil_cliente");
-        if (nuevaFotoPerfil) {
-          setProfileImage(nuevaFotoPerfil);
-          console.log("ProfileDropdown: Fallback a localStorage:", nuevaFotoPerfil);
-        }
       }
     };
 
-    // Agregar event listeners
-    window.addEventListener('storage', handleStorageChange);
     window.addEventListener('fotoPerfilClienteActualizada', handleFotoPerfilActualizada);
 
-    // Limpiar event listeners
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('fotoPerfilClienteActualizada', handleFotoPerfilActualizada);
     };
-  }, []);  // Eliminamos profileImage de las dependencias para evitar bucles
+  }, [imgSrc]);
 
   const cerrarSesion = () => {
     Swal.fire({
@@ -169,23 +150,18 @@ const ProfileDropdown = ({ imgSrc, alt }) => {
       },
       didOpen: () => {
         document.getElementById("confirmarCierre").addEventListener("click", () => {
-          // Guardar la foto del perfil antes de limpiar el localStorage
           const fotoPerfil = localStorage.getItem('foto_perfil');
           
-          // Eliminar datos de autenticación del localStorage
           localStorage.removeItem('token');
           localStorage.removeItem('cedula');
           localStorage.removeItem('cliente');
           
-          // Restaurar la foto del perfil
           if (fotoPerfil) {
             localStorage.setItem('foto_perfil', fotoPerfil);
           }
           
-          // Redirigir al usuario a la página de inicio
           navigate('/Ingreso');
           
-          // Recargar la página para limpiar el estado
           window.location.reload();
         });
 
@@ -196,7 +172,6 @@ const ProfileDropdown = ({ imgSrc, alt }) => {
     });
   };
 
-  // Manejar clics fuera del menú para cerrarlo
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -246,11 +221,21 @@ const ProfileDropdown = ({ imgSrc, alt }) => {
         }
       }}
     >
-      <img
-        src={profileImage}
-        alt={alt}
-        className="h-11 w-11 rounded-full object-cover transform transition hover:scale-110 active:scale-95"
-      />
+      {cargando ? (
+        <div className="h-11 w-11 rounded-full bg-teal-700 animate-pulse flex items-center justify-center">
+          <div className="h-9 w-9 rounded-full bg-teal-600"></div>
+        </div>
+      ) : (
+        <img
+          src={profileImage || Avatar}
+          alt={alt}
+          className="h-11 w-11 rounded-full object-cover transform transition hover:scale-110 active:scale-95"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = Avatar;
+          }}
+        />
+      )}
   
       {isOpen && (
         <div className="absolute left-0 md:right-0 md:left-auto top-12 w-56 max-w-[calc(100vw-20px)] bg-teal-700 border-2 border-gray-900 rounded-xl shadow-xl py-2 z-50 transform transition-all duration-300 ease-in-out">

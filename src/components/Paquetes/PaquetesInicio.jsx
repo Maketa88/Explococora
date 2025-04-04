@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BotonPagoPaquete } from '../PagoPaquetes';
 
 const GestionPaquetes = () => {
   // Estados para la gestión de paquetes
@@ -592,15 +593,10 @@ const GestionPaquetes = () => {
                     {/* Botones de acción */}
                     <div className="relative z-10 mt-auto flex flex-col space-y-2">
                       {/* Botón para reservar */}
-                      <button
-                        onClick={() => {}}
+                      <BotonPagoPaquete 
+                        paquete={paquete} 
                         className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-2 px-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center"
-                      >
-                        <ShoppingBag className="h-5 w-5 mr-3" strokeWidth={2.5} />
-                        <span className="text-base font-medium tracking-wide">
-                          Reservar Paquete
-                        </span>
-                      </button>
+                      />
 
                       {/* Botón para ver detalles */}
                       <button
