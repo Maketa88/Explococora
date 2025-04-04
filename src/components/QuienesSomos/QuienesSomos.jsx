@@ -24,7 +24,7 @@ const QuienesSomos = () => {
             backgroundAttachment: "fixed"
           }}
         ></div>
-        <div className="absolute inset-0 bg-teal-900 opacity-40"></div>
+        <div className="absolute inset-0 bg-black opacity-50"></div>
         <div className="relative flex flex-col items-center justify-center h-full px-4 text-center z-10">
           <motion.h1 
             className="text-4xl sm:text-5xl md:text-6xl font-bold mb-2 md:mb-4 text-white drop-shadow-lg"

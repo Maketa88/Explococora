@@ -12,4 +12,5 @@
 
 .zoom-effect {
   animation: subtle-zoom 20s infinite ease-in-out;
+  filter: brightness(0.8);
 } 
