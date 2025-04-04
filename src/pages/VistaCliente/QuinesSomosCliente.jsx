@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { FaLeaf, FaMapMarkedAlt, FaTree, FaUsers } from "react-icons/fa";
 import { GiHorseHead, GiHorseshoe } from "react-icons/gi";
-import quienes from "../../assets/Images/quienessomos.jpg";
+import quienes from "../../assets/Images/carrusel4.jpg";
 
 const QuienesSomosCliente = () => {
   useTranslation();

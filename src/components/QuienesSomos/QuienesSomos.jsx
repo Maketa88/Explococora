@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { FaLeaf, FaMapMarkedAlt, FaTree, FaUsers } from "react-icons/fa";
 import { GiHorseHead, GiHorseshoe } from "react-icons/gi";
-import quienes from "../../assets/Images/carrusel2.webp";
+import quienes from "../../assets/Images/carrusel4.jpg";
 import './quienesSomos.css';
 
 const QuienesSomos = () => {
@@ -16,7 +16,7 @@ const QuienesSomos = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="relative h-[70vh] md:h-[500px] overflow-hidden">
+      <div className="relative h-[70vh] md:h-[480px] overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-bottom zoom-effect" 
           style={{ 
@@ -24,7 +24,7 @@ const QuienesSomos = () => {
             backgroundAttachment: "fixed"
           }}
         ></div>
-        <div className="absolute inset-0 bg-black opacity-50"></div>
+        <div className="absolute inset-0 bg-black opacity-60"></div>
         <div className="relative flex flex-col items-center justify-center h-full px-4 text-center z-10">
           <motion.h1 
             className="text-4xl sm:text-5xl md:text-6xl font-bold mb-2 md:mb-4 text-white drop-shadow-lg"
