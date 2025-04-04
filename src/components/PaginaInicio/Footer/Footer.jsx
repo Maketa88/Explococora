@@ -32,7 +32,7 @@ export const Footer = () => {
           </FooterSeccion>
 
           <FooterSeccion title={t("politicas")}>
-            <LinkFooter href="/privacidad">
+            <LinkFooter href="/PoliticaPrivacidad">
               {t("politicasPrivacidad")}
             </LinkFooter>
             <LinkFooter href="/seguridad">
@@ -45,19 +45,19 @@ export const Footer = () => {
             <div className="flex gap-6 items-center">
               <IconoRedes
                 Icon={FaFacebookSquare}
-                href="https://www.facebook.com/share/15uWvNG8GT/"
+                href="https://www.facebook.com/profile.php?id=61572216023743"
                 label={t("sigueFacebook")}
                 color="#1877F2" // Color oficial de Facebook
               />
               <IconoRedes
                 Icon={FaInstagram}
-                href="https://instagram.com/valledelcocora"
+                href="https://www.instagram.com/explo.cocora?igsh=MWtuc2hvc2dkdHoydA=="
                 label={t("sigueInstagram")}
                 color="#E4405F" // Color oficial de Instagram
               />
               <IconoRedes
                 Icon={FaTiktok}
-                href="https://www.tiktok.com/@explo.cocora?_t=ZS-8v165ddM5Jw&_r=1"
+                href="https://www.tiktok.com/@explo.cocora?_t=ZS-8vEnVtXqVeB&_r=1"
                 label={t("sigueTiktok")}
                 color="#000000" // Color oficial de TikTok
               />

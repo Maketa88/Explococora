@@ -16,7 +16,7 @@ import { FooterCliente } from "../../pages/VistaCliente/Footer/FooterCliente";
 import { HeaderCliente } from "../../pages/VistaCliente/Header/HeaderCliente";
 import PerfilCliente from "../../pages/VistaCliente/PerfilCliente";
 import QuienesSomosCliente from "../../pages/VistaCliente/QuinesSomosCliente";
-
+import PoliticaPrivacidad from "../../components/PoliticaPrivacidad/PoliticaPrivacidad";
 
 const RutasCliente = () => {
   const [ocultarFooter, setOcultarFooter] = useState(false);
@@ -53,7 +53,7 @@ const RutasCliente = () => {
         <Route path="/PaquetesTuristicos" element={<GestionPaquetes />} />
         <Route path="/PaquetesTuristicos/:idPaquete" element={<GestionPaquetes />} />
         <Route path="/QuienesSomos" element={<QuienesSomosCliente />} />
-        
+        <Route path="/PoliticaPrivacidad" element={<PoliticaPrivacidad />} />
         {/* Rutas para pagos y reservas */}
         <Route path="reserva-ruta/:idRuta" element={<FormularioReservaRuta />} />
         <Route path="reserva/autorizacion-menores" element={<AutorizacionMenores />} />
