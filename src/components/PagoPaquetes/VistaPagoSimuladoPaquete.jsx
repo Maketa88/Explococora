@@ -141,7 +141,7 @@ export const VistaPagoSimuladoPaquete = () => {
         }
         
         // Redireccionar a página de confirmación
-        navigate('/VistaCliente/reserva/confirmacion', {
+        navigate('/VistaCliente/reserva/confirmacion-paquete', {
           state: {
             pagoSimulado: true,
             radicado: radicado,
