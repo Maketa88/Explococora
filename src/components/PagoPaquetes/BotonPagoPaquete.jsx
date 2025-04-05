@@ -51,7 +51,7 @@ export const BotonPagoPaquete = ({ paquete, className }) => {
         disabled={!estaHabilitado || cargando}
         className={`${className || 'py-3 px-6 rounded-xl'} 
           ${estaHabilitado 
-            ? 'bg-gradient-to-br from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white shadow-md hover:shadow-lg transition-all duration-300' 
+            ? 'bg-gradient-to-br from-teal-600 to-teal-700 hover:from-teal-600 hover:to-teal-700 text-white shadow-md hover:shadow-lg transition-all duration-300' 
             : 'bg-gray-200 text-gray-500 cursor-not-allowed'}
           relative overflow-hidden group flex items-center justify-center`}
       >

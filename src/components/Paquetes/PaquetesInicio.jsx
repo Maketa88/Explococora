@@ -455,14 +455,14 @@ const GestionPaquetes = () => {
                   className="group bg-gradient-to-br from-white to-emerald-50 rounded-lg shadow-md overflow-hidden transform transition-all duration-500 hover:shadow-[0_10px_20px_rgba(8,145,178,0.3)] hover:-translate-y-1 border border-emerald-100 relative flex flex-col h-full w-full max-w-xs"
                 >
                   {/* Cinta decorativa en la esquina */}
-                  <div className="absolute -right-8 -top-2 w-28 h-8 bg-emerald-600 text-white text-xs font-bold px-0 py-1 shadow-md transform rotate-45 z-10 flex items-center justify-center">
+                  <div className="absolute -right-8 -top-2 w-28 h-8 bg-teal-600 text-white text-xs font-bold px-0 py-1 shadow-md transform rotate-45 z-10 flex items-center justify-center">
                     <span className="text-white text-xs tracking-wider uppercase">
                       Paquete
                     </span>
         </div>
         
                   {/* Encabezado de la carta */}
-                  <div className="bg-gradient-to-r from-emerald-800 to-emerald-700 text-white p-2 relative overflow-hidden h-16 flex flex-col justify-center">
+                  <div className="bg-gradient-to-r from-teal-800 to-teal-700 text-white p-2 relative overflow-hidden h-16 flex flex-col justify-center">
                     <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-5 rounded-full -mt-6 -mr-6"></div>
                     <div className="absolute bottom-0 left-0 w-10 h-10 bg-white opacity-5 rounded-full -mb-5 -ml-5"></div>
 
@@ -638,7 +638,7 @@ const GestionPaquetes = () => {
               <div className="flex justify-center mt-8 mb-4">
                 <button
                   onClick={navegarAPaginaCompleta}
-                  className="bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-800 hover:to-emerald-700 text-white py-2 px-6 rounded-full transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center group relative overflow-hidden"
+                  className="bg-gradient-to-r from-teal-700 to-teal-600 hover:from-teal-800 hover:to-teal-700 text-white py-2 px-6 rounded-full transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center group relative overflow-hidden"
                 >
                   <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
                   <span className="relative z-10 text-sm font-medium tracking-wide flex items-center">

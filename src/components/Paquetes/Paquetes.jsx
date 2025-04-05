@@ -269,31 +269,7 @@ const GestionPaquetes = () => {
   };
 
   // Función para cambiar entre paquetes
-  const cambiarPaquete = async (direccion) => {
-    const indiceActual = paquetes.findIndex(
-      (p) => p.idPaquete === paqueteActual.idPaquete
-    );
-    const nuevoIndice =
-      direccion === "siguiente"
-        ? (indiceActual + 1) % paquetes.length
-        : (indiceActual - 1 + paquetes.length) % paquetes.length;
-
-    const nuevoPaquete = paquetes[nuevoIndice];
-    setPaqueteActual(nuevoPaquete);
-
-    // Si no tenemos fotos de este paquete, las obtenemos
-    if (!paquetesConFotos[nuevoPaquete.idPaquete]) {
-      obtenerFotosPaquete(nuevoPaquete.idPaquete);
-    }
-
-    // Actualizar la URL manteniendo el contexto de navegación
-    const isClientView = esVistaCliente();
-    const nuevaRuta = isClientView
-      ? `/VistaCliente/PaquetesTuristicos/${nuevoPaquete.idPaquete}`
-      : `/PaquetesTuristicos/${nuevoPaquete.idPaquete}`;
-
-    navigate(nuevaRuta);
-  };
+ 
 
   // Función para desplazar el carousel
   const desplazarCarousel = (direccion) => {
@@ -661,48 +637,7 @@ const GestionPaquetes = () => {
         </div>
 
         {/* Botones de navegación entre paquetes */}
-        <div className="fixed left-4 right-4 top-[63%] -translate-y-1/2 flex justify-between z-10">
-          <button
-            onClick={() => cambiarPaquete("anterior")}
-            className="bg-emerald-600 text-white p-3 rounded-full hover:bg-emerald-700 transition-all duration-300 shadow-lg hover:scale-110 group"
-            aria-label="Paquete anterior"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 transform group-hover:-translate-x-1 transition-transform duration-300"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2.5}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-          <button
-            onClick={() => cambiarPaquete("siguiente")}
-            className="bg-emerald-600 text-white p-3 rounded-full hover:bg-emerald-700 transition-all duration-300 shadow-lg hover:scale-110 group"
-            aria-label="Siguiente paquete"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 transform group-hover:translate-x-1 transition-transform duration-300"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2.5}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </button>
-        </div>
+       
 
         {/* Slider de Fotos */}
         {renderSlider()}
@@ -1022,7 +957,7 @@ const GestionPaquetes = () => {
           </div>
 
           {/* Pie de página */}
-          <div className="bg-emerald-800 text-white p-4 rounded-lg shadow-md relative overflow-hidden mt-8">
+          <div className="bg-teal-800 text-white p-4 rounded-lg shadow-md relative overflow-hidden mt-8">
             <div className="absolute inset-0 opacity-10">
               <svg
                 viewBox="0 0 200 100"

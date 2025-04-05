@@ -378,24 +378,24 @@ const PaquetesTarjeta = ({ onPaqueteSeleccionado, paqueteActualId }) => {
             </div>
           </div>
         ) : paquetes.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 justify-items-center mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 justify-items-center mx-auto p-4">
             {paquetes.map((paquete, index) => (
               <div
                 key={`paquete-${paquete.idPaquete || paquete.id || index}`}
                 className={`group bg-white rounded-lg shadow-sm overflow-hidden border border-emerald-100 hover:shadow-md hover:-translate-y-1 transition-all duration-300 relative flex flex-col h-full w-full max-w-[200px] cursor-pointer ${
-                  paqueteActualId === paquete.idPaquete ? 'ring-2 ring-emerald-500 scale-[1.02] shadow-lg shadow-emerald-200/50 z-10' : ''
+                  paqueteActualId === paquete.idPaquete ? 'ring-2 ring-teal-500 shadow-lg shadow-teal-200/50 z-10' : ''
                 }`}
                 onClick={() => handlePaqueteClick(paquete)}
               >
                 {/* Cinta decorativa en la esquina */}
-                <div className="absolute -right-6 -top-1 w-20 h-6 bg-emerald-600 text-white text-[10px] font-bold px-0 py-1 shadow-md transform rotate-45 z-10 flex items-center justify-center">
+                <div className="absolute -right-6 -top-1 w-20 h-6 bg-teal-600 text-white text-[10px] font-bold px-0 py-1 shadow-md transform rotate-45 z-10 flex items-center justify-center">
                   <span className="text-white tracking-wider uppercase">
                     Paquete
                   </span>
                 </div>
         
                 {/* Encabezado de la carta */}
-                <div className="bg-gradient-to-r from-emerald-800 to-emerald-700 text-white p-1.5 relative overflow-hidden h-12 flex flex-col justify-center">
+                <div className="bg-gradient-to-r from-teal-800 to-teal-700 text-white p-1.5 relative overflow-hidden h-12 flex flex-col justify-center">
                   <h2 className="text-sm font-bold relative z-10 line-clamp-1">
                     {paquete.nombrePaquete}
                   </h2>
