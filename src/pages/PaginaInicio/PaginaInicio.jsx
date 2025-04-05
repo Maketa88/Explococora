@@ -21,7 +21,7 @@ export const PaginaInicio = () => {
       <Carrusel />
       
       {/* Resto del contenido */}
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto  py-12">
         {/* Sección de guías destacados */}
         <GuiasDestacados />
         <NuestrasRutasInicio />
