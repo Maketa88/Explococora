@@ -43,6 +43,22 @@ const QuienesSomos = () => {
             Pioneros en la preservación y gestión sostenible del Valle de Cocora
           </motion.p>
         </div>
+        
+        {/* Ola decorativa en la parte inferior */}
+        <div className="absolute bottom-0 left-0 w-full z-10 leading-none">
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            viewBox="0 0 1440 120" 
+            preserveAspectRatio="none"
+            className="w-full h-12 md:h-16 lg:h-20 block"
+            style={{ display: 'block', marginBottom: '-2px' }}
+          >
+            <path 
+              fill="#f0fdf4" 
+              d="M0,32L48,42.7C96,53,192,75,288,80C384,85,480,75,576,58.7C672,43,768,21,864,21.3C960,21,1056,43,1152,53.3C1248,64,1344,64,1392,64L1440,64L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z"
+            ></path>
+          </svg>
+        </div>
       </div>
 
       <main className="container mx-auto ">
