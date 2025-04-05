@@ -332,8 +332,8 @@ const QuienesSomos = () => {
       </main>
       
       {/* Footer Section */}
-      <footer className="bg-teal-900 p-6 md:p-8 text-center mt-8 text-white">
-        <p className="text-base md:text-lg">&copy; 2024 ExploCocora. Todos los derechos reservados.</p>
+      <footer className="bg-emerald-50 p-6 md:p-8 text-center  text-gray-950">
+        <p className="text-base md:text-lg">&copy; 2025 ExploCocora. Todos los derechos reservados.</p>
       </footer>
     </div>
   );
