@@ -66,7 +66,7 @@ export const TituloBuscador = ({ onSearch }) => {
         </div>
 
         {/* Tercer texto con estilo más limpio y elegante */}
-        <div className="relative mb-3 mt-6 sm:mt-10 md:mt-14 lg:mt-20">
+        <div className="relative mb-10">
           <h3
             className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-medium tracking-wide"
             style={{

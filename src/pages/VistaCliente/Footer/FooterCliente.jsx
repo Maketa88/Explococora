@@ -32,7 +32,7 @@ export const FooterCliente = () => {
           </FooterSeccion>
 
           <FooterSeccion title="Políticas">
-            <LinkFooter href="/privacidad">
+            <LinkFooter href="/VistaCliente/PoliticaPrivacidad">
               Políticas de Privacidad
             </LinkFooter>
             <LinkFooter href="/seguridad">
