@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const AuthContext = createContext();
 
@@ -121,6 +122,77 @@ export const AuthProvider = ({ children }) => {
         
         // Configurar axios para incluir el token en todas las peticiones
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        
+        // Mostrar alerta de verificación exitosa
+        await Swal.fire({
+          html: `
+            <div style="
+              display: flex; 
+              flex-direction: column; 
+              align-items: center;
+              border: 4px solid #004d40;
+              border-radius: 12px;
+              padding: 20px;
+              background-color: #ffffff;
+              box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            ">
+              <div style="
+                display: flex; 
+                flex-direction: column; 
+                align-items: center;
+                border-radius: 8px;
+                padding: 10px;
+              ">
+                <img src="https://i.pinimg.com/originals/bf/fc/c2/bffcc2de14a013a2e7a795668846cae5.gif" 
+                    alt="Caballo corriendo" 
+                    width="150" 
+                    style="margin-bottom: 10px; border-radius: 8px;">
+                <img src="https://i.pinimg.com/736x/10/3e/44/103e4418d4a3675326fbc9273f9af62a.jpg" 
+                    alt="Logo ExploCocora" 
+                    width="120" 
+                    style="border-radius: 8px;">
+              </div>
+              <div style="
+                background-color: #4ade80;
+                border-radius: 50%;
+                width: 60px;
+                height: 60px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-top: 10px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+              ">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <h2 style="
+                font-size: 28px; 
+                font-weight: bold; 
+                font-family: Arial, Helvetica, sans-serif; 
+                color: #004d40; 
+                margin-top: 15px;
+                text-align: center;
+                white-space: nowrap;
+              ">
+                ¡Verificación Exitosa!
+              </h2>
+              <p style="
+                font-size: 18px; 
+                font-family: Arial, Helvetica, sans-serif; 
+                color: #004d40; 
+                text-align: center; 
+                margin-top: 10px;
+              ">
+                Has iniciado sesión correctamente
+              </p>
+            </div>
+          `,
+          showConfirmButton: false,
+          timer: 4000,
+          timerProgressBar: true
+        });
         
         // Redirigir según el rol
         if (role === 'admin') {
