@@ -6,7 +6,7 @@ export const TituloBuscador = ({ onSearch }) => {
 
   return (
     <div className="container mx-auto px-2 sm:px-4 py-24 sm:py-8 md:py-12 lg:py-16 relative z-10 ">
-      <div className="flex flex-col items-center text-center mt-12 sm:mt-32 md:mt-32 lg:mt-32 xl:mt-40">
+      <div className="flex flex-col items-center text-center mt-12 sm:mt-32 md:mt-32 lg:mt-32 xl:mt-36">
         <div className="relative mb-2">
           <h1
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-black tracking-tighter"

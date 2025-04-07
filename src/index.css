@@ -13,9 +13,6 @@
   }
   
   /* Establece el color negro para el texto en campos de entrada */
-  input, textarea, select {
-    color: #000 !important;
-  }
   
   /* Corregir bordes y apariencia en autocompletado */
   input:-webkit-autofill {

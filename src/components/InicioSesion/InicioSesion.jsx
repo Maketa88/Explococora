@@ -227,7 +227,7 @@ export const InicioSesion = () => {
       </div>
 
       {/* Header section - positioned at top with higher z-index */}
-      <div className="relative z-10 w-full bg-white/30 backdrop-blur-sm py-4 px-4 flex flex-col items-center">
+      <div className="relative z-10 w-full bg-white/30 backdrop-blur-sm py-4 px-4 mb-4 flex flex-col items-center">
         <button 
           onClick={cambiarIdioma} 
           className="absolute top-2 right-4 bg-emerald-600/20 py-1 px-3 rounded-full backdrop-blur-sm text-emerald-800 hover:bg-emerald-600/30 transition-all"

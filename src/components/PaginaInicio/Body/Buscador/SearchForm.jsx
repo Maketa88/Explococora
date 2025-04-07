@@ -107,7 +107,7 @@ export const SearchForm = ({ onSearch }) => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('searchPlaceholder', '¿Qué tipo de aventura buscas hoy?')}
-            className="w-full py-4 sm:py-5 px-3 sm:px-4 outline-none text-white text-sm sm:text-base font-medium placeholder-white/70 bg-transparent backdrop-blur-lg"
+            className="w-full py-4 sm:py-5 px-3 sm:px-4 outline-none text-white text-sm sm:text-base font-bold placeholder-white/70 bg-transparent backdrop-blur-lg"
           />
           
           {/* Botón de búsqueda con efectos y texto responsivo */}

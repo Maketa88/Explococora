@@ -9,7 +9,7 @@ export const Footer = () => {
   const { t } = useTranslation();
   
   return (
-    <footer className="bg-teal-800">
+    <footer className="bg-teal-700">
       <div className="max-w-7xl mx-auto  py-2">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 p-3 ">
