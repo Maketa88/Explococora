@@ -377,13 +377,31 @@ export const Registro = () => {
               )}
 
               <div className="pb-3 flex items-center">
-                <input 
-                  type="checkbox" 
-                  className="w-5 h-5 text-emerald-600 rounded border-emerald-300 focus:ring-emerald-500"
-                  required 
-                />
-                <label className="ml-2 text-emerald-700">{t('terminos')}</label>
+                <div className="relative flex items-center">
+                  <input
+                    type="checkbox"
+                    id="aceptaTerminos"
+                    className="opacity-0 absolute h-6 w-6 cursor-pointer"
+                    required
+                  />
+                  <div className="bg-white border-2 rounded-md w-6 h-6 flex flex-shrink-0 justify-center items-center mr-2 focus-within:border-emerald-500 transition-colors duration-200 border-emerald-300">
+                    <svg className="fill-current w-3 h-3 text-emerald-600 pointer-events-none opacity-0" viewBox="0 0 20 20">
+                      <path d="M0 11l2-2 5 5L18 3l2 2L7 18z" />
+                    </svg>
+                  </div>
+                </div>
+                <label htmlFor="aceptaTerminos" className="ml-2 text-emerald-700 cursor-pointer">{t('terminos')}</label>
               </div>
+
+              <style>{`
+                #aceptaTerminos:checked + div svg {
+                  opacity: 1;
+                }
+                #aceptaTerminos:checked + div {
+                  background-color: #ecfdf5;
+                  border-color: #059669;
+                }
+              `}</style>
 
               <button
                 type="submit"
