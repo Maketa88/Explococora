@@ -17,6 +17,19 @@
     color: #000 !important;
   }
   
+  /* Corregir bordes y apariencia en autocompletado */
+  input:-webkit-autofill {
+    border: 1px solid #10b981 !important;
+    border-radius: 0.375rem !important;
+  }
+  
+  /* Mantener estilos de bordes en focus y active */
+  input:focus, input:active, input:focus-visible {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25) !important;
+    outline: none !important;
+  }
+  
   /* Eliminar color azul en inputs autocompletados */
   input:-webkit-autofill,
   input:-webkit-autofill:hover, 
@@ -32,7 +45,7 @@
     input.autofill {
       background-color: white !important;
       color: #000 !important;
-      
+      border-color: #10b981 !important;
     }
   }
   
