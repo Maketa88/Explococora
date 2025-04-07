@@ -255,11 +255,7 @@ export const InicioSesion = () => {
           // Login form
           <div className="mx-auto max-w-md w-full">
             <div className="opacity-70 border-r-4 border-l-4 border-emerald-600 bg-white/80 backdrop-blur-md p-5 rounded-xl border  shadow-lg overflow-hidden relative">
-              {errorMessage && (
-                <div className={`p-3 mb-3 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm ${isAnimating ? 'shake' : ''}`}>
-                  {errorMessage}
-                </div>
-              )}
+             
               
               <form onSubmit={handleSubmit} className="space-y-3">
                 <div className="mb-3">
@@ -285,7 +281,7 @@ export const InicioSesion = () => {
                 <div className="mb-3">
                   <div className="flex justify-between items-center mb-1">
                     <label className="block text-emerald-700 text-base">
-                      {t('contrasenia')}
+                      {t('Contraseña')}
                     </label>
                   </div>
                   <HookContrasenia
@@ -297,6 +293,11 @@ export const InicioSesion = () => {
                     required
                   />
                 </div>
+                {errorMessage && (
+                <div className={`p-3 mb-3 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm ${isAnimating ? 'shake' : ''}`}>
+                  {errorMessage}
+                </div>
+              )}
                 
                 <button
                   type="submit"

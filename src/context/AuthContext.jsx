@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -75,7 +75,7 @@ export const AuthProvider = ({ children }) => {
         setErrorMessage('Error en la autenticación');
       }
     } catch (error) {
-      setErrorMessage('Error al iniciar sesión: ' + (error.response?.data?.message || error.message));
+      setErrorMessage('Correo o contraseña inválidos');
       console.error('Error al iniciar sesión:', error.response?.data || error);
     } finally {
       setLoading(false);
