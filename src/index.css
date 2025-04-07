@@ -11,6 +11,36 @@
   * {
     font-family: 'Nunito', sans-serif;
   }
+  
+  /* Establece el color negro para el texto en campos de entrada */
+  input, textarea, select {
+    color: #000 !important;
+  }
+  
+  /* Eliminar color azul en inputs autocompletados */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus, 
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-text-fill-color: #000 !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+  
+  /* Estilo específico para Mozilla Firefox */
+  @-moz-document url-prefix() {
+    input.autofill {
+      background-color: white !important;
+      color: #000 !important;
+      
+    }
+  }
+  
+  /* Estilo específico para Microsoft Edge */
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none;
+  }
 }
 
 /* Para eliminar el icono de ojo en Edge y Chrome */
