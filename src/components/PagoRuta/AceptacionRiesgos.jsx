@@ -9,7 +9,7 @@ export const AceptacionRiesgos = () => {
   const location = useLocation();
   
   // Obtener datos de la reserva desde el estado de navegación
-  const { formData, rutaInfo, idRuta } = location.state || {};
+  const { formData, rutaInfo, idRuta, serviciosAdicionales = [] } = location.state || {};
   
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
   const [error, setError] = useState(null);
@@ -32,7 +32,8 @@ export const AceptacionRiesgos = () => {
       state: {
         formData,
         rutaInfo,
-        idRuta
+        idRuta,
+        serviciosAdicionales
       }
     });
   };
@@ -42,7 +43,8 @@ export const AceptacionRiesgos = () => {
       state: { 
         formData, 
         rutaInfo, 
-        idRuta 
+        idRuta,
+        serviciosAdicionales
       } 
     });
   };

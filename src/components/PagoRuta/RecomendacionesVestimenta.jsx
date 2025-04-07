@@ -11,7 +11,9 @@ export const RecomendacionesVestimenta = () => {
   const location = useLocation();
   
   // Obtener datos de la reserva desde el estado de navegación
-  const { formData, rutaInfo, idRuta, radicado } = location.state || {};
+  const { formData, rutaInfo, idRuta, radicado, serviciosAdicionales = [] } = location.state || {};
+  
+  console.log("Datos en Recomendaciones:", { formData, rutaInfo, serviciosAdicionales });
   
   const [aceptaRecomendaciones, setAceptaRecomendaciones] = useState(false);
   const [cargando, setCargando] = useState(false);
@@ -32,8 +34,10 @@ export const RecomendacionesVestimenta = () => {
           nombreRuta: rutaInfo.nombreRuta,
           precio: rutaInfo.precio,
           cantidadPersonas: formData.cantidadPersonas,
-          fechaInicio: formData.fechaInicioISO
-        }
+          fechaInicio: formData.fechaInicioISO,
+          radicado: radicadoReserva
+        },
+        serviciosAdicionales
       }
     });
   };
@@ -41,34 +45,29 @@ export const RecomendacionesVestimenta = () => {
   // Función que se ejecuta cuando el usuario hace clic en "Reservar Ahora"
   const handleReservarAhora = async () => {
     if (!aceptaRecomendaciones) {
-      setError(t('debesAceptarRecomendaciones', 'Debes aceptar las recomendaciones de vestimenta para continuar'));
+      setError(t('debesAceptarRecomendaciones', 'Debes aceptar las recomendaciones para continuar'));
       return;
     }
-
+    
     setCargando(true);
     setError(null);
     
     try {
-      // Verificar si ya tenemos un radicado (pasado desde el componente anterior)
-      if (radicado) {
-        // Si ya tenemos un radicado, redirigimos directamente a la pasarela de pago
-        redirigirAPago(radicado);
-        return;
-      }
-
-      // Si no hay radicado, realizamos la petición para crear la reserva
       const token = localStorage.getItem('token');
+      
       if (!token) {
-        navigate('/Ingreso', { 
-          state: { 
-            mensaje: t('debesIniciarSesion', 'Debes iniciar sesión para reservar una ruta'),
-            redireccion: `/NuestrasRutas/${idRuta}`
-          } 
-        });
-        return;
+        throw new Error(t('noAutenticado', 'No estás autenticado'));
       }
-
-      // Realizar la misma petición que haría el formulario original
+      
+      // IMPORTANTE: Transformar serviciosAdicionales al formato correcto
+      const serviciosParaEnviar = serviciosAdicionales.map(servicio => ({
+        idServicio: servicio.servicio.idServicio,
+        cantidad: servicio.cantidad
+      }));
+      
+      console.log("enviando servicios a crear:", serviciosParaEnviar);
+      
+      // Realizar la petición para crear la reserva
       const response = await axios.post('http://localhost:10101/pagos-rutas/crear', 
         {
           idRuta: parseInt(idRuta),
@@ -76,8 +75,8 @@ export const RecomendacionesVestimenta = () => {
           fechaInicio: formData.fechaInicioISO,
           fechaFin: formData.fechaFinISO,
           horaInicio: formData.horaInicio,
-          fechaReserva: formData.fechaReservaMySQL,
-          estado: 'pendiente'
+          // Enviar los servicios con el formato correcto
+          serviciosAdicionales: serviciosParaEnviar
         },
         {
           headers: {
@@ -135,7 +134,21 @@ export const RecomendacionesVestimenta = () => {
         formData, 
         rutaInfo, 
         idRuta, 
-        radicado 
+        radicado,
+        serviciosAdicionales
+      }
+    });
+  };
+
+  const handleContinuar = () => {
+    // Navegar al siguiente paso con todos los datos
+    navigate('/VistaCliente/reserva/mercado-libre', {
+      state: {
+        formData,
+        rutaInfo,
+        serviciosAdicionales, // Enviar los servicios adicionales al siguiente componente
+        idRuta,
+        radicado: location.state?.reserva?.radicado || location.state?.radicado
       }
     });
   };
