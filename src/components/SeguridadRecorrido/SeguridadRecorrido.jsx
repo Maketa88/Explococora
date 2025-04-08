@@ -1,5 +1,5 @@
 import { FaHiking, FaShieldAlt } from 'react-icons/fa';
-import { GiBackpack, GiHorseshoe } from 'react-icons/gi';
+import { GiHorseshoe } from 'react-icons/gi';
 import { MdOutlineSecurity, MdTipsAndUpdates } from 'react-icons/md';
 
 export const SeguridadRecorrido = () => {

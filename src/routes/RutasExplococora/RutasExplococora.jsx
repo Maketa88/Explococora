@@ -23,6 +23,8 @@ import VistaGuia from "../../pages/VistaGuia/VistaGuia";
 import VistaOperador from "../../pages/VistaOperador/VistaOperador";
 import PoliticaPrivacidad from "../../components/PoliticaPrivacidad/PoliticaPrivacidad";
 import { SeguridadRecorrido } from "../../components/SeguridadRecorrido/SeguridadRecorrido";
+import { TerminosCondiciones } from "../../components/TerminosCondiciones/TerminosCondiciones";
+
 
 export const RutasExplococora = () => {
   const location = useLocation();
@@ -60,6 +62,7 @@ export const RutasExplococora = () => {
         <Route path="/recuperar-contrasenia/:token" element={<RecuperarContrasena />} />
         <Route path="/PoliticaPrivacidad" element={<PoliticaPrivacidad />} />
         <Route path="/seguridad" element={<SeguridadRecorrido />} />
+        <Route path="/terminos" element={<TerminosCondiciones />} />
 
         {/* Rutas protegidas */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
