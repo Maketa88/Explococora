@@ -1,4 +1,4 @@
-import React from "react";
+
 
 export const InputRegistro = ({
   label,
@@ -28,7 +28,7 @@ export const InputRegistro = ({
           value={value}
           onChange={onChange}
           required={required}
-          className={`w-full ${
+          className={`w-full text-black ${
             Icon ? "pl-10" : ""
           } placeholder-emerald-300 px-4 py-2 border border-emerald-200 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent`}
         />
