@@ -583,7 +583,7 @@ export const VistaPagoSimulado = () => {
                   {/* Total */}
                   <div className="flex justify-between items-center py-3 border-t border-gray-300 mt-2 font-bold text-lg">
                     <span className="text-gray-800">{t('total', 'Total')}:</span>
-                    <span className="text-blue-600 text-right">${calcularTotal().toLocaleString('es-CO')} COP</span>
+                    <span className="text-teal-700 text-right">${calcularTotal().toLocaleString('es-CO')} COP</span>
                   </div>
 
                   {/* Botones de acción */}
@@ -595,8 +595,8 @@ export const VistaPagoSimulado = () => {
                         cargando || !camposCompletos
                           ? 'bg-gray-300 cursor-not-allowed' 
                           : metodoPago === 'efectivo'
-                            ? 'bg-green-600 hover:bg-green-700 text-white'
-                            : 'bg-blue-600 hover:bg-blue-700 text-white'
+                            ? 'bg-teal-600 hover:bg-teal-700 text-white'
+                            : 'bg-teal-600 hover:bg-teal-700 text-white'
                       } font-medium transition-all duration-300 flex items-center justify-center`}
                     >
                       {cargando ? (

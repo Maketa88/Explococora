@@ -279,7 +279,7 @@ export const ConfirmacionPagoPaquete = () => {
               </button>
               
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/VistaCliente')}
                 className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-6 rounded-lg shadow transition-colors duration-300"
               >
                 {t('volverInicio', 'Volver al Inicio')}

@@ -190,7 +190,7 @@ export const AuthProvider = ({ children }) => {
             </div>
           `,
           showConfirmButton: false,
-          timer: 4000,
+          timer: 3000,
           timerProgressBar: true
         });
         

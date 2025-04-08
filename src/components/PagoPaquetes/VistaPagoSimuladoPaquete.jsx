@@ -511,8 +511,8 @@ export const VistaPagoSimuladoPaquete = () => {
                   <div className="border-t border-gray-200 my-2 pt-2"></div>
                   
                   <div className="flex justify-between items-center text-lg font-bold">
-                    <span className="text-gray-800">{t('total', 'Total')}:</span>
-                    <span className="text-blue-600">
+                    <span className="text-teal-800">{t('total', 'Total')}:</span>
+                    <span className="text-teal-800">
                       ${calcularPrecioTotal().toLocaleString('es-CO')} COP
                     </span>
                   </div>
@@ -528,8 +528,8 @@ export const VistaPagoSimuladoPaquete = () => {
                     cargando || !camposCompletos
                       ? 'bg-gray-300 cursor-not-allowed' 
                       : metodoPago === 'efectivo'
-                        ? 'bg-green-600 hover:bg-green-700 text-white'
-                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                        ? 'bg-teal-600 hover:bg-teal-700 text-white'
+                        : 'bg-teal-600 hover:bg-teal-700 text-white'
                   } font-medium transition-all duration-300 flex items-center justify-center`}
                 >
                   {cargando ? (
