@@ -21,6 +21,8 @@ export const NuestrasRutas = () => {
   const [error, setError] = useState(null);
   const [desplazando, setDesplazando] = useState(false);
   const carouselRef = useRef(null);
+  const [lightboxAbierto, setLightboxAbierto] = useState(false);
+  const [imagenActual, setImagenActual] = useState(0);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -100,6 +102,24 @@ export const NuestrasRutas = () => {
     });
   };
 
+  // Funciones para el lightbox
+  const handleLightbox = (index) => {
+    setImagenActual(index);
+    setLightboxAbierto(true);
+  };
+
+  const navigateLightbox = (direccion) => {
+    if (direccion === 'siguiente') {
+      setImagenActual((prev) => (prev === fotosRutaActual.length - 1 ? 0 : prev + 1));
+    } else {
+      setImagenActual((prev) => (prev === 0 ? fotosRutaActual.length - 1 : prev - 1));
+    }
+  };
+
+  const cerrarLightbox = () => {
+    setLightboxAbierto(false);
+  };
+
   if (cargando) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -151,6 +171,7 @@ export const NuestrasRutas = () => {
             >
               <div 
                 className="w-full h-full relative rounded-lg overflow-hidden cursor-pointer group"
+                onClick={() => handleLightbox(index)}
               >
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
                 <img
@@ -676,6 +697,54 @@ export const NuestrasRutas = () => {
       </div>
     </div>
     </section>
+    
+    {/* Lightbox */}
+    {lightboxAbierto && (
+      <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+        <button 
+          className="absolute top-4 right-4 text-white text-3xl" 
+          onClick={cerrarLightbox}
+        >
+          ×
+        </button>
+        <button 
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2.5 rounded-full transition-all duration-300"
+          onClick={() => navigateLightbox('anterior')}
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className="h-6 w-6" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <img 
+          src={fotosRutaActual[imagenActual]} 
+          alt={`Foto ${imagenActual + 1} de ${rutaActual.nombreRuta}`} 
+          className="max-h-[90vh] max-w-[90vw] object-contain"
+        />
+        <button 
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2.5 rounded-full transition-all duration-300"
+          onClick={() => navigateLightbox('siguiente')}
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className="h-6 w-6" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+        <div className="absolute bottom-4 text-white text-center w-full">
+          <span>{imagenActual + 1} de {fotosRutaActual.length}</span>
+        </div>
+      </div>
+    )}
     </>
   );
 };
