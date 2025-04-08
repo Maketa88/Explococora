@@ -331,7 +331,7 @@ const PaquetesTarjeta = ({ onPaqueteSeleccionado, paqueteActualId }) => {
           <div className="relative z-10 text-center">
             <h1 className="text-4xl font-black tracking-tight relative inline-block">
               <span className="relative bg-clip-text text-transparent bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 drop-shadow-sm">
-                <ShoppingBag className="inline-block h-8 w-8 mr-2 mb-1" /> Paquetes Turísticos
+                Paquetes Turísticos
               </span>
             </h1>
 

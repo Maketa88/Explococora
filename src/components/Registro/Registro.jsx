@@ -195,7 +195,7 @@ export const Registro = () => {
           </svg>
         </div>
         
-        {/* Animated waves from the middle */}
+        {/* Animated waves from the middle 
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none">
           {[1, 2, 3, 4, 5, 6, 7].map((i) => (
             <div 
@@ -211,6 +211,7 @@ export const Registro = () => {
             ></div>
           ))}
         </div>
+        */}
         
         {/* Animated leaves */}
         {leafPosition.map((leaf, index) => (
