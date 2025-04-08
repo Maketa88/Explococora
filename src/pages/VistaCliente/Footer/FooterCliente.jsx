@@ -38,7 +38,7 @@ export const FooterCliente = () => {
             <LinkFooter href="/VistaCliente/Seguridad">
               Seguridad en Caminatas y Cabalgatas
             </LinkFooter>
-            <LinkFooter href="/terminos">Términos y Condiciones</LinkFooter>
+            <LinkFooter href="/VistaCliente/terminos">Términos y Condiciones</LinkFooter>
           </FooterSeccion>
 
           <FooterSeccion title="Síguenos">

@@ -19,6 +19,7 @@ import PerfilCliente from "../../pages/VistaCliente/PerfilCliente";
 import QuienesSomosCliente from "../../pages/VistaCliente/QuinesSomosCliente";
 import PoliticaPrivacidad from "../../components/PoliticaPrivacidad/PoliticaPrivacidad";
 import { SeguridadRecorrido } from "../../components/SeguridadRecorrido/SeguridadRecorrido";
+import { TerminosCondiciones } from "../../components/TerminosCondiciones/TerminosCondiciones";
 
 const RutasCliente = () => {
   const [ocultarFooter, setOcultarFooter] = useState(false);
@@ -56,6 +57,7 @@ const RutasCliente = () => {
         <Route path="/PaquetesTuristicos/:idPaquete" element={<GestionPaquetes />} />
         <Route path="/QuienesSomos" element={<QuienesSomosCliente />} />
         <Route path="/PoliticaPrivacidad" element={<PoliticaPrivacidad />} />
+        <Route path="/terminos" element={<TerminosCondiciones />} />
         {/* Rutas para pagos y reservas */}
         <Route path="reserva-ruta/:idRuta" element={<FormularioReservaRuta />} />
         <Route path="reserva/autorizacion-menores" element={<AutorizacionMenores />} />
