@@ -18,6 +18,7 @@ import { HeaderCliente } from "../../pages/VistaCliente/Header/HeaderCliente";
 import PerfilCliente from "../../pages/VistaCliente/PerfilCliente";
 import QuienesSomosCliente from "../../pages/VistaCliente/QuinesSomosCliente";
 import PoliticaPrivacidad from "../../components/PoliticaPrivacidad/PoliticaPrivacidad";
+import { SeguridadRecorrido } from "../../components/SeguridadRecorrido/SeguridadRecorrido";
 
 const RutasCliente = () => {
   const [ocultarFooter, setOcultarFooter] = useState(false);
@@ -64,6 +65,7 @@ const RutasCliente = () => {
         <Route path="reserva/confirmacion" element={<ConfirmacionPago />} />
         <Route path="reserva/pendiente" element={<ConfirmacionPago />} />
         <Route path="reserva/error" element={<ConfirmacionPago />} />
+        <Route path="/Seguridad" element={<SeguridadRecorrido />} />
         
         {/* Rutas para pagos y reservas de Paquetes */}
         <Route path="reserva-paquete/:idPaquete" element={<FormularioReservaPaquete />} />
