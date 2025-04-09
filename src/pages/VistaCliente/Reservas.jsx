@@ -52,15 +52,17 @@ export const Reservas = () => {
             <div className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <h2 className="text-xl font-semibold text-teal-800">
-                  {reserva.idRuta ? 'Ruta' : 'Paquete'} #{reserva.idRuta || reserva.idPaquete}
+                  {reserva.infoRuta ? 
+                    reserva.infoRuta.nombreRuta : 
+                    reserva.infoPaquete.nombrePaquete
+                  }
                 </h2>
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  reserva.estado === 'Confirmada' ? 'bg-green-100 text-green-800' :
-                  reserva.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' :
+                  reserva.estado === 'confirmada' ? 'bg-green-100 text-green-800' :
+                  reserva.estado === 'pendiente' ? 'bg-yellow-100 text-yellow-800' :
                   'bg-red-100 text-red-800'
                 }`}>
                   {reserva.estado}
-                  
                 </span>
               </div>
 
@@ -69,8 +71,17 @@ export const Reservas = () => {
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
-                  {reserva.cantidadPersonas} personas
+                  {reserva.cantidadPersonas} {reserva.cantidadPersonas === 1 ? 'persona' : 'personas'}
                 </div>
+
+                {reserva.infoRuta && (
+                  <div className="flex items-center text-gray-600">
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                    Dificultad: {reserva.infoRuta.dificultad}
+                  </div>
+                )}
 
                 <div className="flex items-center text-gray-600">
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,14 +97,23 @@ export const Reservas = () => {
                     </svg>
                     Hora: {reserva.horaInicio}
                   </div>
-                  
                 )}
-                 <div className="flex items-center text-gray-600">
+
+                <div className="flex items-center text-gray-600">
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
-                  {reserva.radicado}
+                  Radicado: {reserva.radicado}
                 </div>
+
+                {reserva.nombre_guia && (
+                  <div className="flex items-center text-gray-600">
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Guía: {reserva.nombre_guia}
+                  </div>
+                )}
               </div>
             </div>
           </div>
