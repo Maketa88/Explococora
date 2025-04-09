@@ -48,7 +48,7 @@ export const Reservas = () => {
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {reservas.map((reserva) => (
-          <div key={reserva.id} className="bg-white rounded-lg shadow-lg overflow-hidden border border-teal-100 hover:shadow-xl transition-shadow duration-300">
+          <div key={reserva.idReserva} className="bg-white rounded-lg shadow-lg overflow-hidden border border-teal-100 hover:shadow-xl transition-shadow duration-300">
             <div className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <h2 className="text-xl font-semibold text-teal-800">
@@ -74,14 +74,8 @@ export const Reservas = () => {
                   {reserva.cantidadPersonas} {reserva.cantidadPersonas === 1 ? 'persona' : 'personas'}
                 </div>
 
-                {reserva.infoRuta && (
-                  <div className="flex items-center text-gray-600">
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                    </svg>
-                    Dificultad: {reserva.infoRuta.dificultad}
-                  </div>
-                )}
+                
+               
 
                 <div className="flex items-center text-gray-600">
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
