@@ -204,6 +204,7 @@ const ProfileDropdown = ({ imgSrc, alt }) => {
 
   const menuOptions = [
     { label: "Ver perfil", path: "/VistaCliente/PerfilCliente" },
+    { label: "Mis reservas", path: "/VistaCliente/Reservas" },
     { label: "Cerrar sesión", path: null },
   ];
 

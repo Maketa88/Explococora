@@ -9,6 +9,9 @@ import { AceptacionRiesgosPaquetes, AutorizacionMenoresPaquetes, ConfirmacionPag
 import { AceptacionRiesgos, AutorizacionMenores, ConfirmacionPago, FormularioReservaRuta, RecomendacionesVestimenta } from "../../components/PagoRuta";
 import { VistaPagoSimulado } from "../../components/PagoRuta/VistaPagoSimulado";
 import GestionPaquetes from "../../components/Paquetes/Paquetes";
+import PoliticaPrivacidad from "../../components/PoliticaPrivacidad/PoliticaPrivacidad";
+import { SeguridadRecorrido } from "../../components/SeguridadRecorrido/SeguridadRecorrido";
+import { TerminosCondiciones } from "../../components/TerminosCondiciones/TerminosCondiciones";
 import { PaginaInicio } from "../../pages/PaginaInicio/PaginaInicio";
 import ActualizarDatosCliente from "../../pages/VistaCliente/ActualizarCliente";
 import { BorrarCuenta } from "../../pages/VistaCliente/BorrarCuenta";
@@ -17,9 +20,7 @@ import { FooterCliente } from "../../pages/VistaCliente/Footer/FooterCliente";
 import { HeaderCliente } from "../../pages/VistaCliente/Header/HeaderCliente";
 import PerfilCliente from "../../pages/VistaCliente/PerfilCliente";
 import QuienesSomosCliente from "../../pages/VistaCliente/QuinesSomosCliente";
-import PoliticaPrivacidad from "../../components/PoliticaPrivacidad/PoliticaPrivacidad";
-import { SeguridadRecorrido } from "../../components/SeguridadRecorrido/SeguridadRecorrido";
-import { TerminosCondiciones } from "../../components/TerminosCondiciones/TerminosCondiciones";
+import { Reservas } from "../../pages/VistaCliente/Reservas";
 
 const RutasCliente = () => {
   const [ocultarFooter, setOcultarFooter] = useState(false);
@@ -45,6 +46,7 @@ const RutasCliente = () => {
       <Routes>
         <Route path="/" element={<PaginaInicio />} />
         <Route path="/PerfilCliente" element={<PerfilCliente />} />
+        <Route path="/Reservas" element={<Reservas />} />
         <Route path="/Historia" element={<HistoriaCultura />} />
         <Route path="/Contacto" element={<ContactForm />} />
         <Route path="/ActualizarPerfil" element={<ActualizarDatosCliente />} />
