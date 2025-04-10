@@ -49,38 +49,7 @@ export const Reservas = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-emerald-50 to-white"></div>
 
         {/* Siluetas de palmeras de cera */}
-        <div className="absolute top-0 left-0 w-full h-full opacity-10">
-          <svg
-            viewBox="0 0 1200 600"
-            className="w-full h-full"
-            preserveAspectRatio="xMidYMid slice"
-          >
-            <path
-              d="M100,600 C100,400 150,300 200,100 C220,300 240,400 260,600"
-              fill="none"
-              stroke="#047857"
-              strokeWidth="8"
-            />
-            <path
-              d="M400,600 C400,350 450,250 500,50 C520,250 540,350 560,600"
-              fill="none"
-              stroke="#047857"
-              strokeWidth="8"
-            />
-            <path
-              d="M700,600 C700,400 750,300 800,100 C820,300 840,400 860,600"
-              fill="none"
-              stroke="#047857"
-              strokeWidth="8"
-            />
-            <path
-              d="M1000,600 C1000,350 1050,250 1100,50 C1120,250 1140,350 1160,600"
-              fill="none"
-              stroke="#047857"
-              strokeWidth="8"
-            />
-          </svg>
-        </div>
+       
       </div>
 
       <div className="container mx-auto max-w-7xl">
@@ -101,10 +70,30 @@ export const Reservas = () => {
               <div key={reserva.idReserva} className="bg-white rounded-xl shadow-md overflow-hidden">
                 <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 p-4 text-center">
                   <h2 className="text-xl font-semibold text-white">
-                    {reserva.infoRuta ? 
-                      reserva.infoRuta.nombreRuta : 
-                      reserva.infoPaquete.nombrePaquete
-                    }
+                    {reserva.infoRuta ? (
+                      <>
+                        <span className="inline-flex items-center font-medium text-xs uppercase tracking-wider bg-white text-amber-900 px-2.5 py-1 rounded-md shadow-sm mr-3 transform -translate-y-0.5">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" viewBox="0 0 24 24" fill="none">
+                            <path d="M4,19 C6,16 10,13 12,16 C14,19 18,16 20,13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                            <path d="M4,14 C6,11 10,8 12,11 C14,14 18,11 20,8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                          </svg>
+                          Ruta
+                        </span>
+                        {reserva.infoRuta.nombreRuta}
+                      </>
+                    ) : (
+                      <>
+                        <span className="inline-flex items-center font-medium text-xs uppercase tracking-wider bg-white text-sky-900 px-2.5 py-1 rounded-md shadow-sm mr-3 transform -translate-y-0.5">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm0 0V6a2 2 0 012 2h-2z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 8H8m8 0a4 4 0 01-4 4H8m8 0H8" />
+                            <rect x="3" y="8" width="18" height="12" rx="2" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+                          </svg>
+                          Paquete
+                        </span>
+                        {reserva.infoPaquete.nombrePaquete}
+                      </>
+                    )}
                   </h2>
                 </div>
                 
