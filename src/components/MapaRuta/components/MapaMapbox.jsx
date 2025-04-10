@@ -260,24 +260,10 @@ const MapboxMap = ({
         const routePoints = [
           { 
             name: 'Inicio de Ruta', 
-            coordinates: [-75.47087, 4.63529],
+            coordinates: [-75.486686, 4.638081],
             type: 'start',
-            description: 'Punto de partida del recorrido en el Valle del Cocora',
-            imageUrl: 'https://images.pexels.com/photos/5342974/pexels-photo-5342974.jpeg'
-          },
-          { 
-            name: 'Mirador Valle del Cocora', 
-            coordinates: [-75.47648, 4.63675],
-            type: 'poi',
-            description: 'Mirador con vista panorámica del valle',
-            imageUrl: 'https://images.pexels.com/photos/5342976/pexels-photo-5342976.jpeg'
-          },
-          { 
-            name: 'Forest of the Palms', 
-            coordinates: [-75.48172, 4.63972],
-            type: 'poi',
-            description: 'Bosque de palmas de cera, el árbol nacional de Colombia',
-            imageUrl: 'https://images.pexels.com/photos/5342978/pexels-photo-5342978.jpeg'
+            description: 'Punto de partida del recorrido en Bosques De Cocora',
+            imageUrl: 'https://images.pexels.com/photos/5342982/pexels-photo-5342982.jpeg'
           },
           { 
             name: 'Manos de Cocora Mirador', 
@@ -287,11 +273,25 @@ const MapboxMap = ({
             imageUrl: 'https://images.pexels.com/photos/5342980/pexels-photo-5342980.jpeg'
           },
           { 
-            name: 'Bosques De Cocora', 
-            coordinates: [-75.486686, 4.638081],
+            name: 'Forest of the Palms', 
+            coordinates: [-75.48172, 4.63972],
+            type: 'poi',
+            description: 'Bosque de palmas de cera, el árbol nacional de Colombia',
+            imageUrl: 'https://images.pexels.com/photos/5342978/pexels-photo-5342978.jpeg'
+          },
+          { 
+            name: 'Mirador Valle del Cocora', 
+            coordinates: [-75.47648, 4.63675],
+            type: 'poi',
+            description: 'Mirador con vista panorámica del valle',
+            imageUrl: 'https://images.pexels.com/photos/5342976/pexels-photo-5342976.jpeg'
+          },
+          { 
+            name: 'Fin de Ruta', 
+            coordinates: [-75.47087, 4.63529],
             type: 'end',
-            description: 'Punto final del recorrido, área de descanso y apreciación natural',
-            imageUrl: 'https://images.pexels.com/photos/5342982/pexels-photo-5342982.jpeg'
+            description: 'Punto final del recorrido en el Valle del Cocora',
+            imageUrl: 'https://images.pexels.com/photos/5342974/pexels-photo-5342974.jpeg'
           }
         ];
 
