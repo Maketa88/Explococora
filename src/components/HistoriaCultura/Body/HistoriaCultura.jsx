@@ -1,13 +1,13 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import Carta6 from "../../../assets/Images/historia6.webp";
-import Carta5 from "../../../assets/Images/historia4.webp";
-import Carta1 from "../../../assets/Images/historia1.webp";
-import Carta7 from "../../../assets/Images/historia7.webp";
-import Carta3 from "../../../assets/Images/historia3.webp";
 import Carta2 from "../../../assets/Images/carrusel4.jpg";
-import Carta8 from "../../../assets/Images/historia8.webp";
+import Carta1 from "../../../assets/Images/historia1.webp";
+import Carta3 from "../../../assets/Images/historia3.webp";
+import Carta5 from "../../../assets/Images/historia4.webp";
 import Carta4 from "../../../assets/Images/historia5.webp";
+import Carta6 from "../../../assets/Images/historia6.webp";
+import Carta7 from "../../../assets/Images/historia7.webp";
+import Carta8 from "../../../assets/Images/historia8.webp";
 import { TituloExplo } from "./TituloExplo";
 
 export const HistoriaCultura = () => {
@@ -146,12 +146,14 @@ export const HistoriaCultura = () => {
                     }`}
                   >
                     <div className="w-full h-full border-2 border-teal-600/60 rounded-xl overflow-hidden shadow-sm bg-white flex flex-col md:flex-row">
-                      <div className="w-full md:w-1/2 h-48 md:h-full relative flex items-center justify-center">
-                        <img
-                          src={card.image}
-                          alt={card.title}
-                          className="w-full h-full object-contain p-4 sm:p-6 md:p-8"
-                        />
+                      <div className="w-full md:w-1/2 h-48 md:h-full relative flex items-center justify-center overflow-hidden rounded-xl">
+                        <div className="w-full h-full p-4 sm:p-6 md:p-8 flex items-center justify-center overflow-hidden rounded-xl">
+                          <img
+                            src={card.image}
+                            alt={card.title}
+                            className="w-auto h-auto max-w-[95%] max-h-[95%] rounded-lg imagen-hover transition-all duration-300 shadow-sm"
+                          />
+                        </div>
                       </div>
                       <div className="w-full md:w-1/2 p-4 sm:p-5 md:p-6 flex flex-col justify-center">
                         <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-teal-800 mb-2 sm:mb-3 md:mb-4">
@@ -265,6 +267,18 @@ export const HistoriaCultura = () => {
         
         .animate-float {
           animation: float 15s ease-in-out infinite;
+        }
+
+        /* Estilo para la animación de hover en las imágenes */
+        .imagen-hover {
+          transition: transform 0.4s ease, filter 0.4s ease, box-shadow 0.4s ease;
+          border-radius: 0.75rem;
+        }
+        
+        .imagen-hover:hover {
+          transform: scale(1.05);
+          filter: brightness(1.05);
+          box-shadow: 0 10px 15px -3px rgba(4, 120, 87, 0.2), 0 4px 6px -2px rgba(4, 120, 87, 0.1);
         }
 
         /* Contenedor de texto con altura máxima y scroll solo en móviles */
