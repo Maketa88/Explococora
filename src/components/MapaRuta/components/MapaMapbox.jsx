@@ -260,31 +260,38 @@ const MapboxMap = ({
         const routePoints = [
           { 
             name: 'Inicio de Ruta', 
-            coordinates: [-75.4893, 4.6386],
+            coordinates: [-75.47087, 4.63529],
             type: 'start',
-            description: 'Punto de partida del recorrido',
+            description: 'Punto de partida del recorrido en el Valle del Cocora',
             imageUrl: 'https://images.pexels.com/photos/5342974/pexels-photo-5342974.jpeg'
           },
           { 
-            name: 'Punto de Interés 1', 
-            coordinates: [-75.4950, 4.6415],
+            name: 'Mirador Valle del Cocora', 
+            coordinates: [-75.47648, 4.63675],
             type: 'poi',
-            description: 'Mirador con vista panorámica',
+            description: 'Mirador con vista panorámica del valle',
             imageUrl: 'https://images.pexels.com/photos/5342976/pexels-photo-5342976.jpeg'
           },
           { 
-            name: 'Punto de Interés 2', 
-            coordinates: [-75.5010, 4.6475],
+            name: 'Forest of the Palms', 
+            coordinates: [-75.48172, 4.63972],
             type: 'poi',
-            description: 'Zona de palmas de cera',
+            description: 'Bosque de palmas de cera, el árbol nacional de Colombia',
             imageUrl: 'https://images.pexels.com/photos/5342978/pexels-photo-5342978.jpeg'
           },
           { 
-            name: 'Fin de Ruta', 
-            coordinates: [-75.4898, 4.6386],
-            type: 'end',
-            description: 'Punto final del recorrido',
+            name: 'Manos de Cocora Mirador', 
+            coordinates: [-75.48228, 4.64217],
+            type: 'poi',
+            description: 'Mirador elevado con vistas excepcionales a todo el valle',
             imageUrl: 'https://images.pexels.com/photos/5342980/pexels-photo-5342980.jpeg'
+          },
+          { 
+            name: 'Bosques De Cocora', 
+            coordinates: [-75.486686, 4.638081],
+            type: 'end',
+            description: 'Punto final del recorrido, área de descanso y apreciación natural',
+            imageUrl: 'https://images.pexels.com/photos/5342982/pexels-photo-5342982.jpeg'
           }
         ];
 
