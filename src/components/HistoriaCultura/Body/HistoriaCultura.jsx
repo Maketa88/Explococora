@@ -10,6 +10,7 @@ import Carta7 from "../../../assets/Images/historia7.webp";
 import Carta8 from "../../../assets/Images/historia8.webp";
 import { TituloExplo } from "./TituloExplo";
 import { TituloSlider } from "./TituloSlider";
+import { VideoHistoria } from "./VideoHistoria";
 
 export const HistoriaCultura = () => {
   const { t } = useTranslation();
@@ -223,6 +224,11 @@ export const HistoriaCultura = () => {
           </div>
         </div>
       </div>
+      
+      {/* Sección de Videos */}
+      
+        <VideoHistoria />
+      
       
       {/* Elementos decorativos animados */}
       <div className="absolute bottom-0 right-0 w-full h-full overflow-hidden pointer-events-none">
