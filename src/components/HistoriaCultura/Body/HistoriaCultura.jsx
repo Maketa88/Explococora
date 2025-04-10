@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Carta6 from "../../../assets/Images/caballito.png";
 import Carta5 from "../../../assets/Images/casa.png";
@@ -7,11 +8,33 @@ import Carta3 from "../../../assets/Images/madre-tierra.png";
 import Carta2 from "../../../assets/Images/palma-de-cera.png";
 import Carta8 from "../../../assets/Images/plantando.png";
 import Carta4 from "../../../assets/Images/trucha-arcoiris.png";
-import { Carta } from "./Carta";
 import { TituloExplo } from "./TituloExplo";
 
 export const HistoriaCultura = () => {
   const { t } = useTranslation();
+  const [activeSlide, setActiveSlide] = useState(0);
+  const sliderRef = useRef(null);
+
+  // Control del slider
+  const nextSlide = () => {
+    setActiveSlide((prev) => (prev === 7 ? 0 : prev + 1));
+  };
+
+  const prevSlide = () => {
+    setActiveSlide((prev) => (prev === 0 ? 7 : prev - 1));
+  };
+
+  // Todas las tarjetas para el slider
+  const cardsData = [
+    { image: Carta1, title: t("card1Title"), text: t("card1Text") },
+    { image: Carta2, title: t("card2Title"), text: t("card2Text") },
+    { image: Carta3, title: t("card3Title"), text: t("card3Text") },
+    { image: Carta4, title: t("card4Title"), text: t("card4Text") },
+    { image: Carta5, title: t("card5Title"), text: t("card5Text") },
+    { image: Carta6, title: t("card6Title"), text: t("card6Text") },
+    { image: Carta7, title: t("card7Title"), text: t("card7Text") },
+    { image: Carta8, title: t("card8Title"), text: t("card8Text") },
+  ];
 
   return (
     <div className="min-h-[80vh] bg-gradient-to-br from-teal-50 to-white flex flex-col items-center justify-start p-3 md:p-6 transition-all duration-1000 ease-in-out relative overflow-hidden">
@@ -82,73 +105,100 @@ export const HistoriaCultura = () => {
           </div>
         </div>
 
-        {/* Grid de cartas con padding superior para dejar espacio a la ola */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6 pt-12 sm:pt-16 md:pt-20 pb-12 sm:pb-10 md:pb-30">
-          <div className="border-2 border-teal-600/60 rounded-xl overflow-hidden shadow-sm">
-            <Carta
-              image={Carta1}
-              title={t("card1Title")}
-              text={t("card1Text")}
-            />
-          </div>
-          <div className="border-2 border-teal-600/60 rounded-xl overflow-hidden shadow-sm">
-            <Carta
-              image={Carta2}
-              title={t("card2Title")}
-              text={t("card2Text")}
-            />
-          </div>
-          <div className="border-2 border-teal-600/60 rounded-xl overflow-hidden shadow-sm">
-            <Carta
-              image={Carta3}
-              title={t("card3Title")}
-              text={t("card3Text")}
-            />
-          </div>
-          <div className="border-2 border-teal-600/60 rounded-xl overflow-hidden shadow-sm">
-            <Carta
-              image={Carta4}
-              title={t("card4Title")}
-              text={t("card4Text")}
-            />
-          </div>
-          
-          {/* Línea divisoria después de las primeras 4 cartas */}
-          <div className="col-span-1 sm:col-span-2 lg:col-span-4 my-2 md:my-4">
-            <div className="flex items-center justify-center px-4 sm:px-8 md:px-16">
-              <div className="border-t-2 border-teal-700 flex-grow"></div>
-              <div className="w-2 h-2 md:w-3 md:h-3 bg-teal-700 rounded-full mx-2 animate-pulse"></div>
-              <div className="border-t-2 border-teal-700 flex-grow"></div>
+        {/* Slider de tarjetas */}
+        <div className="pt-12 sm:pt-16 md:pt-20 pb-12 sm:pb-20 md:pb-20 relative" ref={sliderRef}>
+          <div className="w-full max-w-4xl mx-auto">
+            <div className="relative overflow-hidden rounded-xl shadow-lg">
+              {/* Tarjetas del slider */}
+              <div className="relative h-[480px] sm:h-[380px] md:h-[400px] transition-all duration-500">
+                {cardsData.map((card, index) => (
+                  <div
+                    key={index}
+                    className={`absolute top-0 left-0 w-full h-full transition-all duration-700 ease-in-out transform ${
+                      index === activeSlide
+                        ? "opacity-100 translate-x-0"
+                        : index < activeSlide
+                        ? "opacity-0 -translate-x-full"
+                        : "opacity-0 translate-x-full"
+                    }`}
+                  >
+                    <div className="w-full h-full border-2 border-teal-600/60 rounded-xl overflow-hidden shadow-sm bg-white flex flex-col md:flex-row">
+                      <div className="w-full md:w-1/2 h-48 md:h-full relative">
+                        <img
+                          src={card.image}
+                          alt={card.title}
+                          className="w-full h-full object-contain p-8"
+                        />
+                      </div>
+                      <div className="w-full md:w-1/2 p-6 flex flex-col justify-center">
+                        <h3 className="text-xl md:text-2xl font-bold text-teal-800 mb-4">
+                          {card.title}
+                        </h3>
+                        <p className="text-teal-700">{card.text}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Controles del slider */}
+              <button
+                onClick={prevSlide}
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-teal-600/70 hover:bg-teal-700/90 text-white rounded-full p-3 backdrop-blur-sm z-10 transition-all"
+                aria-label="Anterior"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </button>
+              <button
+                onClick={nextSlide}
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-teal-600/70 hover:bg-teal-700/90 text-white rounded-full p-3 backdrop-blur-sm z-10 transition-all"
+                aria-label="Siguiente"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+
+              {/* Indicadores de posición */}
+              <div className="absolute bottom-3 left-0 right-0 flex justify-center space-x-2">
+                {cardsData.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setActiveSlide(index)}
+                    className={`w-3 h-3 rounded-full ${
+                      index === activeSlide
+                        ? "bg-teal-600"
+                        : "bg-teal-300"
+                    } transition-all`}
+                    aria-label={`Ir a slide ${index + 1}`}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-          
-          <div className="border-2 border-teal-600/60 rounded-xl overflow-hidden shadow-sm">
-            <Carta
-              image={Carta5}
-              title={t("card5Title")}
-              text={t("card5Text")}
-            />
-          </div>
-          <div className="border-2 border-teal-600/60 rounded-xl overflow-hidden shadow-sm">
-            <Carta
-              image={Carta6}
-              title={t("card6Title")}
-              text={t("card6Text")}
-            />
-          </div>
-          <div className="border-2 border-teal-600/60 rounded-xl overflow-hidden shadow-sm">
-            <Carta
-              image={Carta7}
-              title={t("card7Title")}
-              text={t("card7Text")}
-            />
-          </div>
-          <div className="border-2 border-teal-600/60 rounded-xl overflow-hidden shadow-sm">
-            <Carta
-              image={Carta8}
-              title={t("card8Title")}
-              text={t("card8Text")}
-            />
           </div>
         </div>
 
