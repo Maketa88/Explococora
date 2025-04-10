@@ -9,6 +9,7 @@ import Carta6 from "../../../assets/Images/historia6.webp";
 import Carta7 from "../../../assets/Images/historia7.webp";
 import Carta8 from "../../../assets/Images/historia8.webp";
 import { TituloExplo } from "./TituloExplo";
+import { TituloSlider } from "./TituloSlider";
 
 export const HistoriaCultura = () => {
   const { t } = useTranslation();
@@ -46,20 +47,7 @@ export const HistoriaCultura = () => {
           preserveAspectRatio="xMidYMid slice"
         >
           {/* Título como marca de agua en el fondo */}
-          <text
-            x="600"
-            y="300"
-            textAnchor="middle"
-            className="text-5xl font-bold"
-            fill="#047857"
-            fontSize="120"
-            fontWeight="bold"
-            fontFamily="Arial, sans-serif"
-            opacity="0.10"
-            letterSpacing="10"
-          >
-            PATRIMONIO
-          </text>
+          
           
           {/* Montañas en diferentes capas */}
           <path
@@ -105,8 +93,14 @@ export const HistoriaCultura = () => {
           </div>
         </div>
 
+        {/* Espacio para separar la ola del título */}
+        <div className="h-10 md:h-12 lg:h-16"></div>
+
+        {/* Título del Slider */}
+        <TituloSlider />
+
         {/* Slider de tarjetas */}
-        <div className="pt-12 sm:pt-16 md:pt-20 pb-12 sm:pb-20 md:pb-20 relative" ref={sliderRef}>
+        <div className="pt-6 sm:pt-8 md:pt-10 pb-12 sm:pb-20 md:pb-20 relative" ref={sliderRef}>
           <div className="w-full max-w-4xl mx-auto relative">
             {/* Botón anterior - posicionado más a la izquierda */}
             <button
