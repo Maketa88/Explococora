@@ -13,21 +13,21 @@ export const VideoHistoria = () => {
       title: t("videoTitle1", "La Danza de la Palma de Cera"),
       description: t("videoDesc1", "Descubre la majestuosidad de las palmas de cera, el árbol nacional de Colombia, que desde hace siglos ha sido testigo de la evolución histórica y cultural del Valle del Cocora."),
       src: "/videos/ia_generando.mp4",
-      thumbnail: "/images/carrusel4.jpg"
+      thumbnail: "/images/palma.png"
     },
     {
       id: 2,
-      title: t("videoTitle2", "Tradiciones Ancestrales"),
-      description: t("videoDesc2", "Conoce las tradiciones que han pasado de generación en generación en esta región, preservando la riqueza cultural de sus habitantes y su conexión con la naturaleza."),
-      src: "/videos/cocora-video2.mp4",
-      thumbnail: "/images/thumb-video2.jpg"
+      title: t("videoTitle2", "Salento: Colorido Patrimonio Cultural"),
+      description: t("videoDesc2", "Descubre las coloridas calles de Salento, joya del eje cafetero con su arquitectura tradicional y balcones floridos que reflejan la auténtica cultura cafetera colombiana."),
+      src: "/videos/salento.mp4",
+      thumbnail: "/images/salento.png"
     },
     {
       id: 3,
-      title: t("videoTitle3", "Leyendas del Valle"),
-      description: t("videoDesc3", "Sumérgete en las fascinantes leyendas que rodean al Valle del Cocora, historias místicas que han dado forma a la identidad cultural de este paraíso natural."),
-      src: "/videos/cocora-video3.mp4",
-      thumbnail: "/images/thumb-video3.jpg"
+      title: t("videoTitle3", "El Majestuoso Valle del Cocora"),
+      description: t("videoDesc3", "Admira el Valle del Cocora, hogar de la emblemática palma de cera. Sus verdes praderas y bosques de niebla crean un paisaje natural único en Colombia."),
+      src: "/videos/valle.mp4",
+      thumbnail: "/images/valle.png"
     }
   ];
 
@@ -68,7 +68,7 @@ export const VideoHistoria = () => {
         <div className="text-center mb-10">
           <h2 className="text-3xl sm:text-4xl font-black tracking-tight relative inline-block mb-3">
             <span className="relative bg-clip-text text-transparent bg-gradient-to-br from-teal-600 via-teal-700 to-teal-800 drop-shadow-sm">
-              {t("videoSectionTitle", "Historias Audiovisuales del Cocora")}
+              {t("videoSectionTitle", "Paisajes Mágicos: Cocora y Salento en Movimiento")}
             </span>
           </h2>
           <div className="w-full max-w-3xl mx-auto h-1 bg-gradient-to-r from-transparent via-teal-600 to-transparent"></div>
