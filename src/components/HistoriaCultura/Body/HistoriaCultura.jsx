@@ -1,13 +1,13 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import Carta6 from "../../../assets/Images/caballito.png";
-import Carta5 from "../../../assets/Images/casa.png";
-import Carta1 from "../../../assets/Images/indigena.png";
-import Carta7 from "../../../assets/Images/loro.png";
-import Carta3 from "../../../assets/Images/madre-tierra.png";
-import Carta2 from "../../../assets/Images/palma-de-cera.png";
-import Carta8 from "../../../assets/Images/plantando.png";
-import Carta4 from "../../../assets/Images/trucha-arcoiris.png";
+import Carta6 from "../../../assets/Images/historia6.webp";
+import Carta5 from "../../../assets/Images/historia4.webp";
+import Carta1 from "../../../assets/Images/historia1.webp";
+import Carta7 from "../../../assets/Images/historia7.webp";
+import Carta3 from "../../../assets/Images/historia3.webp";
+import Carta2 from "../../../assets/Images/carrusel4.jpg";
+import Carta8 from "../../../assets/Images/historia8.webp";
+import Carta4 from "../../../assets/Images/historia5.webp";
 import { TituloExplo } from "./TituloExplo";
 
 export const HistoriaCultura = () => {
@@ -87,7 +87,7 @@ export const HistoriaCultura = () => {
         <TituloExplo />
       </div>
 
-      <div className="relative container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 pb-12 md:pb-16 z-10">
+      <div className="relative container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 z-10">
         {/* Ola superior */}
         <div className="absolute top-0 left-0 w-full h-6 md:h-8 overflow-hidden">
           <div className="w-full h-full bg-gradient-to-r from-teal-600 via-teal-700 to-teal-800 opacity-70">
@@ -107,10 +107,33 @@ export const HistoriaCultura = () => {
 
         {/* Slider de tarjetas */}
         <div className="pt-12 sm:pt-16 md:pt-20 pb-12 sm:pb-20 md:pb-20 relative" ref={sliderRef}>
-          <div className="w-full max-w-4xl mx-auto">
+          <div className="w-full max-w-4xl mx-auto relative">
+            {/* Botón anterior - posicionado más a la izquierda */}
+            <button
+              onClick={prevSlide}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-teal-600/80 hover:bg-teal-700 text-white p-1.5 sm:p-2 rounded-full shadow-md transition-all duration-300 btn-prev"
+              style={{ transform: "translateY(-50%) translateX(-120%)" }}
+              aria-label="Anterior"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 sm:h-6 sm:w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+            
             <div className="relative overflow-hidden rounded-xl shadow-lg">
               {/* Tarjetas del slider */}
-              <div className="relative h-[480px] sm:h-[380px] md:h-[400px] transition-all duration-500">
+              <div className="relative h-[400px] sm:h-[380px] md:h-[400px] transition-all duration-500">
                 {cardsData.map((card, index) => (
                   <div
                     key={index}
@@ -123,82 +146,67 @@ export const HistoriaCultura = () => {
                     }`}
                   >
                     <div className="w-full h-full border-2 border-teal-600/60 rounded-xl overflow-hidden shadow-sm bg-white flex flex-col md:flex-row">
-                      <div className="w-full md:w-1/2 h-48 md:h-full relative">
+                      <div className="w-full md:w-1/2 h-48 md:h-full relative flex items-center justify-center">
                         <img
                           src={card.image}
                           alt={card.title}
-                          className="w-full h-full object-contain p-8"
+                          className="w-full h-full object-contain p-4 sm:p-6 md:p-8"
                         />
                       </div>
-                      <div className="w-full md:w-1/2 p-6 flex flex-col justify-center">
-                        <h3 className="text-xl md:text-2xl font-bold text-teal-800 mb-4">
+                      <div className="w-full md:w-1/2 p-4 sm:p-5 md:p-6 flex flex-col justify-center">
+                        <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-teal-800 mb-2 sm:mb-3 md:mb-4">
                           {card.title}
                         </h3>
-                        <p className="text-teal-700">{card.text}</p>
+                        <div className="text-content-wrapper">
+                          <p className="text-sm sm:text-base text-teal-700">
+                            {card.text}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
-
-              {/* Controles del slider */}
-              <button
-                onClick={prevSlide}
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-teal-600/70 hover:bg-teal-700/90 text-white rounded-full p-3 backdrop-blur-sm z-10 transition-all"
-                aria-label="Anterior"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
-                </svg>
-              </button>
-              <button
-                onClick={nextSlide}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-teal-600/70 hover:bg-teal-700/90 text-white rounded-full p-3 backdrop-blur-sm z-10 transition-all"
-                aria-label="Siguiente"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </button>
-
-              {/* Indicadores de posición */}
-              <div className="absolute bottom-3 left-0 right-0 flex justify-center space-x-2">
-                {cardsData.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setActiveSlide(index)}
-                    className={`w-3 h-3 rounded-full ${
-                      index === activeSlide
-                        ? "bg-teal-600"
-                        : "bg-teal-300"
-                    } transition-all`}
-                    aria-label={`Ir a slide ${index + 1}`}
-                  />
-                ))}
-              </div>
             </div>
+            
+            {/* Indicadores de posición - ahora fuera del contenido */}
+            <div className="flex justify-center space-x-1.5 sm:space-x-2 mt-4">
+              {cardsData.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActiveSlide(index)}
+                  className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${
+                    index === activeSlide
+                      ? "bg-teal-600"
+                      : "bg-teal-300"
+                  } transition-all`}
+                  aria-label={`Ir a slide ${index + 1}`}
+                />
+              ))}
+            </div>
+            
+            {/* Botón siguiente - posicionado más a la derecha */}
+            <button
+              onClick={nextSlide}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-teal-600/80 hover:bg-teal-700 text-white p-1.5 sm:p-2 rounded-full shadow-md transition-all duration-300 btn-next"
+              style={{ transform: "translateY(-50%) translateX(120%)" }}
+              aria-label="Siguiente"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 sm:h-6 sm:w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -241,7 +249,7 @@ export const HistoriaCultura = () => {
         ))}
       </div>
       
-      {/* Estilos CSS para animaciones */}
+      {/* Estilos CSS para animaciones y ajustes responsivos mejorados */}
       <style>{`
         @keyframes float {
           0% {
@@ -258,11 +266,60 @@ export const HistoriaCultura = () => {
         .animate-float {
           animation: float 15s ease-in-out infinite;
         }
+
+        /* Contenedor de texto con altura máxima y scroll solo en móviles */
+        .text-content-wrapper {
+          padding-right: 5px;
+        }
+        
+        /* Estilo para scrollbar */
+        .text-content-wrapper::-webkit-scrollbar {
+          width: 5px;
+        }
+        
+        .text-content-wrapper::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        
+        .text-content-wrapper::-webkit-scrollbar-thumb {
+          background: #0d9488;
+          border-radius: 5px;
+        }
         
         /* Mejoras responsive */
         @media (max-width: 640px) {
           .min-h-[80vh] {
             min-height: 100dvh;
+          }
+          .text-content-wrapper {
+            max-height: 95px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #0d9488 transparent;
+          }
+          .btn-prev {
+            transform: translateY(-50%) translateX(-100%) !important;
+          }
+          .btn-next {
+            transform: translateY(-50%) translateX(100%) !important;
+          }
+        }
+        
+        /* Ajustes para tablets pequeñas */
+        @media (min-width: 641px) and (max-width: 767px) {
+          .text-content-wrapper {
+            max-height: 110px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #0d9488 transparent;
+          }
+        }
+        
+        /* Pantallas grandes sin scroll */
+        @media (min-width: 768px) {
+          .text-content-wrapper {
+            max-height: none;
+            overflow-y: visible;
           }
         }
       `}</style>
