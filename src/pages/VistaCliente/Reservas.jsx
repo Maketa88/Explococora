@@ -72,7 +72,7 @@ export const Reservas = () => {
                   <h2 className="text-xl font-semibold text-white">
                     {reserva.infoRuta ? (
                       <>
-                        <span className="inline-flex items-center font-medium text-xs uppercase tracking-wider bg-white text-amber-900 px-2.5 py-1 rounded-md shadow-sm mr-3 transform -translate-y-0.5">
+                        <span className="inline-flex items-center font-medium text-xs uppercase tracking-wider bg-white text-sky-900 px-2.5 py-1 rounded-md shadow-sm mr-3 transform -translate-y-0.5">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" viewBox="0 0 24 24" fill="none">
                             <path d="M4,19 C6,16 10,13 12,16 C14,19 18,16 20,13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                             <path d="M4,14 C6,11 10,8 12,11 C14,14 18,11 20,8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
