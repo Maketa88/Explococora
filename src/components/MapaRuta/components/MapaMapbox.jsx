@@ -313,6 +313,24 @@ const MapboxMap = ({
           }
         ];
 
+        // Añadir estilo personalizado para los popups para asegurar que estén por encima
+        const styleElement = document.createElement('style');
+        styleElement.textContent = `
+          .mapboxgl-popup {
+            z-index: 1500 !important;
+          }
+          .centered-popup .mapboxgl-popup-content {
+            z-index: 1500 !important;
+          }
+          .marker {
+            z-index: 900;
+          }
+          .marker:hover {
+            z-index: 910;
+          }
+        `;
+        document.head.appendChild(styleElement);
+
         routePoints.forEach(point => {
           if (!point || !point.coordinates || !Array.isArray(point.coordinates) || point.coordinates.length < 2) return;
           
@@ -323,7 +341,7 @@ const MapboxMap = ({
           el.style.height = 'clamp(35px, 5vw, 45px)';
           el.style.backgroundSize = 'cover';
           el.style.cursor = 'pointer';
-          el.style.zIndex = '999';
+          el.style.zIndex = '900';
           
           // Añadir estilos específicos según el tipo de punto
           switch(point.type) {
@@ -348,11 +366,11 @@ const MapboxMap = ({
             if (currentZoom > 15) {
               el.style.width = 'clamp(45px, 6vw, 55px)';
               el.style.height = 'clamp(45px, 6vw, 55px)';
-              el.style.zIndex = '1000';
+              el.style.zIndex = '910';
             } else {
               el.style.width = 'clamp(35px, 5vw, 45px)';
               el.style.height = 'clamp(35px, 5vw, 45px)';
-              el.style.zIndex = '999';
+              el.style.zIndex = '900';
             }
           });
 
@@ -445,8 +463,11 @@ const MapboxMap = ({
             offset: [0, 0]
           });
 
-          // Añadir el marcador al mapa
-          new mapboxgl.Marker(el)
+          // Añadir el marcador al mapa con ancla en la parte inferior del icono
+          new mapboxgl.Marker({
+            element: el,
+            anchor: 'bottom'
+          })
             .setLngLat(point.coordinates)
             .addTo(map.current);
 
@@ -478,7 +499,7 @@ const MapboxMap = ({
           });
         });
 
-        // Actualizar la ruta para que pase por todos los puntos
+        // Actualizar la ruta para que pase por todos los puntos con línea exacta
         if (map.current.getSource('trails')) {
           const updatedTrailsData = {
             'type': 'FeatureCollection',
@@ -498,6 +519,30 @@ const MapboxMap = ({
           };
 
           map.current.getSource('trails').setData(updatedTrailsData);
+          
+          // Asegurar que la línea y los marcadores estén alineados
+          routePoints.forEach(point => {
+            // Añadir puntos invisibles exactamente en las coordenadas para asegurar alineación
+            map.current.addLayer({
+              'id': `point-${point.name.replace(/\s+/g, '-')}`,
+              'type': 'circle',
+              'source': {
+                'type': 'geojson',
+                'data': {
+                  'type': 'Feature',
+                  'geometry': {
+                    'type': 'Point',
+                    'coordinates': point.coordinates
+                  }
+                }
+              },
+              'paint': {
+                'circle-radius': 3,
+                'circle-opacity': 0,
+                'circle-stroke-width': 0
+              }
+            });
+          });
         }
 
       } catch (markerError) {
