@@ -311,7 +311,7 @@ const DashboardLayoutAdmin = ({ children }) => {
     {
       title: "Reservas",
       icon: <PackagePlus className="w-5 h-5" />,
-      path: "/VistaAdmin/Reservas",
+      path: "/VistaAdmin/Reserva",
       section: "Informes"
     },
     {

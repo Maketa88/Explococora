@@ -15,7 +15,7 @@ import EliminarPaquetes from '../../pages/VistaAdmin/GestionPaquetes/EliminarPaq
 import ActualizarPaquetes from '../../pages/VistaAdmin/GestionPaquetes/ActualizarPaquetes';
 import CrearPaquetes from '../../pages/VistaAdmin/GestionPaquetes/CrearPaquetes';
 import PagoPaquete from '../../pages/VistaAdmin/Informes/PagoPaquete';
-import Reservas from '../../pages/VistaAdmin/Informes/Reserva';
+import Reserva from '../../pages/VistaAdmin/Informes/Reserva';
 import PagoRuta from '../../pages/VistaAdmin/Informes/PagoRuta';
 import EstadoGuia from '../../pages/VistaAdmin/GestionUsuarios/EstadoGuia';
 
@@ -38,7 +38,7 @@ const RutasAdmin = () => {
       <Route path="/ActualizarPaquetes" element={<ActualizarPaquetes />} />
       <Route path="/CrearPaquetes" element={<CrearPaquetes />} />
       <Route path="/PagoPaquete" element={<PagoPaquete />} />
-      <Route path="/Reservas" element={<Reservas />} />
+      <Route path="/Reserva" element={<Reserva />} />
       <Route path="/PagoRuta" element={<PagoRuta />} />
       <Route path="/EstadoGuia" element={<EstadoGuia />} />
 

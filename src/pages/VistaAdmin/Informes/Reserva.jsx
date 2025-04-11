@@ -6,7 +6,7 @@ import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import logoImage from '../../../assets/Images/logo.webp'; // Importamos el logo
 
-const Reservas = () => {
+const Reserva = () => {
   const [reservas, setReservas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actualizando, setActualizando] = useState(false);
@@ -24,7 +24,8 @@ const Reservas = () => {
     totalReservas: 0,
     reservasConfirmadas: 0,
     reservasPendientes: 0,
-    montoTotal: 0
+    reservasPagadas: 0,
+    reservasCompletadas: 0
   });
   
   // Estados para paginación
@@ -32,6 +33,9 @@ const Reservas = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const reservasPorPagina = itemsPerPage;
 
+  // Nuevos estados para manejar los filtros y estadísticas de pagos
+  const [estadoPagoFiltro, setEstadoPagoFiltro] = useState('todos');
+  
   useEffect(() => {
     fetchReservas();
   }, []);
@@ -50,7 +54,9 @@ const Reservas = () => {
         totalReservas: reservas.length,
         reservasConfirmadas,
         reservasPendientes,
-        montoTotal
+        montoTotal,
+        reservasPagadas: reservas.filter(r => r.estadoPago === 'completado').length,
+        reservasCompletadas: reservas.length
       });
     }
   }, [reservas]);
@@ -177,12 +183,9 @@ const Reservas = () => {
   
   // Función para exportar a Excel
   const exportarExcel = async () => {
-    if (reservasFiltroAplicado.length === 0) {
-      alert('No hay datos para exportar');
-      return;
-    }
-    
     try {
+      console.log('Iniciando exportación a Excel...');
+      
       // Crear un nuevo libro y hoja de trabajo
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Reservas', {
@@ -231,7 +234,7 @@ const Reservas = () => {
       };
       
       const totalReservasStyle = {
-        font: { bold: true, size: 14, color: { argb: '1B5E20' } },
+        font: { size: 14, color: { argb: '0000' } },
         alignment: { horizontal: 'center', vertical: 'middle' },
         fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E8F5E9' } }, // Verde muy claro
         border: {
@@ -257,18 +260,11 @@ const Reservas = () => {
         }
       };
       
-      const montoTotalStyle = {
-        font: { bold: true, size: 14, color: { argb: '1E40AF' } },
-        alignment: { horizontal: 'center', vertical: 'middle' },
-        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'DBEAFE' } }, // Azul claro
-        border: {
-          outline: { style: 'thin', color: { argb: 'D1D5DB' } }
-        },
-        numFmt: '$#,##0.00'
-      };
+
       
       const tableCellStyle = {
         alignment: { horizontal: 'center', vertical: 'middle' },
+        font: { name: 'Calibri', size: 11, color: { argb: '000000' } }, // Negro para todo el texto
         border: {
           top: { style: 'thin', color: { argb: 'D1D5DB' } },
           left: { style: 'thin', color: { argb: 'D1D5DB' } },
@@ -278,20 +274,18 @@ const Reservas = () => {
       };
       
       const moneyStyle = {
-        font: { color: { argb: '1E3A8A' } },
+        font: { color: { argb: '000000' } },
         numFmt: '$#,##0.00',
         alignment: { horizontal: 'center', vertical: 'middle' }
       };
       
-      const confirmadaStyle = {
-        font: { color: { argb: '166534' } },
-        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'DCFCE7' } },
+      const confirmadaCellStyle = {
+        font: { color: { argb: '000000' } }, // Cambiado a negro (era azul)
         alignment: { horizontal: 'center', vertical: 'middle' }
       };
       
-      const pendienteStyle = {
-        font: { color: { argb: '854D0E' } },
-        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FEF9C3' } },
+      const pendienteCellStyle = {
+        font: { color: { argb: '000000' } }, // Cambiado a negro (era naranja/amarillo)
         alignment: { horizontal: 'center', vertical: 'middle' }
       };
       
@@ -303,12 +297,17 @@ const Reservas = () => {
       // Configurar ancho de columnas
       worksheet.getColumn('A').width = 10; // ID
       worksheet.getColumn('B').width = 25; // Cliente
-      worksheet.getColumn('C').width = 15; // Cédula
-      worksheet.getColumn('D').width = 25; // Ruta/Paquete
-      worksheet.getColumn('E').width = 15; // Fecha
-      worksheet.getColumn('F').width = 12; // Personas
-      worksheet.getColumn('G').width = 15; // Estado
-      worksheet.getColumn('H').width = 18; // Total
+      worksheet.getColumn('C').width = 25; // Ruta/Paquete
+      worksheet.getColumn('D').width = 15; // Fecha
+      worksheet.getColumn('E').width = 12; // Personas
+      worksheet.getColumn('F').width = 15; // Estado
+      worksheet.getColumn('G').width = 15; // Radicado
+      worksheet.getColumn('H').width = 15; // Fecha Reserva
+      worksheet.getColumn('I').width = 15; // Fecha Inicio
+      worksheet.getColumn('J').width = 15; // Fecha Fin
+      worksheet.getColumn('K').width = 15; // ID Pago
+      worksheet.getColumn('L').width = 20; // Guía
+      worksheet.getColumn('M').width = 12; // Hora Inicio
       
       // Obtener el logo como Uint8Array
       const logoResponse = await fetch(logoImage);
@@ -328,14 +327,14 @@ const Reservas = () => {
       });
       
       // Título principal centrado
-      worksheet.mergeCells('A1:H1');
+      worksheet.mergeCells('A1:M1');
       const titleRow = worksheet.getRow(1);
       titleRow.height = 50;
-      titleRow.getCell(1).value = 'REPORTE DE RESERVAS';
+      titleRow.getCell(1).value = 'REPORTE DE RESERVAS TURÍSTICAS';
       titleRow.getCell(1).style = titleStyle;
       
       // Subtítulo con fecha
-      worksheet.mergeCells('A2:H2');
+      worksheet.mergeCells('A2:M2');
       const subtitleRow = worksheet.getRow(2);
       subtitleRow.height = 20;
       subtitleRow.getCell(1).value = `Generado el: ${new Date().toLocaleDateString('es-ES', {
@@ -348,7 +347,7 @@ const Reservas = () => {
       subtitleRow.getCell(1).style = subtitleStyle;
       
       // Línea divisoria verde
-      worksheet.mergeCells('A3:H3');
+      worksheet.mergeCells('A3:M3');
       const dividerRow = worksheet.getRow(3);
       dividerRow.height = 6;
       dividerRow.getCell(1).fill = { 
@@ -358,7 +357,7 @@ const Reservas = () => {
       };
       
       // Encabezado del resumen estadístico
-      worksheet.mergeCells('A4:H4');
+      worksheet.mergeCells('A4:M4');
       const statsHeaderRow = worksheet.getRow(4);
       statsHeaderRow.height = 25;
       statsHeaderRow.getCell(1).value = 'RESUMEN ESTADÍSTICO';
@@ -386,11 +385,6 @@ const Reservas = () => {
       statLabelsRow.getCell(5).alignment = { horizontal: 'center', vertical: 'middle' };
       statLabelsRow.getCell(5).font = { bold: true };
       
-      // Monto Total
-      worksheet.mergeCells('G5:H5');
-      statLabelsRow.getCell(7).value = 'Monto Total';
-      statLabelsRow.getCell(7).alignment = { horizontal: 'center', vertical: 'middle' };
-      statLabelsRow.getCell(7).font = { bold: true };
       
       // Valores de estadísticas
       const statValuesRow = worksheet.getRow(6);
@@ -410,19 +404,15 @@ const Reservas = () => {
       worksheet.mergeCells('E6:F6');
       statValuesRow.getCell(5).value = estadisticas.reservasPendientes;
       statValuesRow.getCell(5).style = reservasPendientesStyle;
-      
-      // Valor Monto Total
-      worksheet.mergeCells('G6:H6');
-      statValuesRow.getCell(7).value = estadisticas.montoTotal;
-      statValuesRow.getCell(7).style = montoTotalStyle;
+
       
       // Espacio entre estadísticas y tabla
       const spacerRow = worksheet.getRow(7);
       spacerRow.height = 10;
       
       // Encabezado de HISTORIAL DE RESERVAS
-      worksheet.mergeCells('A8:H8');
-      const headerRow = worksheet.getRow(8);
+      worksheet.mergeCells('A8:M8');
+      const headerRow = worksheet.getRow(8);  
       headerRow.height = 25;
       headerRow.getCell(1).value = 'HISTORIAL DE RESERVAS';
       headerRow.getCell(1).style = subHeaderStyle;
@@ -430,7 +420,21 @@ const Reservas = () => {
       // Encabezados de columnas
       const columnHeaderRow = worksheet.getRow(9);
       columnHeaderRow.height = 25;
-      columnHeaderRow.values = ['ID', 'Cliente', 'Cédula', 'Ruta/Paquete', 'Fecha', 'Personas', 'Estado', 'Total'];
+      columnHeaderRow.values = [
+        'Reserva', 
+        'Cliente', 
+        'Ruta/Paquete', 
+        'Fecha', 
+        'Personas', 
+        'Estado', 
+        'Radicado', 
+        'Fecha Reserva', 
+        'Fecha Inicio', 
+        'Fecha Fin', 
+        'ID Pago', 
+        'Guía', 
+        'Hora Inicio'
+      ];
       columnHeaderRow.eachCell((cell) => {
         cell.style = headerStyle;
       });
@@ -440,66 +444,79 @@ const Reservas = () => {
       
       // Agregar datos de reservas
       reservasFiltroAplicado.forEach((reserva, index) => {
-        // Obtener datos de la reserva
-        const id = reserva._id || (index + 1);
-        const cliente = reserva.nombre_cliente || 'N/A';
-        const cedula = reserva.cedula || 'N/A';
-        const producto = reserva.infoPaquete?.nombrePaquete || reserva.infoRuta?.nombreRuta || 'N/A';
-        const fecha = formatearFecha(reserva.fechaReserva);
-        const personas = reserva.cantidadPersonas || '1';
-        const estado = reserva.estado || 'N/A';
+        const row = worksheet.getRow(rowIndex++);
+        row.height = 22;
         
-        // Calcular el total
-        const precio = reserva.infoPaquete?.precio || reserva.infoRuta?.precio || 0;
-        const total = precio * (reserva.cantidadPersonas || 1);
+        const tipo = reserva.infoPaquete ? 'Paquete' : reserva.infoRuta ? 'Ruta' : 'N/A';
+        const nombre = reserva.infoPaquete?.nombrePaquete || 
+                     (reserva.infoRuta && reserva.infoRuta.nombreRuta) || 'N/A';
         
-        const row = worksheet.addRow([
-          id,
-          cliente,
-          cedula,
-          producto,
-          fecha,
-          personas,
-          estado.charAt(0).toUpperCase() + estado.slice(1),
-          total
-        ]);
+        const estado = reserva.estado || 'No definido';
         
-        // Color de fondo alternado para mejor legibilidad
-        const fillColor = index % 2 === 0 ? 'F9FAFB' : 'FFFFFF';
+        // Asegúrate de obtener el ID de forma correcta, verificando todas las posibles ubicaciones
+        // Modifica esta línea para buscar el ID en diferentes propiedades posibles
+        row.getCell(1).value = reserva.id || reserva._id || 
+                              (reserva._id && reserva._id.$oid) || 
+                              reserva.idReserva || 
+                              reserva.reservaId || 
+                              'N/A';
+        
+        // Asegúrate de que el ID se muestre correctamente
+        row.getCell(1).alignment = { horizontal: 'right', vertical: 'middle' };
+        row.getCell(1).font = { name: 'Calibri', size: 11, color: { argb: '000000' } }; // Negro en lugar de azul
+        
+        // Crear celdas con datos
+        row.getCell(2).value = reserva.nombre_cliente || 'N/A';
+        row.getCell(3).value = `${tipo}: ${nombre}`;
+        row.getCell(3).font = { name: 'Calibri', size: 11, color: { argb: '000000' } }; // Negro para Ruta/Paquete
+        row.getCell(4).value = formatearFecha(reserva.fechaReserva);
+        row.getCell(5).value = reserva.cantidadPersonas || 'N/A';
+        row.getCell(6).value = estado;
+        row.getCell(7).value = reserva.radicado || reserva.numRadicado || 'N/A';
+        row.getCell(8).value = reserva.fechaReserva ? new Date(reserva.fechaReserva).toLocaleDateString() : 'N/A';
+        row.getCell(9).value = reserva.fechaInicio ? new Date(reserva.fechaInicio).toLocaleDateString() : 'N/A';
+        row.getCell(10).value = reserva.fechaFin ? new Date(reserva.fechaFin).toLocaleDateString() : 'N/A';
+        const idPago = row.getCell(11);
+        idPago.value = reserva.idPago || 'N/A';
+        idPago.style = {
+          alignment: { horizontal: 'center', vertical: 'middle' },
+          font: { name: 'Calibri', size: 11, color: { argb: '000000' } }
+        };
+        idPago.numFmt = '0';
+        row.getCell(12).value = reserva.nombre_guia ? 
+          (reserva.idGuia ? `${reserva.idGuia} - ${reserva.nombre_guia}` : reserva.nombre_guia) : 
+          (reserva.idGuia || 'Sin asignar');
+        row.getCell(13).value = reserva.horaInicio || 'N/A';
         
         // Aplicar estilos a las celdas
-        row.eachCell((cell, colNumber) => {
-          cell.style = {
-            ...tableCellStyle,
-            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: fillColor } }
-          };
-          
-          // Formato especial para la columna de total (monto)
-          if (colNumber === 8) {
-            cell.style = {
-              ...cell.style,
-              ...moneyStyle
-            };
-          }
+        row.eachCell((cell) => {
+          cell.style = tableCellStyle;
         });
         
         // Aplicar estilo especial a la columna de estado
-        const estadoCell = row.getCell(7);
+        const estadoCell = row.getCell(6);
         if (estado.toLowerCase() === 'confirmada') {
-          Object.assign(estadoCell.style, confirmadaStyle);
+          Object.assign(estadoCell.style, confirmadaCellStyle);
         } else if (estado.toLowerCase() === 'pendiente') {
-          Object.assign(estadoCell.style, pendienteStyle);
+          Object.assign(estadoCell.style, pendienteCellStyle);
         }
         
-        rowIndex++;
+        // Agregar esta línea para forzar el color negro en todas las celdas de la fila
+        for (let i = 1; i <= worksheet.columnCount; i++) {
+          if (row.getCell(i).font) {
+            row.getCell(i).font.color = { argb: '000000' };
+          } else {
+            row.getCell(i).font = { color: { argb: '000000' } };
+          }
+        }
       });
       
       // Agregar un footer
       const footerRowIndex = rowIndex + 1;
-      worksheet.mergeCells(`A${footerRowIndex}:H${footerRowIndex}`);
+      worksheet.mergeCells(`A${footerRowIndex}:M${footerRowIndex}`);
       const footerRow = worksheet.getRow(footerRowIndex);
       footerRow.height = 24;
-      footerRow.getCell(1).value = 'ExploCocora - Sistema de Gestión de Reservas © 2024';
+      footerRow.getCell(1).value = 'ExploCocora - Sistema de Gestión de Rutas Turísticas © 2024';
       footerRow.getCell(1).style = footerStyle;
       
       // Generar el archivo
@@ -555,14 +572,18 @@ const Reservas = () => {
           </div>
           
           <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-blue-500">
-            <h3 className="text-gray-500 font-medium mb-2 text-sm uppercase">Monto total</h3>
+            <h3 className="text-gray-500 font-medium mb-2 text-sm uppercase">Pagos</h3>
             <div className="flex items-center justify-between">
               <p className="text-3xl font-bold text-gray-800">
-                ${estadisticas.montoTotal.toLocaleString('es-CO')}
+                {estadisticas.reservasCompletadas ? 
+                  `${Math.round((estadisticas.reservasPagadas / estadisticas.reservasCompletadas) * 100)}%` : 
+                  '0%'}
               </p>
               <DollarSign className="text-blue-500 h-8 w-8" />
             </div>
-            <p className="text-xs text-gray-500 mt-1">Valor total de reservas</p>
+            <p className="text-xs text-gray-500 mt-1">
+              {estadisticas.reservasPagadas || 0} de {estadisticas.reservasCompletadas || 0} pagadas
+            </p>
           </div>
         </div>
         
@@ -652,6 +673,20 @@ const Reservas = () => {
                   <Calendar className="absolute right-3 top-2.5 text-gray-400" size={18} aria-hidden="true" />
                 </div>
               </div>
+              
+              <div>
+                <label htmlFor="filter-pago" className="block text-sm font-medium text-gray-700 mb-1">Estado de Pago</label>
+                <select
+                  id="filter-pago"
+                  value={estadoPagoFiltro}
+                  onChange={(e) => setEstadoPagoFiltro(e.target.value)}
+                  className="w-full p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                >
+                  <option value="todos">Todos los pagos</option>
+                  <option value="completado">Pagado</option>
+                  <option value="pendiente">Pendiente</option>
+                </select>
+              </div>
             </div>
             
             <div className="flex justify-end mt-4">
@@ -734,19 +769,25 @@ const Reservas = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead>
                 <tr className="bg-gray-50">
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reserva</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ruta/Paquete</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Personas</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Radicado</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Reserva</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Inicio</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Fin</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pago</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Guía</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hora Inicio</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading ? (
                   <tr>
-                    <td colSpan="7" className="px-6 py-8 text-center">
+                    <td colSpan="13" className="px-6 py-8 text-center">
                       <div className="flex flex-col items-center justify-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
                         <span className="mt-4 text-gray-500">Cargando reservas...</span>
@@ -768,8 +809,13 @@ const Reservas = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {reserva.infoPaquete?.nombrePaquete || 
-                         (reserva.infoRuta && reserva.infoRuta.nombreRuta) || 'N/A'}
+                        <div className="text-xs text-gray-500 font-bold">
+                          {reserva.infoPaquete ? 'Paquete' : reserva.infoRuta ? 'Ruta' : 'N/A'}
+                        </div>
+                        <div className="font-medium">
+                          {reserva.infoPaquete?.nombrePaquete || 
+                           (reserva.infoRuta && reserva.infoRuta.nombreRuta) || 'N/A'}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                         {formatearFecha(reserva.fechaReserva)}
@@ -792,18 +838,29 @@ const Reservas = () => {
                           )}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">
-                        {reserva.infoPaquete?.precio 
-                          ? `$${(reserva.infoPaquete.precio * (reserva.cantidadPersonas || 1)).toLocaleString('es-CO')}` 
-                          : (reserva.infoRuta?.precio 
-                            ? `$${(reserva.infoRuta.precio * (reserva.cantidadPersonas || 1)).toLocaleString('es-CO')}` 
-                            : '$N/A')}
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{reserva.radicado || reserva.numRadicado || 'N/A'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {reserva.fechaReserva ? new Date(reserva.fechaReserva).toLocaleDateString() : 'N/A'}
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {reserva.fechaInicio ? new Date(reserva.fechaInicio).toLocaleDateString() : 'N/A'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {reserva.fechaFin ? new Date(reserva.fechaFin).toLocaleDateString() : 'N/A'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{reserva.idPago || 'N/A'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <div>{reserva.idGuia}</div>
+                        <div className="text-xs text-gray-600">
+                          {reserva.nombre_guia || 'Sin asignar'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{reserva.horaInicio || 'N/A'}</td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="px-6 py-12 text-center">
+                    <td colSpan="13" className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center">
                         <svg className="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -867,34 +924,28 @@ const Reservas = () => {
                     </svg>
                   </button>
                   
-                  {/* Mostrar números de página limitados para no sobrecargar la interfaz */}
                   {[...Array(Math.min(5, totalPaginas)).keys()].map((i) => {
-                    // Calcular las páginas a mostrar (centradas en la página actual)
                     let pageNumber;
                     if (totalPaginas <= 5) {
-                      // Si hay 5 o menos páginas, mostrarlas todas
                       pageNumber = i + 1;
                     } else {
-                      // Si hay más de 5 páginas, mostrar centradas alrededor de la actual
                       const middlePage = Math.min(Math.max(3, paginaActual), totalPaginas - 2);
                       pageNumber = i + middlePage - 2;
                       
-                      // Ajustar el rango si estamos al inicio o al final
                       if (middlePage < 3) pageNumber = i + 1;
                       if (middlePage > totalPaginas - 2) pageNumber = totalPaginas - 4 + i;
                     }
                     
-                    // Solo mostrar números válidos de página
                     if (pageNumber > 0 && pageNumber <= totalPaginas) {
                       return (
                         <button
                           key={pageNumber}
                           onClick={() => cambiarPagina(pageNumber)}
-                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                            paginaActual === pageNumber
+                          className={`relative inline-flex items-center px-4 py-2 border ${
+                            pageNumber === paginaActual
                               ? 'z-10 bg-emerald-50 border-emerald-500 text-emerald-600'
                               : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                          }`}
+                          } text-sm font-medium`}
                         >
                           {pageNumber}
                         </button>
@@ -921,18 +972,20 @@ const Reservas = () => {
           </div>
         )}
       </div>
-      
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out forwards;
-        }
-      `}} />
     </DashboardLayoutAdmin>
   );
 };
 
-export default Reservas; 
+// Función para convertir una imagen a base64
+const getBase64FromUrl = async (url) => {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
+export default Reserva;
