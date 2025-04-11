@@ -12,7 +12,7 @@ export const VideoHistoria = () => {
       id: 1,
       title: t("videoTitle1", "La Danza de la Palma de Cera"),
       description: t("videoDesc1", "Descubre la majestuosidad de las palmas de cera, el árbol nacional de Colombia, que desde hace siglos ha sido testigo de la evolución histórica y cultural del Valle del Cocora."),
-      src: "/videos/ia_generando.mp4",
+      src: "/videos/amor.mp4",
       thumbnail: "/images/palma.png"
     },
     {
