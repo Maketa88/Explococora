@@ -319,23 +319,42 @@ const MapboxMap = ({
           const el = document.createElement('div');
           el.className = `marker marker-${point.type}`;
           el.style.backgroundImage = 'url(https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-512.png)';
-          el.style.width = 'clamp(30px, 4vw, 40px)';
-          el.style.height = 'clamp(30px, 4vw, 40px)';
+          el.style.width = 'clamp(35px, 5vw, 45px)';
+          el.style.height = 'clamp(35px, 5vw, 45px)';
           el.style.backgroundSize = 'cover';
           el.style.cursor = 'pointer';
+          el.style.zIndex = '999';
           
           // Añadir estilos específicos según el tipo de punto
           switch(point.type) {
             case 'start':
-              el.style.filter = 'hue-rotate(120deg)'; // Verde
+              el.style.filter = 'hue-rotate(120deg) saturate(1.5) brightness(1.2)'; // Verde más brillante
               break;
             case 'poi':
-              el.style.filter = 'hue-rotate(210deg)'; // Azul
+              el.style.filter = 'hue-rotate(210deg) saturate(1.5) brightness(1.2)'; // Azul más brillante
               break;
             case 'end':
-              el.style.filter = 'hue-rotate(0deg)'; // Rojo
+              el.style.filter = 'hue-rotate(0deg) saturate(1.5) brightness(1.2)'; // Rojo más brillante
               break;
           }
+          
+          // Añadir sombra para mejorar visibilidad
+          el.style.filter += ' drop-shadow(0 0 5px rgba(0,0,0,0.5))';
+          
+          // Añadir un evento para aumentar el tamaño al hacer zoom
+          map.current.on('zoom', () => {
+            const currentZoom = map.current.getZoom();
+            // Aumentar tamaño cuando se hace zoom
+            if (currentZoom > 15) {
+              el.style.width = 'clamp(45px, 6vw, 55px)';
+              el.style.height = 'clamp(45px, 6vw, 55px)';
+              el.style.zIndex = '1000';
+            } else {
+              el.style.width = 'clamp(35px, 5vw, 45px)';
+              el.style.height = 'clamp(35px, 5vw, 45px)';
+              el.style.zIndex = '999';
+            }
+          });
 
           // Crear el contenido del popup
           const getPopupContent = (zoom) => {
