@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { AuthProvider } from "./context/AuthContext";
 import { RutasExplococora } from "./routes/RutasExplococora/RutasExplococora";
 import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
-import { motion, AnimatePresence } from "framer-motion";
+
 
 const App = () => {
   const [loading, setLoading] = useState(false);
@@ -63,7 +63,7 @@ const App = () => {
 
   return (
     <>
-      <style jsx global>{`
+      <style>{`
         ::-webkit-scrollbar {
           width: 12px;
         }
