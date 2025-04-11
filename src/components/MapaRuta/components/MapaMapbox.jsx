@@ -247,12 +247,30 @@ const MapboxMap = ({
             'line-cap': 'round'
           },
           'paint': {
-            'line-color': '#32CD32',
-            'line-width': 5,
-            'line-opacity': 0.8,
-            'line-blur': 0.5
+            'line-color': '#FF3366',
+            'line-width': 6,
+            'line-opacity': 0.9,
+            'line-blur': 0.5,
+            'line-dasharray': [1, 0]
           }
         });
+
+        // Añadir efecto de resplandor para la línea del trazado
+        map.current.addLayer({
+          'id': 'trails-glow',
+          'type': 'line',
+          'source': 'trails',
+          'layout': {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          'paint': {
+            'line-color': '#FFFFFF',
+            'line-width': 12,
+            'line-opacity': 0.4,
+            'line-blur': 3
+          }
+        }, 'trails-layer');
       }
 
       // Añadir marcadores en los puntos de interés
@@ -367,7 +385,7 @@ const MapboxMap = ({
                       object-fit: cover;
                     "
                     alt="${point.name}"
-                    onerror="this.src='https://via.placeholder.com/300x200?text=Imagen+no+disponible'"
+                    onerror="this.src='/images/carrusel4.jpg'"
                   />
                 </div>
 
