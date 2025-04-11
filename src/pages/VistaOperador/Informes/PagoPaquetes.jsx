@@ -587,11 +587,6 @@ const PagoPaquetes = () => {
       
       // Agregar datos de pagos
       filteredPagos.forEach((pago, index) => {
-        // Adaptar según la estructura de datos que venga de la API
-        const idReserva = pago.idReserva || pago.id || 'N/A';
-        const radicado = pago.radicado || pago.numRadicado || 'N/A';
-        const nombrePaquete = pago.nombrePaquete || pago.infoPaquete?.nombrePaquete || 'N/A';
-        
         // Extraer el nombre del cliente
         const cliente = 
           pago.nombreCliente ||
@@ -608,7 +603,7 @@ const PagoPaquetes = () => {
           // Solo considerar si es un paquete (tiene infoPaquete)
           return r.infoPaquete !== null && 
                  r.nombre_cliente === cliente && 
-                 (nombrePaqueteReserva === nombrePaquete || pago.nombrePaquete === r.infoPaquete?.nombrePaquete);
+                 (nombrePaqueteReserva === pago.nombrePaquete || pago.nombrePaquete === r.infoPaquete?.nombrePaquete);
         });
         
         // Si no encuentra por paquete, intentar por fecha
@@ -655,9 +650,9 @@ const PagoPaquetes = () => {
         }
         
         const row = worksheet.addRow([
-          idReserva,
-          radicado,
-          nombrePaquete,
+          pago.idPago || 'N/A',
+          pago.radicado || pago.numRadicado || 'N/A',
+          pago.nombrePaquete || pago.infoPaquete?.nombrePaquete || 'N/A',
           clienteFormateado,
           guiaFormateado,
           numPersonas,
@@ -931,7 +926,7 @@ const PagoPaquetes = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead>
                 <tr className="bg-gray-50">
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Reserva</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Pago</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Radicado</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paquete</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
@@ -981,11 +976,6 @@ const PagoPaquetes = () => {
                   </tr>
                 ) : (
                   paginatedPagos.map((pago, index) => {
-                    // Adaptar según la estructura de datos que venga de la API
-                    const idReserva = pago.idReserva || pago.id || 'N/A';
-                    const radicado = pago.radicado || pago.numRadicado || 'N/A';
-                    const nombrePaquete = pago.nombrePaquete || pago.infoPaquete?.nombrePaquete || 'N/A';
-                    
                     // Extraer el nombre del cliente
                     const cliente = 
                       pago.nombreCliente ||
@@ -1002,7 +992,7 @@ const PagoPaquetes = () => {
                       // Solo considerar si es un paquete (tiene infoPaquete)
                       return r.infoPaquete !== null && 
                              r.nombre_cliente === cliente && 
-                             (nombrePaqueteReserva === nombrePaquete || pago.nombrePaquete === r.infoPaquete?.nombrePaquete);
+                             (nombrePaqueteReserva === pago.nombrePaquete || pago.nombrePaquete === r.infoPaquete?.nombrePaquete);
                     });
                     
                     // Si no encuentra por paquete, intentar por fecha
@@ -1049,15 +1039,15 @@ const PagoPaquetes = () => {
                     }
                     
                     // Solo renderizar si está relacionado con un paquete
-                    if (!nombrePaquete || nombrePaquete === 'N/A') {
+                    if (!pago.nombrePaquete || pago.nombrePaquete === 'N/A') {
                       return null; // No renderizar esta fila si no es un paquete
                     }
                     
                     return (
-                      <tr key={`${idReserva}-${index}`} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{idReserva}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{radicado}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">{nombrePaquete}</td>
+                      <tr key={`${pago.idPago}-${index}`} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{pago.idPago}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{pago.radicado || pago.numRadicado || 'N/A'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">{pago.nombrePaquete || pago.infoPaquete?.nombrePaquete || 'N/A'}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                           <div className="font-medium">{cliente}</div>
                           <div className="text-xs text-gray-500">CC: {cedulaCliente !== 'N/A' ? cedulaCliente : 'No disponible'}</div>

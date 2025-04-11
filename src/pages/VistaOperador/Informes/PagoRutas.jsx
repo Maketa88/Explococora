@@ -21,37 +21,100 @@ const PagoRutas = () => {
   });
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const pagosPorPagina = itemsPerPage;
+  const [datosReservas, setDatosReservas] = useState([]);
 
   useEffect(() => {
     fetchPagos();
+    fetchReservas();
   }, []);
+
+  const fetchReservas = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        throw new Error('No se encontró token de autenticación. Por favor inicie sesión nuevamente.');
+      }
+      
+      const response = await axios.get('http://localhost:10101/reserva/todas', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      let reservasList = [];
+      
+      if (response.data && response.data.result) {
+        reservasList = response.data.result;
+      } else if (Array.isArray(response.data)) {
+        reservasList = response.data;
+      } else {
+        throw new Error('Formato de respuesta inválido desde el servidor.');
+      }
+      
+      // Filtramos solo las reservas de rutas (las que no tienen infoPaquete)
+      const soloReservasRutas = reservasList.filter(
+        reserva => reserva.infoPaquete === null || reserva.infoPaquete === undefined
+      );
+      
+      setDatosReservas(soloReservasRutas);
+      
+    } catch (err) {
+      console.error('Error al obtener las reservas de rutas:', err);
+    }
+  };
 
   const fetchPagos = async () => {
     try {
       setLoading(true);
       setActualizando(true);
-      console.log('Intentando obtener pagos de rutas desde la API...');
       
-      // Obtener el token del localStorage
       const token = localStorage.getItem('token');
       
-      // Cambiada la URL para obtener pagos de rutas e incluir el token en los headers
+      if (!token) {
+        throw new Error('No se encontró token de autenticación. Por favor inicie sesión nuevamente.');
+      }
+      
       const response = await axios.get('http://localhost:10101/pagos-rutas/historial', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
       
-      console.log('Respuesta de la API:', response.data);
+      let pagosList = [];
       
-      // Verificar si la respuesta contiene un array en la propiedad 'historial'
       if (response.data && Array.isArray(response.data.historial)) {
-        setPagos(response.data.historial);
+        pagosList = response.data.historial;
+      } else if (Array.isArray(response.data)) {
+        pagosList = response.data;
       } else {
-        console.error('La respuesta no contiene un array de historial válido:', response.data);
-        setPagos([]);
         setError('El formato de datos recibido no es válido');
+        setPagos([]);
+        setActualizando(false);
+        setLoading(false);
+        return;
       }
+      
+      // Filtro MÁS ESTRICTO: Filtrar SOLO pagos de RUTAS
+      pagosList = pagosList.filter(pago => {
+        // Excluir explícitamente cualquier pago con infoPaquete
+        if (pago.infoPaquete) return false;
+        
+        // Verificar si tiene tipoPago "ruta" explícitamente
+        if (pago.tipoPago && pago.tipoPago.toLowerCase() === 'ruta') return true;
+        
+        // Si tiene nombreRuta pero no tiene nombrePaquete
+        if (pago.nombreRuta && !pago.nombrePaquete) return true;
+        
+        // Verificar si la ruta está en campos relacionados
+        if (pago.tipoServicio && pago.tipoServicio.toLowerCase() === 'ruta') return true;
+        
+        // Si no cumple con ninguna condición para ser una ruta, excluirlo
+        return false;
+      });
+      
+      setPagos(pagosList);
+      
     } catch (err) {
       console.error('Error al obtener los pagos de rutas:', err);
       setPagos([]);
@@ -62,20 +125,16 @@ const PagoRutas = () => {
     }
   };
 
-  // Filtrar pagos solo si pagos es un array
   const pagosFiltrados = Array.isArray(pagos) ? pagos.filter(pago => {
-    // Filtro por texto de búsqueda
     const coincideFiltro = 
       (pago.nombreRuta?.toLowerCase() || '').includes(filtro.toLowerCase()) ||
       `${pago.clienteNombre || ''} ${pago.clienteApellido || ''}`.toLowerCase().includes(filtro.toLowerCase()) ||
       (pago.metodoPago?.toLowerCase() || '').includes(filtro.toLowerCase()) ||
       (pago.idPago?.toString() || '').includes(filtro);
     
-    // Filtro por estado
     const coincideEstado = estadoFiltro === 'todos' || 
                            (pago.estadoPago?.toLowerCase() === estadoFiltro.toLowerCase());
     
-    // Filtro por fechas
     let coincideFechas = true;
     if (filtros.fechaInicio && pago.fechaPago) {
       const fechaInicio = new Date(filtros.fechaInicio);
@@ -87,7 +146,7 @@ const PagoRutas = () => {
     
     if (filtros.fechaFin && pago.fechaPago) {
       const fechaFin = new Date(filtros.fechaFin);
-      fechaFin.setHours(23, 59, 59); // Establecer al final del día
+      fechaFin.setHours(23, 59, 59);
       const fechaPago = new Date(pago.fechaPago);
       if (fechaPago > fechaFin) {
         coincideFechas = false;
@@ -96,43 +155,35 @@ const PagoRutas = () => {
     
     return coincideFiltro && coincideEstado && coincideFechas;
   }).sort((a, b) => {
-    // Ordenar por ID de forma descendente (más reciente primero)
     return (b.idPago || 0) - (a.idPago || 0);
   }) : [];
 
-  // Calcular pagos para la página actual
   const indexUltimoPago = paginaActual * pagosPorPagina;
   const indexPrimerPago = indexUltimoPago - pagosPorPagina;
   const pagosActuales = pagosFiltrados.slice(indexPrimerPago, indexUltimoPago);
   
-  // Calcular total de páginas
   const totalPaginas = Math.ceil(pagosFiltrados.length / pagosPorPagina);
   
-  // Cambiar de página
   const cambiarPagina = (numeroPagina) => {
     setPaginaActual(numeroPagina);
   };
   
-  // Ir a la página anterior
   const irPaginaAnterior = () => {
     if (paginaActual > 1) {
       setPaginaActual(paginaActual - 1);
     }
   };
   
-  // Ir a la página siguiente
   const irPaginaSiguiente = () => {
     if (paginaActual < totalPaginas) {
       setPaginaActual(paginaActual + 1);
     }
   };
 
-  // Aplicar filtros
   const aplicarFiltros = () => {
-    setMostrarFiltros(false); // Ocultar modal de filtros después de aplicar
+    setMostrarFiltros(false);
   };
   
-  // Limpiar filtros
   const limpiarFiltros = () => {
     setEstadoFiltro('todos');
     setFiltros({
@@ -142,7 +193,6 @@ const PagoRutas = () => {
     setMostrarFiltros(false);
   };
 
-  // Formatear fecha
   const formatearFecha = (fechaStr) => {
     if (!fechaStr) return 'N/A';
     const fecha = new Date(fechaStr);
@@ -153,7 +203,6 @@ const PagoRutas = () => {
     });
   };
 
-  // Exportar a Excel
   const exportarCSV = async () => {
     if (!Array.isArray(pagos) || pagos.length === 0) {
       alert('No hay datos para exportar');
@@ -161,11 +210,10 @@ const PagoRutas = () => {
     }
     
     try {
-      // Crear un nuevo libro y hoja de trabajo
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Pagos de Rutas', {
         pageSetup: {
-          paperSize: 9, // A4
+          paperSize: 9,
           orientation: 'landscape',
           fitToPage: true,
           fitToWidth: 1,
@@ -173,10 +221,9 @@ const PagoRutas = () => {
         }
       });
       
-      // Estilos personalizados
       const headerStyle = {
         font: { bold: true, color: { argb: 'FFFFFF' }, size: 12 },
-        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: '007F66' } }, // Verde Explococora
+        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: '007F66' } },
         alignment: { horizontal: 'center', vertical: 'middle' },
         border: {
           top: { style: 'thin', color: { argb: 'D1D5DB' } },
@@ -188,7 +235,7 @@ const PagoRutas = () => {
       
       const subHeaderStyle = {
         font: { bold: true, color: { argb: 'FFFFFF' }, size: 12 },
-        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: '007F66' } }, // Verde Explococora
+        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: '007F66' } },
         alignment: { horizontal: 'center', vertical: 'middle' },
         border: {
           top: { style: 'thin', color: { argb: 'D1D5DB' } },
@@ -211,7 +258,7 @@ const PagoRutas = () => {
       const totalPagosStyle = {
         font: { bold: true, size: 14, color: { argb: '1B5E20' } },
         alignment: { horizontal: 'center', vertical: 'middle' },
-        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E8F5E9' } }, // Verde muy claro
+        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E8F5E9' } },
         border: {
           outline: { style: 'thin', color: { argb: 'D1D5DB' } }
         }
@@ -220,7 +267,7 @@ const PagoRutas = () => {
       const pagosCompletadosStyle = {
         font: { bold: true, size: 14, color: { argb: '166534' } },
         alignment: { horizontal: 'center', vertical: 'middle' },
-        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'DCFCE7' } }, // Verde claro
+        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'DCFCE7' } },
         border: {
           outline: { style: 'thin', color: { argb: 'D1D5DB' } }
         }
@@ -229,7 +276,7 @@ const PagoRutas = () => {
       const pagosPendientesStyle = {
         font: { bold: true, size: 14, color: { argb: '854D0E' } },
         alignment: { horizontal: 'center', vertical: 'middle' },
-        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FEF9C3' } }, // Amarillo claro
+        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FEF9C3' } },
         border: {
           outline: { style: 'thin', color: { argb: 'D1D5DB' } }
         }
@@ -238,7 +285,7 @@ const PagoRutas = () => {
       const montoTotalStyle = {
         font: { bold: true, size: 14, color: { argb: '1E40AF' } },
         alignment: { horizontal: 'center', vertical: 'middle' },
-        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'DBEAFE' } }, // Azul claro
+        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'DBEAFE' } },
         border: {
           outline: { style: 'thin', color: { argb: 'D1D5DB' } }
         },
@@ -278,41 +325,40 @@ const PagoRutas = () => {
         alignment: { horizontal: 'center' }
       };
       
-      // Configurar ancho de columnas
       worksheet.getColumn('A').width = 10;
-      worksheet.getColumn('B').width = 25;
-      worksheet.getColumn('C').width = 25;
-      worksheet.getColumn('D').width = 15;
+      worksheet.getColumn('B').width = 10;
+      worksheet.getColumn('C').width = 15;
+      worksheet.getColumn('D').width = 25;
       worksheet.getColumn('E').width = 25;
-      worksheet.getColumn('F').width = 15;
-      worksheet.getColumn('G').width = 15;
+      worksheet.getColumn('F').width = 20;
+      worksheet.getColumn('G').width = 10;
+      worksheet.getColumn('H').width = 15;
+      worksheet.getColumn('I').width = 20;
+      worksheet.getColumn('J').width = 15;
+      worksheet.getColumn('K').width = 15;
+      worksheet.getColumn('L').width = 15;
       
-      // Obtener el logo como Uint8Array
       const logoResponse = await fetch(logoImage);
       const logoArrayBuffer = await logoResponse.arrayBuffer();
       const logoBuffer = new Uint8Array(logoArrayBuffer);
       
-      // Agregar el logo
       const logoId = workbook.addImage({
         buffer: logoBuffer,
         extension: 'webp',
       });
       
-      // Insertar logo en la esquina superior izquierda
       worksheet.addImage(logoId, {
         tl: { col: 0, row: 0 },
         ext: { width: 110, height: 50 }
       });
       
-      // Título principal centrado
-      worksheet.mergeCells('A1:G1');
+      worksheet.mergeCells('A1:L1');
       const titleRow = worksheet.getRow(1);
       titleRow.height = 50;
       titleRow.getCell(1).value = 'REPORTE DE PAGOS DE RUTAS TURÍSTICAS';
       titleRow.getCell(1).style = titleStyle;
       
-      // Subtítulo con fecha
-      worksheet.mergeCells('A2:G2');
+      worksheet.mergeCells('A2:L2');
       const subtitleRow = worksheet.getRow(2);
       subtitleRow.height = 20;
       subtitleRow.getCell(1).value = `Generado el: ${new Date().toLocaleDateString('es-ES', {
@@ -324,8 +370,7 @@ const PagoRutas = () => {
       })}`;
       subtitleRow.getCell(1).style = subtitleStyle;
       
-      // Línea divisoria verde
-      worksheet.mergeCells('A3:G3');
+      worksheet.mergeCells('A3:L3');
       const dividerRow = worksheet.getRow(3);
       dividerRow.height = 6;
       dividerRow.getCell(1).fill = { 
@@ -334,126 +379,153 @@ const PagoRutas = () => {
         fgColor: { argb: '007F66' } 
       };
       
-      // Encabezado del resumen estadístico
-      worksheet.mergeCells('A4:G4');
+      worksheet.mergeCells('A4:L4');
       const statsHeaderRow = worksheet.getRow(4);
       statsHeaderRow.height = 25;
       statsHeaderRow.getCell(1).value = 'RESUMEN ESTADÍSTICO';
       statsHeaderRow.getCell(1).style = subHeaderStyle;
       
-      // Etiquetas de estadísticas
       const statLabelsRow = worksheet.getRow(5);
       statLabelsRow.height = 20;
       
-      // Total de Pagos
       worksheet.mergeCells('A5:B5');
       statLabelsRow.getCell(1).value = 'Total de Pagos';
       statLabelsRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
       statLabelsRow.getCell(1).font = { bold: true };
       
-      // Pagos Completados
       worksheet.mergeCells('C5:D5');
       statLabelsRow.getCell(3).value = 'Pagos Completados';
       statLabelsRow.getCell(3).alignment = { horizontal: 'center', vertical: 'middle' };
       statLabelsRow.getCell(3).font = { bold: true };
       
-      // Pagos Pendientes
       worksheet.mergeCells('E5:F5');
       statLabelsRow.getCell(5).value = 'Pagos Pendientes';
       statLabelsRow.getCell(5).alignment = { horizontal: 'center', vertical: 'middle' };
       statLabelsRow.getCell(5).font = { bold: true };
       
-      // Monto Total
       worksheet.mergeCells('G5:G5');
       statLabelsRow.getCell(7).value = 'Monto Total';
       statLabelsRow.getCell(7).alignment = { horizontal: 'center', vertical: 'middle' };
       statLabelsRow.getCell(7).font = { bold: true };
       
-      // Calcular estadísticas
       const totalPagos = pagosFiltrados.length;
       const pagosCompletados = pagosFiltrados.filter(pago => pago.estadoPago === 'completado').length;
       const pagosPendientes = pagosFiltrados.filter(pago => pago.estadoPago === 'pendiente').length;
       const montoTotal = pagosFiltrados.reduce((sum, pago) => sum + (pago.monto || 0), 0);
       
-      // Valores de estadísticas
       const statValuesRow = worksheet.getRow(6);
       statValuesRow.height = 30;
       
-      // Valor Total de Pagos
       worksheet.mergeCells('A6:B6');
       statValuesRow.getCell(1).value = totalPagos;
       statValuesRow.getCell(1).style = totalPagosStyle;
       
-      // Valor Pagos Completados
       worksheet.mergeCells('C6:D6');
       statValuesRow.getCell(3).value = pagosCompletados;
       statValuesRow.getCell(3).style = pagosCompletadosStyle;
       
-      // Valor Pagos Pendientes
       worksheet.mergeCells('E6:F6');
       statValuesRow.getCell(5).value = pagosPendientes;
       statValuesRow.getCell(5).style = pagosPendientesStyle;
       
-      // Valor Monto Total
       worksheet.mergeCells('G6:G6');
       statValuesRow.getCell(7).value = montoTotal;
       statValuesRow.getCell(7).style = montoTotalStyle;
       
-      // Espacio entre estadísticas y tabla
       const spacerRow = worksheet.getRow(7);
       spacerRow.height = 10;
       
-      // Encabezado de HISTORIAL DE TRANSACCIONES
-      worksheet.mergeCells('A8:G8');
+      worksheet.mergeCells('A8:L8');
       const headerRow = worksheet.getRow(8);
       headerRow.height = 25;
       headerRow.getCell(1).value = 'HISTORIAL DE TRANSACCIONES';
       headerRow.getCell(1).style = subHeaderStyle;
       
-      // Encabezados de columnas
       const columnHeaderRow = worksheet.getRow(9);
       columnHeaderRow.height = 25;
-      columnHeaderRow.values = ['ID', 'Ruta', 'Cliente', 'Monto', 'Método de Pago', 'Estado', 'Fecha'];
+      columnHeaderRow.values = ['ID', 'Radicado', 'Ruta', 'Cliente', 'Guía', 'Personas', 'Método de Pago', 'Fecha Reserva', 'Fecha Inicio', 'Hora Inicio', 'Monto', 'Estado'];
       columnHeaderRow.eachCell((cell) => {
         cell.style = headerStyle;
       });
       
-      // Iniciar fila para datos
       let rowIndex = 10;
       
-      // Agregar datos de pagos
       pagosFiltrados.forEach((pago, index) => {
-        // Obtener datos del pago
         const id = pago.idPago || '';
+        const radicado = pago.radicado || 'N/A';
         const ruta = pago.nombreRuta || 'N/A';
+        
         const cliente = `${pago.clienteNombre || ''} ${pago.clienteApellido || ''}`.trim() || 'N/A';
-        const monto = pago.monto || 0;
+        
+        let reservaFinal = datosReservas.find(r => r.idPago === pago.idPago);
+        
+        if (!reservaFinal) {
+          reservaFinal = datosReservas.find(r => 
+            r.nombreRuta === pago.nombreRuta && 
+            r.nombre_cliente === cliente
+          );
+        }
+        
+        if (!reservaFinal) {
+          const fechaPago = pago.fechaInicio || pago.fecha || pago.fechaReserva;
+          if (fechaPago) {
+            reservaFinal = datosReservas.find(r => 
+              r.nombre_cliente === cliente && 
+              new Date(r.fechaInicio).toDateString() === new Date(fechaPago).toDateString()
+            );
+          }
+        }
+        
+        const nombreGuia = reservaFinal ? reservaFinal.nombre_guia : (pago.guiaNombre || pago.nombreGuia || 'N/A');
+        
+        const personas = reservaFinal ? 
+          reservaFinal.cantidadPersonas : 
+          (pago.cantidadPersonas || pago.numeroPersonas || pago.cantidad_personas || (pago.personas && typeof pago.personas === 'number' ? pago.personas : null) || 'N/A');
+        
         const metodoPago = pago.metodoPago || 'N/A';
+        
+        const fechaReserva = reservaFinal ? 
+          formatearFecha(reservaFinal.fechaReserva) : 
+          formatearFecha(pago.fechaReserva) || 'N/A';
+        
+        const fechaInicio = reservaFinal ? 
+          formatearFecha(reservaFinal.fechaInicio) : 
+          formatearFecha(pago.fechaInicio) || 'N/A';
+        
+        const horaInicio = reservaFinal ? 
+          reservaFinal.horaInicio : 
+          (pago.horaInicio || 'N/A');
+        
+        const monto = pago.monto || 0;
+        
         const estado = pago.estadoPago || 'pendiente';
-        const fecha = formatearFecha(pago.fechaPago);
+        
+        const cedulaCliente = reservaFinal ? reservaFinal.cedula : 'N/A';
         
         const row = worksheet.addRow([
           id,
+          radicado,
           ruta,
           cliente,
-          monto,
+          nombreGuia,
+          personas,
           metodoPago,
-          estado.charAt(0).toUpperCase() + estado.slice(1),
-          fecha
+          fechaReserva,
+          fechaInicio,
+          horaInicio,
+          monto,
+          estado.charAt(0).toUpperCase() + estado.slice(1)
         ]);
         
-        // Color de fondo alternado para mejor legibilidad
         const fillColor = index % 2 === 0 ? 'F9FAFB' : 'FFFFFF';
         
-        // Aplicar estilos a las celdas
         row.eachCell((cell, colNumber) => {
           cell.style = {
             ...tableCellStyle,
             fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: fillColor } }
           };
           
-          // Formato especial para la columna de monto
-          if (colNumber === 4) {
+          if (colNumber === 12) {
             cell.style = {
               ...cell.style,
               ...moneyStyle
@@ -461,8 +533,7 @@ const PagoRutas = () => {
           }
         });
         
-        // Aplicar estilo especial a la columna de estado
-        const estadoCell = row.getCell(6);
+        const estadoCell = row.getCell(13);
         if (estado.toLowerCase() === 'completado') {
           Object.assign(estadoCell.style, completadoCellStyle);
         } else {
@@ -472,15 +543,13 @@ const PagoRutas = () => {
         rowIndex++;
       });
       
-      // Agregar un footer
       const footerRowIndex = rowIndex + 1;
-      worksheet.mergeCells(`A${footerRowIndex}:G${footerRowIndex}`);
+      worksheet.mergeCells(`A${footerRowIndex}:L${footerRowIndex}`);
       const footerRow = worksheet.getRow(footerRowIndex);
       footerRow.height = 24;
       footerRow.getCell(1).value = 'ExploCocora - Sistema de Gestión de Rutas Turísticas © 2024';
       footerRow.getCell(1).style = footerStyle;
       
-      // Generar el archivo
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       saveAs(blob, `pagos_rutas_${new Date().toISOString().slice(0,10)}.xlsx`);
@@ -494,7 +563,6 @@ const PagoRutas = () => {
   return (
     <DashboardLayout>
       <div className="p-6">
-        {/* Encabezado y título */}
         <div className="mb-6 bg-gradient-to-r from-emerald-700 to-emerald-500 p-6 rounded-lg text-white shadow-lg">
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <FileText className="text-white" aria-hidden="true" />
@@ -503,7 +571,6 @@ const PagoRutas = () => {
           <p className="mt-2 opacity-90">Gestión y seguimiento de transacciones de rutas turísticas</p>
         </div>
         
-        {/* Tarjetas de estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-emerald-500">
             <h3 className="text-gray-500 font-medium mb-2 text-sm uppercase">Total de pagos</h3>
@@ -548,7 +615,6 @@ const PagoRutas = () => {
           </div>
         </div>
         
-        {/* Controles de búsqueda y filtrado */}
         <div className="mb-6 flex flex-col md:flex-row justify-between gap-4 bg-white p-4 rounded-lg shadow-md">
           <div className="relative flex-1">
             <input
@@ -586,7 +652,6 @@ const PagoRutas = () => {
           </div>
         </div>
         
-        {/* Modal de filtros avanzados */}
         {mostrarFiltros && (
           <div id="panel-filtros" className="mb-6 p-4 bg-white rounded-lg shadow-md border-t-4 border-emerald-500">
             <h2 className="text-lg font-semibold text-emerald-800 mb-4">Filtrar Pagos</h2>
@@ -652,7 +717,6 @@ const PagoRutas = () => {
           </div>
         )}
         
-        {/* Estado de carga */}
         {loading && (
           <div className="bg-white p-8 rounded-lg shadow-md flex flex-col items-center justify-center">
             <div className="w-12 h-12 border-t-2 border-b-2 border-emerald-500 rounded-full animate-spin mb-4"></div>
@@ -660,7 +724,6 @@ const PagoRutas = () => {
           </div>
         )}
         
-        {/* Estado de error */}
         {error && !loading && (
           <div className="bg-white rounded-lg overflow-hidden shadow-md">
             <div className="p-4 border-b border-red-100 bg-red-50">
@@ -682,7 +745,6 @@ const PagoRutas = () => {
           </div>
         )}
         
-        {/* Controles de paginación por encima de la tabla */}
         <div className="flex items-center justify-between mb-4 bg-white p-3 rounded-lg shadow-sm">
           <div className="text-sm text-gray-700">
             Mostrando {pagosActuales.length} de {pagosFiltrados.length} registros
@@ -704,7 +766,6 @@ const PagoRutas = () => {
           </div>
         </div>
         
-        {/* Tabla de pagos */}
         <div className="bg-white rounded-lg overflow-hidden mb-6 shadow-lg">
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-800">Historial de Transacciones</h2>
@@ -716,18 +777,23 @@ const PagoRutas = () => {
               <thead>
                 <tr className="bg-gray-50">
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Radicado</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ruta</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Guía</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Personas</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Método de Pago</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Reserva</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Inicio</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hora Inicio</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading ? (
                   <tr>
-                    <td colSpan="7" className="px-6 py-8 text-center">
+                    <td colSpan="12" className="px-6 py-8 text-center">
                       <div className="flex flex-col items-center justify-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
                         <span className="mt-4 text-gray-500">Cargando pagos...</span>
@@ -735,36 +801,95 @@ const PagoRutas = () => {
                     </td>
                   </tr>
                 ) : pagosActuales.length > 0 ? (
-                  pagosActuales.map((pago) => (
-                    <tr key={pago.idPago || Math.random()} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{pago.idPago}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">{pago.nombreRuta || 'N/A'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{`${pago.clienteNombre || ''} ${pago.clienteApellido || ''}`}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">${(pago.monto || 0).toLocaleString('es-CO')}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        <span className="px-2 py-1 bg-gray-100 rounded text-gray-800">{pago.metodoPago}</span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          pago.estadoPago === 'completado' || pago.estadoPago === 'Completado' 
-                            ? 'bg-green-100 text-green-800' 
-                            : pago.estadoPago === 'pendiente' || pago.estadoPago === 'Pendiente' 
-                              ? 'bg-yellow-100 text-yellow-800' 
-                              : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {pago.estadoPago === 'completado' || pago.estadoPago === 'Completado' ? (
-                            <><CheckCircle className="mr-1 h-3 w-3" /> {pago.estadoPago || 'No definido'}</>
-                          ) : (
-                            <><Clock className="mr-1 h-3 w-3" /> {pago.estadoPago || 'No definido'}</>
-                          )}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{formatearFecha(pago.fechaPago)}</td>
-                    </tr>
-                  ))
+                  pagosActuales.map((pago, index) => {
+                    let reservaFinal = datosReservas.find(r => r.idPago === pago.idPago);
+                    
+                    if (!reservaFinal) {
+                      const cliente = `${pago.clienteNombre || ''} ${pago.clienteApellido || ''}`.trim() || 'N/A';
+                      
+                      reservaFinal = datosReservas.find(r => 
+                        r.nombreRuta === pago.nombreRuta && 
+                        r.nombre_cliente === cliente
+                      );
+                      
+                      if (!reservaFinal) {
+                        const fechaPago = pago.fechaInicio || pago.fecha || pago.fechaReserva;
+                        if (fechaPago) {
+                          reservaFinal = datosReservas.find(r => 
+                            r.nombre_cliente === cliente && 
+                            new Date(r.fechaInicio).toDateString() === new Date(fechaPago).toDateString()
+                          );
+                        }
+                      }
+                    }
+                    
+                    const nombreGuia = reservaFinal ? reservaFinal.nombre_guia : (pago.guiaNombre || pago.nombreGuia || 'N/A');
+                    
+                    const fechaReserva = reservaFinal ? 
+                      formatearFecha(reservaFinal.fechaReserva) : 
+                      formatearFecha(pago.fechaReserva) || 'N/A';
+                    
+                    const fechaInicio = reservaFinal ? 
+                      formatearFecha(reservaFinal.fechaInicio) : 
+                      formatearFecha(pago.fechaInicio) || 'N/A';
+                    
+                    const horaInicio = reservaFinal ? 
+                      reservaFinal.horaInicio : 
+                      (pago.horaInicio || 'N/A');
+                    
+                    const cedulaCliente = reservaFinal ? reservaFinal.cedula : 'N/A';
+                    
+                    const numPersonas = reservaFinal ? 
+                      reservaFinal.cantidadPersonas : 
+                      (pago.cantidadPersonas || pago.numeroPersonas || pago.cantidad_personas || (pago.personas && typeof pago.personas === 'number' ? pago.personas : null) || 'N/A');
+                    
+                    const cliente = `${pago.clienteNombre || ''} ${pago.clienteApellido || ''}`.trim() || 
+                      (reservaFinal ? reservaFinal.nombre_cliente : 'N/A');
+                    
+                    return (
+                      <tr key={pago.idPago || Math.random()} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{pago.idPago}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                          {pago.radicado || (reservaFinal ? reservaFinal.radicado : 'N/A')}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">{pago.nombreRuta || 'N/A'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                          <div className="font-medium">{cliente}</div>
+                          <div className="text-xs text-gray-500">CC: {cedulaCliente !== 'N/A' ? cedulaCliente : 'No disponible'}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                          <div className="font-medium">{nombreGuia}</div>
+                          {nombreGuia !== 'N/A' && <div className="text-xs text-gray-500">Guía asignado</div>}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{numPersonas}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                          <span className="px-2 py-1 bg-gray-100 rounded text-gray-800">{pago.metodoPago}</span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{fechaReserva}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{fechaInicio}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{horaInicio}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">${(pago.monto || 0).toLocaleString('es-CO')}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            pago.estadoPago === 'completado' || pago.estadoPago === 'Completado' 
+                              ? 'bg-green-100 text-green-800' 
+                              : pago.estadoPago === 'pendiente' || pago.estadoPago === 'Pendiente' 
+                                ? 'bg-yellow-100 text-yellow-800' 
+                                : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {pago.estadoPago === 'completado' || pago.estadoPago === 'Completado' ? (
+                              <><CheckCircle className="mr-1 h-3 w-3" /> {pago.estadoPago || 'No definido'}</>
+                            ) : (
+                              <><Clock className="mr-1 h-3 w-3" /> {pago.estadoPago || 'No definido'}</>
+                            )}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
-                    <td colSpan="7" className="px-6 py-12 text-center">
+                    <td colSpan="12" className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center">
                         <svg className="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -780,7 +905,6 @@ const PagoRutas = () => {
           </div>
         </div>
         
-        {/* Paginación */}
         {pagosFiltrados.length > 0 && (
           <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200 bg-gray-50 rounded-lg shadow-sm mb-6">
             <div className="flex-1 flex justify-between sm:hidden">
@@ -830,24 +954,18 @@ const PagoRutas = () => {
                     </svg>
                   </button>
                   
-                  {/* Mostrar números de página limitados para no sobrecargar la interfaz */}
                   {[...Array(Math.min(5, totalPaginas)).keys()].map((i) => {
-                    // Calcular las páginas a mostrar (centradas en la página actual)
                     let pageNumber;
                     if (totalPaginas <= 5) {
-                      // Si hay 5 o menos páginas, mostrarlas todas
                       pageNumber = i + 1;
                     } else {
-                      // Si hay más de 5 páginas, mostrar centradas alrededor de la actual
                       const middlePage = Math.min(Math.max(3, paginaActual), totalPaginas - 2);
                       pageNumber = i + middlePage - 2;
                       
-                      // Ajustar el rango si estamos al inicio o al final
                       if (middlePage < 3) pageNumber = i + 1;
                       if (middlePage > totalPaginas - 2) pageNumber = totalPaginas - 4 + i;
                     }
                     
-                    // Solo mostrar números válidos de página
                     if (pageNumber > 0 && pageNumber <= totalPaginas) {
                       return (
                         <button

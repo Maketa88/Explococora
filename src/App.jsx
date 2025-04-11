@@ -62,13 +62,39 @@ const App = () => {
   }, []);
 
   return (
-    <AuthProvider>
-      {loading ? (
-        <LoadingScreen isLoading={loading} />
-      ) : (
-        <RutasExplococora />
-      )}
-    </AuthProvider>
+    <>
+      <style jsx global>{`
+        ::-webkit-scrollbar {
+          width: 12px;
+        }
+        
+        ::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+          background: linear-gradient(to bottom, #fff 50%, rgba(17, 94, 89, 0.5) 50%);
+          border-radius: 6px;
+          border: 2px solid white;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(to bottom, #fff 50%, rgba(17, 94, 89, 0.7) 50%);
+        }
+        
+        * {
+          scrollbar-width: thin;
+          scrollbar-color: #fff rgba(17, 94, 89, 0.5);
+        }
+      `}</style>
+      <AuthProvider>
+        {loading ? (
+          <LoadingScreen isLoading={loading} />
+        ) : (
+          <RutasExplococora />
+        )}
+      </AuthProvider>
+    </>
   );
 };
 
