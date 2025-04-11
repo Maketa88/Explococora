@@ -1,6 +1,11 @@
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import punto1 from "../../../assets/Images/1.jpg";
+import punto2 from "../../../assets/Images/2.jpg";
+import punto3 from "../../../assets/Images/3.jpg";
+import punto4 from "../../../assets/Images/4.jpg";
+import punto5 from "../../../assets/Images/5.jpg";
 import { getRouteDirections } from '../../../services/mapboxService';
 import { MAPBOX_CONFIG } from '../config/mapboxConfig';
 
@@ -281,35 +286,35 @@ const MapboxMap = ({
             coordinates: [-75.486686, 4.638081],
             type: 'start',
             description: 'Punto de partida Los Willkys',
-            imageUrl: 'https://images.pexels.com/photos/5342982/pexels-photo-5342982.jpeg'
+            imageUrl: punto1,
           },
           { 
             name: 'Punto de Referencia 1', 
             coordinates: [-75.48228, 4.64217],
             type: 'poi',
             description: 'Finca la Esperanza',
-            imageUrl: 'https://images.pexels.com/photos/5342980/pexels-photo-5342980.jpeg'
+            imageUrl: punto2
           },
           { 
             name: 'Punto de Referencia 2', 
             coordinates: [-75.48172, 4.63972],
             type: 'poi',
             description: 'Mirador 1',
-            imageUrl: 'https://images.pexels.com/photos/5342978/pexels-photo-5342978.jpeg'
+            imageUrl: punto3
           },
           { 
             name: 'Punto de Referencia 3', 
             coordinates: [-75.47648, 4.63675],
             type: 'poi',
             description: 'Mirador 2',
-            imageUrl: 'https://images.pexels.com/photos/5342976/pexels-photo-5342976.jpeg'
+            imageUrl: punto4
           },
           { 
             name: 'Fin de Ruta', 
             coordinates: [-75.47087, 4.63529],
             type: 'end',
             description: 'Finca la Montaña',
-            imageUrl: 'https://images.pexels.com/photos/5342974/pexels-photo-5342974.jpeg'
+            imageUrl: punto5
           }
         ];
 
