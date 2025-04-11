@@ -410,7 +410,7 @@ const MapboxMap = ({
                   border-bottom: 1px solid #eee;
                 ">${point.name}</h3>
                 
-                <div style="
+                <div class="popup-image-container" style="
                   position: relative;
                   width: 100%;
                   height: ${imageHeight};
@@ -418,7 +418,8 @@ const MapboxMap = ({
                   border-radius: 6px;
                   overflow: hidden;
                   box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-                ">
+                  cursor: zoom-in;
+                " onclick="window.openMapLightbox('${point.imageUrl}')">
                   <img 
                     src="${point.imageUrl}" 
                     style="
@@ -742,6 +743,133 @@ const MapboxMap = ({
     if (!mapContainer.current) return;
 
     mapboxgl.accessToken = MAPBOX_CONFIG.accessToken;
+
+    // Agregar estilos para el lightbox al inicio
+    const lightboxStyle = document.createElement('style');
+    lightboxStyle.textContent = `
+      .map-lightbox {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgb(0, 0, 0);
+        z-index: 10000;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .map-lightbox.active {
+        display: flex;
+        opacity: 1;
+      }
+      .map-lightbox-content {
+        max-width: 90%;
+        max-height: 90%;
+        position: relative;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+        transform: scale(0.9);
+        transition: transform 0.3s ease;
+        background-color: #000;
+      }
+      .map-lightbox-image {
+        display: block;
+        max-width: 100%;
+        max-height: 90vh;
+        object-fit: contain;
+      }
+      .map-lightbox-close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        z-index: 10001;
+        border: none;
+        padding: 0;
+        line-height: 40px;
+        text-align: center;
+      }
+      .map-lightbox-close:hover {
+        background-color: rgba(255, 255, 255, 1);
+        transform: scale(1.1);
+      }
+      .popup-image-container {
+        cursor: zoom-in;
+        overflow: hidden;
+        transition: transform 0.2s ease;
+      }
+      .popup-image-container:hover {
+        transform: scale(1.02);
+      }
+    `;
+    document.head.appendChild(lightboxStyle);
+
+    // Función para cerrar el lightbox
+    window.closeLightbox = function() {
+      document.querySelector('.map-lightbox').classList.remove('active');
+    };
+
+    // Crear el elemento lightbox con onclick directamente en el HTML
+    const lightbox = document.createElement('div');
+    lightbox.className = 'map-lightbox';
+    lightbox.style.zIndex = '10000';
+    lightbox.innerHTML = `
+      <button 
+        class="map-lightbox-close" 
+        style="z-index: 10001;"
+        onclick="window.closeLightbox()"
+      >×</button>
+      <div class="map-lightbox-content">
+        <img class="map-lightbox-image" src="" alt="Vista ampliada" />
+      </div>
+    `;
+
+    // Remover el lightbox anterior si existe
+    const existingLightbox = document.querySelector('.map-lightbox');
+    if (existingLightbox) {
+      existingLightbox.remove();
+    }
+    
+    // Añadir el nuevo lightbox al body
+    document.body.appendChild(lightbox);
+    
+    // Añadir evento de cierre al hacer clic fuera de la imagen
+    lightbox.onclick = function(e) {
+      if (e.target === this) {
+        window.closeLightbox();
+      }
+    };
+    
+    // Registrar función global para abrir lightbox
+    window.openMapLightbox = function(imageUrl) {
+      const lightboxImage = document.querySelector('.map-lightbox-image');
+      lightboxImage.src = imageUrl;
+      document.querySelector('.map-lightbox').classList.add('active');
+      
+      // Añadir evento para cerrar con la tecla Escape
+      const handleEscape = function(e) {
+        if (e.key === 'Escape') {
+          window.closeLightbox();
+          document.removeEventListener('keydown', handleEscape);
+        }
+      };
+      document.addEventListener('keydown', handleEscape);
+    };
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
