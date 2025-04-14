@@ -11,19 +11,20 @@ import { NuestrosGuias } from "../../components/NuestrosGuias/NuestrosGuias";
 import { Footer } from "../../components/PaginaInicio/Footer/Footer";
 import { Header } from "../../components/PaginaInicio/Header/Header";
 import GestionPaquetes from "../../components/Paquetes/Paquetes";
+import PoliticaPrivacidad from "../../components/PoliticaPrivacidad/PoliticaPrivacidad";
 import ProtectedRoute from "../../components/ProtectedRoute/ProtectedRoute";
 import QuienesSomos from "../../components/QuienesSomos/QuienesSomos";
 import RecuperarContrasena from "../../components/RecuperarContrasena/RecuperarContrasena";
 import { Registro } from "../../components/Registro/Registro";
+import { SeguridadRecorrido } from "../../components/SeguridadRecorrido/SeguridadRecorrido";
+import { TerminosCondiciones } from "../../components/TerminosCondiciones/TerminosCondiciones";
 import { VerificacionOTP } from '../../components/VerificacionOTP/VerificacionOTP';
 import { PaginaInicio } from "../../pages/PaginaInicio/PaginaInicio";
 import VistaAdmin from "../../pages/VistaAdmin/VistaAdmin";
 import VistaCliente from "../../pages/VistaCliente/VistaCliente";
 import VistaGuia from "../../pages/VistaGuia/VistaGuia";
 import VistaOperador from "../../pages/VistaOperador/VistaOperador";
-import PoliticaPrivacidad from "../../components/PoliticaPrivacidad/PoliticaPrivacidad";
-import { SeguridadRecorrido } from "../../components/SeguridadRecorrido/SeguridadRecorrido";
-import { TerminosCondiciones } from "../../components/TerminosCondiciones/TerminosCondiciones";
+import { ScrollToTop } from "../../components/ScrollToTop";
 
 
 export const RutasExplococora = () => {
@@ -40,6 +41,8 @@ export const RutasExplococora = () => {
 
   return (
     <div className="min-h-screen">
+      {/* Componente para reestablecer el scroll */}
+      <ScrollToTop />
       {/* Mostrar Header solo si no estamos en un panel interno */}
       {!isInternalPanel && <Header />}
       
