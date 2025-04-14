@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { combinarFechaHoraISO, generarTimestampMySQL } from '../../utils/formatUtils';
 import { ServiciosAdicionales } from './ServiciosAdicionales';
-import { DetalleServiciosAdicionales } from './DetalleServiciosAdicionales';
+
 
 export const FormularioReservaRuta = () => {
   const { t } = useTranslation();
@@ -37,6 +37,9 @@ export const FormularioReservaRuta = () => {
     { value: '14:00', label: '02:00 PM' },
   ];
 
+  // Última hora disponible para reservas (formato 24h)
+  const ultimaHoraDisponible = '14:00';
+
   // Estados para controlar los datepickers personalizados
   const [isInicioCalendarOpen, setIsInicioCalendarOpen] = useState(false);
   const [isFinCalendarOpen, setIsFinCalendarOpen] = useState(false);
@@ -53,6 +56,41 @@ export const FormularioReservaRuta = () => {
   
   // Estado para servicios adicionales
   const [serviciosAdicionales, setServiciosAdicionales] = useState([]);
+
+  // Verificar si ya pasó la última hora disponible para hoy
+  const ahora = new Date();
+  const horaActual = ahora.getHours().toString().padStart(2, '0') + ':' + ahora.getMinutes().toString().padStart(2, '0');
+  const pasaronTodasLasHoras = horaActual > ultimaHoraDisponible;
+  
+  // Calcular fecha mínima considerando las horas disponibles
+  const fechaMinimaDate = new Date();
+  if (pasaronTodasLasHoras) {
+    fechaMinimaDate.setDate(fechaMinimaDate.getDate() + 1);
+  }
+  const fechaMinima = fechaMinimaDate.toISOString().split('T')[0];
+  
+  // Calcular fecha máxima (6 meses desde hoy)
+  const fechaMaxima = new Date();
+  fechaMaxima.setMonth(fechaMaxima.getMonth() + 6);
+  const fechaMaximaStr = fechaMaxima.toISOString().split('T')[0];
+
+  // Filtrar horas disponibles según la fecha seleccionada
+  const getHorasDisponiblesHoy = () => {
+    // Si la fecha seleccionada NO es hoy, todas las horas están disponibles
+    if (formData.fechaInicio !== fechaMinima) {
+      return horaOptions;
+    }
+    
+    // Es el día actual, así que filtramos las horas pasadas
+    const horaActualObj = new Date();
+    // Añadir 30 minutos como margen mínimo para reservar
+    horaActualObj.setMinutes(horaActualObj.getMinutes() + 30);
+    const horaActualFormato = horaActualObj.getHours().toString().padStart(2, '0') + ':' + 
+                            horaActualObj.getMinutes().toString().padStart(2, '0');
+    
+    // Filtrar opciones que sean mayores a la hora actual + margen
+    return horaOptions.filter(option => option.value > horaActualFormato);
+  };
   
   // Funciones para generar días del calendario
   const getDiasCalendario = (fecha) => {
@@ -80,19 +118,32 @@ export const FormularioReservaRuta = () => {
       });
     }
     
-    // Días del mes actual
+    // Obtener solo la fecha de hoy (sin hora)
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
     
+    // Obtener la primera fecha disponible
+    // Si ya pasaron todas las horas disponibles, la primera fecha disponible es mañana
+    const primeraFechaDisponible = new Date();
+    if (pasaronTodasLasHoras) {
+      primeraFechaDisponible.setDate(primeraFechaDisponible.getDate() + 1);
+    }
+    primeraFechaDisponible.setHours(0, 0, 0, 0);
+    
+    // Días del mes actual
     for (let i = 1; i <= ultimoDia.getDate(); i++) {
       const dia = new Date(year, month, i);
+      
+      // Verificar si este día es hoy y ya pasaron todas las horas disponibles
+      const esHoyYPasaronHoras = dia.getTime() === hoy.getTime() && pasaronTodasLasHoras;
+      
       diasArray.push({
         date: dia,
         day: i,
         month: month,
         isCurrentMonth: true,
         isToday: dia.getTime() === hoy.getTime(),
-        isDisabled: dia < new Date(fechaMinima) || dia > new Date(fechaMaximaStr)
+        isDisabled: dia < primeraFechaDisponible || dia > new Date(fechaMaximaStr) || esHoyYPasaronHoras
       });
     }
     
@@ -126,17 +177,43 @@ export const FormularioReservaRuta = () => {
     const formattedDate = adjustedDate.toISOString().slice(0, 10);
     
     if (tipo === 'inicio') {
-      if (formData.fechaFin && new Date(formattedDate) > new Date(formData.fechaFin)) {
-        setFormData({
-          ...formData,
-          fechaInicio: formattedDate,
-          fechaFin: formattedDate
-        });
+      // Si es el día actual, verificar si la hora seleccionada aún está disponible
+      if (formattedDate === fechaMinima && !pasaronTodasLasHoras) {
+        const horasDisponibles = getHorasDisponiblesHoy();
+        // Si la hora actual ya no está disponible, seleccionar la primera disponible
+        if (horasDisponibles.length > 0 && !horasDisponibles.some(h => h.value === formData.horaInicio)) {
+          setFormData({
+            ...formData,
+            fechaInicio: formattedDate,
+            horaInicio: horasDisponibles[0].value
+          });
+        } else {
+          if (formData.fechaFin && new Date(formattedDate) > new Date(formData.fechaFin)) {
+            setFormData({
+              ...formData,
+              fechaInicio: formattedDate,
+              fechaFin: formattedDate
+            });
+          } else {
+            setFormData({
+              ...formData,
+              fechaInicio: formattedDate
+            });
+          }
+        }
       } else {
-        setFormData({
-          ...formData,
-          fechaInicio: formattedDate
-        });
+        if (formData.fechaFin && new Date(formattedDate) > new Date(formData.fechaFin)) {
+          setFormData({
+            ...formData,
+            fechaInicio: formattedDate,
+            fechaFin: formattedDate
+          });
+        } else {
+          setFormData({
+            ...formData,
+            fechaInicio: formattedDate
+          });
+        }
       }
       setIsInicioCalendarOpen(false);
     } else {
@@ -160,6 +237,21 @@ export const FormularioReservaRuta = () => {
       setFinViewDate(newDate);
     }
   };
+
+  // Efecto para ajustar la hora seleccionada cuando cambia la fecha
+  useEffect(() => {
+    if (formData.fechaInicio === fechaMinima && !pasaronTodasLasHoras) {
+      const horasDisponibles = getHorasDisponiblesHoy();
+      
+      // Si la hora seleccionada ya no está disponible, seleccionar la primera disponible
+      if (horasDisponibles.length > 0 && !horasDisponibles.some(h => h.value === formData.horaInicio)) {
+        setFormData({
+          ...formData,
+          horaInicio: horasDisponibles[0].value
+        });
+      }
+    }
+  }, [formData.fechaInicio]);
   
   // Formatear fecha para mostrar
   const formatDisplayDate = (dateString) => {
@@ -193,14 +285,6 @@ export const FormularioReservaRuta = () => {
       cargarInfoRuta();
     }
   }, [idRuta, rutaInfo, t]);
-
-  // Calcular fecha mínima (hoy)
-  const fechaMinima = new Date().toISOString().split('T')[0];
-  
-  // Calcular fecha máxima (6 meses desde hoy)
-  const fechaMaxima = new Date();
-  fechaMaxima.setMonth(fechaMaxima.getMonth() + 6);
-  const fechaMaximaStr = fechaMaxima.toISOString().split('T')[0];
 
   // Cerrar calendarios al hacer clic fuera
   useEffect(() => {
@@ -563,7 +647,9 @@ export const FormularioReservaRuta = () => {
                   {isHoraDropdownOpen && (
                     <div className="absolute mt-1 w-full z-10 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
                       <ul className="py-1">
-                        {horaOptions.map((option) => (
+                        {(formData.fechaInicio === fechaMinima && !pasaronTodasLasHoras
+                          ? getHorasDisponiblesHoy()
+                          : horaOptions).map((option) => (
                           <li
                             key={option.value}
                             className={`cursor-pointer px-3 py-2 hover:bg-teal-700 hover:text-white ${
