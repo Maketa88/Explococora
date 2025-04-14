@@ -239,7 +239,7 @@ const ProfileDropdown = ({ imgSrc, alt }) => {
       )}
   
       {isOpen && (
-        <div className="absolute left-0 md:right-0 md:left-auto top-12 w-56 max-w-[calc(100vw-20px)] bg-teal-700 border-2 border-gray-900 rounded-xl shadow-xl py-2 z-50 transform transition-all duration-300 ease-in-out">
+        <div className="absolute left-0 md:right-0 md:left-auto top-12 w-56 max-w-[calc(100vw-20px)] bg-teal-800 bg-opacity-50 border-2 border-gray-900 rounded-xl shadow-xl py-2 z-50 transform transition-all duration-300 ease-in-out">
 
 
 
