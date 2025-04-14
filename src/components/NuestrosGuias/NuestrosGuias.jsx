@@ -441,10 +441,15 @@ const NuestrosGuias = () => {
         <>
           {guiasFiltrados.length === 0 && busqueda && (
             <div className="text-center py-12 px-4">
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-8 max-w-lg mx-auto shadow-lg">
+              <div className="bg-white/90 backdrop-blur-sm border-2 border-emerald-200 rounded-xl p-8 max-w-lg mx-auto shadow-lg relative overflow-hidden">
+                {/* Decoraciones de fondo */}
+                <div className="absolute -top-10 -left-10 w-20 h-20 bg-emerald-100 rounded-full opacity-50"></div>
+                <div className="absolute -bottom-10 -right-10 w-24 h-24 bg-emerald-100 rounded-full opacity-50"></div>
+                
+                
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-16 w-16 text-amber-400 mx-auto mb-4"
+                  className="h-16 w-16 text-emerald-500 mx-auto mb-4 opacity-90"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -456,18 +461,30 @@ const NuestrosGuias = () => {
                     d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <h3 className="text-xl font-bold text-amber-800 mb-2">
-                  No se encontraron resultados
+                <h3 className="text-xl font-bold text-emerald-800 mb-2 relative">
+                  <span className="relative bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-emerald-800">
+                    No se encontraron resultados
+                  </span>
                 </h3>
-                <p className="text-amber-700 mb-4">
+                <p className="text-emerald-700 mb-6">
                   No hay guías que coincidan con tu búsqueda.
                 </p>
                 <button
                   onClick={() => setBusqueda("")}
-                  className="px-4 py-2 bg-amber-200 hover:bg-amber-300 text-amber-800 rounded-md transition-colors duration-300"
+                  className="px-5 py-2.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-md transition-all duration-300 shadow-sm hover:shadow font-medium flex items-center mx-auto"
                 >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                   Limpiar búsqueda
                 </button>
+                
+                {/* Línea decorativa inferior */}
+                <div className="mt-6 flex justify-center space-x-1">
+                  <div className="w-10 h-1 bg-gradient-to-r from-transparent to-emerald-600 rounded-full"></div>
+                  <div className="w-20 h-1 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-full"></div>
+                  <div className="w-10 h-1 bg-gradient-to-r from-emerald-700 to-transparent rounded-full"></div>
+                </div>
               </div>
             </div>
           )}
