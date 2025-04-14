@@ -13,6 +13,8 @@ export const NuestrasRutasTarjeta = ({ onRutaSeleccionada, rutaActualId }) => {
   const [cargandoFotos, setCargandoFotos] = useState({});
   const [desplazamiento, setDesplazamiento] = useState(0);
   const sliderRef = useRef(null);
+  // Añadir estado de carga
+  const [loading, setLoading] = useState(true);
   // Comentar navigate ya que no se está utilizando
   // const navigate = useNavigate();
 
@@ -23,6 +25,7 @@ export const NuestrasRutasTarjeta = ({ onRutaSeleccionada, rutaActualId }) => {
   useEffect(() => {
     const fetchRutas = async () => {
       try {
+        setLoading(true); // Establecer loading a true al iniciar la carga
         const response = await axios.get("http://localhost:10101/rutas");
 
         if (Array.isArray(response.data)) {
@@ -39,9 +42,11 @@ export const NuestrasRutasTarjeta = ({ onRutaSeleccionada, rutaActualId }) => {
         } else {
           throw new Error("La respuesta no es un array");
         }
+        setLoading(false); // Desactivar loading cuando termine la carga
       } catch (error) {
         console.error("Error al obtener las rutas:", error);
         setError(error.message);
+        setLoading(false); // Desactivar loading en caso de error
       }
     };
 
@@ -329,7 +334,16 @@ export const NuestrasRutasTarjeta = ({ onRutaSeleccionada, rutaActualId }) => {
             </div>
           )}
 
-          {Array.isArray(rutas) && rutas.length > 0 ? (
+          {/* Agregar el indicador de carga similar al de PaquetesTarjeta */}
+          {loading ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-pulse flex space-x-1">
+                <div className="h-2 w-2 bg-teal-600 rounded-full animate-bounce"></div>
+                <div className="h-2 w-2 bg-teal-600 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                <div className="h-2 w-2 bg-teal-600 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></div>
+              </div>
+            </div>
+          ) : Array.isArray(rutas) && rutas.length > 0 ? (
             <>
               <div className="relative max-w-7xl mx-auto px-10">
                 {/* Botón de desplazamiento izquierdo - posicionado fuera del slider */}
