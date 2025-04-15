@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -17,6 +17,21 @@ export const HeaderCliente = () => {
   const [fotoPerfil, setFotoPerfil] = useState(null); // Inicialmente null para evitar mostrar cualquier foto
   const [cargandoFoto, setCargandoFoto] = useState(true);
   const [monedaSeleccionada, setMonedaSeleccionada] = useState("COP"); // Estado para moneda seleccionada
+  const [monedaDropdownOpen, setMonedaDropdownOpen] = useState(false);
+  const monedaDropdownRef = useRef(null);
+
+  // Cerrar dropdown al hacer clic fuera
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (monedaDropdownRef.current && !monedaDropdownRef.current.contains(event.target)) {
+        setMonedaDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     // PRIORIDAD: Obtener la foto actualizada del servidor primero
@@ -174,16 +189,40 @@ export const HeaderCliente = () => {
               </button>
             </div>
 
-            {/* Selector de Moneda */}
-            <div className="flex items-center">
-              <select
-                value={monedaSeleccionada}
-                onChange={(e) => setMonedaSeleccionada(e.target.value)}
-                className="bg-teal-800 bg-opacity-70 text-white text-sm rounded-md border border-teal-600 focus:ring-2 focus:ring-teal-500 focus:outline-none px-2 py-1 cursor-pointer transition-all duration-300 hover:bg-teal-600"
+            {/* Selector de Moneda - Dropdown personalizado simplificado */}
+            <div className="relative w-[70px]" ref={monedaDropdownRef}>
+              <button
+                onClick={() => setMonedaDropdownOpen(!monedaDropdownOpen)}
+                className="w-full bg-teal-800 text-white px-3 py-1.5 rounded-md border border-teal-600 flex items-center justify-between text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
               >
-                <option value="COP">COP</option>
-                <option value="USD">USD</option>
-              </select>
+                {monedaSeleccionada}
+                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+              
+              {monedaDropdownOpen && (
+                <div className="absolute z-10 w-full mt-1 rounded-md shadow-lg bg-teal-800 border border-teal-600 overflow-hidden">
+                  <div 
+                    className={`px-3 py-2 cursor-pointer ${monedaSeleccionada === "COP" ? "bg-teal-700" : "hover:bg-teal-600"} text-white text-sm transition-colors duration-150`}
+                    onClick={() => {
+                      setMonedaSeleccionada("COP");
+                      setMonedaDropdownOpen(false);
+                    }}
+                  >
+                    COP
+                  </div>
+                  <div 
+                    className={`px-3 py-2 cursor-pointer ${monedaSeleccionada === "USD" ? "bg-teal-700" : "hover:bg-teal-600"} text-white text-sm transition-colors duration-150`}
+                    onClick={() => {
+                      setMonedaSeleccionada("USD");
+                      setMonedaDropdownOpen(false);
+                    }}
+                  >
+                    USD
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center">
