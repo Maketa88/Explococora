@@ -16,6 +16,7 @@ export const HeaderCliente = () => {
   const { t, i18n } = useTranslation();
   const [fotoPerfil, setFotoPerfil] = useState(null); // Inicialmente null para evitar mostrar cualquier foto
   const [cargandoFoto, setCargandoFoto] = useState(true);
+  const [monedaSeleccionada, setMonedaSeleccionada] = useState("COP"); // Estado para moneda seleccionada
 
   useEffect(() => {
     // PRIORIDAD: Obtener la foto actualizada del servidor primero
@@ -172,6 +173,19 @@ export const HeaderCliente = () => {
                 <NavItem tipo="imagen" imgSrc={Usa} alt="USA Flag" className="w-8 h-8 sm:w-auto sm:h-auto" />
               </button>
             </div>
+
+            {/* Selector de Moneda */}
+            <div className="flex items-center">
+              <select
+                value={monedaSeleccionada}
+                onChange={(e) => setMonedaSeleccionada(e.target.value)}
+                className="bg-teal-800 bg-opacity-70 text-white text-sm rounded-md border border-teal-600 focus:ring-2 focus:ring-teal-500 focus:outline-none px-2 py-1 cursor-pointer transition-all duration-300 hover:bg-teal-600"
+              >
+                <option value="COP">COP</option>
+                <option value="USD">USD</option>
+              </select>
+            </div>
+
             <div className="flex items-center">
               {cargandoFoto ? (
                 <div className="h-11 w-11 rounded-full bg-teal-700 animate-pulse flex items-center justify-center">
