@@ -16,9 +16,17 @@ export const HeaderCliente = () => {
   const { t, i18n } = useTranslation();
   const [fotoPerfil, setFotoPerfil] = useState(null); // Inicialmente null para evitar mostrar cualquier foto
   const [cargandoFoto, setCargandoFoto] = useState(true);
-  const [monedaSeleccionada, setMonedaSeleccionada] = useState("COP"); // Estado para moneda seleccionada
+  const [monedaSeleccionada, setMonedaSeleccionada] = useState(() => {
+    // Recuperar del localStorage o usar valor predeterminado
+    return localStorage.getItem("moneda_seleccionada") || "COP";
+  });
   const [monedaDropdownOpen, setMonedaDropdownOpen] = useState(false);
   const monedaDropdownRef = useRef(null);
+
+  // Guardar en localStorage cuando cambie la moneda
+  useEffect(() => {
+    localStorage.setItem("moneda_seleccionada", monedaSeleccionada);
+  }, [monedaSeleccionada]);
 
   // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
