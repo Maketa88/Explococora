@@ -58,13 +58,13 @@ export const Header = () => {
           <NavItem
             tipo="boton"
             contenido={t("ingresar")}
-            estilos="bg-blue-600 text-white hover:bg-blue-800 font-nunito"
+            estilos="bg-teal-700 text-white font-bold hover:bg-teal-800 font-nunito"
             to="/Ingreso"
           />
           <NavItem
             tipo="boton"
             contenido={t("crearCuenta")}
-            estilos="bg-blue-600 text-white hover:bg-blue-800 font-nunito"
+            estilos="bg-teal-700 text-white font-bold hover:bg-teal-800 font-nunito"
             to="/Registro"
           />
 
