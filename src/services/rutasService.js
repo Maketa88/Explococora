@@ -25,8 +25,6 @@ export const obtenerRutas = async () => {
   }
 };
 
-
-
 export const obtenerFotosRuta = async (idRuta) => {
   try {
     // Verificar que el ID sea válido antes de hacer la petición
@@ -35,11 +33,9 @@ export const obtenerFotosRuta = async (idRuta) => {
       return [];
     }
 
-    console.log(`Obteniendo fotos para la ruta ${idRuta}...`);
     const response = await axios.get(
       `${API_URL}/rutas/fotos-publicas/${idRuta}`
     );
-    console.log(`Respuesta de la API para ruta ${idRuta}:`, response.data);
 
     let fotosArray = [];
 
@@ -102,9 +98,7 @@ export const obtenerFotosRuta = async (idRuta) => {
  * @returns {Object} Objeto con coordenadas de inicio, fin y puntos intermedios
  */
 
-
 export default {
   obtenerRutas,
   obtenerFotosRuta,
-  
 };

@@ -6,7 +6,7 @@ import PaquetesInicio from "../../components/Paquetes/PaquetesInicio";
 
 export const PaginaInicio = () => {
   const handleSearch = (searchData) => {
-    console.log('Datos de búsqueda:', searchData);
+    "Datos de búsqueda:", searchData;
     // Aquí puedes implementar la lógica de búsqueda
   };
 
@@ -16,10 +16,10 @@ export const PaginaInicio = () => {
       <div className="absolute top-0 left-0 w-full z-10 pt-8">
         <TituloBuscador onSearch={handleSearch} />
       </div>
-      
+
       {/* Carrusel como fondo */}
       <Carrusel />
-      
+
       {/* Resto del contenido */}
       <div className="container mx-auto  py-12">
         {/* Sección de guías destacados */}

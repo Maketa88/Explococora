@@ -31,7 +31,10 @@ export const HeaderCliente = () => {
   // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
     function handleClickOutside(event) {
-      if (monedaDropdownRef.current && !monedaDropdownRef.current.contains(event.target)) {
+      if (
+        monedaDropdownRef.current &&
+        !monedaDropdownRef.current.contains(event.target)
+      ) {
         setMonedaDropdownOpen(false);
       }
     }
@@ -48,7 +51,7 @@ export const HeaderCliente = () => {
         setCargandoFoto(true);
         const cedula = localStorage.getItem("cedula");
         const token = localStorage.getItem("token");
-        
+
         if (!cedula || !token) {
           // Si no hay credenciales, usar la foto de localStorage o Avatar como fallback
           const fotoGuardada = localStorage.getItem("foto_perfil_cliente");
@@ -56,7 +59,7 @@ export const HeaderCliente = () => {
           setCargandoFoto(false);
           return;
         }
-        
+
         const response = await axios.get(
           `http://localhost:10101/cliente/perfil-completo/${cedula}`,
           {
@@ -65,13 +68,15 @@ export const HeaderCliente = () => {
             },
           }
         );
-        
-        const clienteData = Array.isArray(response.data) ? response.data[0] : response.data;
-        
+
+        const clienteData = Array.isArray(response.data)
+          ? response.data[0]
+          : response.data;
+
         // Procesar la foto recibida del servidor
         if (clienteData.foto_perfil || clienteData.foto) {
           let fotoUrl = clienteData.foto_perfil || clienteData.foto;
-          
+
           if (!fotoUrl.startsWith("http")) {
             if (fotoUrl.includes("/uploads/images/")) {
               fotoUrl = `http://localhost:10101${fotoUrl}`;
@@ -79,9 +84,7 @@ export const HeaderCliente = () => {
               fotoUrl = `http://localhost:10101/uploads/images/${fotoUrl}`;
             }
           }
-          
-          console.log("HeaderCliente: Foto obtenida del servidor:", fotoUrl);
-          
+
           // Actualizar estado y localStorage
           setFotoPerfil(fotoUrl);
           localStorage.setItem("foto_perfil_cliente", fotoUrl);
@@ -99,7 +102,7 @@ export const HeaderCliente = () => {
         setCargandoFoto(false);
       }
     };
-    
+
     // Ejecutar al montar el componente - prioridad alta
     obtenerFotoActualizada();
 
@@ -111,11 +114,17 @@ export const HeaderCliente = () => {
     };
 
     // Registrar el evento
-    window.addEventListener("fotoPerfilClienteActualizada", manejarActualizacionFoto);
+    window.addEventListener(
+      "fotoPerfilClienteActualizada",
+      manejarActualizacionFoto
+    );
 
     // Limpiar el evento al desmontar
     return () => {
-      window.removeEventListener("fotoPerfilClienteActualizada", manejarActualizacionFoto);
+      window.removeEventListener(
+        "fotoPerfilClienteActualizada",
+        manejarActualizacionFoto
+      );
     };
   }, []);
 
@@ -128,7 +137,10 @@ export const HeaderCliente = () => {
     <header className="bg-teal-800 shadow-lg z-50 sticky top-0 bg-opacity-50 backdrop-blur-sm transition-all duration-300">
       <nav className="container mx-auto px-2 sm:px-3 md:px-4 py-2 sm:py-4 md:py-6 lg:py-8 flex justify-between items-center relative transition-all duration-300">
         {/* Logo - Smaller on mobile */}
-        <Link to="/VistaCliente" className="mx-1 sm:mx-2 scale-75 sm:scale-90 md:scale-100 origin-left transition-transform duration-300">
+        <Link
+          to="/VistaCliente"
+          className="mx-1 sm:mx-2 scale-75 sm:scale-90 md:scale-100 origin-left transition-transform duration-300"
+        >
           <Logo />
         </Link>
 
@@ -138,7 +150,12 @@ export const HeaderCliente = () => {
             menuAbierto ? "block" : "hidden"
           } absolute lg:relative bg-teal-800 lg:bg-transparent w-full lg:w-auto top-16 sm:top-20 md:top-24 left-0 lg:top-0 lg:flex-row space-y-4 lg:space-y-0 text-center z-50 items-center py-4 lg:py-0 px-4 lg:px-0 transition-all duration-300`}
         >
-          <NavItem tipo="enlace" contenido={t("inicio")} to="/VistaCliente" className="text-sm sm:text-base" />
+          <NavItem
+            tipo="enlace"
+            contenido={t("inicio")}
+            to="/VistaCliente"
+            className="text-sm sm:text-base"
+          />
           <NavItem
             tipo="enlace"
             contenido={t("historia")}
@@ -193,7 +210,12 @@ export const HeaderCliente = () => {
                   i18n.language === "en" ? "opacity-100" : "opacity-50"
                 } scale-90 sm:scale-100`}
               >
-                <NavItem tipo="imagen" imgSrc={Usa} alt="USA Flag" className="w-8 h-8 sm:w-auto sm:h-auto" />
+                <NavItem
+                  tipo="imagen"
+                  imgSrc={Usa}
+                  alt="USA Flag"
+                  className="w-8 h-8 sm:w-auto sm:h-auto"
+                />
               </button>
             </div>
 
@@ -204,15 +226,29 @@ export const HeaderCliente = () => {
                 className="w-full bg-teal-800 text-white px-3 py-1.5 rounded-md border border-teal-600 flex items-center justify-between text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
               >
                 {monedaSeleccionada}
-                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                <svg
+                  className="w-4 h-4 ml-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  ></path>
                 </svg>
               </button>
-              
+
               {monedaDropdownOpen && (
                 <div className="absolute z-10 w-full mt-1 rounded-md shadow-lg bg-teal-800 border border-teal-600 overflow-hidden">
-                  <div 
-                    className={`px-3 py-2 cursor-pointer ${monedaSeleccionada === "COP" ? "bg-teal-700" : "hover:bg-teal-600"} text-white text-sm transition-colors duration-150`}
+                  <div
+                    className={`px-3 py-2 cursor-pointer ${
+                      monedaSeleccionada === "COP"
+                        ? "bg-teal-700"
+                        : "hover:bg-teal-600"
+                    } text-white text-sm transition-colors duration-150`}
                     onClick={() => {
                       setMonedaSeleccionada("COP");
                       setMonedaDropdownOpen(false);
@@ -220,8 +256,12 @@ export const HeaderCliente = () => {
                   >
                     COP
                   </div>
-                  <div 
-                    className={`px-3 py-2 cursor-pointer ${monedaSeleccionada === "USD" ? "bg-teal-700" : "hover:bg-teal-600"} text-white text-sm transition-colors duration-150`}
+                  <div
+                    className={`px-3 py-2 cursor-pointer ${
+                      monedaSeleccionada === "USD"
+                        ? "bg-teal-700"
+                        : "hover:bg-teal-600"
+                    } text-white text-sm transition-colors duration-150`}
                     onClick={() => {
                       setMonedaSeleccionada("USD");
                       setMonedaDropdownOpen(false);

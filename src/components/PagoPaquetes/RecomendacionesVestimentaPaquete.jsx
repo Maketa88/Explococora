@@ -107,7 +107,7 @@ export const RecomendacionesVestimentaPaquete = () => {
             guiaAsignadoInfo = { nombre: response.data.guiaAsignado.trim() };
           }
           
-          console.log('Guía asignado (procesado):', guiaAsignadoInfo);
+          
         }
         
         localStorage.setItem('reserva_pendiente', JSON.stringify({
