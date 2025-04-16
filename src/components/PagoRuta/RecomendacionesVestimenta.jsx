@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaHiking, FaTshirt } from "react-icons/fa";
 import { GiHorseHead } from "react-icons/gi";
@@ -23,9 +23,16 @@ export const RecomendacionesVestimenta = () => {
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
 
-  // Si no hay datos suficientes, redirigir al formulario de reserva
+  // Usar useEffect para la redirección si faltan datos
+  useEffect(() => {
+    // Si no hay datos suficientes, redirigir al formulario de reserva
+    if (!formData || !rutaInfo || !idRuta) {
+      navigate("/VistaCliente/reserva-ruta");
+    }
+  }, [formData, rutaInfo, idRuta, navigate]);
+
+  // Si no hay datos suficientes, no renderizar nada mientras se redirige
   if (!formData || !rutaInfo || !idRuta) {
-    navigate("/VistaCliente/reserva-ruta");
     return null;
   }
 
@@ -151,19 +158,6 @@ export const RecomendacionesVestimenta = () => {
         idRuta,
         radicado,
         serviciosAdicionales,
-      },
-    });
-  };
-
-  const handleContinuar = () => {
-    // Navegar al siguiente paso con todos los datos
-    navigate("/VistaCliente/reserva/mercado-libre", {
-      state: {
-        formData,
-        rutaInfo,
-        serviciosAdicionales, // Enviar los servicios adicionales al siguiente componente
-        idRuta,
-        radicado: location.state?.reserva?.radicado || location.state?.radicado,
       },
     });
   };

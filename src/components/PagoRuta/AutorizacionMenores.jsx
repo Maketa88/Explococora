@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaChild } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -14,9 +14,16 @@ export const AutorizacionMenores = () => {
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
   const [error, setError] = useState(null);
 
-  // Si no hay datos suficientes, redirigir al formulario de reserva
+  // Usar useEffect para la redirección si faltan datos
+  useEffect(() => {
+    // Si no hay datos suficientes, redirigir al formulario de reserva
+    if (!formData || !rutaInfo || !idRuta) {
+      navigate('/VistaCliente/reserva-ruta');
+    }
+  }, [formData, rutaInfo, idRuta, navigate]);
+
+  // Si no hay datos suficientes, no renderizar nada mientras se redirige
   if (!formData || !rutaInfo || !idRuta) {
-    navigate('/VistaCliente/reserva-ruta');
     return null;
   }
 
