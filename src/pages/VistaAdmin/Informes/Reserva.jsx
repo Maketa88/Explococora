@@ -25,7 +25,8 @@ const Reserva = () => {
     reservasConfirmadas: 0,
     reservasPendientes: 0,
     reservasPagadas: 0,
-    reservasCompletadas: 0
+    reservasCompletadas: 0,
+    montoTotal: 0
   });
   
   // Estados para paginación
@@ -36,6 +37,9 @@ const Reserva = () => {
   // Nuevos estados para manejar los filtros y estadísticas de pagos
   const [estadoPagoFiltro, setEstadoPagoFiltro] = useState('todos');
   
+  // Agregar estado para el total de montos
+  const [totalMontos, setTotalMontos] = useState(0);
+
   useEffect(() => {
     fetchReservas();
   }, []);
@@ -58,6 +62,14 @@ const Reserva = () => {
         reservasPagadas: reservas.filter(r => r.estadoPago === 'completado').length,
         reservasCompletadas: reservas.length
       });
+      
+      // Calcular la suma total de montos
+      const sumTotal = reservas.reduce((acc, reserva) => {
+        const monto = reserva.monto || reserva.valorTotal || reserva.total || 0;
+        return acc + Number(monto);
+      }, 0);
+      
+      setTotalMontos(sumTotal);
     }
   }, [reservas]);
 
@@ -431,7 +443,7 @@ const Reserva = () => {
         'Fecha Reserva', 
         'Fecha Inicio', 
         'Fecha Fin', 
-        'ID Pago', 
+        'Monto', 
         'Guía', 
         'Hora Inicio'
       ];
@@ -476,13 +488,13 @@ const Reserva = () => {
         row.getCell(8).value = reserva.fechaReserva ? new Date(reserva.fechaReserva).toLocaleDateString() : 'N/A';
         row.getCell(9).value = reserva.fechaInicio ? new Date(reserva.fechaInicio).toLocaleDateString() : 'N/A';
         row.getCell(10).value = reserva.fechaFin ? new Date(reserva.fechaFin).toLocaleDateString() : 'N/A';
-        const idPago = row.getCell(11);
-        idPago.value = reserva.idPago || 'N/A';
-        idPago.style = {
-          alignment: { horizontal: 'center', vertical: 'middle' },
+        const montoCell = row.getCell(11);
+        montoCell.value = reserva.monto || reserva.valorTotal || reserva.total || 0;
+        montoCell.style = {
+          alignment: { horizontal: 'right', vertical: 'middle' },
           font: { name: 'Calibri', size: 11, color: { argb: '000000' } }
         };
-        idPago.numFmt = '0';
+        montoCell.numFmt = '"$"#,##0.00'; // Formato de moneda
         row.getCell(12).value = reserva.nombre_guia ? 
           (reserva.idGuia ? `${reserva.idGuia} - ${reserva.nombre_guia}` : reserva.nombre_guia) : 
           (reserva.idGuia || 'Sin asignar');
@@ -572,17 +584,15 @@ const Reserva = () => {
           </div>
           
           <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-blue-500">
-            <h3 className="text-gray-500 font-medium mb-2 text-sm uppercase">Pagos</h3>
+            <h3 className="text-gray-500 font-medium mb-2 text-sm uppercase">Total Pagos</h3>
             <div className="flex items-center justify-between">
               <p className="text-3xl font-bold text-gray-800">
-                {estadisticas.reservasCompletadas ? 
-                  `${Math.round((estadisticas.reservasPagadas / estadisticas.reservasCompletadas) * 100)}%` : 
-                  '0%'}
+                ${totalMontos.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
               </p>
               <DollarSign className="text-blue-500 h-8 w-8" />
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              {estadisticas.reservasPagadas || 0} de {estadisticas.reservasCompletadas || 0} pagadas
+              Suma de {reservas.length} reservaciones
             </p>
           </div>
         </div>
@@ -779,7 +789,7 @@ const Reserva = () => {
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Reserva</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Inicio</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Fin</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pago</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Guía</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hora Inicio</th>
                 </tr>
@@ -848,7 +858,7 @@ const Reserva = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {reserva.fechaFin ? new Date(reserva.fechaFin).toLocaleDateString() : 'N/A'}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{reserva.idPago || 'N/A'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{reserva.monto || reserva.valorTotal || reserva.total || 0}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <div>{reserva.idGuia}</div>
                         <div className="text-xs text-gray-600">

@@ -4,7 +4,7 @@ import { FileEdit, KeyRound, LogOut, ArrowRight, Shield, Bell, ExternalLink } fr
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const Settings = () => {
+const Configuracion = () => {
   const navigate = useNavigate();
 
   const handleCerrarSesion = async () => {
@@ -65,7 +65,7 @@ const Settings = () => {
                 <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2">Cambiar Correo</h3>
                 <p className="text-gray-600 mb-4 text-sm sm:text-base">Actualiza tu dirección de correo electrónico asociada a tu cuenta.</p>
                 <button 
-                  onClick={() => navigate('/VistaAdmin/CambiarCorreo')} 
+                  onClick={() => navigate('/VistaAdmin/ActualizarCorreo')} 
                   className="flex items-center text-white bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition-colors w-full justify-center"
                 >
                   Cambiar Correo
@@ -144,4 +144,4 @@ const Settings = () => {
   );
 };
 
-export default Settings; 
+export default Configuracion; 

@@ -320,9 +320,21 @@ const DashboardLayoutAdmin = ({ children }) => {
       path: "/VistaAdmin/GestionPaquetes",
       section: "Rutas"
     },
+    {
+      title: "GestionCaballos",
+      icon: <PackagePlus className="w-5 h-5" />,
+      path: "/VistaAdmin/GestionCaballos",
+      section: "Caballos"
+    },
+    {
+      title: "GestionPlantillas",
+      icon: <PackagePlus className="w-5 h-5" />,
+      path: "/VistaAdmin/GestionPlantillas",
+      section: "Plantillas"
+    }
   ];
   
-  const sections = ["Dashboard", "Usuarios", "Rutas", , "Informes", ];
+  const sections = ["Dashboard", "Usuarios", "Rutas",  "Informes", "Caballos","Plantillas" ];
 
   const toggleMenu = (e) => {
     e.stopPropagation();

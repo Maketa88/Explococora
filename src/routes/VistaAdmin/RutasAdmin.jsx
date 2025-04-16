@@ -18,6 +18,8 @@ import PagoPaquete from '../../pages/VistaAdmin/Informes/PagoPaquete';
 import Reserva from '../../pages/VistaAdmin/Informes/Reserva';
 import PagoRuta from '../../pages/VistaAdmin/Informes/PagoRuta';
 import EstadoGuia from '../../pages/VistaAdmin/GestionUsuarios/EstadoGuia';
+import GestionCaballos from '../../pages/VistaAdmin/Caballos/GestionCaballos';
+import GestionPlantillas from '../../pages/VistaAdmin/Plantillas/GestionPlantillas';
 
 const RutasAdmin = () => {
   return (
@@ -41,9 +43,10 @@ const RutasAdmin = () => {
       <Route path="/Reserva" element={<Reserva />} />
       <Route path="/PagoRuta" element={<PagoRuta />} />
       <Route path="/EstadoGuia" element={<EstadoGuia />} />
-
+      <Route path="/GestionCaballos" element={<GestionCaballos />} />
+      <Route path="/GestionPlantillas" element={<GestionPlantillas />} />
     </Routes>
   );
 };
 
-export default RutasAdmin; 
+export default RutasAdmin;
