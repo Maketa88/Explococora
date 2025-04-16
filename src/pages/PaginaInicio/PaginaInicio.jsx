@@ -6,7 +6,7 @@ import PaquetesInicio from "../../components/Paquetes/PaquetesInicio";
 
 export const PaginaInicio = () => {
   const handleSearch = (searchData) => {
-    console.log('Datos de búsqueda:', searchData);
+    ('Datos de búsqueda:', searchData);
     // Aquí puedes implementar la lógica de búsqueda
   };
 

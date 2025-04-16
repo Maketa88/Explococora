@@ -19,7 +19,6 @@ import {
   obtenerRutas,
 } from "../../../../../services/rutasService";
 
-
 // Imágenes de respaldo por dificultad (se usarán si no hay fotos disponibles de la API)
 const imagenesRespaldoPorDificultad = {
   Facil:
@@ -372,18 +371,13 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
 
     // Si estamos cargando las fotos para esta ruta, mostrar un placeholder o la imagen de respaldo
     if (cargandoFotos[ruta.idRuta]) {
-      console.log(
-        `Cargando fotos para ruta ${ruta.idRuta}, usando imagen de respaldo temporalmente`
-      );
       return imagenesRespaldoPorDificultad[ruta.dificultad];
     }
 
     // Si tenemos fotos para esta ruta, mostrar la primera
     if (rutasConFotos[ruta.idRuta] && rutasConFotos[ruta.idRuta].length > 0) {
       const imagenUrl = rutasConFotos[ruta.idRuta][0];
-      console.log(
-        `Usando imagen real de API para ruta ${ruta.idRuta}: ${imagenUrl}`
-      );
+
       return imagenUrl;
     }
 
@@ -496,7 +490,6 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
             </div>
           </div>
         </div>
-      
 
         {/* Contenido detallado */}
         <div className="">
@@ -514,7 +507,10 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
                 {t("reservaAhora", "¿Te gusta esta ruta?")}
               </h3>
               <p className="text-gray-600">
-                {t("puedesReservarla", "Puedes reservarla ahora mismo con un solo clic")}
+                {t(
+                  "puedesReservarla",
+                  "Puedes reservarla ahora mismo con un solo clic"
+                )}
               </p>
             </div>
             <div className="flex justify-center">
@@ -524,8 +520,8 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
                 transition={{ delay: 0.5, duration: 0.3 }}
                 className="w-full max-w-sm"
               >
-                <BotonPagoRuta 
-                  ruta={rutaPrincipal} 
+                <BotonPagoRuta
+                  ruta={rutaPrincipal}
                   className="w-full py-3 px-6 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center"
                 />
               </motion.div>
@@ -536,10 +532,8 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
           {rutaPrincipal && (
             <MapaRutaIntegracion rutaPrincipal={rutaPrincipal} altura="400px" />
           )}
-            
 
           <div className="bg-gradient-to-br from-teal-50 via-white to-teal-50 p-8 shadow-xl  relative overflow-hidden">
-
             <h3 className="text-2xl font-bold text-center mb-8 relative z-10">
               <span className="bg-gradient-to-r from-teal-700 to-teal-500 bg-clip-text text-transparent px-4">
                 {t("puntosInteres", "Lo que verás en esta ruta")}
@@ -558,7 +552,6 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
           </div>
 
           <div className="bg-gradient-to-br from-teal-50 via-white to-teal-50 p-8 shadow-xl  relative overflow-hidden">
-           
             <h3 className="text-2xl font-bold text-center mb-8 relative z-10">
               <span className="bg-gradient-to-r from-teal-700 to-teal-500 bg-clip-text text-transparent px-4">
                 {t("recomendaciones", "Recomendaciones")}
@@ -709,10 +702,13 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
               </div>
               <div className="p-3 border-t border-gray-100">
                 <p className="text-xs text-teal-600 text-center mb-2 font-medium">
-                  {t("tambienTeGustara", "¡También te encantará esta experiencia!")}
+                  {t(
+                    "tambienTeGustara",
+                    "¡También te encantará esta experiencia!"
+                  )}
                 </p>
-                <BotonPagoRuta 
-                  ruta={ruta} 
+                <BotonPagoRuta
+                  ruta={ruta}
                   className="w-full py-2 text-sm bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 flex items-center justify-center"
                 />
               </div>

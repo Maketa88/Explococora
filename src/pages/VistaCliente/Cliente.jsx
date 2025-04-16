@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -15,13 +15,15 @@ const ProfileDropdown = ({ imgSrc, alt }) => {
     if (imgSrc) {
       setProfileImage(imgSrc);
       setCargando(false);
-      console.log("ProfileDropdown: Imagen establecida desde props:", imgSrc);
     } else {
       const fotoGuardada = localStorage.getItem("foto_perfil_cliente");
       if (fotoGuardada) {
         setProfileImage(fotoGuardada);
         setCargando(false);
-        console.log("ProfileDropdown: Imagen cargada desde localStorage:", fotoGuardada);
+        console.log(
+          "ProfileDropdown: Imagen cargada desde localStorage:",
+          fotoGuardada
+        );
       } else {
         setProfileImage(Avatar);
         setCargando(false);
@@ -29,16 +31,25 @@ const ProfileDropdown = ({ imgSrc, alt }) => {
     }
 
     const handleFotoPerfilActualizada = (event) => {
-      console.log("ProfileDropdown: Evento de actualización recibido:", event.detail);
+      console.log(
+        "ProfileDropdown: Evento de actualización recibido:",
+        event.detail
+      );
       if (event.detail && event.detail.fotoUrl) {
         setProfileImage(event.detail.fotoUrl);
       }
     };
 
-    window.addEventListener('fotoPerfilClienteActualizada', handleFotoPerfilActualizada);
+    window.addEventListener(
+      "fotoPerfilClienteActualizada",
+      handleFotoPerfilActualizada
+    );
 
     return () => {
-      window.removeEventListener('fotoPerfilClienteActualizada', handleFotoPerfilActualizada);
+      window.removeEventListener(
+        "fotoPerfilClienteActualizada",
+        handleFotoPerfilActualizada
+      );
     };
   }, [imgSrc]);
 
@@ -145,30 +156,34 @@ const ProfileDropdown = ({ imgSrc, alt }) => {
       showConfirmButton: false,
       allowOutsideClick: false,
       customClass: {
-        popup: 'swal2-popup-custom',
-        container: 'swal2-container-custom'
+        popup: "swal2-popup-custom",
+        container: "swal2-container-custom",
       },
       didOpen: () => {
-        document.getElementById("confirmarCierre").addEventListener("click", () => {
-          const fotoPerfil = localStorage.getItem('foto_perfil');
-          
-          localStorage.removeItem('token');
-          localStorage.removeItem('cedula');
-          localStorage.removeItem('cliente');
-          
-          if (fotoPerfil) {
-            localStorage.setItem('foto_perfil', fotoPerfil);
-          }
-          
-          navigate('/Ingreso');
-          
-          window.location.reload();
-        });
+        document
+          .getElementById("confirmarCierre")
+          .addEventListener("click", () => {
+            const fotoPerfil = localStorage.getItem("foto_perfil");
 
-        document.getElementById("cancelarCierre").addEventListener("click", () => {
-          Swal.close();
-        });
-      }
+            localStorage.removeItem("token");
+            localStorage.removeItem("cedula");
+            localStorage.removeItem("cliente");
+
+            if (fotoPerfil) {
+              localStorage.setItem("foto_perfil", fotoPerfil);
+            }
+
+            navigate("/Ingreso");
+
+            window.location.reload();
+          });
+
+        document
+          .getElementById("cancelarCierre")
+          .addEventListener("click", () => {
+            Swal.close();
+          });
+      },
     });
   };
 
@@ -210,70 +225,67 @@ const ProfileDropdown = ({ imgSrc, alt }) => {
 
   return (
     <div className="relative" ref={dropdownRef}>
-    <div
-      className="flex items-center cursor-pointer"
-      onClick={toggleMenu}
-      role="button"
-      aria-expanded={isOpen}
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          toggleMenu(e);
-        }
-      }}
-    >
-      {cargando ? (
-        <div className="h-11 w-11 rounded-full bg-teal-700 animate-pulse flex items-center justify-center">
-          <div className="h-9 w-9 rounded-full bg-teal-600"></div>
-        </div>
-      ) : (
-        <img
-          src={profileImage || Avatar}
-          alt={alt}
-          className="h-11 w-11 rounded-full object-cover transform transition hover:scale-110 active:scale-95"
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = Avatar;
-          }}
-        />
-      )}
-  
-      {isOpen && (
-        <div className="absolute left-0 md:right-0 md:left-auto top-12 w-56 max-w-[calc(100vw-20px)] bg-teal-800 bg-opacity-50 border-2 border-gray-900 rounded-xl shadow-xl py-2 z-50 transform transition-all duration-300 ease-in-out">
+      <div
+        className="flex items-center cursor-pointer"
+        onClick={toggleMenu}
+        role="button"
+        aria-expanded={isOpen}
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            toggleMenu(e);
+          }
+        }}
+      >
+        {cargando ? (
+          <div className="h-11 w-11 rounded-full bg-teal-700 animate-pulse flex items-center justify-center">
+            <div className="h-9 w-9 rounded-full bg-teal-600"></div>
+          </div>
+        ) : (
+          <img
+            src={profileImage || Avatar}
+            alt={alt}
+            className="h-11 w-11 rounded-full object-cover transform transition hover:scale-110 active:scale-95"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = Avatar;
+            }}
+          />
+        )}
 
-
-
-          {menuOptions.map((option, index) => (
-            <div
-              key={index}
-              onClick={() => handleOptionClick(option.path)}
-              role="menuitem"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  handleOptionClick(option.path);
-                }
-              }}
-              className={`group px-4 py-3 text-white ${
-                index === menuOptions.length - 1
-                  ? "mt-1 text-red-400 hover:text-white hover:bg-red-600 active:bg-red-700 font-bold"
-                  : "hover:bg-teal-600 active:bg-teal-500"
-              } flex items-center cursor-pointer transition-all duration-200 text-sm md:text-base relative overflow-hidden`}
-            >
-              <span className="relative z-10">{option.label}</span>
-              <span 
-                className={`absolute bottom-0 left-0 w-0 h-0.5 ${
+        {isOpen && (
+          <div className="absolute left-0 md:right-0 md:left-auto top-12 w-56 max-w-[calc(100vw-20px)] bg-teal-800 bg-opacity-50 border-2 border-gray-900 rounded-xl shadow-xl py-2 z-50 transform transition-all duration-300 ease-in-out">
+            {menuOptions.map((option, index) => (
+              <div
+                key={index}
+                onClick={() => handleOptionClick(option.path)}
+                role="menuitem"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    handleOptionClick(option.path);
+                  }
+                }}
+                className={`group px-4 py-3 text-white ${
                   index === menuOptions.length - 1
-                    ? "bg-red-400"
-                    : "bg-teal-400"
-                } group-hover:w-full transition-all duration-300 ease-out`}
-              ></span>
-            </div>
-          ))}
-        </div>
-      )}
+                    ? "mt-1 text-red-400 hover:text-white hover:bg-red-600 active:bg-red-700 font-bold"
+                    : "hover:bg-teal-600 active:bg-teal-500"
+                } flex items-center cursor-pointer transition-all duration-200 text-sm md:text-base relative overflow-hidden`}
+              >
+                <span className="relative z-10">{option.label}</span>
+                <span
+                  className={`absolute bottom-0 left-0 w-0 h-0.5 ${
+                    index === menuOptions.length - 1
+                      ? "bg-red-400"
+                      : "bg-teal-400"
+                  } group-hover:w-full transition-all duration-300 ease-out`}
+                ></span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
-  </div>
   );
 };
 
