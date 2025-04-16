@@ -1,8 +1,11 @@
-import axios from 'axios';
-import { useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { combinarFechaHoraISO, generarTimestampMySQL } from '../../utils/formatUtils';
+import axios from "axios";
+import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  combinarFechaHoraISO,
+  generarTimestampMySQL,
+} from "../../utils/formatUtils";
 
 export const FormularioReservaPaquete = () => {
   const { t } = useTranslation();
@@ -10,14 +13,14 @@ export const FormularioReservaPaquete = () => {
   const { idPaquete } = useParams();
   const location = useLocation();
   const paqueteInfo = location.state?.paqueteInfo;
-  
+
   const [cargando] = useState(false);
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     cantidadPersonas: 1,
-    fechaInicio: '',
-    fechaFin: '',
-    horaInicio: '08:00'
+    fechaInicio: "",
+    fechaFin: "",
+    horaInicio: "08:00",
   });
 
   // Estado para controlar el dropdown personalizado
@@ -26,13 +29,13 @@ export const FormularioReservaPaquete = () => {
 
   // Opciones de hora para el dropdown personalizado
   const horaOptions = [
-    { value: '08:00', label: '08:00 AM' },
-    { value: '09:00', label: '09:00 AM' },
-    { value: '10:00', label: '10:00 AM' },
-    { value: '11:00', label: '11:00 AM' },
-    { value: '12:00', label: '12:00 PM' },
-    { value: '13:00', label: '01:00 PM' },
-    { value: '14:00', label: '02:00 PM' },
+    { value: "08:00", label: "08:00 AM" },
+    { value: "09:00", label: "09:00 AM" },
+    { value: "10:00", label: "10:00 AM" },
+    { value: "11:00", label: "11:00 AM" },
+    { value: "12:00", label: "12:00 PM" },
+    { value: "13:00", label: "01:00 PM" },
+    { value: "14:00", label: "02:00 PM" },
   ];
 
   // Estados para controlar los datepickers personalizados
@@ -40,27 +43,40 @@ export const FormularioReservaPaquete = () => {
   const [isFinCalendarOpen, setIsFinCalendarOpen] = useState(false);
   const inicioCalendarRef = useRef(null);
   const finCalendarRef = useRef(null);
-  
+
   // Meses en español
-  const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  const meses = [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
+  ];
   const diasSemana = ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"];
-  
+
   // Estado para el mes y año actual de cada calendario
   const [inicioViewDate, setInicioViewDate] = useState(new Date());
   const [finViewDate, setFinViewDate] = useState(new Date());
-  
+
   // Funciones para generar días del calendario
   const getDiasCalendario = (fecha) => {
     const year = fecha.getFullYear();
     const month = fecha.getMonth();
-    
+
     // Primer día del mes actual
     const primerDia = new Date(year, month, 1);
     // Último día del mes actual
     const ultimoDia = new Date(year, month + 1, 0);
-    
+
     const diasArray = [];
-    
+
     // Días del mes anterior para completar la primera semana
     const diasAntesPrimerDia = primerDia.getDay();
     for (let i = diasAntesPrimerDia; i > 0; i--) {
@@ -71,14 +87,14 @@ export const FormularioReservaPaquete = () => {
         month: dia.getMonth(),
         isCurrentMonth: false,
         isToday: false,
-        isDisabled: dia < new Date(fechaMinima)
+        isDisabled: dia < new Date(fechaMinima),
       });
     }
-    
+
     // Días del mes actual
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
-    
+
     for (let i = 1; i <= ultimoDia.getDate(); i++) {
       const dia = new Date(year, month, i);
       diasArray.push({
@@ -87,10 +103,11 @@ export const FormularioReservaPaquete = () => {
         month: month,
         isCurrentMonth: true,
         isToday: dia.getTime() === hoy.getTime(),
-        isDisabled: dia < new Date(fechaMinima) || dia > new Date(fechaMaximaStr)
+        isDisabled:
+          dia < new Date(fechaMinima) || dia > new Date(fechaMaximaStr),
       });
     }
-    
+
     // Días del mes siguiente para completar la última semana
     const diasDespuesUltimoDia = 6 - ultimoDia.getDay();
     for (let i = 1; i <= diasDespuesUltimoDia; i++) {
@@ -101,51 +118,54 @@ export const FormularioReservaPaquete = () => {
         month: dia.getMonth(),
         isCurrentMonth: false,
         isToday: false,
-        isDisabled: true
+        isDisabled: true,
       });
     }
-    
+
     return diasArray;
   };
-  
+
   // Manejar la selección de fecha
   const handleDateSelect = (date, tipo) => {
     // Ajustar fecha para evitar problemas de zona horaria
     const year = date.getFullYear();
     const month = date.getMonth();
     const day = date.getDate();
-    
+
     // Crear fecha en UTC para evitar desplazamientos por zona horaria
     const adjustedDate = new Date(Date.UTC(year, month, day));
     // Formatear fecha en formato ISO y tomar solo la parte de la fecha
     const formattedDate = adjustedDate.toISOString().slice(0, 10);
-    
-    if (tipo === 'inicio') {
-      if (formData.fechaFin && new Date(formattedDate) > new Date(formData.fechaFin)) {
+
+    if (tipo === "inicio") {
+      if (
+        formData.fechaFin &&
+        new Date(formattedDate) > new Date(formData.fechaFin)
+      ) {
         setFormData({
           ...formData,
           fechaInicio: formattedDate,
-          fechaFin: formattedDate
+          fechaFin: formattedDate,
         });
       } else {
         setFormData({
           ...formData,
-          fechaInicio: formattedDate
+          fechaInicio: formattedDate,
         });
       }
       setIsInicioCalendarOpen(false);
     } else {
       setFormData({
         ...formData,
-        fechaFin: formattedDate
+        fechaFin: formattedDate,
       });
       setIsFinCalendarOpen(false);
     }
   };
-  
+
   // Funciones para cambiar de mes
   const cambiarMes = (increment, tipo) => {
-    if (tipo === 'inicio') {
+    if (tipo === "inicio") {
       const newDate = new Date(inicioViewDate);
       newDate.setMonth(newDate.getMonth() + increment);
       setInicioViewDate(newDate);
@@ -155,58 +175,80 @@ export const FormularioReservaPaquete = () => {
       setFinViewDate(newDate);
     }
   };
-  
+
   // Formatear fecha para mostrar
   const formatDisplayDate = (dateString) => {
-    if (!dateString) return '';
-    
+    if (!dateString) return "";
+
     // Dividir la cadena de fecha en sus componentes
-    const [year, month, day] = dateString.split('-').map(num => parseInt(num, 10));
-    
+    const [year, month, day] = dateString
+      .split("-")
+      .map((num) => parseInt(num, 10));
+
     // Crear nueva fecha usando los componentes (asegurar que no hay desplazamiento por zona horaria)
     const date = new Date(year, month - 1, day);
-    
+
     // Formatear para mostrar
-    return `${date.getDate()} ${meses[date.getMonth()].substring(0, 3)} ${date.getFullYear()}`;
+    return `${date.getDate()} ${meses[date.getMonth()].substring(
+      0,
+      3
+    )} ${date.getFullYear()}`;
   };
-  
+
   // Si no hay información del paquete en location.state, cargarla desde la API
   useEffect(() => {
     if (!paqueteInfo && idPaquete) {
       const cargarInfoPaquete = async () => {
         try {
-          const response = await axios.get(`http://localhost:10101/paquetes/${idPaquete}`);
+          const response = await axios.get(
+            `http://localhost:10101/paquete/obtener-paquete/${idPaquete}`
+          );
+
           if (response.data) {
             // Manejar la respuesta según la estructura real de tu API
           }
         } catch (error) {
-          console.error('Error al cargar información del paquete:', error);
-          setError(t('errorCargandoPaquete', 'No se pudo cargar la información del paquete'));
+          console.error("Error al cargar información del paquete:", error);
+          setError(
+            t(
+              "errorCargandoPaquete",
+              "No se pudo cargar la información del paquete"
+            )
+          );
         }
       };
-      
+
       cargarInfoPaquete();
     }
   }, [idPaquete, paqueteInfo, t]);
 
   // Calcular fecha mínima (hoy)
-  const fechaMinima = new Date().toISOString().split('T')[0];
-  
+  const fechaMinima = new Date().toISOString().split("T")[0];
+
   // Calcular fecha máxima (6 meses desde hoy)
   const fechaMaxima = new Date();
   fechaMaxima.setMonth(fechaMaxima.getMonth() + 6);
-  const fechaMaximaStr = fechaMaxima.toISOString().split('T')[0];
+  const fechaMaximaStr = fechaMaxima.toISOString().split("T")[0];
 
   // Cerrar calendarios al hacer clic fuera
   useEffect(() => {
     function handleClickOutside(event) {
-      if (horaDropdownRef.current && !horaDropdownRef.current.contains(event.target)) {
+      if (
+        horaDropdownRef.current &&
+        !horaDropdownRef.current.contains(event.target)
+      ) {
         setIsHoraDropdownOpen(false);
       }
-      if (inicioCalendarRef.current && !inicioCalendarRef.current.contains(event.target)) {
+      if (
+        inicioCalendarRef.current &&
+        !inicioCalendarRef.current.contains(event.target)
+      ) {
         setIsInicioCalendarOpen(false);
       }
-      if (finCalendarRef.current && !finCalendarRef.current.contains(event.target)) {
+      if (
+        finCalendarRef.current &&
+        !finCalendarRef.current.contains(event.target)
+      ) {
         setIsFinCalendarOpen(false);
       }
     }
@@ -219,33 +261,33 @@ export const FormularioReservaPaquete = () => {
   // Manejar cambios en el formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Validación de cantidad de personas
-    if (name === 'cantidadPersonas') {
+    if (name === "cantidadPersonas") {
       const cantidad = parseInt(value);
       const capacidadMaxima = parseInt(paqueteInfo?.capacidadMaxima || 99);
-      
+
       if (cantidad < 1) {
         return setFormData({ ...formData, [name]: 1 });
       }
-      
+
       if (cantidad > capacidadMaxima) {
         return setFormData({ ...formData, [name]: capacidadMaxima });
       }
     }
-    
+
     // Validación fecha fin ≥ fecha inicio
-    if (name === 'fechaInicio') {
+    if (name === "fechaInicio") {
       if (formData.fechaFin && new Date(value) > new Date(formData.fechaFin)) {
-        setFormData({ 
-          ...formData, 
+        setFormData({
+          ...formData,
           [name]: value,
-          fechaFin: value
+          fechaFin: value,
         });
         return;
       }
     }
-    
+
     setFormData({ ...formData, [name]: value });
   };
 
@@ -258,53 +300,62 @@ export const FormularioReservaPaquete = () => {
   // Manejar envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validaciones básicas
     if (!formData.fechaInicio || !formData.fechaFin || !formData.horaInicio) {
-      setError(t('camposRequeridos', 'Todos los campos son requeridos'));
+      setError(t("camposRequeridos", "Todos los campos son requeridos"));
       return;
     }
-    
+
     // Obtener token del localStorage para verificar autenticación
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      navigate('/Ingreso', { 
-        state: { 
-          mensaje: t('debesIniciarSesion', 'Debes iniciar sesión para reservar un paquete'),
-          redireccion: `/Paquetes/${idPaquete}`
-        } 
+      navigate("/Ingreso", {
+        state: {
+          mensaje: t(
+            "debesIniciarSesion",
+            "Debes iniciar sesión para reservar un paquete"
+          ),
+          redireccion: `/Paquetes/${idPaquete}`,
+        },
       });
       return;
     }
 
     // Usar nuestra utilidad para combinar fecha y hora correctamente
-    const fechaInicioISO = combinarFechaHoraISO(formData.fechaInicio, formData.horaInicio);
-    const fechaFinISO = combinarFechaHoraISO(formData.fechaFin, formData.horaInicio);
-    
+    const fechaInicioISO = combinarFechaHoraISO(
+      formData.fechaInicio,
+      formData.horaInicio
+    );
+    const fechaFinISO = combinarFechaHoraISO(
+      formData.fechaFin,
+      formData.horaInicio
+    );
+
     // Generar el timestamp actual para la fecha de reserva
     const fechaReservaMySQL = generarTimestampMySQL();
-    
+
     // En lugar de hacer la petición directamente, primero redirigir a la pantalla de autorización
     // con todos los datos necesarios para procesar la reserva después
-    navigate('/VistaCliente/reserva/autorizacion-menores-paquete', {
+    navigate("/VistaCliente/reserva/autorizacion-menores-paquete", {
       state: {
         formData: {
           ...formData,
           fechaInicioISO,
           fechaFinISO,
-          fechaReservaMySQL
+          fechaReservaMySQL,
         },
         paqueteInfo,
-        idPaquete
-      }
+        idPaquete,
+      },
     });
   };
-  
+
   // Si no hay paquete, mostrar mensaje de carga o error
   if (!paqueteInfo && !idPaquete) {
     return (
       <div className="text-center p-4">
-        {t('paqueteNoEncontrado', 'No se encontró información del paquete')}
+        {t("paqueteNoEncontrado", "No se encontró información del paquete")}
       </div>
     );
   }
@@ -328,35 +379,35 @@ export const FormularioReservaPaquete = () => {
               fill="#047857"
               opacity="0.3"
             />
-            
+
             {/* Arroyo serpenteante */}
             <path
               d="M0,450 C100,430 150,470 250,440 C350,410 400,450 500,430 C600,410 650,450 750,430 C850,410 900,450 1000,430 C1100,410 1150,450 1200,430 L1200,500 C1100,520 1050,480 950,500 C850,520 800,480 700,500 C600,520 550,480 450,500 C350,520 300,480 200,500 C100,520 50,480 0,500 Z"
               fill="#047857"
               opacity="0.4"
             />
-            
+
             {/* Silueta de árbol 1 - pino */}
             <path
               d="M200,600 L200,400 L150,400 L200,350 L170,350 L220,300 L190,300 L240,250 L210,250 L250,200 L230,200 L270,150 L250,150 L280,100 L310,150 L290,150 L330,200 L310,200 L350,250 L320,250 L370,300 L340,300 L390,350 L360,350 L410,400 L360,400 L360,600 Z"
               fill="#047857"
               opacity="0.7"
             />
-            
+
             {/* Silueta de árbol 2 - frondoso */}
             <path
               d="M600,600 L600,350 C600,350 550,300 570,250 C590,200 630,220 650,180 C670,140 700,160 720,130 C740,100 780,120 800,150 C820,180 850,160 870,200 C890,240 930,220 950,270 C970,320 920,350 920,350 L920,600 Z"
               fill="#047857"
               opacity="0.7"
             />
-            
+
             {/* Silueta de árbol 3 - roble */}
             <path
               d="M1000,600 L1000,400 C1000,400 950,380 960,340 C970,300 1000,320 1010,280 C1020,240 1050,260 1060,220 C1070,180 1100,200 1110,240 C1120,280 1150,260 1160,300 C1170,340 1200,320 1200,360 C1200,400 1150,400 1150,400 L1150,600 Z"
               fill="#047857"
               opacity="0.7"
             />
-            
+
             {/* Flores en el campo - grupo 1 */}
             <g opacity="0.6">
               <circle cx="150" cy="500" r="15" fill="#047857" />
@@ -365,7 +416,7 @@ export const FormularioReservaPaquete = () => {
               <circle cx="170" cy="515" r="15" fill="#047857" />
               <circle cx="170" cy="500" r="10" fill="#047857" />
             </g>
-            
+
             {/* Flores en el campo - grupo 2 */}
             <g opacity="0.6">
               <circle cx="450" cy="520" r="15" fill="#047857" />
@@ -374,7 +425,7 @@ export const FormularioReservaPaquete = () => {
               <circle cx="470" cy="535" r="15" fill="#047857" />
               <circle cx="470" cy="520" r="10" fill="#047857" />
             </g>
-            
+
             {/* Flores en el campo - grupo 3 */}
             <g opacity="0.6">
               <circle cx="750" cy="500" r="15" fill="#047857" />
@@ -383,7 +434,7 @@ export const FormularioReservaPaquete = () => {
               <circle cx="770" cy="515" r="15" fill="#047857" />
               <circle cx="770" cy="500" r="10" fill="#047857" />
             </g>
-            
+
             {/* Mariposas */}
             <g opacity="0.7">
               {/* Mariposa 1 */}
@@ -411,12 +462,10 @@ export const FormularioReservaPaquete = () => {
         {/* Encabezado */}
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-teal-700 mb-2">
-            {t('reservarPaquete', 'Reservar Paquete')}
+            {t("reservarPaquete", "Reservar Paquete")}
           </h1>
           {paqueteInfo && (
-            <p className="text-xl text-teal-600">
-              {paqueteInfo.nombrePaquete}
-            </p>
+            <p className="text-xl text-teal-600">{paqueteInfo.nombrePaquete}</p>
           )}
         </div>
 
@@ -427,20 +476,27 @@ export const FormularioReservaPaquete = () => {
             <div className="bg-gradient-to-r from-teal-700 to-teal-600 text-white p-6">
               <div className="flex flex-wrap items-center justify-between">
                 <div className="mb-4 md:mb-0">
-                  <h2 className="text-xl font-bold">{paqueteInfo.nombrePaquete}</h2>
-                  <p className="text-teal-100">{paqueteInfo.tipo} • {paqueteInfo.dificultad}</p>
+                  <h2 className="text-xl font-bold">
+                    {paqueteInfo.nombrePaquete}
+                  </h2>
+                  <p className="text-teal-100">
+                    {paqueteInfo.tipo} • {paqueteInfo.dificultad}
+                  </p>
                 </div>
-                
+
                 <div className="flex flex-col items-end">
                   <div className="text-2xl font-bold">
-                    ${Number(paqueteInfo.precio).toLocaleString('es-CO')} <span className="text-sm font-normal">COP</span>
+                    ${Number(paqueteInfo.precio).toLocaleString("es-CO")}{" "}
+                    <span className="text-sm font-normal">COP</span>
                   </div>
-                  <div className="text-sm text-teal-100">{t('porPersona', 'por persona')}</div>
+                  <div className="text-sm text-teal-100">
+                    {t("porPersona", "por persona")}
+                  </div>
                 </div>
               </div>
             </div>
           )}
-          
+
           {/* Formulario de reserva */}
           <form onSubmit={handleSubmit} className="p-6">
             {/* Mensaje de error */}
@@ -448,8 +504,18 @@ export const FormularioReservaPaquete = () => {
               <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
                 <div className="flex">
                   <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    <svg
+                      className="h-5 w-5 text-red-500"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
                     </svg>
                   </div>
                   <div className="ml-3">
@@ -462,17 +528,36 @@ export const FormularioReservaPaquete = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Cantidad de personas */}
               <div>
-                <label htmlFor="cantidadPersonas" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('cantidadPersonas', 'Cantidad de personas')} *
+                <label
+                  htmlFor="cantidadPersonas"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("cantidadPersonas", "Cantidad de personas")} *
                 </label>
                 <div className="flex">
-                  <button 
+                  <button
                     type="button"
                     className="bg-teal-600 hover:bg-teal-700 text-white h-10 w-10 rounded-l-lg flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
-                    onClick={() => handleChange({ target: { name: 'cantidadPersonas', value: Math.max(1, formData.cantidadPersonas - 1) } })}
+                    onClick={() =>
+                      handleChange({
+                        target: {
+                          name: "cantidadPersonas",
+                          value: Math.max(1, formData.cantidadPersonas - 1),
+                        },
+                      })
+                    }
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </button>
                   <input
@@ -486,27 +571,50 @@ export const FormularioReservaPaquete = () => {
                     className="block w-full border-y border-teal-300 focus:ring-teal-500 focus:border-teal-500 text-center h-10 text-lg font-medium"
                     required
                   />
-                  <button 
+                  <button
                     type="button"
                     className="bg-teal-600 hover:bg-teal-700 text-white h-10 w-10 rounded-r-lg flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
-                    onClick={() => handleChange({ target: { name: 'cantidadPersonas', value: Math.min(parseInt(paqueteInfo?.capacidadMaxima || 99), formData.cantidadPersonas + 1) } })}
+                    onClick={() =>
+                      handleChange({
+                        target: {
+                          name: "cantidadPersonas",
+                          value: Math.min(
+                            parseInt(paqueteInfo?.capacidadMaxima || 99),
+                            formData.cantidadPersonas + 1
+                          ),
+                        },
+                      })
+                    }
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </button>
                 </div>
                 {paqueteInfo && (
                   <p className="mt-1 text-xs text-gray-500">
-                    {t('capacidadMaxima', 'Capacidad máxima')}: {paqueteInfo.capacidadMaxima} {t('personas', 'personas')}
+                    {t("capacidadMaxima", "Capacidad máxima")}:{" "}
+                    {paqueteInfo.capacidadMaxima} {t("personas", "personas")}
                   </p>
                 )}
               </div>
 
               {/* Hora de inicio (Dropdown Personalizado) */}
               <div>
-                <label htmlFor="horaInicio" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('horaInicio', 'Hora de inicio')} *
+                <label
+                  htmlFor="horaInicio"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("horaInicio", "Hora de inicio")} *
                 </label>
                 <div className="relative" ref={horaDropdownRef}>
                   <button
@@ -515,14 +623,26 @@ export const FormularioReservaPaquete = () => {
                     className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 px-3 py-2 text-left bg-white"
                     onClick={() => setIsHoraDropdownOpen(!isHoraDropdownOpen)}
                   >
-                    {horaOptions.find(option => option.value === formData.horaInicio)?.label || '08:00 AM'}
+                    {horaOptions.find(
+                      (option) => option.value === formData.horaInicio
+                    )?.label || "08:00 AM"}
                     <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                      <svg
+                        className="h-5 w-5 text-gray-400"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                     </span>
                   </button>
-                  
+
                   {isHoraDropdownOpen && (
                     <div className="absolute mt-1 w-full z-10 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
                       <ul className="py-1">
@@ -530,7 +650,9 @@ export const FormularioReservaPaquete = () => {
                           <li
                             key={option.value}
                             className={`cursor-pointer px-3 py-2 hover:bg-teal-700 hover:text-white ${
-                              formData.horaInicio === option.value ? 'bg-teal-600 text-white' : 'text-gray-900'
+                              formData.horaInicio === option.value
+                                ? "bg-teal-600 text-white"
+                                : "text-gray-900"
                             }`}
                             onClick={() => handleHoraSelect(option.value)}
                           >
@@ -540,7 +662,7 @@ export const FormularioReservaPaquete = () => {
                       </ul>
                     </div>
                   )}
-                  
+
                   {/* Campo oculto para mantener compatibilidad con el formulario */}
                   <input
                     type="hidden"
@@ -553,118 +675,197 @@ export const FormularioReservaPaquete = () => {
 
               {/* Fecha de inicio personalizada */}
               <div>
-                <label htmlFor="fechaInicio" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('fechaInicio', 'Fecha de inicio')} *
+                <label
+                  htmlFor="fechaInicio"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("fechaInicio", "Fecha de inicio")} *
                 </label>
                 <div className="relative" ref={inicioCalendarRef}>
                   <button
                     type="button"
                     className="flex items-center justify-between w-full px-4 py-2.5 text-left border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500 bg-white transition-all duration-300 hover:border-teal-400"
-                    onClick={() => setIsInicioCalendarOpen(!isInicioCalendarOpen)}
+                    onClick={() =>
+                      setIsInicioCalendarOpen(!isInicioCalendarOpen)
+                    }
                   >
                     <div className="flex items-center">
-                      <svg className="w-5 h-5 mr-2 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      <svg
+                        className="w-5 h-5 mr-2 text-teal-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        ></path>
                       </svg>
-                      <span className="text-gray-700">{formData.fechaInicio ? formatDisplayDate(formData.fechaInicio) : t('seleccioneFecha', 'Seleccione fecha')}</span>
+                      <span className="text-gray-700">
+                        {formData.fechaInicio
+                          ? formatDisplayDate(formData.fechaInicio)
+                          : t("seleccioneFecha", "Seleccione fecha")}
+                      </span>
                     </div>
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                    <svg
+                      className="w-5 h-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 9l-7 7-7-7"
+                      ></path>
                     </svg>
                   </button>
-                  
+
                   {isInicioCalendarOpen && (
                     <div className="absolute z-20 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 transform transition-all duration-300 origin-top animate-zoom-in">
                       <div className="p-3 bg-gradient-to-r from-teal-600 to-teal-500 text-white rounded-t-lg">
                         <div className="flex justify-between items-center mb-2">
-                          <button 
-                            type="button" 
+                          <button
+                            type="button"
                             className="p-1 hover:bg-teal-700 rounded-full transition-colors duration-200"
-                            onClick={() => cambiarMes(-1, 'inicio')}
+                            onClick={() => cambiarMes(-1, "inicio")}
                           >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M15 19l-7-7 7-7"
+                              ></path>
                             </svg>
                           </button>
                           <h3 className="font-bold text-lg">
-                            {meses[inicioViewDate.getMonth()]} {inicioViewDate.getFullYear()}
+                            {meses[inicioViewDate.getMonth()]}{" "}
+                            {inicioViewDate.getFullYear()}
                           </h3>
-                          <button 
-                            type="button" 
+                          <button
+                            type="button"
                             className="p-1 hover:bg-teal-700 rounded-full transition-colors duration-200"
-                            onClick={() => cambiarMes(1, 'inicio')}
+                            onClick={() => cambiarMes(1, "inicio")}
                           >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M9 5l7 7-7 7"
+                              ></path>
                             </svg>
                           </button>
                         </div>
-                        
+
                         <div className="grid grid-cols-7 gap-1 mt-1">
                           {diasSemana.map((dia, index) => (
-                            <div key={index} className="text-xs text-center font-medium text-teal-100 py-1">
+                            <div
+                              key={index}
+                              className="text-xs text-center font-medium text-teal-100 py-1"
+                            >
                               {dia}
                             </div>
                           ))}
                         </div>
                       </div>
-                      
+
                       <div className="p-2">
                         <div className="grid grid-cols-7 gap-1">
-                          {getDiasCalendario(inicioViewDate).map((dia, index) => (
-                            <button
-                              key={index}
-                              type="button"
-                              disabled={dia.isDisabled}
-                              onClick={() => !dia.isDisabled && handleDateSelect(dia.date, 'inicio')}
-                              className={`
+                          {getDiasCalendario(inicioViewDate).map(
+                            (dia, index) => (
+                              <button
+                                key={index}
+                                type="button"
+                                disabled={dia.isDisabled}
+                                onClick={() =>
+                                  !dia.isDisabled &&
+                                  handleDateSelect(dia.date, "inicio")
+                                }
+                                className={`
                                 w-9 h-9 m-0.5 text-sm rounded-full flex items-center justify-center transition-all duration-200
-                                ${!dia.isCurrentMonth ? 'text-gray-400 hover:bg-gray-100' : 'text-gray-800 hover:bg-teal-100'}
-                                ${dia.isToday ? 'bg-teal-100 text-teal-800 font-medium ring-2 ring-teal-400 ring-opacity-50' : ''}
-                                ${formData.fechaInicio && dia.date.toISOString().split('T')[0] === formData.fechaInicio 
-                                  ? 'bg-teal-600 text-white hover:bg-teal-700 font-medium shadow-md' 
-                                  : ''}
-                                ${!dia.isDisabled 
-                                  ? 'hover:shadow-sm' 
-                                  : 'opacity-50 cursor-not-allowed bg-gray-50'}
+                                ${
+                                  !dia.isCurrentMonth
+                                    ? "text-gray-400 hover:bg-gray-100"
+                                    : "text-gray-800 hover:bg-teal-100"
+                                }
+                                ${
+                                  dia.isToday
+                                    ? "bg-teal-100 text-teal-800 font-medium ring-2 ring-teal-400 ring-opacity-50"
+                                    : ""
+                                }
+                                ${
+                                  formData.fechaInicio &&
+                                  dia.date.toISOString().split("T")[0] ===
+                                    formData.fechaInicio
+                                    ? "bg-teal-600 text-white hover:bg-teal-700 font-medium shadow-md"
+                                    : ""
+                                }
+                                ${
+                                  !dia.isDisabled
+                                    ? "hover:shadow-sm"
+                                    : "opacity-50 cursor-not-allowed bg-gray-50"
+                                }
                               `}
-                            >
-                              {dia.day}
-                            </button>
-                          ))}
+                              >
+                                {dia.day}
+                              </button>
+                            )
+                          )}
                         </div>
                       </div>
-                      
+
                       <div className="border-t border-gray-200 p-2 flex justify-between">
-                        <button 
+                        <button
                           type="button"
                           className="text-xs text-teal-600 hover:text-teal-800 transition-colors duration-200"
                           onClick={() => {
                             const today = new Date();
                             today.setHours(0, 0, 0, 0);
-                            if (today >= new Date(fechaMinima) && today <= new Date(fechaMaximaStr)) {
-                              handleDateSelect(today, 'inicio');
+                            if (
+                              today >= new Date(fechaMinima) &&
+                              today <= new Date(fechaMaximaStr)
+                            ) {
+                              handleDateSelect(today, "inicio");
                             }
                           }}
                         >
-                          {t('hoy', 'Hoy')}
+                          {t("hoy", "Hoy")}
                         </button>
-                        <button 
+                        <button
                           type="button"
                           className="text-xs text-red-500 hover:text-red-700 transition-colors duration-200"
                           onClick={() => setIsInicioCalendarOpen(false)}
                         >
-                          {t('cerrar', 'Cerrar')}
+                          {t("cerrar", "Cerrar")}
                         </button>
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Campo oculto para mantener la compatibilidad con el formulario */}
                   <input
                     type="hidden"
                     id="fechaInicio"
-                    name="fechaInicio" 
+                    name="fechaInicio"
                     value={formData.fechaInicio}
                     required
                   />
@@ -673,89 +874,176 @@ export const FormularioReservaPaquete = () => {
 
               {/* Fecha de fin personalizada */}
               <div>
-                <label htmlFor="fechaFin" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('fechaFin', 'Fecha de fin')} *
+                <label
+                  htmlFor="fechaFin"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("fechaFin", "Fecha de fin")} *
                 </label>
                 <div className="relative" ref={finCalendarRef}>
                   <button
                     type="button"
-                    className={`flex items-center justify-between w-full px-4 py-2.5 text-left border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500 bg-white transition-all duration-300 hover:border-teal-400 ${!formData.fechaInicio ? 'opacity-75 cursor-not-allowed' : ''}`}
-                    onClick={() => formData.fechaInicio && setIsFinCalendarOpen(!isFinCalendarOpen)}
+                    className={`flex items-center justify-between w-full px-4 py-2.5 text-left border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500 bg-white transition-all duration-300 hover:border-teal-400 ${
+                      !formData.fechaInicio
+                        ? "opacity-75 cursor-not-allowed"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      formData.fechaInicio &&
+                      setIsFinCalendarOpen(!isFinCalendarOpen)
+                    }
                     disabled={!formData.fechaInicio}
                   >
                     <div className="flex items-center">
-                      <svg className="w-5 h-5 mr-2 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      <svg
+                        className="w-5 h-5 mr-2 text-teal-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        ></path>
                       </svg>
-                      <span className="text-gray-700">{formData.fechaFin ? formatDisplayDate(formData.fechaFin) : t('seleccioneFecha', 'Seleccione fecha')}</span>
+                      <span className="text-gray-700">
+                        {formData.fechaFin
+                          ? formatDisplayDate(formData.fechaFin)
+                          : t("seleccioneFecha", "Seleccione fecha")}
+                      </span>
                     </div>
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                    <svg
+                      className="w-5 h-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 9l-7 7-7-7"
+                      ></path>
                     </svg>
                   </button>
-                  
+
                   {isFinCalendarOpen && (
                     <div className="absolute z-20 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 transform transition-all duration-300 origin-top animate-zoom-in">
                       <div className="p-3 bg-gradient-to-r from-teal-600 to-teal-500 text-white rounded-t-lg">
                         <div className="flex justify-between items-center mb-2">
-                          <button 
-                            type="button" 
+                          <button
+                            type="button"
                             className="p-1 hover:bg-teal-700 rounded-full transition-colors duration-200"
-                            onClick={() => cambiarMes(-1, 'fin')}
+                            onClick={() => cambiarMes(-1, "fin")}
                           >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M15 19l-7-7 7-7"
+                              ></path>
                             </svg>
                           </button>
                           <h3 className="font-bold text-lg">
-                            {meses[finViewDate.getMonth()]} {finViewDate.getFullYear()}
+                            {meses[finViewDate.getMonth()]}{" "}
+                            {finViewDate.getFullYear()}
                           </h3>
-                          <button 
-                            type="button" 
+                          <button
+                            type="button"
                             className="p-1 hover:bg-teal-700 rounded-full transition-colors duration-200"
-                            onClick={() => cambiarMes(1, 'fin')}
+                            onClick={() => cambiarMes(1, "fin")}
                           >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M9 5l7 7-7 7"
+                              ></path>
                             </svg>
                           </button>
                         </div>
-                        
+
                         <div className="grid grid-cols-7 gap-1 mt-1">
                           {diasSemana.map((dia, index) => (
-                            <div key={index} className="text-xs text-center font-medium text-teal-100 py-1">
+                            <div
+                              key={index}
+                              className="text-xs text-center font-medium text-teal-100 py-1"
+                            >
                               {dia}
                             </div>
                           ))}
                         </div>
                       </div>
-                      
+
                       <div className="p-2">
                         <div className="grid grid-cols-7 gap-1">
                           {getDiasCalendario(finViewDate).map((dia, index) => {
                             // Asegurarse de que no se pueda seleccionar una fecha anterior a fechaInicio
-                            const fechaMinParaFin = formData.fechaInicio || fechaMinima;
-                            const estaDeshabilitado = dia.isDisabled || (!dia.isCurrentMonth) || (dia.date < new Date(fechaMinParaFin));
-                            
+                            const fechaMinParaFin =
+                              formData.fechaInicio || fechaMinima;
+                            const estaDeshabilitado =
+                              dia.isDisabled ||
+                              !dia.isCurrentMonth ||
+                              dia.date < new Date(fechaMinParaFin);
+
                             return (
                               <button
                                 key={index}
                                 type="button"
                                 disabled={estaDeshabilitado}
-                                onClick={() => !estaDeshabilitado && handleDateSelect(dia.date, 'fin')}
+                                onClick={() =>
+                                  !estaDeshabilitado &&
+                                  handleDateSelect(dia.date, "fin")
+                                }
                                 className={`
                                   w-9 h-9 m-0.5 text-sm rounded-full flex items-center justify-center transition-all duration-200
-                                  ${!dia.isCurrentMonth ? 'text-gray-400 hover:bg-gray-100' : 'text-gray-800 hover:bg-teal-100'}
-                                  ${dia.isToday ? 'bg-teal-100 text-teal-800 font-medium ring-2 ring-teal-400 ring-opacity-50' : ''}
-                                  ${formData.fechaFin && dia.date.toISOString().split('T')[0] === formData.fechaFin 
-                                    ? 'bg-teal-600 text-white hover:bg-teal-700 font-medium shadow-md' 
-                                    : ''}
-                                  ${formData.fechaInicio && dia.date.toISOString().split('T')[0] === formData.fechaInicio 
-                                    ? 'bg-teal-200 text-teal-800 ring-1 ring-teal-500' 
-                                    : ''}
-                                  ${!estaDeshabilitado 
-                                    ? 'hover:shadow-sm' 
-                                    : 'opacity-50 cursor-not-allowed bg-gray-50'}
+                                  ${
+                                    !dia.isCurrentMonth
+                                      ? "text-gray-400 hover:bg-gray-100"
+                                      : "text-gray-800 hover:bg-teal-100"
+                                  }
+                                  ${
+                                    dia.isToday
+                                      ? "bg-teal-100 text-teal-800 font-medium ring-2 ring-teal-400 ring-opacity-50"
+                                      : ""
+                                  }
+                                  ${
+                                    formData.fechaFin &&
+                                    dia.date.toISOString().split("T")[0] ===
+                                      formData.fechaFin
+                                      ? "bg-teal-600 text-white hover:bg-teal-700 font-medium shadow-md"
+                                      : ""
+                                  }
+                                  ${
+                                    formData.fechaInicio &&
+                                    dia.date.toISOString().split("T")[0] ===
+                                      formData.fechaInicio
+                                      ? "bg-teal-200 text-teal-800 ring-1 ring-teal-500"
+                                      : ""
+                                  }
+                                  ${
+                                    !estaDeshabilitado
+                                      ? "hover:shadow-sm"
+                                      : "opacity-50 cursor-not-allowed bg-gray-50"
+                                  }
                                 `}
                               >
                                 {dia.day}
@@ -764,39 +1052,44 @@ export const FormularioReservaPaquete = () => {
                           })}
                         </div>
                       </div>
-                      
+
                       <div className="border-t border-gray-200 p-2 flex justify-between">
-                        <button 
+                        <button
                           type="button"
                           className="text-xs text-teal-600 hover:text-teal-800 transition-colors duration-200"
                           onClick={() => {
                             // Seleccionar fecha de inicio si es válida y superior a fecha mínima/inicio
                             const today = new Date();
                             today.setHours(0, 0, 0, 0);
-                            const minDate = formData.fechaInicio ? new Date(formData.fechaInicio) : new Date(fechaMinima);
-                            if (today >= minDate && today <= new Date(fechaMaximaStr)) {
-                              handleDateSelect(today, 'fin');
+                            const minDate = formData.fechaInicio
+                              ? new Date(formData.fechaInicio)
+                              : new Date(fechaMinima);
+                            if (
+                              today >= minDate &&
+                              today <= new Date(fechaMaximaStr)
+                            ) {
+                              handleDateSelect(today, "fin");
                             }
                           }}
                         >
-                          {t('hoy', 'Hoy')}
+                          {t("hoy", "Hoy")}
                         </button>
-                        <button 
+                        <button
                           type="button"
                           className="text-xs text-red-500 hover:text-red-700 transition-colors duration-200"
                           onClick={() => setIsFinCalendarOpen(false)}
                         >
-                          {t('cerrar', 'Cerrar')}
+                          {t("cerrar", "Cerrar")}
                         </button>
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Campo oculto para mantener la compatibilidad con el formulario */}
                   <input
                     type="hidden"
                     id="fechaFin"
-                    name="fechaFin" 
+                    name="fechaFin"
                     value={formData.fechaFin}
                     required
                   />
@@ -807,21 +1100,39 @@ export const FormularioReservaPaquete = () => {
             {/* Resumen de la reserva */}
             {formData.cantidadPersonas > 0 && paqueteInfo?.precio && (
               <div className="mt-8 p-4 bg-teal-50 rounded-lg border border-teal-100">
-                <h3 className="text-lg font-semibold text-teal-800 mb-2">{t('resumenReserva', 'Resumen de la reserva')}</h3>
-                
+                <h3 className="text-lg font-semibold text-teal-800 mb-2">
+                  {t("resumenReserva", "Resumen de la reserva")}
+                </h3>
+
                 <div className="space-y-2 mb-3">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">{t('precioUnitario', 'Precio unitario')}:</span>
-                    <span className="font-medium">${Number(paqueteInfo.precio).toLocaleString('es-CO')} COP</span>
+                    <span className="text-gray-600">
+                      {t("precioUnitario", "Precio unitario")}:
+                    </span>
+                    <span className="font-medium">
+                      ${Number(paqueteInfo.precio).toLocaleString("es-CO")} COP
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">{t('cantidadPersonas', 'Cantidad de personas')}:</span>
-                    <span className="font-medium">{formData.cantidadPersonas}</span>
+                    <span className="text-gray-600">
+                      {t("cantidadPersonas", "Cantidad de personas")}:
+                    </span>
+                    <span className="font-medium">
+                      {formData.cantidadPersonas}
+                    </span>
                   </div>
                   <div className="border-t border-teal-200 my-2"></div>
                   <div className="flex justify-between text-lg font-bold">
-                    <span className="text-teal-800">{t('total', 'Total')}:</span>
-                    <span className="text-teal-800">${(formData.cantidadPersonas * Number(paqueteInfo.precio)).toLocaleString('es-CO')} COP</span>
+                    <span className="text-teal-800">
+                      {t("total", "Total")}:
+                    </span>
+                    <span className="text-teal-800">
+                      $
+                      {(
+                        formData.cantidadPersonas * Number(paqueteInfo.precio)
+                      ).toLocaleString("es-CO")}{" "}
+                      COP
+                    </span>
                   </div>
                 </div>
               </div>
@@ -833,25 +1144,52 @@ export const FormularioReservaPaquete = () => {
                 type="submit"
                 disabled={cargando}
                 className={`w-full py-4 rounded-xl ${
-                  cargando 
-                    ? 'bg-gray-300 cursor-not-allowed' 
-                    : 'bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white'
+                  cargando
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white"
                 } font-medium transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center`}
               >
                 {cargando ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
-                    {t('procesando', 'Procesando...')}
+                    {t("procesando", "Procesando...")}
                   </>
                 ) : (
                   <>
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                    <svg
+                      className="w-5 h-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M13 7l5 5m0 0l-5 5m5-5H6"
+                      ></path>
                     </svg>
-                    {t('continuar', 'Continuar')}
+                    {t("continuar", "Continuar")}
                   </>
                 )}
               </button>
@@ -861,12 +1199,25 @@ export const FormularioReservaPaquete = () => {
 
         {/* Nota importante */}
         <div className="mt-6 text-sm text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-200">
-          <h3 className="font-semibold mb-2">{t('informacionImportante', 'Información importante')}:</h3>
+          <h3 className="font-semibold mb-2">
+            {t("informacionImportante", "Información importante")}:
+          </h3>
           <ul className="list-disc pl-5 space-y-1">
-            <li>{t('notaCapacidad', 'La reserva está sujeta a disponibilidad.')}</li>
-            <li>{t('notaGuia', 'Se te asignará un guía experimentado para tu aventura.')}</li>
-            <li>{t('notaEquipo', 'Recomendamos llevar ropa cómoda, protector solar y agua.')}</li>
-            
+            <li>
+              {t("notaCapacidad", "La reserva está sujeta a disponibilidad.")}
+            </li>
+            <li>
+              {t(
+                "notaGuia",
+                "Se te asignará un guía experimentado para tu aventura."
+              )}
+            </li>
+            <li>
+              {t(
+                "notaEquipo",
+                "Recomendamos llevar ropa cómoda, protector solar y agua."
+              )}
+            </li>
           </ul>
         </div>
       </div>
@@ -874,4 +1225,4 @@ export const FormularioReservaPaquete = () => {
   );
 };
 
-export default FormularioReservaPaquete; 
+export default FormularioReservaPaquete;
