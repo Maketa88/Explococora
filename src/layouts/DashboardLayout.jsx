@@ -299,10 +299,22 @@ const DashboardLayout = ({ children }) => {
       icon: <CalendarDays className="w-5 h-5" />,
       path: "/VistaOperador/reservas",
       section: "Informes"
+    },
+    {
+      title: "GestionCaballos",
+      icon: <CalendarDays className="w-5 h-5" />,
+      path: "/VistaOperador/gestion-caballos",
+      section: "Caballos"
+    },
+    {
+      title: "Plantilla",
+      icon: <CalendarDays className="w-5 h-5" />,
+      path: "/VistaOperador/plantilla",
+      section: "Gestión Plantillas"
     }
   ];
 
-  const sections = ["Dashboard", "Rutas", "Guías", "Informes"];
+  const sections = ["Dashboard", "Rutas", "Guías", "Informes","Caballos","Gestión Plantillas"];
 
   const handleLogout = async () => {
     try {

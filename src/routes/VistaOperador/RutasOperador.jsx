@@ -17,6 +17,8 @@ import CambiarContrasena from '../../pages/VistaOperador/Perfil/CambiarContrasen
 import PagoRutas from '../../pages/VistaOperador/Informes/PagoRutas';
 import PagoPaquetes from '../../pages/VistaOperador/Informes/PagoPaquetes';
 import Reservas from '../../pages/VistaOperador/Informes/Reservas';
+import Caballos from '../../pages/VistaOperador/GestionCaballos/Caballos';
+import Plantilla from '../../pages/VistaOperador/Plantilla/Plantilla';
 
 const RutasOperador = () => {
   return (
@@ -38,6 +40,8 @@ const RutasOperador = () => {
       <Route path="/pago-rutas" element={<PagoRutas />} />
       <Route path="/pago-paquetes" element={<PagoPaquetes />} />
       <Route path="/reservas" element={<Reservas />} />
+      <Route path="/gestion-caballos" element={<Caballos />} />
+      <Route path="/plantilla" element={<Plantilla />} />
     </Routes>
   );
 };
