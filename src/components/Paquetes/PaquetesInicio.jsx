@@ -526,7 +526,7 @@ const GestionPaquetes = () => {
                     <div className="grid grid-cols-2 gap-1 mb-3 relative z-10">
                       <div className="flex flex-col items-center p-1.5 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-lg shadow-sm">
                         <Clock className="h-3 w-3 text-emerald-700 mb-0.5" />
-                        <span className="text-emerald-800 text-xs font-medium uppercase tracking-wider">
+                        <span className="text-emerald-800 text-xs font-medium ">
                           Duración
                         </span>
                         <span className="text-emerald-900 text-xs font-bold">
@@ -535,7 +535,7 @@ const GestionPaquetes = () => {
                       </div>
                       <div className="flex flex-col items-center p-1.5 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-lg shadow-sm">
                         <DollarSign className="h-3 w-3 text-emerald-700 mb-0.5" />
-                        <span className="text-emerald-800 text-xs font-medium uppercase tracking-wider">
+                        <span className="text-emerald-800 text-xs font-medium ">
                           Precio
                         </span>
                         <span className="text-emerald-900 text-xs font-bold">
@@ -544,6 +544,8 @@ const GestionPaquetes = () => {
                       </div>
                       </div>
                       
+                   
+                    
                     {/* Descripción */}
                     <div className="mb-3 relative z-10 h-16">
                       <h3 className="text-emerald-800 text-xs font-semibold mb-1 flex items-center">
@@ -579,6 +581,28 @@ const GestionPaquetes = () => {
                           {paquete.rutasAsociadas?.length || 0} incluidas
                         </span>
                       </div>
+                       {/* Estrellas de calificación centradas */}
+                    <div className="flex justify-center mt-2 mb-1 relative z-10">
+                      <div className="rounded-full px-2 py-1 flex items-center">
+                        <div className="flex">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
                         {paquete.descuento > 0 && (
                         <div className="flex items-center bg-white bg-opacity-70 p-1.5 rounded-lg transform transition-transform duration-300 group-hover:translate-x-1">
                           <DollarSign className="h-3 w-3 text-emerald-700 mr-1" />
