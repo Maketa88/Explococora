@@ -221,7 +221,10 @@ export const RecomendacionesVestimentaPaquete = () => {
               <div className="mb-4 md:mb-0">
                 <h2 className="text-xl font-bold">{paqueteInfo.nombrePaquete}</h2>
                 <p className="mt-2 text-teal-200 font-semibold">
-                  ${paqueteInfo.precio?.toLocaleString('es-CO')} COP
+                  ${(paqueteInfo.precio * (formData?.cantidadPersonas || 1) + 
+                     (serviciosAdicionales?.reduce((total, item) => 
+                       total + (item.servicio.precio * item.cantidad), 0) || 0)
+                    ).toLocaleString('es-CO')} COP
                 </p>
               </div>
               

@@ -9,7 +9,7 @@ export const AutorizacionMenoresPaquetes = () => {
   const location = useLocation();
 
   // Obtener datos de la reserva desde el estado de navegación
-  const { formData, paqueteInfo, idPaquete } = location.state || {};
+  const { formData, paqueteInfo, idPaquete, serviciosAdicionales = [] } = location.state || {};
 
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
   const [error, setError] = useState(null);
@@ -27,6 +27,16 @@ export const AutorizacionMenoresPaquetes = () => {
     return null;
   }
 
+  // Función para calcular el total
+  const calcularTotal = () => {
+    const precioBase = paqueteInfo.precio * (formData?.cantidadPersonas || 1);
+    const precioServicios = (serviciosAdicionales || []).reduce(
+      (total, item) => total + (item.servicio?.precio || 0) * (item.cantidad || 0), 
+      0
+    );
+    return precioBase + precioServicios;
+  };
+
   // Función que se ejecuta cuando el usuario hace clic en "Continuar"
   const handleReservarAhora = async () => {
     if (!aceptaTerminos) {
@@ -38,9 +48,6 @@ export const AutorizacionMenoresPaquetes = () => {
       );
       return;
     }
-
-    // Obtener serviciosAdicionales del estado actual o inicializar como array vacío
-    const serviciosAdicionales = location.state?.serviciosAdicionales || [];
 
     // Redirigir al componente de aceptación de riesgos
     navigate("/VistaCliente/reserva/aceptacion-riesgos-paquete", {
@@ -183,7 +190,7 @@ export const AutorizacionMenoresPaquetes = () => {
                 </h2>
 
                 <p className="mt-2 text-teal-200 font-semibold">
-                  ${paqueteInfo.precio?.toLocaleString("es-CO")} COP
+                  ${calcularTotal().toLocaleString("es-CO")} COP
                 </p>
               </div>
 

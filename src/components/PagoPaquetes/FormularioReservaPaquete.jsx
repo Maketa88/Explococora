@@ -861,176 +861,402 @@ export const FormularioReservaPaquete = () => {
               cantidadPersonas={formData.cantidadPersonas}
             />
             
-            {/* Resumen de reserva en el estilo exacto de FormularioReservaRuta */}
+            {/* RESUMEN DE RESERVA */}
             {formData.cantidadPersonas > 0 && paqueteInfo?.precio && (
-              <div className="bg-white rounded-xl shadow-sm border border-teal-100 overflow-hidden mt-8">
-                {/* Cabecera */}
-                <div className="bg-teal-600 px-6 py-4 relative">
-                  <div className="flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                    </svg>
-                    <h3 className="text-xl font-bold text-white">{t('resumenReserva', 'Resumen de la reserva')}</h3>
-                  </div>
-                  <div className="absolute bottom-0 right-0 w-24 h-24 opacity-10">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M3 3V21H21V3H3Z" fill="white" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M3 9H21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M9 21V9" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </div>
+              <div className="mt-8">
+                {/* Encabezado del resumen */}
+                <div className="bg-teal-600 px-4 py-3 rounded-t-lg flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 text-white mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    ></path>
+                  </svg>
+                  <h3 className="text-lg font-bold text-white">
+                    {t("resumenReserva", "Resumen de la reserva")}
+                  </h3>
                 </div>
 
-                {/* Contenido */}
-                <div className="p-6 divide-y divide-teal-100">
-                  {/* Sección 1: Detalles del Paquete */}
-                  <div className="pb-5">
-                    <div className="flex items-center mb-4">
-                      <div className="bg-teal-100 p-2 rounded-full mr-3">
-                        <svg className="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                {/* Contenido del resumen */}
+                <div className="border border-teal-100 rounded-b-lg p-4 bg-white">
+                  {/* Detalles del paquete */}
+                  <div className="mb-5">
+                    <div className="flex items-center mb-3">
+                      <div className="text-teal-600 mr-2">
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                          ></path>
                         </svg>
                       </div>
-                      <h4 className="text-lg font-semibold text-gray-800">{t('detallesPaquete', 'Detalles del paquete')}</h4>
+                      <span className="text-teal-600 font-medium">
+                        {t("detallesPaquete", "Detalles del paquete")}
+                      </span>
                     </div>
-                    
-                    <div className="space-y-3 pl-11">
+
+                    <div className="pl-7 space-y-2">
+                      {/* Precio unitario */}
                       <div className="flex justify-between items-center">
-                        <div className="flex items-center text-gray-700">
-                          <svg className="w-4 h-4 mr-2 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <div className="flex items-center text-gray-600">
+                          <svg
+                            className="w-4 h-4 mr-2 text-teal-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            ></path>
                           </svg>
-                          {t('precioUnitario', 'Precio unitario')}
+                          {t("precioUnitario", "Precio unitario")}
                         </div>
-                        <span className="font-medium text-teal-700 bg-teal-50 px-3 py-1 rounded-full">
-                          ${Number(paqueteInfo.precio).toLocaleString('es-CO')} COP
+                        <span className="text-teal-700">
+                          ${Number(paqueteInfo.precio).toLocaleString("es-CO")} COP
                         </span>
                       </div>
+
+                      {/* Cantidad de personas */}
                       <div className="flex justify-between items-center">
-                        <div className="flex items-center text-gray-700">
-                          <svg className="w-4 h-4 mr-2 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        <div className="flex items-center text-gray-600">
+                          <svg
+                            className="w-4 h-4 mr-2 text-teal-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                            ></path>
                           </svg>
-                          {t('cantidadPersonas', 'Cantidad de personas')}
+                          {t("cantidadPersonas", "Cantidad de personas")}
                         </div>
-                        <span className="font-medium text-teal-700 bg-teal-50 px-3 py-1 rounded-full">{formData.cantidadPersonas}</span>
+                        <span className="text-teal-700">
+                          {formData.cantidadPersonas}
+                        </span>
                       </div>
+
+                      {/* Subtotal de reserva */}
                       <div className="flex justify-between items-center mt-2 pt-2 border-t border-dashed border-teal-100">
-                        <div className="flex items-center text-gray-800 font-medium">
-                          <svg className="w-4 h-4 mr-2 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                        <div className="flex items-center text-gray-700 font-medium">
+                          <svg
+                            className="w-4 h-4 mr-2 text-teal-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M5 13l4 4L19 7"
+                            ></path>
                           </svg>
-                          {t('subtotalReserva', 'Subtotal reserva')}
+                          {t("subtotalReserva", "Subtotal reserva")}
                         </div>
-                        <span className="font-semibold text-teal-800 bg-teal-100 px-3 py-1 rounded-md">
-                          ${(formData.cantidadPersonas * Number(paqueteInfo.precio)).toLocaleString('es-CO')} COP
+                        <span className="font-semibold text-teal-700 bg-teal-50 px-3 py-1 rounded">
+                          ${(formData.cantidadPersonas * Number(paqueteInfo.precio)).toLocaleString("es-CO")} COP
                         </span>
                       </div>
                     </div>
                   </div>
-                  
-                  {/* Sección 2: Servicios Adicionales */}
+
+                  {/* Servicios adicionales */}
                   {serviciosAdicionales.length > 0 && (
-                    <div className="py-5">
-                      <div className="flex items-center mb-4">
-                        <div className="bg-teal-100 p-2 rounded-full mr-3">
-                          <svg className="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    <div className="mb-5">
+                      <div className="flex items-center mb-3">
+                        <div className="text-teal-600 mr-2">
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M13 10V3L4 14h7v7l9-11h-7z"
+                            ></path>
                           </svg>
                         </div>
-                        <h4 className="text-lg font-semibold text-gray-800">{t('serviciosAdicionales', 'Servicios adicionales')}</h4>
+                        <span className="text-teal-600 font-medium">
+                          {t("serviciosAdicionales", "Servicios adicionales")}
+                        </span>
                       </div>
-                      
-                      <div className="space-y-2 pl-11">
+
+                      <div className="pl-7 space-y-2">
                         {serviciosAdicionales.map((item, index) => (
-                          <div key={index} className="flex justify-between items-center py-1.5 border-b border-dashed border-teal-50 last:border-0">
-                            <div className="flex items-center text-gray-700">
-                              <svg className="w-4 h-4 mr-2 text-teal-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                          <div
+                            key={`servicio-${index}`}
+                            className="flex justify-between items-center"
+                          >
+                            <div className="flex items-center text-gray-600">
+                              <svg
+                                className="w-4 h-4 mr-2 text-teal-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                ></path>
                               </svg>
-                              <span className="truncate">{item.servicio.nombre} x {item.cantidad}</span>
+                              {item.servicio.nombre} x {item.cantidad}
                             </div>
-                            <span className="font-medium text-teal-700">${parseInt(item.servicio.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                            <span className="text-teal-700">
+                              ${parseInt(item.servicio.precio * item.cantidad).toLocaleString("es-CO")}
+                            </span>
                           </div>
                         ))}
-                        
+
+                        {/* Subtotal servicios */}
                         <div className="flex justify-between items-center mt-2 pt-2 border-t border-dashed border-teal-100">
-                          <div className="flex items-center text-gray-800 font-medium">
-                            <svg className="w-4 h-4 mr-2 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                          <div className="flex items-center text-gray-700 font-medium">
+                            <svg
+                              className="w-4 h-4 mr-2 text-teal-600"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M5 13l4 4L19 7"
+                              ></path>
                             </svg>
-                            {t('subtotalServicios', 'Subtotal servicios')}
+                            {t("subtotalServicios", "Subtotal servicios")}
                           </div>
-                          <span className="font-semibold text-teal-800 bg-teal-100 px-3 py-1 rounded-md">
-                            ${serviciosAdicionales.reduce((total, item) => 
-                              total + (item.servicio.precio * item.cantidad), 0).toLocaleString('es-CO')} COP
+                          <span className="font-semibold text-teal-700 bg-teal-50 px-3 py-1 rounded">
+                            ${serviciosAdicionales
+                              .reduce(
+                                (total, item) => total + item.servicio.precio * item.cantidad,
+                                0
+                              )
+                              .toLocaleString("es-CO")} COP
                           </span>
                         </div>
                       </div>
                     </div>
                   )}
-                  
-                  {/* Sección 3: Total General */}
-                  <div className="pt-5">
-                    <div className="bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg p-4 shadow-sm">
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center">
-                          <svg className="w-6 h-6 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                          </svg>
-                          <span className="text-white font-bold text-lg">{t('totalGeneral', 'Total general')}:</span>
-                        </div>
-                        <div className="bg-white text-teal-800 font-bold text-xl px-4 py-1.5 rounded-lg shadow-sm">
-                          ${calcularTotalReserva().toLocaleString('es-CO')} COP
-                        </div>
-                      </div>
+
+                  {/* Total general */}
+                  <div className="bg-teal-600 rounded p-3 flex justify-between items-center">
+                    <div className="flex items-center">
+                      <svg
+                        className="w-5 h-5 mr-2 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        ></path>
+                      </svg>
+                      <span className="text-white font-bold">
+                        {t("totalGeneral", "Total general")}:
+                      </span>
+                    </div>
+                    <div className="bg-white text-teal-800 font-bold px-3 py-1 rounded">
+                      ${calcularTotalReserva().toLocaleString("es-CO")} COP
                     </div>
                   </div>
                 </div>
               </div>
             )}
 
+            {/* Información importante */}
+            <div className="mt-6">
+              <div className="flex items-center mb-3">
+                <svg
+                  className="w-5 h-5 mr-2 text-teal-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+                <h3 className="font-semibold text-gray-800">
+                  {t("informacionImportante", "Información importante")}:
+                </h3>
+              </div>
+              <ul className="pl-7 space-y-2">
+                <li className="flex items-start text-gray-600">
+                  <svg
+                    className="w-4 h-4 mt-1 mr-2 text-teal-500 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                  </svg>
+                  {t("notaCapacidad", "La reserva está sujeta a disponibilidad.")}
+                </li>
+                <li className="flex items-start text-gray-600">
+                  <svg
+                    className="w-4 h-4 mt-1 mr-2 text-teal-500 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                  </svg>
+                  {t("notaGuia", "Se te asignará un guía experimentado para tu aventura.")}
+                </li>
+                <li className="flex items-start text-gray-600">
+                  <svg
+                    className="w-4 h-4 mt-1 mr-2 text-teal-500 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                  </svg>
+                  {t("notaEquipo", "Recomendamos llevar ropa cómoda, protector solar y agua.")}
+                </li>
+              </ul>
+            </div>
+
             {/* Botones de acción */}
-            <div className="mt-8">
+            <div className="mt-8 flex space-x-3 justify-end">
+              <button
+                type="button"
+                onClick={() => navigate(`/PaquetesTuristicos/${idPaquete}`)}
+                className="group px-5 py-2.5 rounded-lg text-teal-700 bg-white border border-teal-300 hover:bg-teal-50 hover:border-teal-500 transition-all duration-200 shadow-sm flex items-center justify-center font-medium"
+              >
+                <svg
+                  className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform duration-200"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                  ></path>
+                </svg>
+                {t("cancelar", "Cancelar")}
+              </button>
+
               <button
                 type="submit"
                 disabled={cargando}
-                className={`w-full py-4 rounded-xl ${
-                  cargando 
-                    ? 'bg-gray-300 cursor-not-allowed' 
-                    : 'bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white'
-                } font-medium transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center`}
+                className={`group px-5 py-2.5 rounded-lg text-white font-medium shadow-sm transition-all duration-200 flex items-center justify-center
+                  ${
+                    !formData.fechaInicio || !formData.fechaFin
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-teal-600 hover:bg-teal-700 hover:shadow"
+                  }`}
               >
                 {cargando ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
-                    {t('procesando', 'Procesando...')}
+                    {t("procesando", "Procesando...")}
                   </>
                 ) : (
                   <>
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                    {t("continuarReserva", "Continuar con la reserva")}
+                    <svg
+                      className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-200"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M14 5l7 7m0 0l-7 7m7-7H3"
+                      ></path>
                     </svg>
-                    {t('continuar', 'Continuar')}
                   </>
                 )}
               </button>
             </div>
           </form>
-        </div>
-
-        {/* Nota importante */}
-        <div className="mt-6 text-sm text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-200">
-          <h3 className="font-semibold mb-2">{t('informacionImportante', 'Información importante')}:</h3>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>{t('notaCapacidad', 'La reserva está sujeta a disponibilidad.')}</li>
-            <li>{t('notaGuia', 'Se te asignará un guía experimentado para tu aventura.')}</li>
-            <li>{t('notaEquipo', 'Recomendamos llevar ropa cómoda, protector solar y agua.')}</li>
-            
-          </ul>
         </div>
       </div>
     </section>
