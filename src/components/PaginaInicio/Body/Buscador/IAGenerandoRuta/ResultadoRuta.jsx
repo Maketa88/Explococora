@@ -382,9 +382,7 @@ export const ResultadoRuta = ({ resultadoIA, consulta }) => {
     }
 
     // Si no hay fotos disponibles, mostrar la imagen de respaldo
-    console.log(
-      `No hay fotos disponibles para ruta ${ruta.idRuta}, usando imagen de respaldo`
-    );
+
     return imagenesRespaldoPorDificultad[ruta.dificultad];
   };
 

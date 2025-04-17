@@ -1,15 +1,14 @@
-import axios from 'axios';
-import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import axios from "axios";
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate } from "react-router-dom";
 import AmericanExpress from "../../assets/Images/american.png";
 import BannerPago from "../../assets/Images/banner.png";
 import Diners from "../../assets/Images/dinner.png";
 import Master from "../../assets/Images/Master.png";
 import Pago from "../../assets/Images/Pago.png";
 import Visa from "../../assets/Images/Visa.png";
-import DetalleServiciosAdicionales from "./DetalleServiciosAdicionales";
-import { PaisajeFondo } from '../UI/PaisajeFondo';
+import { PaisajeFondo } from "../UI/PaisajeFondo";
 
 export const VistaPagoSimulado = () => {
   const { t } = useTranslation();
@@ -17,66 +16,69 @@ export const VistaPagoSimulado = () => {
   const location = useLocation();
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
-  const [metodoPago, setMetodoPago] = useState('tarjeta'); // Nuevo estado para el método de pago
-  
+  const [metodoPago, setMetodoPago] = useState("tarjeta"); // Nuevo estado para el método de pago
+
   // Generar un número de pago fijo para evitar problemas de renderizado
-  const [numeroPago] = useState('184841580058');
-  
+  const [numeroPago] = useState("184841580058");
+
   // Estado para los campos simulados del formulario de pago
   const [formPago, setFormPago] = useState({
-    numeroTarjeta: '',
-    nombreTitular: '',
-    mesExpiracion: '',
-    anioExpiracion: '',
-    codigoSeguridad: '',
-    cuotas: '1'
+    numeroTarjeta: "",
+    nombreTitular: "",
+    mesExpiracion: "",
+    anioExpiracion: "",
+    codigoSeguridad: "",
+    cuotas: "1",
   });
 
   // Estado para los campos de pago en efectivo
   const [formEfectivo, setFormEfectivo] = useState({
-    nombres: '',
-    apellidos: '',
-    cedula: ''
+    nombres: "",
+    apellidos: "",
+    cedula: "",
   });
-  
+
   // Obtener los datos de la reserva pasados por navigate
-  const { radicado, rutaInfo, serviciosAdicionales = [] } = location.state || {};
-  
+  const {
+    radicado,
+    rutaInfo,
+    serviciosAdicionales = [],
+  } = location.state || {};
+
   // Agregar log para depuración
-  console.log("DATOS EN PAGO SIMULADO:", { rutaInfo, serviciosAdicionales });
-  
+
   // Si no hay radicado, redirigir a la página principal
   if (!radicado && !location.state) {
     // Evitar un ciclo de redirección infinito
     useEffect(() => {
-      navigate('/VistaCliente');
+      navigate("/VistaCliente");
     }, []);
-    
+
     return <div className="p-8 text-center">Redirigiendo...</div>;
   }
 
   // Función para manejar cambios en el formulario simulado
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Validación específica para número de tarjeta (solo números y máximo 16 dígitos)
-    if (name === 'numeroTarjeta') {
-      const soloNumeros = value.replace(/\D/g, '');
+    if (name === "numeroTarjeta") {
+      const soloNumeros = value.replace(/\D/g, "");
       if (soloNumeros.length <= 16) {
         setFormPago({ ...formPago, [name]: soloNumeros });
       }
       return;
     }
-    
+
     // Validación para código de seguridad (solo números y máximo 4 dígitos)
-    if (name === 'codigoSeguridad') {
-      const soloNumeros = value.replace(/\D/g, '');
+    if (name === "codigoSeguridad") {
+      const soloNumeros = value.replace(/\D/g, "");
       if (soloNumeros.length <= 4) {
         setFormPago({ ...formPago, [name]: soloNumeros });
       }
       return;
     }
-    
+
     // Para el resto de campos, actualizar normalmente
     setFormPago({ ...formPago, [name]: value });
   };
@@ -84,14 +86,14 @@ export const VistaPagoSimulado = () => {
   // Función para manejar cambios en el formulario de efectivo
   const handleChangeEfectivo = (e) => {
     const { name, value } = e.target;
-    
+
     // Validación para cédula (solo números)
-    if (name === 'cedula') {
-      const soloNumeros = value.replace(/\D/g, '');
+    if (name === "cedula") {
+      const soloNumeros = value.replace(/\D/g, "");
       setFormEfectivo({ ...formEfectivo, [name]: soloNumeros });
       return;
     }
-    
+
     // Para el resto de campos, actualizar normalmente
     setFormEfectivo({ ...formEfectivo, [name]: value });
   };
@@ -104,10 +106,14 @@ export const VistaPagoSimulado = () => {
 
   // Calcular el total, incluyendo servicios adicionales
   const calcularTotal = () => {
-    const precioBase = rutaInfo?.precio * (rutaInfo?.cantidadPersonas || 1) || 0;
-    const precioServicios = serviciosAdicionales?.reduce((total, item) => 
-      total + (item.servicio.precio * item.cantidad), 0) || 0;
-    
+    const precioBase =
+      rutaInfo?.precio * (rutaInfo?.cantidadPersonas || 1) || 0;
+    const precioServicios =
+      serviciosAdicionales?.reduce(
+        (total, item) => total + item.servicio.precio * item.cantidad,
+        0
+      ) || 0;
+
     return precioBase + precioServicios;
   };
 
@@ -116,61 +122,60 @@ export const VistaPagoSimulado = () => {
     try {
       setCargando(true);
       setError(null);
-      
-      const token = localStorage.getItem('token');
-      
+
+      const token = localStorage.getItem("token");
+
       if (!token) {
-        throw new Error(t('noAutenticado', 'No estás autenticado'));
+        throw new Error(t("noAutenticado", "No estás autenticado"));
       }
-      
+
       // CORREGIR: Asegurarse de que el radicado esté limpio sin caracteres adicionales
-      const radicadoLimpio = radicado ? radicado.split(':')[0] : '';
-      
-      console.log('Enviando petición con radicado:', radicadoLimpio);
-      
+      const radicadoLimpio = radicado ? radicado.split(":")[0] : "";
+
       // Llamar a endpoint de simulación con el radicado limpio
-      const response = await axios.get(`http://localhost:10101/pagos-rutas/simular/${radicadoLimpio}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+      const response = await axios.get(
+        `http://localhost:10101/pagos-rutas/simular/${radicadoLimpio}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
-      
-      console.log('Respuesta de simulación:', response.data);
-      
+      );
+
       if (response.data && response.data.success) {
-        console.log(`Simulación exitosa. ID de pago: ${response.data.idPago}`);
-        
         // Mensaje personalizado según método de pago
-        let mensajeExtra = metodoPago === 'efectivo' 
-          ? 'Pago en efectivo registrado correctamente'
-          : 'Pago con tarjeta procesado correctamente';
-        
-        console.log(mensajeExtra);
-        
+        let mensajeExtra =
+          metodoPago === "efectivo"
+            ? "Pago en efectivo registrado correctamente"
+            : "Pago con tarjeta procesado correctamente";
+
+        mensajeExtra;
+
         // Obtener información del guía desde localStorage
         let guiaAsignado = null;
         try {
-          const reservaPendiente = localStorage.getItem('reserva_pendiente');
+          const reservaPendiente = localStorage.getItem("reserva_pendiente");
           if (reservaPendiente) {
             const datos = JSON.parse(reservaPendiente);
             guiaAsignado = datos.guiaAsignado || null;
-            
+
             // Limpiar espacios en blanco en el nombre del guía si existe
-            if (guiaAsignado && typeof guiaAsignado === 'object' && guiaAsignado.nombre) {
+            if (
+              guiaAsignado &&
+              typeof guiaAsignado === "object" &&
+              guiaAsignado.nombre
+            ) {
               guiaAsignado.nombre = guiaAsignado.nombre.trim();
             }
-            
-            console.log('Guía asignado para el pago:', guiaAsignado);
           }
         } catch (error) {
-          console.error('Error al obtener guía del localStorage:', error);
+          console.error("Error al obtener guía del localStorage:", error);
         }
-        
+
         // Imprimir los servicios adicionales para depuración
-        console.log('Servicios adicionales antes de navegar:', serviciosAdicionales);
-        
+
         // Redireccionar a página de confirmación asegurando que se envíen los servicios
-        navigate('/VistaCliente/reserva/confirmacion', {
+        navigate("/VistaCliente/reserva/confirmacion", {
           state: {
             pagoSimulado: true,
             radicado: radicadoLimpio, // Usar el radicado limpio
@@ -180,17 +185,22 @@ export const VistaPagoSimulado = () => {
             rutaInfo: rutaInfo,
             serviciosAdicionales: serviciosAdicionales, // Asegurar que se envían los servicios
             // Agregar datos de contacto cuando el método de pago es efectivo
-            ...(metodoPago === 'efectivo' && {
+            ...(metodoPago === "efectivo" && {
               datosContacto: {
                 nombres: formEfectivo.nombres,
                 apellidos: formEfectivo.apellidos,
-                cedula: formEfectivo.cedula
-              }
-            })
-          }
+                cedula: formEfectivo.cedula,
+              },
+            }),
+          },
         });
       } else {
-        throw new Error(t('errorSimulacion', 'Error en la simulación del pago: Respuesta inválida del servidor'));
+        throw new Error(
+          t(
+            "errorSimulacion",
+            "Error en la simulación del pago: Respuesta inválida del servidor"
+          )
+        );
       }
     } catch (error) {
       // ... existing code ...
@@ -205,28 +215,29 @@ export const VistaPagoSimulado = () => {
   };
 
   // Verificar si todos los campos requeridos están completos
-  const camposCompletos = metodoPago === 'tarjeta'
-    ? (formPago.numeroTarjeta.length === 16 && 
-       formPago.nombreTitular.trim() !== '' && 
-       formPago.mesExpiracion !== '' &&
-       formPago.anioExpiracion !== '' &&
-       formPago.codigoSeguridad.length >= 3)
-    : (formEfectivo.nombres.trim() !== '' &&
-       formEfectivo.apellidos.trim() !== '' &&
-       formEfectivo.cedula.length >= 5);
+  const camposCompletos =
+    metodoPago === "tarjeta"
+      ? formPago.numeroTarjeta.length === 16 &&
+        formPago.nombreTitular.trim() !== "" &&
+        formPago.mesExpiracion !== "" &&
+        formPago.anioExpiracion !== "" &&
+        formPago.codigoSeguridad.length >= 3
+      : formEfectivo.nombres.trim() !== "" &&
+        formEfectivo.apellidos.trim() !== "" &&
+        formEfectivo.cedula.length >= 5;
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ position: "relative" }}>
       <PaisajeFondo />
       <div className="max-w-4xl mx-auto px-4 py-6">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Encabezado con banner - solo visible para pago con tarjeta */}
-          {metodoPago === 'tarjeta' && (
+          {metodoPago === "tarjeta" && (
             <div className="w-full flex justify-center items-center py-4 bg-blue-100">
               <div className="max-w-xs">
-                <img 
-                  src={BannerPago} 
-                  alt="Banner de pago" 
+                <img
+                  src={BannerPago}
+                  alt="Banner de pago"
                   className="h-20 object-contain mx-auto"
                 />
               </div>
@@ -241,30 +252,30 @@ export const VistaPagoSimulado = () => {
                 {/* Selector de método de pago */}
                 <div className="mb-6">
                   <h2 className="text-xl font-bold text-gray-800 mb-4">
-                    {t('metodoPago', 'Método de pago')}
+                    {t("metodoPago", "Método de pago")}
                   </h2>
                   <div className="flex space-x-4">
                     <button
                       type="button"
-                      onClick={() => cambiarMetodoPago('tarjeta')}
+                      onClick={() => cambiarMetodoPago("tarjeta")}
                       className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
-                        metodoPago === 'tarjeta' 
-                          ? 'border-blue-500 bg-blue-50 text-blue-700' 
-                          : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                        metodoPago === "tarjeta"
+                          ? "border-blue-500 bg-blue-50 text-blue-700"
+                          : "border-gray-300 text-gray-700 hover:bg-gray-50"
                       }`}
                     >
-                      {t('tarjeta', 'Tarjeta')}
+                      {t("tarjeta", "Tarjeta")}
                     </button>
                     <button
                       type="button"
-                      onClick={() => cambiarMetodoPago('efectivo')}
+                      onClick={() => cambiarMetodoPago("efectivo")}
                       className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
-                        metodoPago === 'efectivo' 
-                          ? 'border-green-500 bg-green-50 text-green-700' 
-                          : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                        metodoPago === "efectivo"
+                          ? "border-green-500 bg-green-50 text-green-700"
+                          : "border-gray-300 text-gray-700 hover:bg-gray-50"
                       }`}
                     >
-                      {t('efectivo', 'Efectivo')}
+                      {t("efectivo", "Efectivo")}
                     </button>
                   </div>
                 </div>
@@ -274,8 +285,18 @@ export const VistaPagoSimulado = () => {
                   <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
                     <div className="flex">
                       <div className="flex-shrink-0">
-                        <svg className="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        <svg
+                          className="h-5 w-5 text-red-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                          />
                         </svg>
                       </div>
                       <div className="ml-3">
@@ -285,32 +306,48 @@ export const VistaPagoSimulado = () => {
                   </div>
                 )}
 
-                {metodoPago === 'tarjeta' ? (
+                {metodoPago === "tarjeta" ? (
                   <>
                     <h2 className="text-xl font-bold text-gray-800 mb-4">
-                      {t('pagoConTarjeta', 'Pago con tarjeta')}
+                      {t("pagoConTarjeta", "Pago con tarjeta")}
                     </h2>
 
                     {/* Tipos de tarjetas */}
                     <div className="flex mb-6 space-x-6 items-center justify-center">
                       {/* Visa */}
                       <div className="bg-white p-3  w-28 h-20 flex items-center justify-center">
-                        <img src={Visa} alt="Visa" className="max-w-full max-h-full object-contain" />
+                        <img
+                          src={Visa}
+                          alt="Visa"
+                          className="max-w-full max-h-full object-contain"
+                        />
                       </div>
-                      
+
                       {/* Mastercard */}
                       <div className="bg-white p-3  w-28 h-20 flex items-center justify-center">
-                        <img src={Master} alt="Mastercard" className="max-w-full max-h-full object-contain" />
+                        <img
+                          src={Master}
+                          alt="Mastercard"
+                          className="max-w-full max-h-full object-contain"
+                        />
                       </div>
-                      
+
                       {/* American Express */}
                       <div className="bg-white p-3  w-28 h-20 flex items-center justify-center">
-                        <img src={AmericanExpress} alt="American Express" className="max-w-full max-h-full object-contain" />
+                        <img
+                          src={AmericanExpress}
+                          alt="American Express"
+                          className="max-w-full max-h-full object-contain"
+                        />
                       </div>
-                      
+
                       {/* Diners Club */}
                       <div className="bg-white p-3  w-28 h-20 flex items-center justify-center">
-                        <img src={Diners} alt="Diners Club" className="max-w-full max-h-full object-contain" />
+                        <img
+                          src={Diners}
+                          alt="Diners Club"
+                          className="max-w-full max-h-full object-contain"
+                        />
                       </div>
                     </div>
 
@@ -318,7 +355,7 @@ export const VistaPagoSimulado = () => {
                     <form className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t('numeroTarjeta', 'Número de tarjeta')}
+                          {t("numeroTarjeta", "Número de tarjeta")}
                         </label>
                         <input
                           type="text"
@@ -329,10 +366,10 @@ export const VistaPagoSimulado = () => {
                           className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
-                      
+
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t('nombreTitular', 'Nombre y apellido del titular')}
+                          {t("nombreTitular", "Nombre y apellido del titular")}
                         </label>
                         <input
                           type="text"
@@ -343,11 +380,11 @@ export const VistaPagoSimulado = () => {
                           className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
-                      
+
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            {t('fechaExpiracion', 'Fecha de expiración')}
+                            {t("fechaExpiracion", "Fecha de expiración")}
                           </label>
                           <div className="grid grid-cols-2 gap-2">
                             <select
@@ -356,9 +393,9 @@ export const VistaPagoSimulado = () => {
                               onChange={handleChange}
                               className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                             >
-                              <option value="">{t('mes', 'Mes')}</option>
+                              <option value="">{t("mes", "Mes")}</option>
                               {Array.from({ length: 12 }, (_, i) => {
-                                const mes = (i + 1).toString().padStart(2, '0');
+                                const mes = (i + 1).toString().padStart(2, "0");
                                 return (
                                   <option key={mes} value={mes}>
                                     {mes}
@@ -372,9 +409,11 @@ export const VistaPagoSimulado = () => {
                               onChange={handleChange}
                               className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                             >
-                              <option value="">{t('año', 'Año')}</option>
+                              <option value="">{t("año", "Año")}</option>
                               {Array.from({ length: 10 }, (_, i) => {
-                                const anio = (new Date().getFullYear() + i).toString();
+                                const anio = (
+                                  new Date().getFullYear() + i
+                                ).toString();
                                 return (
                                   <option key={anio} value={anio}>
                                     {anio}
@@ -384,10 +423,10 @@ export const VistaPagoSimulado = () => {
                             </select>
                           </div>
                         </div>
-                        
+
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            {t('codigoSeguridad', 'Código de seguridad')}
+                            {t("codigoSeguridad", "Código de seguridad")}
                           </label>
                           <input
                             type="password"
@@ -399,17 +438,17 @@ export const VistaPagoSimulado = () => {
                           />
                         </div>
                       </div>
-                      
+
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t('cuotas', 'Cuotas')}
+                          {t("cuotas", "Cuotas")}
                         </label>
                         <select
                           name="cuotas"
                           value={formPago.cuotas}
                           onChange={handleChange}
                           className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                        > 
+                        >
                           <option value="1">1 cuotas sin interés</option>
                           <option value="2">2 cuotas sin interés</option>
                           <option value="3">3 cuotas sin interés</option>
@@ -422,29 +461,42 @@ export const VistaPagoSimulado = () => {
                 ) : (
                   <>
                     <h2 className="text-xl font-bold text-gray-800 mb-4">
-                      {t('pagoEnEfectivo', 'Pago en efectivo')}
+                      {t("pagoEnEfectivo", "Pago en efectivo")}
                     </h2>
-                    
+
                     <div className="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded">
                       <div className="flex">
                         <div className="flex-shrink-0">
-                          <svg className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          <svg
+                            className="h-5 w-5 text-green-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
                           </svg>
                         </div>
                         <div className="ml-3">
                           <p className="text-sm text-green-700">
-                            {t('mensajeEfectivo', 'Al seleccionar esta opción, podrás pagar en efectivo al momento de tomar la ruta.')}
+                            {t(
+                              "mensajeEfectivo",
+                              "Al seleccionar esta opción, podrás pagar en efectivo al momento de tomar la ruta."
+                            )}
                           </p>
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Formulario de pago en efectivo */}
                     <form className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t('nombres', 'Nombres')}
+                          {t("nombres", "Nombres")}
                         </label>
                         <input
                           type="text"
@@ -455,10 +507,10 @@ export const VistaPagoSimulado = () => {
                           className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
-                      
+
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t('apellidos', 'Apellidos')}
+                          {t("apellidos", "Apellidos")}
                         </label>
                         <input
                           type="text"
@@ -469,10 +521,10 @@ export const VistaPagoSimulado = () => {
                           className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
-                      
+
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t('cedula', 'Cédula')}
+                          {t("cedula", "Cédula")}
                         </label>
                         <input
                           type="text"
@@ -487,48 +539,74 @@ export const VistaPagoSimulado = () => {
                   </>
                 )}
               </div>
-              
+
               {/* Columna derecha: Resumen de compra */}
               <div className="md:w-5/12">
                 <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
                   <h2 className="text-xl font-bold text-gray-800 mb-4">
-                    {t('detallesCompra', 'Detalles de la compra')}
+                    {t("detallesCompra", "Detalles de la compra")}
                   </h2>
-                  
+
                   {/* Información de la ruta */}
                   {rutaInfo && (
                     <div className="mb-4">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-600 font-medium">{t('servicio', 'Servicio')}:</span>
-                        <span className="font-medium text-right">{rutaInfo.nombreRuta}</span>
-                      </div>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-600 font-medium">{t('referencia', 'Referencia')}:</span>
+                        <span className="text-gray-600 font-medium">
+                          {t("servicio", "Servicio")}:
+                        </span>
                         <span className="font-medium text-right">
-                          {rutaInfo.radicado || (
-                            setError('Error: No se encontró un radicado válido para esta reserva. Por favor, contacta a soporte.'),
-                            'Error: Sin radicado'
-                          )}
+                          {rutaInfo.nombreRuta}
                         </span>
                       </div>
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-600 font-medium">{t('numeroPago', 'Número de pago')}:</span>
-                        <span className="font-medium text-right">{numeroPago}</span>
+                        <span className="text-gray-600 font-medium">
+                          {t("referencia", "Referencia")}:
+                        </span>
+                        <span className="font-medium text-right">
+                          {rutaInfo.radicado ||
+                            (setError(
+                              "Error: No se encontró un radicado válido para esta reserva. Por favor, contacta a soporte."
+                            ),
+                            "Error: Sin radicado")}
+                        </span>
                       </div>
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-600 font-medium">{t('personas', 'Personas')}:</span>
-                        <span className="font-medium text-right">{rutaInfo.cantidadPersonas || 1}</span>
+                        <span className="text-gray-600 font-medium">
+                          {t("numeroPago", "Número de pago")}:
+                        </span>
+                        <span className="font-medium text-right">
+                          {numeroPago}
+                        </span>
                       </div>
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-600 font-medium">{t('precioUnitario', 'Precio unitario')}:</span>
-                        <span className="font-medium text-right">${(rutaInfo.precio || 0).toLocaleString('es-CO')} COP</span>
+                        <span className="text-gray-600 font-medium">
+                          {t("personas", "Personas")}:
+                        </span>
+                        <span className="font-medium text-right">
+                          {rutaInfo.cantidadPersonas || 1}
+                        </span>
                       </div>
-                      
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-gray-600 font-medium">
+                          {t("precioUnitario", "Precio unitario")}:
+                        </span>
+                        <span className="font-medium text-right">
+                          ${(rutaInfo.precio || 0).toLocaleString("es-CO")} COP
+                        </span>
+                      </div>
+
                       {/* Subtotal de la ruta (Precio unitario × Cantidad de personas) */}
                       <div className="flex justify-between items-center py-2 border-t border-dashed border-gray-200">
-                        <span className="text-gray-700 font-medium">{t('subtotalRuta', 'Subtotal ruta')}:</span>
+                        <span className="text-gray-700 font-medium">
+                          {t("subtotalRuta", "Subtotal ruta")}:
+                        </span>
                         <span className="font-semibold text-gray-800 text-right">
-                          ${((rutaInfo.precio || 0) * (rutaInfo.cantidadPersonas || 1)).toLocaleString('es-CO')} COP
+                          $
+                          {(
+                            (rutaInfo.precio || 0) *
+                            (rutaInfo.cantidadPersonas || 1)
+                          ).toLocaleString("es-CO")}{" "}
+                          COP
                         </span>
                       </div>
                     </div>
@@ -542,36 +620,56 @@ export const VistaPagoSimulado = () => {
                     <>
                       <div className="my-4">
                         <h3 className="font-medium text-gray-800 mb-3">
-                          {t('serviciosAdicionales', 'Servicios adicionales')}:
+                          {t("serviciosAdicionales", "Servicios adicionales")}:
                         </h3>
                         <div className="space-y-2">
                           {serviciosAdicionales.map((item, index) => (
-                            <div key={index} className="flex items-center py-1.5">
+                            <div
+                              key={index}
+                              className="flex items-center py-1.5"
+                            >
                               {/* Nombre del servicio con cantidad */}
                               <div className="flex-1 min-w-0 pr-2">
                                 <span className="text-gray-700 block truncate">
-                                  {item.servicio.nombre} <span className="text-gray-500">x {item.cantidad}</span>
+                                  {item.servicio.nombre}{" "}
+                                  <span className="text-gray-500">
+                                    x {item.cantidad}
+                                  </span>
                                 </span>
                               </div>
-                              
+
                               {/* Precio con moneda - usando nowrap para mantenerlos juntos */}
                               <div className="flex-shrink-0 whitespace-nowrap">
                                 <span className="font-medium text-right">
-                                  ${(item.servicio.precio * item.cantidad).toLocaleString('es-CO')} COP
+                                  $
+                                  {(
+                                    item.servicio.precio * item.cantidad
+                                  ).toLocaleString("es-CO")}{" "}
+                                  COP
                                 </span>
                               </div>
                             </div>
                           ))}
-                          
+
                           {/* Subtotal de servicios adicionales */}
                           <div className="flex items-center py-2 border-t border-dashed border-gray-200 mt-2">
                             <div className="flex-1">
-                              <span className="text-gray-700 font-medium">{t('subtotalServicios', 'Subtotal servicios')}:</span>
+                              <span className="text-gray-700 font-medium">
+                                {t("subtotalServicios", "Subtotal servicios")}:
+                              </span>
                             </div>
                             <div className="flex-shrink-0 whitespace-nowrap">
                               <span className="font-semibold text-gray-800">
-                                ${serviciosAdicionales.reduce((total, item) => 
-                                  total + (item.servicio.precio * item.cantidad), 0).toLocaleString('es-CO')} COP
+                                $
+                                {serviciosAdicionales
+                                  .reduce(
+                                    (total, item) =>
+                                      total +
+                                      item.servicio.precio * item.cantidad,
+                                    0
+                                  )
+                                  .toLocaleString("es-CO")}{" "}
+                                COP
                               </span>
                             </div>
                           </div>
@@ -582,8 +680,12 @@ export const VistaPagoSimulado = () => {
 
                   {/* Total */}
                   <div className="flex justify-between items-center py-3 border-t border-gray-300 mt-2 font-bold text-lg">
-                    <span className="text-gray-800">{t('total', 'Total')}:</span>
-                    <span className="text-teal-700 text-right">${calcularTotal().toLocaleString('es-CO')} COP</span>
+                    <span className="text-gray-800">
+                      {t("total", "Total")}:
+                    </span>
+                    <span className="text-teal-700 text-right">
+                      ${calcularTotal().toLocaleString("es-CO")} COP
+                    </span>
                   </div>
 
                   {/* Botones de acción */}
@@ -593,30 +695,46 @@ export const VistaPagoSimulado = () => {
                       disabled={cargando || !camposCompletos}
                       className={`w-full py-3 rounded-lg ${
                         cargando || !camposCompletos
-                          ? 'bg-gray-300 cursor-not-allowed' 
-                          : metodoPago === 'efectivo'
-                            ? 'bg-teal-600 hover:bg-teal-700 text-white'
-                            : 'bg-teal-600 hover:bg-teal-700 text-white'
+                          ? "bg-gray-300 cursor-not-allowed"
+                          : metodoPago === "efectivo"
+                          ? "bg-teal-600 hover:bg-teal-700 text-white"
+                          : "bg-teal-600 hover:bg-teal-700 text-white"
                       } font-medium transition-all duration-300 flex items-center justify-center`}
                     >
                       {cargando ? (
                         <>
-                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          <svg
+                            className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
                           </svg>
-                          {t('procesando', 'Procesando...')}
+                          {t("procesando", "Procesando...")}
                         </>
-                      ) : metodoPago === 'efectivo' ? (
-                        t('confirmarPagoEfectivo', 'Pagar con pago en efectivo')
+                      ) : metodoPago === "efectivo" ? (
+                        t("confirmarPagoEfectivo", "Pagar con pago en efectivo")
                       ) : (
                         <>
-                          <img 
-                            src={Pago} 
-                            alt="Mercado Pago" 
+                          <img
+                            src={Pago}
+                            alt="Mercado Pago"
                             className="h-8 w-8 mr-4"
                           />
-                          {t('confirmarPago', 'Pagar con Mercado Pago')}
+                          {t("confirmarPago", "Pagar con Mercado Pago")}
                         </>
                       )}
                     </button>
@@ -626,7 +744,7 @@ export const VistaPagoSimulado = () => {
                       disabled={cargando}
                       className="w-full py-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium transition-all duration-300"
                     >
-                      {t('cancelar', 'Cancelar')}
+                      {t("cancelar", "Cancelar")}
                     </button>
                   </div>
                 </div>
@@ -639,4 +757,4 @@ export const VistaPagoSimulado = () => {
   );
 };
 
-export default VistaPagoSimulado; 
+export default VistaPagoSimulado;
