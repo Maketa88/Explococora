@@ -9,7 +9,7 @@ export const AceptacionRiesgosPaquetes = () => {
   const location = useLocation();
   
   // Obtener datos de la reserva desde el estado de navegación
-  const { formData, paqueteInfo, idPaquete } = location.state || {};
+  const { formData, paqueteInfo, idPaquete, serviciosAdicionales = [] } = location.state || {};
   
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
   const [error, setError] = useState(null);
@@ -32,7 +32,8 @@ export const AceptacionRiesgosPaquetes = () => {
       state: {
         formData,
         paqueteInfo,
-        idPaquete
+        idPaquete,
+        serviciosAdicionales
       }
     });
   };
@@ -42,7 +43,8 @@ export const AceptacionRiesgosPaquetes = () => {
       state: { 
         formData, 
         paqueteInfo, 
-        idPaquete 
+        idPaquete,
+        serviciosAdicionales 
       } 
     });
   };

@@ -11,8 +11,11 @@ export const RecomendacionesVestimentaPaquete = () => {
   const location = useLocation();
   
   // Obtener datos de la reserva desde el estado de navegación
-  const { formData, paqueteInfo, idPaquete, radicado } = location.state || {};
+  const { formData, paqueteInfo, idPaquete, radicado, serviciosAdicionales = [] } = location.state || {};
   
+  // Añadir log para depuración
+  console.log("Servicios adicionales en RecomendacionesVestimenta:", serviciosAdicionales);
+
   const [aceptaRecomendaciones, setAceptaRecomendaciones] = useState(false);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
@@ -33,8 +36,13 @@ export const RecomendacionesVestimentaPaquete = () => {
           descripcion: paqueteInfo.descripcion,
           precio: paqueteInfo.precio,
           cantidadPersonas: formData.cantidadPersonas,
-          fechaInicio: formData.fechaInicioISO
-        }
+          fechaInicio: formData.fechaInicioISO,
+          fechaFin: formData.fechaFinISO,
+          horaInicio: formData.horaInicio,
+          fechaReserva: formData.fechaReservaMySQL
+        },
+        idPaquete,
+        serviciosAdicionales
       }
     });
   };
@@ -69,7 +77,15 @@ export const RecomendacionesVestimentaPaquete = () => {
         return;
       }
 
-      // Realizar la petición para crear el pago del paquete
+      // Asegurarnos de que serviciosAdicionales tenga el formato correcto
+      const serviciosFormateados = serviciosAdicionales.map(item => ({
+        idServicio: item.servicio.id || item.servicio.idServicio,
+        cantidad: item.cantidad,
+        precioUnitario: item.servicio.precio
+      }));
+      
+      console.log("Servicios formateados para enviar al backend:", serviciosFormateados);
+      
       const response = await axios.post('http://localhost:10101/pago-paquetes/crear', 
         {
           idPaquete: parseInt(idPaquete),
@@ -78,7 +94,8 @@ export const RecomendacionesVestimentaPaquete = () => {
           fechaFin: formData.fechaFinISO,
           horaInicio: formData.horaInicio,
           fechaReserva: formData.fechaReservaMySQL,
-          estado: 'pendiente'
+          estado: 'pendiente',
+          serviciosAdicionales: serviciosFormateados // Usar el formato correcto para el backend
         },
         {
           headers: {
@@ -114,7 +131,8 @@ export const RecomendacionesVestimentaPaquete = () => {
           radicado: response.data.radicado,
           fechaCreacion: formData.fechaReservaMySQL,
           fechaInicio: formData.fechaInicioISO,
-          guiaAsignado: guiaAsignadoInfo
+          guiaAsignado: guiaAsignadoInfo,
+          serviciosAdicionales: Array.isArray(serviciosAdicionales) ? serviciosAdicionales : []
         }));
         
         // Redirigir directamente a la página de pago
@@ -136,7 +154,8 @@ export const RecomendacionesVestimentaPaquete = () => {
         formData, 
         paqueteInfo, 
         idPaquete, 
-        radicado 
+        radicado,
+        serviciosAdicionales
       }
     });
   };

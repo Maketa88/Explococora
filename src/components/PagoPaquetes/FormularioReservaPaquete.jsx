@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { combinarFechaHoraISO, generarTimestampMySQL } from '../../utils/formatUtils';
+import ServiciosAdicionalesPaquete from './ServiciosAdicionalesPaquete';
+import DetalleServiciosAdicionalesPaquete from './DetalleServiciosAdicionalesPaquete';
 
 export const FormularioReservaPaquete = () => {
   const { t } = useTranslation();
@@ -48,6 +50,18 @@ export const FormularioReservaPaquete = () => {
   // Estado para el mes y año actual de cada calendario
   const [inicioViewDate, setInicioViewDate] = useState(new Date());
   const [finViewDate, setFinViewDate] = useState(new Date());
+  
+  // Añadir estado para servicios adicionales
+  const [serviciosAdicionales, setServiciosAdicionales] = useState([]);
+  
+  // Añadir función para calcular el total
+  const calcularTotalReserva = () => {
+    const subtotalPaquete = formData.cantidadPersonas * Number(paqueteInfo?.precio || 0);
+    const subtotalServicios = serviciosAdicionales.reduce((total, item) => 
+      total + (item.servicio.precio * item.cantidad), 0);
+    
+    return subtotalPaquete + subtotalServicios;
+  };
   
   // Funciones para generar días del calendario
   const getDiasCalendario = (fecha) => {
@@ -255,7 +269,17 @@ export const FormularioReservaPaquete = () => {
     setIsHoraDropdownOpen(false);
   };
 
-  // Manejar envío del formulario
+  // Función para manejar cuando se agrega un servicio adicional
+  const handleServicioAdicionalAgregado = (servicio) => {
+    setServiciosAdicionales(prevServicios => [...prevServicios, servicio]);
+  };
+
+  // Función para manejar cuando se elimina un servicio adicional
+  const handleServicioAdicionalEliminado = (index) => {
+    setServiciosAdicionales(prevServicios => prevServicios.filter((_, i) => i !== index));
+  };
+
+  // Modificar el handleSubmit para incluir los serviciosAdicionales
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -284,8 +308,9 @@ export const FormularioReservaPaquete = () => {
     // Generar el timestamp actual para la fecha de reserva
     const fechaReservaMySQL = generarTimestampMySQL();
     
-    // En lugar de hacer la petición directamente, primero redirigir a la pantalla de autorización
-    // con todos los datos necesarios para procesar la reserva después
+    console.log("Servicios adicionales a enviar:", serviciosAdicionales);
+    
+    // Navegar a la siguiente página con todos los datos
     navigate('/VistaCliente/reserva/autorizacion-menores-paquete', {
       state: {
         formData: {
@@ -295,7 +320,8 @@ export const FormularioReservaPaquete = () => {
           fechaReservaMySQL
         },
         paqueteInfo,
-        idPaquete
+        idPaquete,
+        serviciosAdicionales
       }
     });
   };
@@ -308,6 +334,31 @@ export const FormularioReservaPaquete = () => {
       </div>
     );
   }
+
+  const handleContinuar = (e) => {
+    e.preventDefault();
+    
+    if (!formData.fechaInicio || !formData.fechaFin) {
+      setError(t('fechasRequeridas', 'Por favor selecciona las fechas de tu reserva'));
+      return;
+    }
+    
+    // Obtener servicios adicionales del componente hijo
+    const serviciosParaEnviar = serviciosAdicionales;
+    
+    // Log para depuración
+    console.log("Servicios adicionales seleccionados:", serviciosParaEnviar);
+    
+    // Navegar al siguiente paso
+    navigate('/VistaCliente/reserva-paquete/autorizacion-menores', {
+      state: {
+        formData,
+        paqueteInfo,
+        idPaquete,
+        serviciosAdicionales
+      }
+    });
+  };
 
   return (
     <section className="relative py-16 px-4 overflow-hidden">
@@ -804,24 +855,136 @@ export const FormularioReservaPaquete = () => {
               </div>
             </div>
 
-            {/* Resumen de la reserva */}
+            {/* Agregar el componente de servicios adicionales aquí */}
+            <ServiciosAdicionalesPaquete 
+              onServiciosChange={setServiciosAdicionales}
+              cantidadPersonas={formData.cantidadPersonas}
+            />
+            
+            {/* Resumen de reserva en el estilo exacto de FormularioReservaRuta */}
             {formData.cantidadPersonas > 0 && paqueteInfo?.precio && (
-              <div className="mt-8 p-4 bg-teal-50 rounded-lg border border-teal-100">
-                <h3 className="text-lg font-semibold text-teal-800 mb-2">{t('resumenReserva', 'Resumen de la reserva')}</h3>
-                
-                <div className="space-y-2 mb-3">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">{t('precioUnitario', 'Precio unitario')}:</span>
-                    <span className="font-medium">${Number(paqueteInfo.precio).toLocaleString('es-CO')} COP</span>
+              <div className="bg-white rounded-xl shadow-sm border border-teal-100 overflow-hidden mt-8">
+                {/* Cabecera */}
+                <div className="bg-teal-600 px-6 py-4 relative">
+                  <div className="flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    <h3 className="text-xl font-bold text-white">{t('resumenReserva', 'Resumen de la reserva')}</h3>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">{t('cantidadPersonas', 'Cantidad de personas')}:</span>
-                    <span className="font-medium">{formData.cantidadPersonas}</span>
+                  <div className="absolute bottom-0 right-0 w-24 h-24 opacity-10">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M3 3V21H21V3H3Z" fill="white" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M3 9H21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M9 21V9" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
                   </div>
-                  <div className="border-t border-teal-200 my-2"></div>
-                  <div className="flex justify-between text-lg font-bold">
-                    <span className="text-teal-800">{t('total', 'Total')}:</span>
-                    <span className="text-teal-800">${(formData.cantidadPersonas * Number(paqueteInfo.precio)).toLocaleString('es-CO')} COP</span>
+                </div>
+
+                {/* Contenido */}
+                <div className="p-6 divide-y divide-teal-100">
+                  {/* Sección 1: Detalles del Paquete */}
+                  <div className="pb-5">
+                    <div className="flex items-center mb-4">
+                      <div className="bg-teal-100 p-2 rounded-full mr-3">
+                        <svg className="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                        </svg>
+                      </div>
+                      <h4 className="text-lg font-semibold text-gray-800">{t('detallesPaquete', 'Detalles del paquete')}</h4>
+                    </div>
+                    
+                    <div className="space-y-3 pl-11">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center text-gray-700">
+                          <svg className="w-4 h-4 mr-2 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                          </svg>
+                          {t('precioUnitario', 'Precio unitario')}
+                        </div>
+                        <span className="font-medium text-teal-700 bg-teal-50 px-3 py-1 rounded-full">
+                          ${Number(paqueteInfo.precio).toLocaleString('es-CO')} COP
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center text-gray-700">
+                          <svg className="w-4 h-4 mr-2 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                          </svg>
+                          {t('cantidadPersonas', 'Cantidad de personas')}
+                        </div>
+                        <span className="font-medium text-teal-700 bg-teal-50 px-3 py-1 rounded-full">{formData.cantidadPersonas}</span>
+                      </div>
+                      <div className="flex justify-between items-center mt-2 pt-2 border-t border-dashed border-teal-100">
+                        <div className="flex items-center text-gray-800 font-medium">
+                          <svg className="w-4 h-4 mr-2 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                          </svg>
+                          {t('subtotalReserva', 'Subtotal reserva')}
+                        </div>
+                        <span className="font-semibold text-teal-800 bg-teal-100 px-3 py-1 rounded-md">
+                          ${(formData.cantidadPersonas * Number(paqueteInfo.precio)).toLocaleString('es-CO')} COP
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Sección 2: Servicios Adicionales */}
+                  {serviciosAdicionales.length > 0 && (
+                    <div className="py-5">
+                      <div className="flex items-center mb-4">
+                        <div className="bg-teal-100 p-2 rounded-full mr-3">
+                          <svg className="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                          </svg>
+                        </div>
+                        <h4 className="text-lg font-semibold text-gray-800">{t('serviciosAdicionales', 'Servicios adicionales')}</h4>
+                      </div>
+                      
+                      <div className="space-y-2 pl-11">
+                        {serviciosAdicionales.map((item, index) => (
+                          <div key={index} className="flex justify-between items-center py-1.5 border-b border-dashed border-teal-50 last:border-0">
+                            <div className="flex items-center text-gray-700">
+                              <svg className="w-4 h-4 mr-2 text-teal-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                              </svg>
+                              <span className="truncate">{item.servicio.nombre} x {item.cantidad}</span>
+                            </div>
+                            <span className="font-medium text-teal-700">${parseInt(item.servicio.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                          </div>
+                        ))}
+                        
+                        <div className="flex justify-between items-center mt-2 pt-2 border-t border-dashed border-teal-100">
+                          <div className="flex items-center text-gray-800 font-medium">
+                            <svg className="w-4 h-4 mr-2 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            {t('subtotalServicios', 'Subtotal servicios')}
+                          </div>
+                          <span className="font-semibold text-teal-800 bg-teal-100 px-3 py-1 rounded-md">
+                            ${serviciosAdicionales.reduce((total, item) => 
+                              total + (item.servicio.precio * item.cantidad), 0).toLocaleString('es-CO')} COP
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Sección 3: Total General */}
+                  <div className="pt-5">
+                    <div className="bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg p-4 shadow-sm">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center">
+                          <svg className="w-6 h-6 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                          </svg>
+                          <span className="text-white font-bold text-lg">{t('totalGeneral', 'Total general')}:</span>
+                        </div>
+                        <div className="bg-white text-teal-800 font-bold text-xl px-4 py-1.5 rounded-lg shadow-sm">
+                          ${calcularTotalReserva().toLocaleString('es-CO')} COP
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

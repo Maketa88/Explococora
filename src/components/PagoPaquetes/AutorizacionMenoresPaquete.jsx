@@ -32,12 +32,16 @@ export const AutorizacionMenoresPaquetes = () => {
       return;
     }
 
+    // Obtener serviciosAdicionales del estado actual o inicializar como array vacío
+    const serviciosAdicionales = location.state?.serviciosAdicionales || [];
+
     // Redirigir al componente de aceptación de riesgos
     navigate("/VistaCliente/reserva/aceptacion-riesgos-paquete", {
       state: {
         formData,
         paqueteInfo,
         idPaquete,
+        serviciosAdicionales // Incluir serviciosAdicionales en el state
       },
     });
   };
