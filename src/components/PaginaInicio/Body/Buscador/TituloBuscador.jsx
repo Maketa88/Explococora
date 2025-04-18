@@ -70,9 +70,22 @@ export const TituloBuscador = ({ onSearch }) => {
           <h3
             className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-medium tracking-wide"
             style={{
-              color: "white",
-              letterSpacing: "1px",
-              textShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+              color: "#ffffff",
+              background: "linear-gradient(to bottom, #ffffff, #ffffff)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              textShadow: `
+                0 0 8px rgba(255,255,255,0.8),
+                0 1px 0 rgba(255,255,255,0.9),
+                0 2px 0 rgba(255,255,255,0.8),
+                0 3px 0 rgba(255,255,255,0.7),
+                0 4px 0 rgba(255,255,255,0.6),
+                0 5px 0 rgba(255,255,255,0.5),
+                0 6px 5px rgba(0,0,0,0.5),
+                0 7px 10px rgba(0,0,0,0.25),
+                0 8px 15px rgba(0,0,0,0.2),
+                0 20px 20px rgba(0,0,0,0.15)
+              `,
             }}
           >
             {t("findRoute", "Encuentra Tu Ruta Perfecta")}

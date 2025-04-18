@@ -25,7 +25,8 @@ const Reservas = () => {
     reservasConfirmadas: 0,
     reservasPendientes: 0,
     reservasPagadas: 0,
-    reservasCompletadas: 0
+    reservasCompletadas: 0,
+    montoTotal: 0
   });
   
   // Estados para paginación
@@ -35,6 +36,11 @@ const Reservas = () => {
 
   // Nuevos estados para manejar los filtros y estadísticas de pagos
   const [estadoPagoFiltro, setEstadoPagoFiltro] = useState('todos');
+  
+  const [serviciosReserva, setServiciosReserva] = useState([]);
+  const [reservaSeleccionada, setReservaSeleccionada] = useState(null);
+  const [loadingServicios, setLoadingServicios] = useState(false);
+  const [modalServiciosAbierto, setModalServiciosAbierto] = useState(false);
   
   useEffect(() => {
     fetchReservas();
@@ -46,8 +52,21 @@ const Reservas = () => {
       const reservasConfirmadas = reservas.filter(r => r.estado === 'confirmada').length;
       const reservasPendientes = reservas.filter(r => r.estado === 'pendiente').length;
       const montoTotal = reservas.reduce((sum, r) => {
-        const precio = r.infoPaquete?.precio || r.infoRuta?.precio || 0;
-        return sum + (precio * (r.cantidadPersonas || 1));
+        // Usar la misma lógica comprehensiva que se usa en la tabla
+        const precio = 
+          r.precio || 
+          r.monto ||
+          r.infoPaquete?.precio || 
+          r.infoRuta?.precio || 
+          (r.infoPaquete && r.infoPaquete.precio) || 
+          (r.infoRuta && r.infoRuta.precio) || 
+          0;
+        
+        // Buscar cantidad en todas las ubicaciones posibles
+        const cantidad = r.cantidadPersonas || r.cantidad || 1;
+        
+        // Calcular total
+        return sum + (precio * cantidad);
       }, 0);
       
       setEstadisticas({
@@ -83,7 +102,26 @@ const Reservas = () => {
       const reservasData = response.data.result || [];
       console.log('Datos de reservas procesados:', reservasData);
       
-      setReservas(reservasData);
+      // Ordenar las reservas por ID de mayor a menor
+      const reservasOrdenadas = [...reservasData].sort((a, b) => {
+        // Obtener el ID de cada reserva considerando las diferentes propiedades posibles
+        const idA = a.id || a._id || a.idReserva || a.radicado || 0;
+        const idB = b.id || b._id || b.idReserva || b.radicado || 0;
+        
+        // Si los IDs son numéricos, convertirlos a números para la comparación
+        const numA = !isNaN(parseInt(idA)) ? parseInt(idA) : idA;
+        const numB = !isNaN(parseInt(idB)) ? parseInt(idB) : idB;
+        
+        // Orden descendente (de mayor a menor)
+        if (typeof numA === 'number' && typeof numB === 'number') {
+          return numB - numA;
+        } else {
+          // Para IDs no numéricos, usar comparación de strings
+          return String(numB).localeCompare(String(numA));
+        }
+      });
+      
+      setReservas(reservasOrdenadas);
     } catch (err) {
       console.error('Error al obtener reservas:', err);
       setError('Error al cargar las reservas: ' + (err.response?.data?.message || err.message));
@@ -327,14 +365,14 @@ const Reservas = () => {
       });
       
       // Título principal centrado
-      worksheet.mergeCells('A1:M1');
+      worksheet.mergeCells('A1:O1');
       const titleRow = worksheet.getRow(1);
       titleRow.height = 50;
       titleRow.getCell(1).value = 'REPORTE DE RESERVAS TURÍSTICAS';
       titleRow.getCell(1).style = titleStyle;
       
       // Subtítulo con fecha
-      worksheet.mergeCells('A2:M2');
+      worksheet.mergeCells('A2:O2');
       const subtitleRow = worksheet.getRow(2);
       subtitleRow.height = 20;
       subtitleRow.getCell(1).value = `Generado el: ${new Date().toLocaleDateString('es-ES', {
@@ -347,7 +385,7 @@ const Reservas = () => {
       subtitleRow.getCell(1).style = subtitleStyle;
       
       // Línea divisoria verde
-      worksheet.mergeCells('A3:M3');
+      worksheet.mergeCells('A3:O3');
       const dividerRow = worksheet.getRow(3);
       dividerRow.height = 6;
       dividerRow.getCell(1).fill = { 
@@ -357,7 +395,7 @@ const Reservas = () => {
       };
       
       // Encabezado del resumen estadístico
-      worksheet.mergeCells('A4:M4');
+      worksheet.mergeCells('A4:O4');
       const statsHeaderRow = worksheet.getRow(4);
       statsHeaderRow.height = 25;
       statsHeaderRow.getCell(1).value = 'RESUMEN ESTADÍSTICO';
@@ -411,7 +449,7 @@ const Reservas = () => {
       spacerRow.height = 10;
       
       // Encabezado de HISTORIAL DE RESERVAS
-      worksheet.mergeCells('A8:M8');
+      worksheet.mergeCells('A8:O8');
       const headerRow = worksheet.getRow(8);  
       headerRow.height = 25;
       headerRow.getCell(1).value = 'HISTORIAL DE RESERVAS';
@@ -431,10 +469,16 @@ const Reservas = () => {
         'Fecha Reserva', 
         'Fecha Inicio', 
         'Fecha Fin', 
-        'ID Pago', 
+        'Monto', 
         'Guía', 
-        'Hora Inicio'
+        'Hora Inicio',
+        'Servicios Adicionales',
+        '' // Añadir celda extra para extender Servicios Adicionales
       ];
+      
+      // Mergear la celda de Servicios Adicionales para que ocupe 2 columnas
+      worksheet.mergeCells('N9:O9');
+      
       columnHeaderRow.eachCell((cell) => {
         cell.style = headerStyle;
       });
@@ -455,11 +499,7 @@ const Reservas = () => {
         
         // Asegúrate de obtener el ID de forma correcta, verificando todas las posibles ubicaciones
         // Modifica esta línea para buscar el ID en diferentes propiedades posibles
-        row.getCell(1).value = reserva.id || reserva._id || 
-                              (reserva._id && reserva._id.$oid) || 
-                              reserva.idReserva || 
-                              reserva.reservaId || 
-                              'N/A';
+        row.getCell(1).value = reserva.id || reserva._id || reserva.idReserva || reserva.radicado || `SIN-ID-${index}`;
         
         // Asegúrate de que el ID se muestre correctamente
         row.getCell(1).alignment = { horizontal: 'right', vertical: 'middle' };
@@ -476,17 +516,35 @@ const Reservas = () => {
         row.getCell(8).value = reserva.fechaReserva ? new Date(reserva.fechaReserva).toLocaleDateString() : 'N/A';
         row.getCell(9).value = reserva.fechaInicio ? new Date(reserva.fechaInicio).toLocaleDateString() : 'N/A';
         row.getCell(10).value = reserva.fechaFin ? new Date(reserva.fechaFin).toLocaleDateString() : 'N/A';
-        const idPago = row.getCell(11);
-        idPago.value = reserva.idPago || 'N/A';
-        idPago.style = {
-          alignment: { horizontal: 'center', vertical: 'middle' },
-          font: { name: 'Calibri', size: 11, color: { argb: '000000' } }
-        };
-        idPago.numFmt = '0';
+        const montoCell = row.getCell(11);
+        montoCell.value = (() => {
+          // Look for price in all possible locations
+          const precio = 
+            reserva.precio || 
+            reserva.monto ||
+            reserva.infoPaquete?.precio || 
+            reserva.infoRuta?.precio || 
+            (reserva.infoPaquete && reserva.infoPaquete.precio) || 
+            (reserva.infoRuta && reserva.infoRuta.precio) || 
+            0;
+          
+          // Look for quantity in all possible locations  
+          const cantidad = reserva.cantidadPersonas || reserva.cantidad || 1;
+          
+          // Calculate total
+          const total = precio * cantidad;
+          
+          return total > 0 ? `$${total.toLocaleString()}` : 'N/A';
+        })();
+        montoCell.style = moneyStyle;
         row.getCell(12).value = reserva.nombre_guia ? 
           (reserva.idGuia ? `${reserva.idGuia} - ${reserva.nombre_guia}` : reserva.nombre_guia) : 
           (reserva.idGuia || 'Sin asignar');
         row.getCell(13).value = reserva.horaInicio || 'N/A';
+        
+        // Mergear las celdas para servicios adicionales en cada fila
+        worksheet.mergeCells(`N${rowIndex-1}:O${rowIndex-1}`);
+        row.getCell(14).value = "Ver en sistema"; // Reemplazando el componente React con texto simple
         
         // Aplicar estilos a las celdas
         row.eachCell((cell) => {
@@ -527,6 +585,54 @@ const Reservas = () => {
     } catch (error) {
       console.error('Error al exportar datos:', error);
       alert('Error al exportar los datos a Excel');
+    }
+  };
+  
+  // Función para obtener servicios adicionales de una reserva
+  const obtenerServiciosAdicionales = async (radicado) => {
+    if (!radicado) {
+      console.error('Error: Se intentó obtener servicios sin proporcionar un radicado');
+      return;
+    }
+    
+    try {
+      setLoadingServicios(true);
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        throw new Error('No se encontró token de autenticación');
+      }
+      
+      console.log(`Consultando servicios para radicado: ${radicado}`);
+      const response = await axios.get(`http://localhost:10101/servicios-adicionales/reserva/${radicado}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      console.log(`Respuesta de servicios para radicado ${radicado}:`, response.data);
+      
+      if (response.data && response.data.success === true) {
+        // Comprobamos si hay servicios y si es un array  
+        if (Array.isArray(response.data.servicios)) {
+          setServiciosReserva(response.data.servicios);
+          console.log(`${response.data.servicios.length} servicios encontrados para radicado ${radicado}:`, response.data.servicios);
+        } else {
+          console.warn(`No se encontraron servicios válidos para radicado ${radicado}`);
+          setServiciosReserva([]);
+        }
+      } else {
+        console.warn(`Respuesta inválida para radicado ${radicado}:`, response.data);
+        setServiciosReserva([]);
+      }
+      
+      setModalServiciosAbierto(true);
+    } catch (err) {
+      console.error(`Error al obtener servicios adicionales para radicado ${radicado}:`, err);
+      setServiciosReserva([]);
+      setModalServiciosAbierto(true);
+    } finally {
+      setLoadingServicios(false);
     }
   };
   
@@ -572,17 +678,15 @@ const Reservas = () => {
           </div>
           
           <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-blue-500">
-            <h3 className="text-gray-500 font-medium mb-2 text-sm uppercase">Pagos</h3>
+            <h3 className="text-gray-500 font-medium mb-2 text-sm uppercase">Monto Total</h3>
             <div className="flex items-center justify-between">
               <p className="text-3xl font-bold text-gray-800">
-                {estadisticas.reservasCompletadas ? 
-                  `${Math.round((estadisticas.reservasPagadas / estadisticas.reservasCompletadas) * 100)}%` : 
-                  '0%'}
+                ${estadisticas.montoTotal ? estadisticas.montoTotal.toLocaleString() : '0'}
               </p>
               <DollarSign className="text-blue-500 h-8 w-8" />
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              {estadisticas.reservasPagadas || 0} de {estadisticas.reservasCompletadas || 0} pagadas
+              Total de todas las reservas
             </p>
           </div>
         </div>
@@ -779,15 +883,16 @@ const Reservas = () => {
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Reserva</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Inicio</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Fin</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pago</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Guía</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hora Inicio</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Servicios Adicionales</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading ? (
                   <tr>
-                    <td colSpan="13" className="px-6 py-8 text-center">
+                    <td colSpan="14" className="px-6 py-8 text-center">
                       <div className="flex flex-col items-center justify-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
                         <span className="mt-4 text-gray-500">Cargando reservas...</span>
@@ -796,9 +901,9 @@ const Reservas = () => {
                   </tr>
                 ) : reservasActuales.length > 0 ? (
                   reservasActuales.map((reserva, index) => (
-                    <tr key={reserva._id || index} className="hover:bg-gray-50 transition-colors">
+                    <tr key={reserva._id || reserva.id || index} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {reserva._id || index + 1}
+                        {reserva.id || reserva._id || reserva.idReserva || reserva.radicado || `SIN-ID-${index}`}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-800">
@@ -848,7 +953,27 @@ const Reservas = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {reserva.fechaFin ? new Date(reserva.fechaFin).toLocaleDateString() : 'N/A'}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{reserva.idPago || 'N/A'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {(() => {
+                          // Look for price in all possible locations
+                          const precio = 
+                            reserva.precio || 
+                            reserva.monto ||
+                            reserva.infoPaquete?.precio || 
+                            reserva.infoRuta?.precio || 
+                            (reserva.infoPaquete && reserva.infoPaquete.precio) || 
+                            (reserva.infoRuta && reserva.infoRuta.precio) || 
+                            0;
+                          
+                          // Look for quantity in all possible locations  
+                          const cantidad = reserva.cantidadPersonas || reserva.cantidad || 1;
+                          
+                          // Calculate total
+                          const total = precio * cantidad;
+                          
+                          return total > 0 ? `$${total.toLocaleString()}` : 'N/A';
+                        })()}
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <div>{reserva.idGuia}</div>
                         <div className="text-xs text-gray-600">
@@ -856,11 +981,23 @@ const Reservas = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{reserva.horaInicio || 'N/A'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                        <button
+                          onClick={() => {
+                            setReservaSeleccionada(reserva);
+                            obtenerServiciosAdicionales(reserva.radicado);
+                          }}
+                          className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded hover:bg-emerald-200 transition-colors"
+                          title="Ver servicios adicionales"
+                        >
+                          Ver servicios
+                        </button>
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="13" className="px-6 py-12 text-center">
+                    <td colSpan="14" className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center">
                         <svg className="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -967,6 +1104,105 @@ const Reservas = () => {
                     </svg>
                   </button>
                 </nav>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Modal de Servicios Adicionales */}
+        {modalServiciosAbierto && reservaSeleccionada && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-3xl max-h-[80vh] overflow-y-auto">
+              <h3 className="text-xl font-bold text-emerald-800 mb-2 flex items-center justify-between">
+                <span>Servicios Adicionales</span>
+                <button
+                  onClick={() => setModalServiciosAbierto(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                  aria-label="Cerrar"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </h3>
+              
+              <div className="bg-emerald-50 p-3 rounded-lg mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <div>
+                    <p className="text-sm text-gray-600">Radicado: <span className="font-semibold text-emerald-700">{reservaSeleccionada.radicado || 'N/A'}</span></p>
+                    <p className="text-sm text-gray-600">Cliente: <span className="font-semibold">{reservaSeleccionada.nombre_cliente || 'N/A'}</span></p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">
+                      Tipo: <span className="font-semibold">
+                        {reservaSeleccionada.infoPaquete ? 'Paquete' : reservaSeleccionada.infoRuta ? 'Ruta' : 'N/A'}
+                      </span>
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Nombre: <span className="font-semibold">
+                        {reservaSeleccionada.infoPaquete?.nombrePaquete || 
+                         (reservaSeleccionada.infoRuta && reservaSeleccionada.infoRuta.nombreRuta) || 'N/A'}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {loadingServicios ? (
+                <div className="flex justify-center items-center py-8">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
+                  <span className="ml-3 text-gray-500">Cargando servicios para radicado {reservaSeleccionada.radicado}...</span>
+                </div>
+              ) : serviciosReserva && serviciosReserva.length > 0 ? (
+                <div className="space-y-4">
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {serviciosReserva.map((servicio, index) => (
+                          <tr key={servicio._id || index} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{servicio.nombre}</td>
+                            <td className="px-6 py-4 text-sm text-gray-500">{servicio.descripcion}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{servicio.categoria}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${servicio.precioUnitario?.toLocaleString() || 'N/A'}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{servicio.cantidad || 1}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  <div className="bg-gray-50 p-4 rounded-lg mt-4">
+                    <p className="text-right font-bold text-lg text-emerald-700">
+                      Total: ${serviciosReserva.reduce((total, servicio) => total + ((servicio.precioUnitario || 0) * (servicio.cantidad || 1)), 0).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <svg className="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 12H4M20 12a8 8 0 01-8 8m8-8a8 8 0 00-8-8m8 8H4"></path>
+                  </svg>
+                  <p className="mt-4 text-lg text-gray-500">No hay servicios adicionales</p>
+                  <p className="text-sm text-gray-400 mt-1">La reserva con radicado <span className="font-medium">{reservaSeleccionada.radicado}</span> no tiene servicios adicionales asociados</p>
+                </div>
+              )}
+              
+              <div className="flex justify-end mt-6">
+                <button
+                  onClick={() => setModalServiciosAbierto(false)}
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                >
+                  Cerrar
+                </button>
               </div>
             </div>
           </div>
