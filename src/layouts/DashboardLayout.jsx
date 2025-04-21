@@ -247,12 +247,6 @@ const DashboardLayout = ({ children }) => {
       section: "Dashboard"
     },
     {
-      title: "Reports",
-      icon: <FileText className="w-5 h-5" />,
-      path: "/VistaOperador/reports",
-      section: "Dashboard"
-    },
-    {
       title: "Rutas",
       icon: <Map className="w-5 h-5" />,
       path: "/VistaOperador/Rutas",

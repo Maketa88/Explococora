@@ -8,7 +8,7 @@
   
   // Configuración
   const SYNC_INTERVAL = 30000; // 30 segundos
-  const API_URL = 'http://localhost:10101';
+  const API_URL = 'https://servicio-explococora.onrender.com';
   
   // Función para sincronizar el estado del operador
   async function sincronizarEstadoOperador() {
