@@ -40,7 +40,7 @@ const RutasAsignadas = () => {
         
         // Si no podemos obtener el ID del token, intentamos con una llamada al API
         if (!idGuiaActual) {
-          const perfilResponse = await axios.get('http://localhost:10101/guia/perfil', {
+          const perfilResponse = await axios.get('https://servicio-explococora.onrender.com/guia/perfil', {
             headers: { Authorization: `Bearer ${token}` }
           });
           idGuiaActual = perfilResponse.data.id || perfilResponse.data.idGuia;
@@ -51,7 +51,7 @@ const RutasAsignadas = () => {
       }
 
       // Endpoint para obtener todas las rutas
-      const response = await axios.get('http://localhost:10101/guia/mi-historial-rutas', {
+      const response = await axios.get('https://servicio-explococora.onrender.com/guia/mi-historial-rutas', {
         headers: {
           Authorization: `Bearer ${token}`
         }

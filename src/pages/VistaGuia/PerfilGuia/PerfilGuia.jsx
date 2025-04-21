@@ -30,7 +30,7 @@ const PerfilGuia = () => {
       return;
     }
 
-    axios.get(`http://localhost:10101/guia/perfil-completo/${cedula}`, {
+    axios.get(`https://servicio-explococora.onrender.com/guia/perfil-completo/${cedula}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -62,9 +62,9 @@ const PerfilGuia = () => {
             // Verificar si la ruta ya incluye /uploads/images
             let fotoUrl;
             if (guiaData.foto_perfil.includes('/uploads/images/')) {
-              fotoUrl = `http://localhost:10101${guiaData.foto_perfil}`;
+              fotoUrl = `https://servicio-explococora.onrender.com${guiaData.foto_perfil}`;
             } else {
-              fotoUrl = `http://localhost:10101/uploads/images/${guiaData.foto_perfil}`;
+              fotoUrl = `https://servicio-explococora.onrender.com/uploads/images/${guiaData.foto_perfil}`;
             }
             
             console.log("URL de foto construida:", fotoUrl);
@@ -84,9 +84,9 @@ const PerfilGuia = () => {
           if (guiaData.foto.startsWith('http')) {
             fotoUrl = guiaData.foto;
           } else if (guiaData.foto.includes('/uploads/images/')) {
-            fotoUrl = `http://localhost:10101${guiaData.foto}`;
+            fotoUrl = `https://servicio-explococora.onrender.com${guiaData.foto}`;
           } else {
-            fotoUrl = `http://localhost:10101/uploads/images/${guiaData.foto}`;
+            fotoUrl = `https://servicio-explococora.onrender.com/uploads/images/${guiaData.foto}`;
           }
           
           console.log("URL de foto construida:", fotoUrl);
@@ -119,7 +119,7 @@ const PerfilGuia = () => {
       });
       
     // Cargar certificados del guía
-    axios.get(`http://localhost:10101/guia/mis-certificados`, {
+    axios.get(`https://servicio-explococora.onrender.com/guia/mis-certificados`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

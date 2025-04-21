@@ -39,7 +39,7 @@ const CambiarContraseñaAdmin = () => {
 
       try {
         const response = await axios.get(
-          'http://localhost:10101/administrador',
+          'https://servicio-explococora.onrender.com/administrador',
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -153,7 +153,7 @@ const CambiarContraseñaAdmin = () => {
 
     try {
       const response = await axios.patch(
-        `http://localhost:10101/administrador/cambiarcontrasenia/${userEmail}`,
+        `https://servicio-explococora.onrender.com/administrador/cambiarcontrasenia/${userEmail}`,
         { 
           contrasenaActual: formData.currentPassword,
           contrasenia: formData.newPassword

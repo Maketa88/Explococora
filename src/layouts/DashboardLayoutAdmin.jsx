@@ -88,7 +88,7 @@ const DashboardLayoutAdmin = ({ children }) => {
         if (cedula && token) {
           
           // Llamar a la API para cambiar estado
-          await axios.patch('http://localhost:10101/usuarios/cambiar-estado', 
+          await axios.patch('https://servicio-explococora.onrender.com/usuarios/cambiar-estado', 
             { nuevoEstado: "disponible", cedula }, 
             {
               headers: {
@@ -158,7 +158,7 @@ const DashboardLayoutAdmin = ({ children }) => {
       
       if (cedula && token) {
         // Optional: fetch the latest photo data from the server
-        axios.get(`http://localhost:10101/admin/perfil-completo/${cedula}`, {
+        axios.get(`https://servicio-explococora.onrender.com/admin/perfil-completo/${cedula}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -172,9 +172,9 @@ const DashboardLayoutAdmin = ({ children }) => {
               if (adminData.foto_perfil.startsWith('http')) {
                 fotoUrl = adminData.foto_perfil;
               } else if (adminData.foto_perfil.includes('/uploads/images/')) {
-                fotoUrl = `http://localhost:10101${adminData.foto_perfil}`;
+                fotoUrl = `https://servicio-explococora.onrender.com${adminData.foto_perfil}`;
               } else {
-                fotoUrl = `http://localhost:10101/uploads/images/${adminData.foto_perfil}`;
+                fotoUrl = `https://servicio-explococora.onrender.com/uploads/images/${adminData.foto_perfil}`;
               }
               
               setPreviewFoto(fotoUrl);
@@ -207,7 +207,7 @@ const DashboardLayoutAdmin = ({ children }) => {
       return;
     }
 
-    axios.get(`http://localhost:10101/admin/perfil-completo/${cedula}`, {
+    axios.get(`https://servicio-explococora.onrender.com/admin/perfil-completo/${cedula}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -230,9 +230,9 @@ const DashboardLayoutAdmin = ({ children }) => {
           else {
             let fotoUrl;
             if (adminData.foto_perfil.includes('/uploads/images/')) {
-              fotoUrl = `http://localhost:10101${adminData.foto_perfil}`;
+              fotoUrl = `https://servicio-explococora.onrender.com${adminData.foto_perfil}`;
             } else {
-              fotoUrl = `http://localhost:10101/uploads/images/${adminData.foto_perfil}`;
+              fotoUrl = `https://servicio-explococora.onrender.com/uploads/images/${adminData.foto_perfil}`;
             }
             
             setPreviewFoto(fotoUrl);
@@ -245,9 +245,9 @@ const DashboardLayoutAdmin = ({ children }) => {
           if (adminData.foto.startsWith('http')) {
             fotoUrl = adminData.foto;
           } else if (adminData.foto.includes('/uploads/images/')) {
-            fotoUrl = `http://localhost:10101${adminData.foto}`;
+            fotoUrl = `https://servicio-explococora.onrender.com${adminData.foto}`;
           } else {
-            fotoUrl = `http://localhost:10101/uploads/images/${adminData.foto}`;
+            fotoUrl = `https://servicio-explococora.onrender.com/uploads/images/${adminData.foto}`;
           }
           
           setPreviewFoto(fotoUrl);
@@ -358,7 +358,7 @@ const DashboardLayoutAdmin = ({ children }) => {
           if (cedula && token) {
             
             // Llamar a la API para cambiar estado antes de cerrar sesión
-            await axios.patch('http://localhost:10101/usuarios/cambiar-estado', 
+            await axios.patch('https://servicio-explococora.onrender.com/usuarios/cambiar-estado', 
               { nuevoEstado: "inactivo", cedula }, 
               {
                 headers: {

@@ -34,7 +34,7 @@ const ActualizarCorreoAdmin = () => {
 
     try {
       const response = await axios.patch(
-        'http://localhost:10101/administrador/cambiar-correo',
+        'https://servicio-explococora.onrender.com/administrador/cambiar-correo',
         { email: formData.email },
         {
           headers: {

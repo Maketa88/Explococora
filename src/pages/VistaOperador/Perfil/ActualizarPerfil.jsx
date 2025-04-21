@@ -86,7 +86,7 @@ const ActualizarPerfil = () => {
       console.log("🔍 Solicitando datos completos del operador...");
       
       const response = await axios.get(
-        `http://localhost:10101/operador-turistico/perfil-completo/${cedula}`, 
+        `https://servicio-explococora.onrender.com/operador-turistico/perfil-completo/${cedula}`, 
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -108,7 +108,7 @@ const ActualizarPerfil = () => {
         // Intentar obtener el teléfono específicamente si existe un endpoint para ello
         try {
           const telefonoResponse = await axios.get(
-            `http://localhost:10101/operador-turistico/telefono/${cedula}`,
+            `https://servicio-explococora.onrender.com/operador-turistico/telefono/${cedula}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -165,9 +165,9 @@ const ActualizarPerfil = () => {
           if (fotoField.startsWith('http')) {
             fotoUrl = fotoField;
           } else if (fotoField.includes('/uploads/images/')) {
-            fotoUrl = `http://localhost:10101${fotoField}`;
+            fotoUrl = `https://servicio-explococora.onrender.com${fotoField}`;
           } else {
-            fotoUrl = `http://localhost:10101/uploads/images/${fotoField}`;
+            fotoUrl = `https://servicio-explococora.onrender.com/uploads/images/${fotoField}`;
           }
           
           console.log("🖼️ URL de foto encontrada:", fotoUrl);
@@ -336,7 +336,7 @@ const ActualizarPerfil = () => {
           fotoFormData.append('foto', foto);
           
           const fotoResponse = await axios.post(
-            `http://localhost:10101/operador-turistico/subir-foto`,
+            `https://servicio-explococora.onrender.com/operador-turistico/subir-foto`,
             fotoFormData,
             {
               headers: {
@@ -374,7 +374,7 @@ const ActualizarPerfil = () => {
       }
       
       // URL correcta según el controlador
-      const url = `http://localhost:10101/operador-turistico/actualizar/${cedula}`;
+      const url = `https://servicio-explococora.onrender.com/operador-turistico/actualizar/${cedula}`;
       
       try {
         // Usar método PATCH según el controlador

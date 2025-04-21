@@ -86,7 +86,7 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
 
   const cambiarEstado = async (nuevoEstado) => {
     try {
-      const url = 'http://localhost:10101/usuarios/cambiar-estado';
+      const url = 'https://servicio-explococora.onrender.com/usuarios/cambiar-estado';
       let data = { nuevoEstado };
       
       // Si es admin cambiando su propio estado

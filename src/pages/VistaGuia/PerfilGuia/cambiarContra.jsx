@@ -132,7 +132,7 @@ const CambiarContraseña = () => {
 
       // Ajustar la URL y el cuerpo según la ruta del backend para guía
       await axios.patch(
-        `http://localhost:10101/guia/cambiar-contrasenia/${formData.cedula}`,
+        `https://servicio-explococora.onrender.com/guia/cambiar-contrasenia/${formData.cedula}`,
         {
           contrasenaActual: formData.contrasenaActual,
           contrasenia: formData.nuevaContrasena

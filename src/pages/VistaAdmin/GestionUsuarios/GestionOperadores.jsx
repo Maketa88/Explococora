@@ -118,7 +118,7 @@ const Operadores = () => {
       const token = localStorage.getItem('token');
       
       // Intentar obtener el estado silenciosamente - sin mostrar errores en consola
-      const response = await axios.get(`http://localhost:10101/usuarios/consultar-estado/cedula/${cedula}`, {
+      const response = await axios.get(`https://servicio-explococora.onrender.com/usuarios/consultar-estado/cedula/${cedula}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         },
@@ -152,7 +152,7 @@ const Operadores = () => {
 
       // Llamada a la API para actualizar el estado
       const response = await axios.patch(
-        `http://localhost:10101/usuarios/cambiar-estado/cedula/${operador.cedula}`,
+        `https://servicio-explococora.onrender.com/usuarios/cambiar-estado/cedula/${operador.cedula}`,
         { 
           estado: nuevoEstado 
         },
@@ -194,7 +194,7 @@ const Operadores = () => {
         return;
       }
       
-      const response = await axios.get('http://localhost:10101/usuarios/listar-estados', {
+      const response = await axios.get('https://servicio-explococora.onrender.com/usuarios/listar-estados', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -280,8 +280,8 @@ const Operadores = () => {
         
         // Lista de posibles endpoints para probar
         const endpoints = [
-          'http://localhost:10101/operador-turistico',
-          'http://localhost:10101/operador-turistico',
+          'https://servicio-explococora.onrender.com/operador-turistico',
+          'https://servicio-explococora.onrender.com/operador-turistico',
         ];
         
         let operadoresData = [];
@@ -363,7 +363,7 @@ const Operadores = () => {
           if (operador.cedula) {
             try {
               // Intentar obtener datos completos del operador
-              const perfilResponse = await axios.get(`http://localhost:10101/operador-turistico/perfil-completo/${operador.cedula}`, {
+              const perfilResponse = await axios.get(`https://servicio-explococora.onrender.com/operador-turistico/perfil-completo/${operador.cedula}`, {
                 headers: {
                   Authorization: `Bearer ${token}`
                 }
@@ -552,7 +552,7 @@ const Operadores = () => {
                   <img
                     src={
                       operador.foto
-                        ? (operador.foto.startsWith('http') ? operador.foto : `http://localhost:10101/uploads/images/${operador.foto}`)
+                        ? (operador.foto.startsWith('http') ? operador.foto : `https://servicio-explococora.onrender.com/uploads/images/${operador.foto}`)
                         : `https://ui-avatars.com/api/?name=${operador.primerNombre ? operador.primerNombre.charAt(0) : ''}${operador.primerApellido ? operador.primerApellido.charAt(0) : ''}&background=0D8ABC&color=fff&size=128`
                     }
                     alt={`Foto de ${operador.primerNombre || ''} ${operador.primerApellido || ''}`}
@@ -930,7 +930,7 @@ const Operadores = () => {
                         <img
                           src={
                             operador.foto
-                              ? (operador.foto.startsWith('http') ? operador.foto : `http://localhost:10101/uploads/images/${operador.foto}`)
+                              ? (operador.foto.startsWith('http') ? operador.foto : `https://servicio-explococora.onrender.com/uploads/images/${operador.foto}`)
                               : "https://i.pinimg.com/736x/8d/37/31/8d3731a57b8209114c08488eeb0b6a64.jpg"
                           }
                           alt={`Foto de ${operador.primerNombre || ''} ${operador.primerApellido || ''}`}

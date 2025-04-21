@@ -44,7 +44,7 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
         setPreviewFoto(
           guia.foto.startsWith('http') 
             ? guia.foto 
-            : `http://localhost:10101/uploads/images/${guia.foto}`
+            : `https://servicio-explococora.onrender.com/uploads/images/${guia.foto}`
         );
       }
     }
@@ -107,7 +107,7 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
       console.log("DATOS QUE SE ENVIARÁN PARA ACTUALIZAR:", datosActualizar);
       
       const response = await axios.patch(
-        `http://localhost:10101/guia/actualizar/${guia.cedula}`,
+        `https://servicio-explococora.onrender.com/guia/actualizar/${guia.cedula}`,
         datosActualizar,
         {
           headers: {
@@ -122,7 +122,7 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
       try {
         console.log("Actualizando teléfono específicamente...");
         const telefonoResponse = await axios.post(
-          `http://localhost:10101/guia/telefono/${guia.cedula}`,
+          `https://servicio-explococora.onrender.com/guia/telefono/${guia.cedula}`,
           { numeroCelular: formData.telefono },
           {
             headers: {
@@ -144,7 +144,7 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
         
         try {
           const fotoResponse = await axios.post(
-            `http://localhost:10101/guia/subir-foto/${guia.cedula}`,
+            `https://servicio-explococora.onrender.com/guia/subir-foto/${guia.cedula}`,
             formDataFoto,
             {
               headers: {

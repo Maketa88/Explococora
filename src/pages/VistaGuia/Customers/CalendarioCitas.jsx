@@ -65,7 +65,7 @@ const VerifiedCustomers = () => {
       }
 
       // Llamada al endpoint para obtener las citas del guía
-      const response = await axios.get('http://localhost:10101/guia/mis-citas', {
+      const response = await axios.get('https://servicio-explococora.onrender.com/guia/mis-citas', {
         headers: {
           Authorization: `Bearer ${token}`
         }

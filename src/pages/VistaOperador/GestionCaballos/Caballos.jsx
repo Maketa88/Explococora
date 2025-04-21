@@ -89,7 +89,7 @@ const Caballos = () => {
         console.error('Error al decodificar token:', e);
       }
       
-      const response = await axios.get('http://localhost:10101/caballo/todos', {
+      const response = await axios.get('https://servicio-explococora.onrender.com/caballo/todos', {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -245,14 +245,14 @@ const Caballos = () => {
       if (caballoSeleccionado) {
         // Actualizar caballo existente
         console.log(`Actualizando caballo con serial: ${formData.serialCaballo}`);
-        const response = await axios.patch(`http://localhost:10101/caballo/${formData.serialCaballo}`, formData, { headers });
+        const response = await axios.patch(`https://servicio-explococora.onrender.com/caballo/${formData.serialCaballo}`, formData, { headers });
         console.log('Respuesta de actualización:', response.data);
         showAlert(`Caballo ${formData.serialCaballo} actualizado con éxito`, 'success');
       } else {
         // Crear nuevo caballo
         console.log(`Creando nuevo caballo con serial: ${formData.serialCaballo}`);
         try {
-          const response = await axios.post('http://localhost:10101/caballo/registrar', formData, { headers });
+          const response = await axios.post('https://servicio-explococora.onrender.com/caballo/registrar', formData, { headers });
           console.log('Respuesta de creación:', response.data);
           showAlert(`Caballo ${formData.serialCaballo} registrado con éxito`, 'success');
         } catch (error) {
@@ -379,7 +379,7 @@ const Caballos = () => {
       }
       
       const serialCaballo = caballo.serialCaballo;
-      const response = await axios.delete(`http://localhost:10101/caballo/${serialCaballo}`, {
+      const response = await axios.delete(`https://servicio-explococora.onrender.com/caballo/${serialCaballo}`, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -443,7 +443,7 @@ const Caballos = () => {
         return;
       }
       
-      const response = await axios.get(`http://localhost:10101/caballo/${serial}`, {
+      const response = await axios.get(`https://servicio-explococora.onrender.com/caballo/${serial}`, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'

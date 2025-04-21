@@ -45,7 +45,7 @@ const PerfilAdmin = () => {
       return;
     }
 
-    axios.get('http://localhost:10101/administrador', {
+    axios.get('https://servicio-explococora.onrender.com/administrador', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -136,7 +136,7 @@ const PerfilAdmin = () => {
 
       // Cambiar contraseña
       const response = await axios.patch(
-        `http://localhost:10101/administrador/cambiarcontrasenia/${email}`,
+        `https://servicio-explococora.onrender.com/administrador/cambiarcontrasenia/${email}`,
         {
           contrasenia: passwordForm.nuevaContrasena,
           contrasenaActual: passwordForm.contrasenaActual
@@ -190,7 +190,7 @@ const PerfilAdmin = () => {
 
     try {
       const response = await axios.patch(
-        'http://localhost:10101/administrador/cambiar-correo',
+        'https://servicio-explococora.onrender.com/administrador/cambiar-correo',
         { email: newEmail },
         {
           headers: {

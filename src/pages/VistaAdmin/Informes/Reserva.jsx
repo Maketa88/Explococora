@@ -91,7 +91,7 @@ const Reservas = () => {
         throw new Error('No se encontró token de autenticación');
       }
       
-      const response = await axios.get('http://localhost:10101/reserva/todas', {
+      const response = await axios.get('https://servicio-explococora.onrender.com/reserva/todas', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -604,7 +604,7 @@ const Reservas = () => {
       }
       
       console.log(`Consultando servicios para radicado: ${radicado}`);
-      const response = await axios.get(`http://localhost:10101/servicios-adicionales/reserva/${radicado}`, {
+      const response = await axios.get(`https://servicio-explococora.onrender.com/servicios-adicionales/reserva/${radicado}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

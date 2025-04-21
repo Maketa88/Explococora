@@ -28,7 +28,7 @@ const PerfilGuia = () => {
         }
         
         // Obtener datos del perfil
-        const perfilResponse = await axios.get(`http://localhost:10101/guia/${cedula}`, {
+        const perfilResponse = await axios.get(`https://servicio-explococora.onrender.com/guia/${cedula}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -38,7 +38,7 @@ const PerfilGuia = () => {
           const perfil = perfilResponse.data.data;
           
           // Consultar estado actual con parámetros de consulta correctos
-          const estadoResponse = await axios.get(`http://localhost:10101/usuarios/consultar-estado/${cedula}`, {
+          const estadoResponse = await axios.get(`https://servicio-explococora.onrender.com/usuarios/consultar-estado/${cedula}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }

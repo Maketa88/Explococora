@@ -48,7 +48,7 @@ const PagoPaquete = () => {
         }
         
         // Usar la ruta para todas las reservas
-        const response = await axios.get('http://localhost:10101/reserva/todas', {
+        const response = await axios.get('https://servicio-explococora.onrender.com/reserva/todas', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -87,7 +87,7 @@ const PagoPaquete = () => {
         }
         
         // Realizar la petición a la API con el token
-        const response = await axios.get('http://localhost:10101/pago-paquetes/historial', {
+        const response = await axios.get('https://servicio-explococora.onrender.com/pago-paquetes/historial', {
           headers: {
             'Authorization': `Bearer ${token}`
           }

@@ -111,7 +111,7 @@ const EliminarCuentaGuia = () => {
 
       // Llamada a la API para eliminar la cuenta
       await axios.delete(
-        `http://localhost:10101/guia/eliminar/${formData.cedula}`,
+        `https://servicio-explococora.onrender.com/guia/eliminar/${formData.cedula}`,
         {
           data: { contrasena: formData.contrasena },
           headers: {

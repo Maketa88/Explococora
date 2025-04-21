@@ -57,7 +57,7 @@ const ActualizarPaquetes = ({ onClose, onUpdated, paquete, rutasDisponibles }) =
   // Función para obtener las fotos del paquete
   const obtenerFotosPaquete = async () => {
     try {
-      const response = await axios.get(`http://localhost:10101/paquete/fotos-publicas/${paquete.idPaquete}`);
+      const response = await axios.get(`https://servicio-explococora.onrender.com/paquete/fotos-publicas/${paquete.idPaquete}`);
       console.log('Fotos obtenidas:', response.data);
       
       // Extraer los datos de las fotos según la estructura de la respuesta
@@ -84,7 +84,7 @@ const ActualizarPaquetes = ({ onClose, onUpdated, paquete, rutasDisponibles }) =
           } else if (foto.url) {
             imageUrl = foto.url;
           } else if (foto.ruta) {
-            imageUrl = `http://localhost:10101${foto.ruta}`;
+            imageUrl = `https://servicio-explococora.onrender.com${foto.ruta}`;
           } else {
             // URL de fallback si no hay ninguna ruta válida
             imageUrl = '';
@@ -111,7 +111,7 @@ const ActualizarPaquetes = ({ onClose, onUpdated, paquete, rutasDisponibles }) =
       console.log('Obteniendo rutas para el paquete:', paquete.idPaquete);
       
       // Intentar obtener el paquete directamente por ID
-      const response = await axios.get(`http://localhost:10101/paquete/obtener-paquete/${paquete.idPaquete}`);
+      const response = await axios.get(`https://servicio-explococora.onrender.com/paquete/obtener-paquete/${paquete.idPaquete}`);
       console.log('Respuesta de obtener-paquete:', response.data);
       
       // Verificar si la respuesta es un array
@@ -207,7 +207,7 @@ const ActualizarPaquetes = ({ onClose, onUpdated, paquete, rutasDisponibles }) =
     try {
       // Eliminar cada imagen marcada usando la API
       const promesasEliminacion = imagenesParaEliminar.map(imagen => 
-        axios.delete(`http://localhost:10101/paquete/foto/${imagen.id}`, {
+        axios.delete(`https://servicio-explococora.onrender.com/paquete/foto/${imagen.id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -255,7 +255,7 @@ const ActualizarPaquetes = ({ onClose, onUpdated, paquete, rutasDisponibles }) =
       nuevasImagenes.forEach(img => formData.append('fotos', img));
       
       await axios.post(
-        `http://localhost:10101/paquete/subir-fotos/${idPaquete}`,
+        `https://servicio-explococora.onrender.com/paquete/subir-fotos/${idPaquete}`,
         formData,
         {
           headers: {
@@ -306,7 +306,7 @@ const ActualizarPaquetes = ({ onClose, onUpdated, paquete, rutasDisponibles }) =
       
       // Enviar solicitud al servidor con JSON
       const response = await axios.patch(
-        `http://localhost:10101/paquete/actualizar/${paquete.idPaquete}`,
+        `https://servicio-explococora.onrender.com/paquete/actualizar/${paquete.idPaquete}`,
         datosActualizados,
         {
           headers: {

@@ -72,7 +72,7 @@ const Guias = () => {
       const token = localStorage.getItem('token');
       
       // Ruta corregida según tu configuración de API
-      const response = await axios.get(`http://localhost:10101/usuarios/consultar-estado/cedula/${cedula}`, {
+      const response = await axios.get(`https://servicio-explococora.onrender.com/usuarios/consultar-estado/cedula/${cedula}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -198,7 +198,7 @@ const Guias = () => {
 
       const cedula = guiaAEliminar.cedula;
       
-      const response = await axios.delete(`http://localhost:10101/guia/eliminar/${cedula}`, {
+      const response = await axios.delete(`https://servicio-explococora.onrender.com/guia/eliminar/${cedula}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -240,7 +240,7 @@ const Guias = () => {
       
       // Luego cargamos los datos completos
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:10101/guia/perfil-completo/${guia.cedula}`, {
+      const response = await axios.get(`https://servicio-explococora.onrender.com/guia/perfil-completo/${guia.cedula}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -291,9 +291,9 @@ const Guias = () => {
       
       // Lista de posibles endpoints para probar
       const endpoints = [
-        'http://localhost:10101/guia/todos',
-        'http://localhost:10101/guias/todos',
-        'http://localhost:10101/operador-turistico/guias'
+        'https://servicio-explococora.onrender.com/guia/todos',
+        'https://servicio-explococora.onrender.com/guias/todos',
+        'https://servicio-explococora.onrender.com/operador-turistico/guias'
       ];
       
       let guiasData = [];
@@ -334,7 +334,7 @@ const Guias = () => {
           
           // Intentar obtener perfil completo para cada guía
           try {
-            const perfilResponse = await axios.get(`http://localhost:10101/guia/perfil-completo/${guia.cedula}`, {
+            const perfilResponse = await axios.get(`https://servicio-explococora.onrender.com/guia/perfil-completo/${guia.cedula}`, {
               headers: {
                 Authorization: `Bearer ${token}`
               }
@@ -423,7 +423,7 @@ const Guias = () => {
       
       // Realizar la actualización principal como en EditarGuia.jsx
       const response = await axios.patch(
-        `http://localhost:10101/guia/actualizar/${guiaDetalle.cedula}`,
+        `https://servicio-explococora.onrender.com/guia/actualizar/${guiaDetalle.cedula}`,
         datosActualizar,
         {
           headers: {
@@ -438,7 +438,7 @@ const Guias = () => {
       try {
         console.log("Actualizando teléfono específicamente...");
         const telefonoResponse = await axios.post(
-          `http://localhost:10101/guia/telefono/${guiaDetalle.cedula}`,
+          `https://servicio-explococora.onrender.com/guia/telefono/${guiaDetalle.cedula}`,
           { numeroCelular: formData.telefono },
           {
             headers: {
@@ -735,7 +735,7 @@ const Guias = () => {
                       {/* Imagen sin efectos de transformación */}
                       {guia.foto ? (
                         <img 
-                          src={guia.foto.startsWith('http') ? guia.foto : `http://localhost:10101/uploads/images/${guia.foto}`} 
+                          src={guia.foto.startsWith('http') ? guia.foto : `https://servicio-explococora.onrender.com/uploads/images/${guia.foto}`} 
                           alt={construirNombreCompleto(guia)}
                           className="w-full h-full object-cover"
                           onError={(e) => {
@@ -859,7 +859,7 @@ const Guias = () => {
                   <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-emerald-500 mb-4">
                     {guiaDetalle.foto ? (
                       <img 
-                        src={guiaDetalle.foto.startsWith('http') ? guiaDetalle.foto : `http://localhost:10101/uploads/images/${guiaDetalle.foto}`} 
+                        src={guiaDetalle.foto.startsWith('http') ? guiaDetalle.foto : `https://servicio-explococora.onrender.com/uploads/images/${guiaDetalle.foto}`} 
                         alt={construirNombreCompleto(guiaDetalle)}
                         className="w-full h-full object-cover"
                         onError={(e) => {
@@ -984,7 +984,7 @@ const Guias = () => {
               <div className="relative">
                 {guiaAEliminar.foto ? (
                   <img 
-                    src={guiaAEliminar.foto.startsWith('http') ? guiaAEliminar.foto : `http://localhost:10101/uploads/images/${guiaAEliminar.foto}`} 
+                    src={guiaAEliminar.foto.startsWith('http') ? guiaAEliminar.foto : `https://servicio-explococora.onrender.com/uploads/images/${guiaAEliminar.foto}`} 
                     alt={construirNombreCompleto(guiaAEliminar)}
                     className="w-20 h-20 rounded-full object-cover border-2 border-red-500 shadow-lg"
                     onError={(e) => {
@@ -1095,7 +1095,7 @@ const Guias = () => {
                     <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-white shadow-md">
                       {guiaDetalle.foto ? (
                         <img 
-                          src={guiaDetalle.foto.startsWith('http') ? guiaDetalle.foto : `http://localhost:10101/uploads/images/${guiaDetalle.foto}`} 
+                          src={guiaDetalle.foto.startsWith('http') ? guiaDetalle.foto : `https://servicio-explococora.onrender.com/uploads/images/${guiaDetalle.foto}`} 
                           alt={construirNombreCompleto(guiaDetalle)}
                           className="w-full h-full object-cover"
                           onError={(e) => {

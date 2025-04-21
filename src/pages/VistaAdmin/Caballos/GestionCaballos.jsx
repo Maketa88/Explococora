@@ -47,7 +47,7 @@ const GestionCaballos = () => {
         console.error('Error al decodificar token:', e);
       }
       
-      const response = await axios.get('http://localhost:10101/caballo/todos', {
+      const response = await axios.get('https://servicio-explococora.onrender.com/caballo/todos', {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -129,11 +129,11 @@ const GestionCaballos = () => {
       
       if (caballoSeleccionado) {
         // Actualizar caballo existente
-        await axios.patch(`http://localhost:10101/caballo/${formData.serialCaballo}`, formData, { headers });
+        await axios.patch(`https://servicio-explococora.onrender.com/caballo/${formData.serialCaballo}`, formData, { headers });
         alert('Caballo actualizado con éxito');
       } else {
         // Crear nuevo caballo
-        await axios.post('http://localhost:10101/caballo/registrar', formData, { headers });
+        await axios.post('https://servicio-explococora.onrender.com/caballo/registrar', formData, { headers });
         alert('Caballo registrado con éxito');
       }
       
@@ -159,7 +159,7 @@ const GestionCaballos = () => {
     setCargando(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:10101/caballo/${caballoSeleccionado.serialCaballo}`, {
+      await axios.delete(`https://servicio-explococora.onrender.com/caballo/${caballoSeleccionado.serialCaballo}`, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -182,7 +182,7 @@ const GestionCaballos = () => {
     setCargando(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:10101/caballo/${serial}`, {
+      const response = await axios.get(`https://servicio-explococora.onrender.com/caballo/${serial}`, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'

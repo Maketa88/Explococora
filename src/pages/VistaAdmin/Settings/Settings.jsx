@@ -14,7 +14,7 @@ const Configuracion = () => {
       
       if (cedula && token) {
         // Llamar a la API para cambiar estado antes de cerrar sesión
-        await axios.patch('http://localhost:10101/usuarios/cambiar-estado', 
+        await axios.patch('https://servicio-explococora.onrender.com/usuarios/cambiar-estado', 
           { nuevoEstado: "inactivo", cedula }, 
           {
             headers: {

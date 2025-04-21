@@ -61,7 +61,7 @@ const EstadoOperador = () => {
       setSincronizando(true);
       
       const response = await axios.get(
-        `http://localhost:10101/usuarios/consultar-estado/${cedulaOperador}`,
+        `https://servicio-explococora.onrender.com/usuarios/consultar-estado/${cedulaOperador}`,
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
       
@@ -115,7 +115,7 @@ const EstadoOperador = () => {
       setSincronizando(true);
       
       await axios.patch(
-        'http://localhost:10101/usuarios/cambiar-estado',
+        'https://servicio-explococora.onrender.com/usuarios/cambiar-estado',
         {
           cedula: cedulaOperador,
           nuevoEstado: nuevoEstado

@@ -92,7 +92,7 @@ const EditarOperador = ({ operador, onClose, onOperadorUpdated }) => {
         setPreviewFoto(
           operador.foto.startsWith('http') 
             ? operador.foto 
-            : `http://localhost:10101/uploads/images/${operador.foto}`
+            : `https://servicio-explococora.onrender.com/uploads/images/${operador.foto}`
         );
       } else {
         // Configurar avatar predeterminado si no hay foto
@@ -161,7 +161,7 @@ const EditarOperador = ({ operador, onClose, onOperadorUpdated }) => {
       
       try {
         const response = await axios.patch(
-          `http://localhost:10101/operador-turistico/actualizar/${operador.cedula}`,
+          `https://servicio-explococora.onrender.com/operador-turistico/actualizar/${operador.cedula}`,
           datosActualizar,
           {
             headers: {

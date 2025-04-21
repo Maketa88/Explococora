@@ -42,7 +42,7 @@ const VisualizarRutas = () => {
   const fetchRutas = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:10101/rutas');
+      const response = await axios.get('https://servicio-explococora.onrender.com/rutas');
       console.log("API Response:", response.data);
 
       if (Array.isArray(response.data)) {
@@ -86,7 +86,7 @@ const VisualizarRutas = () => {
       
       // INTENTO 1: Endpoint fotos
       try {
-        const response = await axios.get(`http://localhost:10101/rutas/fotos-publicas/${idRuta}`);
+        const response = await axios.get(`https://servicio-explococora.onrender.com/rutas/fotos-publicas/${idRuta}`);
         
         console.log('Respuesta de endpoint fotos:', response.data);
         
@@ -128,7 +128,7 @@ const VisualizarRutas = () => {
       if (fotosArray.length === 0) {
         try {
           console.log(`Intentando obtener directamente la ruta ${idRuta} con sus fotos...`);
-          const rutaResponse = await axios.get(`http://localhost:10101/rutas/${idRuta}`);
+          const rutaResponse = await axios.get(`https://servicio-explococora.onrender.com/rutas/${idRuta}`);
           
           if (rutaResponse.data && rutaResponse.data.fotos) {
             if (Array.isArray(rutaResponse.data.fotos)) {

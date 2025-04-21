@@ -85,7 +85,7 @@ const DashboardLayoutGuia = ({ children }) => {
       
       if (!token) return;
       
-      const response = await axios.get('http://localhost:10101/guia/mi-historial-rutas', {
+      const response = await axios.get('https://servicio-explococora.onrender.com/guia/mi-historial-rutas', {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -214,7 +214,7 @@ const DashboardLayoutGuia = ({ children }) => {
           // Solo si no hay estado guardado o es la primera sesión, establecer a disponible
           if (!estadoGuardado || estadoGuardado === 'disponible') {
             // Llamar a la API para cambiar estado
-            await axios.patch('http://localhost:10101/usuarios/cambiar-estado', 
+            await axios.patch('https://servicio-explococora.onrender.com/usuarios/cambiar-estado', 
               { nuevoEstado: "disponible", cedula }, 
               {
                 headers: {
@@ -229,7 +229,7 @@ const DashboardLayoutGuia = ({ children }) => {
           } else {
             // Si hay un estado guardado, verificar con el servidor y sincronizar
             try {
-              await axios.patch('http://localhost:10101/usuarios/cambiar-estado', 
+              await axios.patch('https://servicio-explococora.onrender.com/usuarios/cambiar-estado', 
                 { nuevoEstado: estadoGuardado, cedula }, 
                 {
                   headers: {
@@ -299,7 +299,7 @@ const DashboardLayoutGuia = ({ children }) => {
       
       if (cedula && token) {
         // Optional: fetch the latest photo data from the server
-        axios.get(`http://localhost:10101/guia/perfil-completo/${cedula}`, {
+        axios.get(`https://servicio-explococora.onrender.com/guia/perfil-completo/${cedula}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -313,9 +313,9 @@ const DashboardLayoutGuia = ({ children }) => {
               if (guiaData.foto_perfil.startsWith('http')) {
                 fotoUrl = guiaData.foto_perfil;
               } else if (guiaData.foto_perfil.includes('/uploads/images/')) {
-                fotoUrl = `http://localhost:10101${guiaData.foto_perfil}`;
+                fotoUrl = `https://servicio-explococora.onrender.com${guiaData.foto_perfil}`;
               } else {
-                fotoUrl = `http://localhost:10101/uploads/images/${guiaData.foto_perfil}`;
+                fotoUrl = `https://servicio-explococora.onrender.com/uploads/images/${guiaData.foto_perfil}`;
               }
               
               setPreviewFoto(fotoUrl);
@@ -348,7 +348,7 @@ const DashboardLayoutGuia = ({ children }) => {
       return;
     }
 
-    axios.get(`http://localhost:10101/guia/perfil-completo/${cedula}`, {
+    axios.get(`https://servicio-explococora.onrender.com/guia/perfil-completo/${cedula}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -371,9 +371,9 @@ const DashboardLayoutGuia = ({ children }) => {
           else {
             let fotoUrl;
             if (guiaData.foto_perfil.includes('/uploads/images/')) {
-              fotoUrl = `http://localhost:10101${guiaData.foto_perfil}`;
+              fotoUrl = `https://servicio-explococora.onrender.com${guiaData.foto_perfil}`;
             } else {
-              fotoUrl = `http://localhost:10101/uploads/images/${guiaData.foto_perfil}`;
+              fotoUrl = `https://servicio-explococora.onrender.com/uploads/images/${guiaData.foto_perfil}`;
             }
             
             setPreviewFoto(fotoUrl);
@@ -386,9 +386,9 @@ const DashboardLayoutGuia = ({ children }) => {
           if (guiaData.foto.startsWith('http')) {
             fotoUrl = guiaData.foto;
           } else if (guiaData.foto.includes('/uploads/images/')) {
-            fotoUrl = `http://localhost:10101${guiaData.foto}`;
+            fotoUrl = `https://servicio-explococora.onrender.com${guiaData.foto}`;
           } else {
-            fotoUrl = `http://localhost:10101/uploads/images/${guiaData.foto}`;
+            fotoUrl = `https://servicio-explococora.onrender.com/uploads/images/${guiaData.foto}`;
           }
           
           setPreviewFoto(fotoUrl);
@@ -487,7 +487,7 @@ const DashboardLayoutGuia = ({ children }) => {
           if (cedula && token) {
             
             // Llamar a la API para cambiar estado antes de cerrar sesión
-            await axios.patch('http://localhost:10101/usuarios/cambiar-estado', 
+            await axios.patch('https://servicio-explococora.onrender.com/usuarios/cambiar-estado', 
               { nuevoEstado: "inactivo", cedula }, 
               {
                 headers: {

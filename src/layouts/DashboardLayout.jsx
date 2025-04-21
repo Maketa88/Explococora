@@ -110,7 +110,7 @@ const DashboardLayout = ({ children }) => {
         console.log("Cargando foto de perfil desde el servidor...");
         
         // Hacer la solicitud para obtener los datos del operador
-        const response = await axios.get(`http://localhost:10101/operador-turistico/${cedula}`, {
+        const response = await axios.get(`https://servicio-explococora.onrender.com/operador-turistico/${cedula}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -128,9 +128,9 @@ const DashboardLayout = ({ children }) => {
             if (operadorData.foto.startsWith('http')) {
               fotoUrl = operadorData.foto;
             } else if (operadorData.foto.includes('/uploads/images/')) {
-              fotoUrl = `http://localhost:10101${operadorData.foto}`;
+              fotoUrl = `https://servicio-explococora.onrender.com${operadorData.foto}`;
             } else {
-              fotoUrl = `http://localhost:10101/uploads/images/${operadorData.foto}`;
+              fotoUrl = `https://servicio-explococora.onrender.com/uploads/images/${operadorData.foto}`;
             }
             
             console.log("Foto cargada desde el servidor:", fotoUrl);
@@ -194,7 +194,7 @@ const DashboardLayout = ({ children }) => {
       
       if (cedula && token) {
         // Obtener la foto más reciente del servidor
-        axios.get(`http://localhost:10101/operador-turistico/perfil-completo/${cedula}`, {
+        axios.get(`https://servicio-explococora.onrender.com/operador-turistico/perfil-completo/${cedula}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -213,9 +213,9 @@ const DashboardLayout = ({ children }) => {
               if (operadorData.foto.startsWith('http')) {
                 fotoUrl = operadorData.foto;
               } else if (operadorData.foto.includes('/uploads/images/')) {
-                fotoUrl = `http://localhost:10101${operadorData.foto}`;
+                fotoUrl = `https://servicio-explococora.onrender.com${operadorData.foto}`;
               } else {
-                fotoUrl = `http://localhost:10101/uploads/images/${operadorData.foto}`;
+                fotoUrl = `https://servicio-explococora.onrender.com/uploads/images/${operadorData.foto}`;
               }
               
               setFotoPerfil(fotoUrl);
@@ -322,7 +322,7 @@ const DashboardLayout = ({ children }) => {
       const cedula = localStorage.getItem('cedula');
       
       // Cambiar estado a inactivo antes de cerrar sesión
-      await axios.patch('http://localhost:10101/usuarios/cambiar-estado', 
+      await axios.patch('https://servicio-explococora.onrender.com/usuarios/cambiar-estado', 
         { 
           cedula: cedula,
           nuevoEstado: 'inactivo'
@@ -390,7 +390,7 @@ const DashboardLayout = ({ children }) => {
         data.append('nuevoEstado', 'inactivo');
 
         navigator.sendBeacon(
-          'http://localhost:10101/usuarios/cambiar-estado',
+          'https://servicio-explococora.onrender.com/usuarios/cambiar-estado',
           data
         );
       } catch (error) {

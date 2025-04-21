@@ -55,7 +55,7 @@ const EstadoGuia = () => {
       setSincronizando(true);
       
       const response = await axios.get(
-        `http://localhost:10101/usuarios/consultar-estado/${cedulaGuia}`,
+        `https://servicio-explococora.onrender.com/usuarios/consultar-estado/${cedulaGuia}`,
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
       
@@ -113,7 +113,7 @@ const EstadoGuia = () => {
       setSincronizando(true);
       
       const response = await axios.patch(
-        'http://localhost:10101/usuarios/cambiar-estado',
+        'https://servicio-explococora.onrender.com/usuarios/cambiar-estado',
         {
           cedula: cedulaGuia,
           nuevoEstado: nuevoEstado

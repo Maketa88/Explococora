@@ -3,7 +3,7 @@ import axios from "axios";
 const obtenerGuias = async () => {
   try {
     const token = localStorage.getItem("token"); // Recuperar el token guardado
-    const response = await axios.get("http://localhost:10101/todos", {
+    const response = await axios.get("https://servicio-explococora.onrender.com/todos", {
       headers: {
         Authorization: `Bearer ${token}`, // Agregar token en el encabezado
       },

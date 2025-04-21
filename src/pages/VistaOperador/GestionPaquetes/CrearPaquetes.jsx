@@ -76,7 +76,7 @@ const CrearPaquetes = ({ onClose, onCreated, rutasDisponibles, mostrarAlerta }) 
         formData.append('fotos', imagen);
       });
       
-      await axios.post(`http://localhost:10101/paquete/subir-fotos/${paqueteId}`, formData, {
+      await axios.post(`https://servicio-explococora.onrender.com/paquete/subir-fotos/${paqueteId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`
@@ -126,7 +126,7 @@ const CrearPaquetes = ({ onClose, onCreated, rutasDisponibles, mostrarAlerta }) 
       
       // Enviar solicitud al servidor
       const response = await axios.post(
-        `http://localhost:10101/paquete/crear-paquete/${rutasIdsParam}`,
+        `https://servicio-explococora.onrender.com/paquete/crear-paquete/${rutasIdsParam}`,
         {
           nombrePaquete: paquete.nombrePaquete,
           descripcion: paquete.descripcion,

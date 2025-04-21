@@ -59,7 +59,7 @@ const ActualizarDatosGuia = () => {
       
       // Primero, obtenemos los datos básicos del guía
       const response = await axios.get(
-        `http://localhost:10101/guia/perfil-completo/${cedula}`, 
+        `https://servicio-explococora.onrender.com/guia/perfil-completo/${cedula}`, 
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -78,7 +78,7 @@ const ActualizarDatosGuia = () => {
         try {
           console.log("Solicitando datos de teléfono actualizados...");
           const telefonoResponse = await axios.get(
-            `http://localhost:10101/guia/telefono/${cedula}`,
+            `https://servicio-explococora.onrender.com/guia/telefono/${cedula}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -125,9 +125,9 @@ const ActualizarDatosGuia = () => {
           else {
             // Verificar si la ruta ya incluye /uploads/images
             if (guiaData.foto_perfil.includes('/uploads/images/')) {
-              setPreviewFoto(`http://localhost:10101${guiaData.foto_perfil}`);
+              setPreviewFoto(`https://servicio-explococora.onrender.com${guiaData.foto_perfil}`);
             } else {
-              setPreviewFoto(`http://localhost:10101/uploads/images/${guiaData.foto_perfil}`);
+              setPreviewFoto(`https://servicio-explococora.onrender.com/uploads/images/${guiaData.foto_perfil}`);
             }
           }
         } 
@@ -227,7 +227,7 @@ const ActualizarDatosGuia = () => {
           
           // Llamar al endpoint para subir la foto
           const fotoResponse = await axios.post(
-            `http://localhost:10101/guia/subir-Foto`,
+            `https://servicio-explococora.onrender.com/guia/subir-Foto`,
             formDataFoto,
             {
               headers: {
@@ -274,7 +274,7 @@ const ActualizarDatosGuia = () => {
       console.log("DATOS QUE SE ENVIARÁN PARA ACTUALIZAR:", JSON.stringify(datosActualizar, null, 2));
       
       const response = await axios.patch(
-        `http://localhost:10101/guia/actualizar/${cedula}`,
+        `https://servicio-explococora.onrender.com/guia/actualizar/${cedula}`,
         datosActualizar,
         {
           headers: {

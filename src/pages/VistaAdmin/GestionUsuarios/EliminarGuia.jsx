@@ -48,7 +48,7 @@ const EliminarGuia = ({ guia, onClose, onDeleteSuccess }) => {
       
       // Lista de posibles endpoints para probar
       const endpoints = [
-        `http://localhost:10101/guia/eliminar/${cedula}`
+        `https://servicio-explococora.onrender.com/guia/eliminar/${cedula}`
       ];
       
       let success = false;

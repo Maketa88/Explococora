@@ -42,7 +42,7 @@ const GuiasVerificados = () => {
         }
         
         // Intentar obtener guías verificados
-        const response = await axios.get('http://localhost:10101/guia/todos', {
+        const response = await axios.get('https://servicio-explococora.onrender.com/guia/todos', {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -130,7 +130,7 @@ const GuiasVerificados = () => {
                       <div className="w-28 h-28 rounded-full border-4 border-white overflow-hidden bg-blue-200">
                         {guia.foto ? (
                           <img 
-                            src={guia.foto.startsWith('http') ? guia.foto : `http://localhost:10101/uploads/images/${guia.foto}`} 
+                            src={guia.foto.startsWith('http') ? guia.foto : `https://servicio-explococora.onrender.com/uploads/images/${guia.foto}`} 
                             alt={construirNombreCompleto(guia)}
                             className="w-full h-full object-cover"
                             onError={(e) => {

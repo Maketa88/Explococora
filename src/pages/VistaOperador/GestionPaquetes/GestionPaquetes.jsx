@@ -58,7 +58,7 @@ const GestionPaquetes = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('http://localhost:10101/paquete/lista-paquetes');
+      const response = await axios.get('https://servicio-explococora.onrender.com/paquete/lista-paquetes');
       console.log('Paquetes cargados:', response.data);
       
       // Verificar la estructura de la respuesta
@@ -113,7 +113,7 @@ const GestionPaquetes = () => {
   // Función para obtener rutas disponibles
   const fetchRutas = async () => {
     try {
-      const response = await axios.get('http://localhost:10101/rutas');
+      const response = await axios.get('https://servicio-explococora.onrender.com/rutas');
       setRutasDisponibles(response.data);
     } catch (err) {
       console.error('Error al cargar rutas:', err);
@@ -128,7 +128,7 @@ const GestionPaquetes = () => {
   // Función para obtener las fotos de un paquete
   const obtenerFotosPaquete = async (idPaquete) => {
     try {
-      const response = await axios.get(`http://localhost:10101/paquete/fotos-publicas/${idPaquete}`);
+      const response = await axios.get(`https://servicio-explococora.onrender.com/paquete/fotos-publicas/${idPaquete}`);
       
       // Extraer los datos de las fotos según la estructura de la respuesta
       let fotosArray = response.data;
@@ -154,7 +154,7 @@ const GestionPaquetes = () => {
           } else if (foto.url) {
             imageUrl = foto.url;
           } else if (foto.ruta) {
-            imageUrl = `http://localhost:10101${foto.ruta}`;
+            imageUrl = `https://servicio-explococora.onrender.com${foto.ruta}`;
           } else {
             // URL de fallback si no hay ninguna ruta válida
             imageUrl = '';
@@ -191,7 +191,7 @@ const GestionPaquetes = () => {
       console.log('Obteniendo rutas para el paquete:', idPaquete);
       
       // Intentar obtener el paquete directamente por ID
-      const response = await axios.get(`http://localhost:10101/paquete/obtener-paquete/${idPaquete}`);
+      const response = await axios.get(`https://servicio-explococora.onrender.com/paquete/obtener-paquete/${idPaquete}`);
       console.log('Respuesta de obtener-paquete:', response.data);
       
       // Verificar si la respuesta es un array

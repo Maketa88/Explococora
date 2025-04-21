@@ -34,7 +34,7 @@ const EliminarPaquetes = ({ onClose, onDeleted, paquete, mostrarAlerta }) => {
       // Usar el ID numérico en la URL
       const response = await axios({
         method: 'DELETE',
-        url: `http://localhost:10101/paquete/eliminar/${paqueteId}`,
+        url: `https://servicio-explococora.onrender.com/paquete/eliminar/${paqueteId}`,
         headers: {
           'Authorization': `Bearer ${token}`
         }

@@ -26,7 +26,7 @@ const NewCustomer = () => {
       }
 
       // Intentar obtener alertas y recordatorios del servidor
-      const response = await axios.get('http://localhost:10101/guia/mis-alertas', {
+      const response = await axios.get('https://servicio-explococora.onrender.com/guia/mis-alertas', {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -203,7 +203,7 @@ const NewCustomer = () => {
       const token = localStorage.getItem("token");
       
       // Intentar marcar en el servidor
-      await axios.put(`http://localhost:10101/guia/alertas/${id}/leer`, {}, {
+      await axios.put(`https://servicio-explococora.onrender.com/guia/alertas/${id}/leer`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       }).catch(() => {
         // Si la API no existe, solo actualizar el estado local
@@ -228,7 +228,7 @@ const NewCustomer = () => {
       const token = localStorage.getItem("token");
       
       // Intentar marcar en el servidor
-      await axios.put(`http://localhost:10101/guia/recordatorios/${id}/completar`, {}, {
+      await axios.put(`https://servicio-explococora.onrender.com/guia/recordatorios/${id}/completar`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       }).catch(() => {
         // Si la API no existe, solo actualizar el estado local

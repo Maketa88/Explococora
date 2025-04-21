@@ -152,7 +152,7 @@ const SelectorEstado = ({ estadoActual = 'disponible', onCambioEstado, cedula, e
       // Enviar con estructura exacta que el backend espera
       const response = await axios({
         method: 'PATCH',
-        url: 'http://localhost:10101/usuarios/cambiar-estado',
+        url: 'https://servicio-explococora.onrender.com/usuarios/cambiar-estado',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

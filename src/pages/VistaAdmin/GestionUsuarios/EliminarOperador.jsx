@@ -48,7 +48,7 @@ const EliminarOperador = ({ operador, onClose, onDeleteSuccess }) => {
       
       // Lista de posibles endpoints para probar
       const endpoints = [
-        `http://localhost:10101/operador-turistico/eliminar/${cedula}`
+        `https://servicio-explococora.onrender.com/operador-turistico/eliminar/${cedula}`
       ];
       
       let success = false;

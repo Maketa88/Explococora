@@ -76,7 +76,7 @@ const Rutas = () => {
   const fetchRutas = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:10101/rutas');
+      const response = await axios.get('https://servicio-explococora.onrender.com/rutas');
       console.log("API Response:", response.data);
 
       if (Array.isArray(response.data)) {
@@ -120,7 +120,7 @@ const Rutas = () => {
       
       // INTENTO 1: Endpoint fotos
       try {
-        const response = await axios.get(`http://localhost:10101/rutas/fotos/${idRuta}`, {
+        const response = await axios.get(`https://servicio-explococora.onrender.com/rutas/fotos/${idRuta}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -166,7 +166,7 @@ const Rutas = () => {
       if (!intentoExitoso) {
         try {
           console.log(`Intentando con endpoint fotos-publicas para ruta ${idRuta}...`);
-          const response = await axios.get(`http://localhost:10101/rutas/fotos-publicas/${idRuta}`);
+          const response = await axios.get(`https://servicio-explococora.onrender.com/rutas/fotos-publicas/${idRuta}`);
           
           console.log('Respuesta de endpoint fotos-publicas:', response.data);
           
@@ -200,7 +200,7 @@ const Rutas = () => {
       if (fotosArray.length === 0) {
         try {
           console.log(`Intentando obtener directamente la ruta ${idRuta} con sus fotos...`);
-          const rutaResponse = await axios.get(`http://localhost:10101/rutas/${idRuta}`);
+          const rutaResponse = await axios.get(`https://servicio-explococora.onrender.com/rutas/${idRuta}`);
           
           if (rutaResponse.data && rutaResponse.data.fotos) {
             if (Array.isArray(rutaResponse.data.fotos)) {
@@ -331,7 +331,7 @@ const Rutas = () => {
       
       // Usar la URL correcta para subir imágenes
       const response = await axios.post(
-        `http://localhost:10101/rutas/subir-fotos/${rutaId}`, 
+        `https://servicio-explococora.onrender.com/rutas/subir-fotos/${rutaId}`, 
         formData, 
         config
       );
@@ -459,7 +459,7 @@ const Rutas = () => {
     try {
       setConfirmacionEliminar({ ...confirmacionEliminar, mostrar: false });
       
-      await axiosWithAuth.delete(`http://localhost:10101/rutas/${rutaId}`);
+      await axiosWithAuth.delete(`https://servicio-explococora.onrender.com/rutas/${rutaId}`);
       toast.success('Ruta eliminada correctamente', {
         position: "top-right",
         autoClose: 3000,
@@ -492,7 +492,7 @@ const Rutas = () => {
       setConfirmacionEliminar({ ...confirmacionEliminar, mostrar: false });
       
       // Llamar al endpoint para eliminar la foto
-      const response = await axiosWithAuth.delete(`http://localhost:10101/rutas/foto/${idFoto}`);
+      const response = await axiosWithAuth.delete(`https://servicio-explococora.onrender.com/rutas/foto/${idFoto}`);
       
       console.log('Respuesta de eliminación de foto:', response.data);
       
@@ -675,7 +675,7 @@ const Rutas = () => {
           body: JSON.stringify(updateData)
         };
         
-        const fetchResponse = await fetch(`http://localhost:10101/rutas/${rutaId}`, requestOptions);
+        const fetchResponse = await fetch(`https://servicio-explococora.onrender.com/rutas/${rutaId}`, requestOptions);
         
         if (!fetchResponse.ok) {
           const errorData = await fetchResponse.json();
@@ -717,7 +717,7 @@ const Rutas = () => {
         };
         
         console.log('Creating new route:', rutaData);
-        response = await axiosWithAuth.post('http://localhost:10101/rutas', rutaData);
+        response = await axiosWithAuth.post('https://servicio-explococora.onrender.com/rutas', rutaData);
         
         console.log('Create response:', response.data);
         rutaId = response.data.id || response.data.idRuta;

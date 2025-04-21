@@ -26,7 +26,7 @@ const PerfilOperador = () => {
       console.log("Obteniendo teléfono para operador ID:", idOperador);
       
       // Llamada directa a la tabla de teléfono usando el ID del operador
-      const response = await axios.get(`http://localhost:10101/telefono/operador/${idOperador}`, {
+      const response = await axios.get(`https://servicio-explococora.onrender.com/telefono/operador/${idOperador}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -59,7 +59,7 @@ const PerfilOperador = () => {
         
         try {
           // Usar el endpoint de perfil completo para obtener todos los datos, incluyendo el teléfono
-          const response = await axios.get(`http://localhost:10101/operador-turistico/perfil-completo/${cedula}`, {
+          const response = await axios.get(`https://servicio-explococora.onrender.com/operador-turistico/perfil-completo/${cedula}`, {
             headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json'
@@ -125,9 +125,9 @@ const PerfilOperador = () => {
               if (datosOperador.foto.startsWith('http')) {
                 fotoUrl = datosOperador.foto;
               } else if (datosOperador.foto.includes('/uploads/images/')) {
-                fotoUrl = `http://localhost:10101${datosOperador.foto}`;
+                fotoUrl = `https://servicio-explococora.onrender.com${datosOperador.foto}`;
               } else {
-                fotoUrl = `http://localhost:10101/uploads/images/${datosOperador.foto}`;
+                fotoUrl = `https://servicio-explococora.onrender.com/uploads/images/${datosOperador.foto}`;
               }
               
               setFotoPerfil(fotoUrl);
@@ -212,7 +212,7 @@ const PerfilOperador = () => {
       
       if (!cedula || !token) return;
       
-      const response = await axios.get(`http://localhost:10101/operador-turistico/${cedula}`, {
+      const response = await axios.get(`https://servicio-explococora.onrender.com/operador-turistico/${cedula}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -229,9 +229,9 @@ const PerfilOperador = () => {
           if (operadorData.foto.startsWith('http')) {
             fotoUrl = operadorData.foto;
           } else if (operadorData.foto.includes('/uploads/images/')) {
-            fotoUrl = `http://localhost:10101${operadorData.foto}`;
+            fotoUrl = `https://servicio-explococora.onrender.com${operadorData.foto}`;
           } else {
-            fotoUrl = `http://localhost:10101/uploads/images/${operadorData.foto}`;
+            fotoUrl = `https://servicio-explococora.onrender.com/uploads/images/${operadorData.foto}`;
           }
           
           setFotoPerfil(fotoUrl);
@@ -256,7 +256,7 @@ const PerfilOperador = () => {
         if (!cedula || !token) return;
         
         // Llamada a un nuevo endpoint específico para teléfono usando la cédula
-        const response = await axios.get(`http://localhost:10101/telefono/operador-cedula/${cedula}`, {
+        const response = await axios.get(`https://servicio-explococora.onrender.com/telefono/operador-cedula/${cedula}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

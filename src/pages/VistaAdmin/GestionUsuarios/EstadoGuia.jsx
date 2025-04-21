@@ -20,7 +20,7 @@ const Products = () => {
   });
   
   // Configuración para el servidor
-  const API_URL = 'http://localhost:10101';
+  const API_URL = 'https://servicio-explococora.onrender.com';
   const API_PATH = '/usuarios/listar-por-rol/guia';
   const API_CONTADOR_PATH = '/usuarios/contar-por-estado';
 
@@ -353,7 +353,7 @@ const Products = () => {
                           <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-white font-bold overflow-hidden">
                             {guia.foto ? (
                               <img 
-                                src={guia.foto.startsWith('http') ? guia.foto : `http://localhost:10101/uploads/images/${guia.foto}`} 
+                                src={guia.foto.startsWith('http') ? guia.foto : `https://servicio-explococora.onrender.com/uploads/images/${guia.foto}`} 
                                 alt={construirNombreCompleto(guia)}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
@@ -460,7 +460,7 @@ const Products = () => {
                 <div className="h-16 w-16 rounded-full overflow-hidden bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-white text-xl font-bold">
                   {guiaSeleccionado.foto ? (
                     <img 
-                      src={guiaSeleccionado.foto.startsWith('http') ? guiaSeleccionado.foto : `http://localhost:10101/uploads/images/${guiaSeleccionado.foto}`} 
+                      src={guiaSeleccionado.foto.startsWith('http') ? guiaSeleccionado.foto : `https://servicio-explococora.onrender.com/uploads/images/${guiaSeleccionado.foto}`} 
                       alt={construirNombreCompleto(guiaSeleccionado)}
                       className="w-full h-full object-cover"
                       onError={(e) => {

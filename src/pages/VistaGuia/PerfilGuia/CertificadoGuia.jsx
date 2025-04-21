@@ -33,7 +33,7 @@ const CertificadoGuia = () => {
       setLoading(true);
       const token = localStorage.getItem("token");
       
-      const response = await axios.get('http://localhost:10101/guia/mis-certificados', {
+      const response = await axios.get('https://servicio-explococora.onrender.com/guia/mis-certificados', {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -81,7 +81,7 @@ const CertificadoGuia = () => {
       setUploading(true);
       const token = localStorage.getItem("token");
       
-      await axios.post('http://localhost:10101/guia/subir-certificado', formData, {
+      await axios.post('https://servicio-explococora.onrender.com/guia/subir-certificado', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`
@@ -107,7 +107,7 @@ const CertificadoGuia = () => {
       try {
         const token = localStorage.getItem("token");
         
-        await axios.delete(`http://localhost:10101/guia/certificado/${idCertificado}`, {
+        await axios.delete(`https://servicio-explococora.onrender.com/guia/certificado/${idCertificado}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -129,7 +129,7 @@ const CertificadoGuia = () => {
       // Si la URL es relativa, convertirla a absoluta
       const fullUrl = urlArchivo.startsWith('http') 
         ? urlArchivo 
-        : `http://localhost:10101${urlArchivo.startsWith('/') ? '' : '/'}${urlArchivo}`;
+        : `https://servicio-explococora.onrender.com${urlArchivo.startsWith('/') ? '' : '/'}${urlArchivo}`;
       
       console.log("URL completa para descarga:", fullUrl);
       
@@ -188,7 +188,7 @@ const CertificadoGuia = () => {
         try {
           const fullUrl = urlArchivo.startsWith('http') 
             ? urlArchivo 
-            : `http://localhost:10101${urlArchivo.startsWith('/') ? '' : '/'}${urlArchivo}`;
+            : `https://servicio-explococora.onrender.com${urlArchivo.startsWith('/') ? '' : '/'}${urlArchivo}`;
           
           window.open(fullUrl, '_blank');
           toast.info('Abriendo certificado en una nueva pestaña');
