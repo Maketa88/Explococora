@@ -53,7 +53,7 @@ const RecuperarContrasena = () => {
     
     try {
       // La URL ahora es más simple, solo necesitamos el token
-      const url = `http://localhost:10101/recuperar-contrasenia/${token}`;
+      const url = `https://servicio-explococora.onrender.com/recuperar-contrasenia/${token}`;
       
       console.log("Enviando solicitud a:", url);
       console.log("Datos:", { nuevaContrasenia: contrasenia });

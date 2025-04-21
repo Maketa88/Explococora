@@ -5,7 +5,7 @@ class GuiaEstadoService {
   constructor() {
     this.estados = new Map(); // Mapa para almacenar estados por cédula
     this.callbacks = new Map(); // Callbacks de actualización
-    this.API_URL = 'http://localhost:10101/usuarios'; // Base URL para las rutas de estados
+    this.API_URL = 'https://servicio-explococora.onrender.com/usuarios'; // Base URL para las rutas de estados
     
     // Inicializar escucha de eventos
     this.inicializarEventos();
