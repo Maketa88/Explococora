@@ -75,7 +75,7 @@ i18n
           programaTuRuta: "¡Programa tu ruta hoy!",
           ubicacion: "Colombia",
           telefono: "+57 1234567890",
-          email: "Explococora@gmail.com",
+          email: "Correo Electrónico",
           
           // Página de Historia
           tituloHistoria: "Descubre la Magia del Valle del Cocora",
@@ -253,7 +253,7 @@ i18n
           programaTuRuta: "Schedule your route today!",
           ubicacion: "Colombia",
           telefono: "+57 1234567890",
-          email: "Explococora@gmail.com",
+          email: "Email",
           
           // History page
           tituloHistoria: "Discover the Magic of Cocora Valley",
