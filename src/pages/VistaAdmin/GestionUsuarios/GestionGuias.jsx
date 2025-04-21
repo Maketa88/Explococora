@@ -8,6 +8,7 @@ import EstadoGuia from '../../../components/Guias/EstadoGuia';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2';
+import CrearGuia from './CrearGuia';
 
 const Guias = () => {
   const navigate = useNavigate();
@@ -46,10 +47,32 @@ const Guias = () => {
   });
   const [updating, setUpdating] = useState(false);
   const [alert, setAlert] = useState({ show: false, message: "", type: "" });
+  const [showCrearGuiaModal, setShowCrearGuiaModal] = useState(false);
 
-  // Función para redirigir a la página de nuevo guía
+  // Función para mostrar el modal de Crear Guía en lugar de navegar
   const handleAddGuia = () => {
-    navigate('/VistaOperador/nuevo-guia');
+    setShowCrearGuiaModal(true);
+  };
+
+  // Función para cerrar el modal de Crear Guía
+  const handleCloseCrearGuiaModal = () => {
+    setShowCrearGuiaModal(false);
+  };
+
+  // Función para manejar la creación exitosa de un guía
+  const handleGuiaCreated = (newGuia) => {
+    // Actualizar la lista de guías sin tener que recargar la página
+    setGuiasCompletos(prevGuias => [newGuia, ...prevGuias]);
+    // Actualizar contadores
+    actualizarContadores([newGuia, ...guiasCompletos]);
+    // Mostrar notificación de éxito
+    toast.success("¡Guía creado exitosamente!");
+    // Cerrar el modal
+    setShowCrearGuiaModal(false);
+    // Recargar la lista de guías para asegurar que todos los datos estén actualizados
+    setTimeout(() => {
+      cargarGuias();
+    }, 1000);
   };
 
   // Función para construir nombre completo
@@ -537,6 +560,13 @@ const Guias = () => {
   return (
     <DashboardLayoutAdmin>
       <AlertComponent />
+      {/* Render the CrearGuia modal conditionally */}
+      {showCrearGuiaModal && (
+        <CrearGuia 
+          onClose={handleCloseCrearGuiaModal} 
+          onGuiaCreated={handleGuiaCreated}
+        />
+      )}
       <div className="p-6 bg-white">
         {/* Cabecera con título y botones */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
