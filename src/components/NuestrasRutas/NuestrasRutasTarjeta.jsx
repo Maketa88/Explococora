@@ -26,7 +26,7 @@ export const NuestrasRutasTarjeta = ({ onRutaSeleccionada, rutaActualId }) => {
     const fetchRutas = async () => {
       try {
         setLoading(true); // Establecer loading a true al iniciar la carga
-        const response = await axios.get("http://localhost:10101/rutas");
+        const response = await axios.get("https://servicio-explococora.onrender.com/rutas");
 
         if (Array.isArray(response.data)) {
           setRutas(response.data);
@@ -64,7 +64,7 @@ export const NuestrasRutasTarjeta = ({ onRutaSeleccionada, rutaActualId }) => {
       }
 
       const response = await axios.get(
-        `http://localhost:10101/rutas/fotos-publicas/${idRuta}`
+        `https://servicio-explococora.onrender.com/rutas/fotos-publicas/${idRuta}`
       );
 
       if (

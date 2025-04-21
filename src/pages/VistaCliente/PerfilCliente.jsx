@@ -25,7 +25,7 @@ const PerfilCliente = () => {
 
       try {
         const response = await axios.get(
-          `http://localhost:10101/cliente/perfil-completo/${cedula}`,
+          `https://servicio-explococora.onrender.com/cliente/perfil-completo/${cedula}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -94,9 +94,9 @@ const PerfilCliente = () => {
 
       if (!fotoUrl.startsWith("http")) {
         if (fotoUrl.includes("/uploads/images/")) {
-          fotoUrl = `http://localhost:10101${fotoUrl}`;
+          fotoUrl = `https://servicio-explococora.onrender.com${fotoUrl}`;
         } else {
-          fotoUrl = `http://localhost:10101/uploads/images/${fotoUrl}`;
+          fotoUrl = `https://servicio-explococora.onrender.com/uploads/images/${fotoUrl}`;
         }
       }
 
@@ -106,9 +106,9 @@ const PerfilCliente = () => {
 
       if (!fotoUrl.startsWith("http")) {
         if (fotoUrl.includes("/uploads/images/")) {
-          fotoUrl = `http://localhost:10101${fotoUrl}`;
+          fotoUrl = `https://servicio-explococora.onrender.com${fotoUrl}`;
         } else {
-          fotoUrl = `http://localhost:10101/uploads/images/${fotoUrl}`;
+          fotoUrl = `https://servicio-explococora.onrender.com/uploads/images/${fotoUrl}`;
         }
       }
 

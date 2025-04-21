@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // URL base para las peticiones de rutas
-const API_URL = "http://localhost:10101";
+const API_URL = "https://servicio-explococora.onrender.com";
 
 // Crear una instancia de axios con la URL base
 const rutasApi = axios.create({

@@ -14,7 +14,7 @@ export const Reservas = () => {
   useEffect(() => {
     const fetchReservas = async () => {
       try {
-        const response = await axios.get('http://localhost:10101/reserva/todas');
+        const response = await axios.get('https://servicio-explococora.onrender.com/reserva/todas');
         setReservas(response.data.result);
         setLoading(false);
       } catch {

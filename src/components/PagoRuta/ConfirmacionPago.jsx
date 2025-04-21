@@ -112,7 +112,7 @@ export const ConfirmacionPago = () => {
 
       // CORREGIR: Usar el endpoint correcto de pagos-rutas
       const response = await axios.get(
-        `http://localhost:10101/pagos-rutas/info-reserva`,
+        `https://servicio-explococora.onrender.com/pagos-rutas/info-reserva`,
         {
           params: { radicado: radicado },
           headers: {

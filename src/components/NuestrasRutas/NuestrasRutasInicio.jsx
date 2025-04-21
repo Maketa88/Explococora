@@ -19,7 +19,7 @@ export const NuestrasRutasInicio = () => {
   useEffect(() => {
     const fetchRutas = async () => {
       try {
-        const response = await axios.get("http://localhost:10101/rutas");
+        const response = await axios.get("https://servicio-explococora.onrender.com/rutas");
 
         if (Array.isArray(response.data)) {
           setRutas(response.data);
@@ -55,7 +55,7 @@ export const NuestrasRutasInicio = () => {
       }
 
       const response = await axios.get(
-        `http://localhost:10101/rutas/fotos-publicas/${idRuta}`
+        `https://servicio-explococora.onrender.com/rutas/fotos-publicas/${idRuta}`
       );
 
       if (

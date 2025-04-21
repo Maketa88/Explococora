@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:10101/'; // Cambia esto por la URL de tu backend
+const API_URL = 'https://servicio-explococora.onrender.com/'; // Cambia esto por la URL de tu backend
 
 export const login = async (credentials) => {
   try {

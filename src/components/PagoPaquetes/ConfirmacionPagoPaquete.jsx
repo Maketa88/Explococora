@@ -88,7 +88,7 @@ export const ConfirmacionPagoPaquete = () => {
 
       // Endpoint para verificar estado de pago de paquete
       const response = await axios.get(
-        `http://localhost:10101/pago-paquetes/info-reserva?radicado=${radicado}`,
+        `https://servicio-explococora.onrender.com/pago-paquetes/info-reserva?radicado=${radicado}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

@@ -42,7 +42,7 @@ const ActualizarDatosCliente = () => {
     try {
       // Hacemos la petición al endpoint correcto de clientes
       const response = await axios.get(
-        `http://localhost:10101/cliente/perfil-completo/${cedula}`,
+        `https://servicio-explococora.onrender.com/cliente/perfil-completo/${cedula}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -114,9 +114,9 @@ const ActualizarDatosCliente = () => {
           // Verificar si la ruta ya incluye /uploads/images
           let fotoUrl;
           if (clienteData.foto_perfil.includes("/uploads/images/")) {
-            fotoUrl = `http://localhost:10101${clienteData.foto_perfil}`;
+            fotoUrl = `https://servicio-explococora.onrender.com${clienteData.foto_perfil}`;
           } else {
-            fotoUrl = `http://localhost:10101/uploads/images/${clienteData.foto_perfil}`;
+            fotoUrl = `https://servicio-explococora.onrender.com/uploads/images/${clienteData.foto_perfil}`;
           }
 
           console.log("URL de foto construida:", fotoUrl);
@@ -132,9 +132,9 @@ const ActualizarDatosCliente = () => {
         if (clienteData.foto.startsWith("http")) {
           fotoUrl = clienteData.foto;
         } else if (clienteData.foto.includes("/uploads/images/")) {
-          fotoUrl = `http://localhost:10101${clienteData.foto}`;
+          fotoUrl = `https://servicio-explococora.onrender.com${clienteData.foto}`;
         } else {
-          fotoUrl = `http://localhost:10101/uploads/images/${clienteData.foto}`;
+          fotoUrl = `https://servicio-explococora.onrender.com/uploads/images/${clienteData.foto}`;
         }
 
         console.log("URL de foto construida:", fotoUrl);
@@ -241,7 +241,7 @@ const ActualizarDatosCliente = () => {
 
           // Llamar al endpoint para subir la foto
           const fotoResponse = await axios.post(
-            `http://localhost:10101/cliente/subir-foto`,
+            `https://servicio-explococora.onrender.com/cliente/subir-foto`,
             formDataFoto,
             {
               headers: {
@@ -279,7 +279,7 @@ const ActualizarDatosCliente = () => {
 
       // Continuar con la actualización de los demás datos
       const response = await axios.patch(
-        `http://localhost:10101/cliente/${cedula}`,
+        `https://servicio-explococora.onrender.com/cliente/${cedula}`,
         {
           primerNombre: formData.primerNombre,
           segundoNombre: formData.segundoNombre,

@@ -105,7 +105,7 @@ export const RecomendacionesVestimentaPaquete = () => {
       }));
 
       const response = await axios.post(
-        "http://localhost:10101/pago-paquetes/crear",
+        "https://servicio-explococora.onrender.com/pago-paquetes/crear",
         {
           idPaquete: parseInt(idPaquete),
           cantidadPersonas: parseInt(formData.cantidadPersonas),

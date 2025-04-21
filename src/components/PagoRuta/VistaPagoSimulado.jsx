@@ -134,7 +134,7 @@ export const VistaPagoSimulado = () => {
 
       // Llamar a endpoint de simulación con el radicado limpio
       const response = await axios.get(
-        `http://localhost:10101/pagos-rutas/simular/${radicadoLimpio}`,
+        `https://servicio-explococora.onrender.com/pagos-rutas/simular/${radicadoLimpio}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

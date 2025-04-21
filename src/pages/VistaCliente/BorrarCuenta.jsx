@@ -60,7 +60,7 @@ export const BorrarCuenta = () => {
       }
 
       // Llamada al backend para eliminar la cuenta
-      await axios.delete(`http://localhost:10101/cliente/${cedula}`, {
+      await axios.delete(`https://servicio-explococora.onrender.com/cliente/${cedula}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }

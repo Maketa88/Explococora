@@ -5,7 +5,7 @@ import Feedback from "../Feedback/Feedback";
 import { CardGuia } from "./Card";
 
 // URL del backend (mejor moverla a un archivo de configuración)
-const API_URL = "http://localhost:10101";
+const API_URL = "https://servicio-explococora.onrender.com";
 
 /**
  * Función para mapear los datos del guía desde el backend al formato esperado por el frontend

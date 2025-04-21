@@ -113,7 +113,7 @@ export const VistaPagoSimuladoPaquete = () => {
 
       // Llamar a endpoint de simulación
       const response = await axios.get(
-        `http://localhost:10101/pago-paquetes/simular/${radicado}`,
+        `https://servicio-explococora.onrender.com/pago-paquetes/simular/${radicado}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

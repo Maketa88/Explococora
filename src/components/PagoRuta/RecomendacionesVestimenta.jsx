@@ -83,7 +83,7 @@ export const RecomendacionesVestimenta = () => {
 
       // Realizar la petición para crear la reserva
       const response = await axios.post(
-        "http://localhost:10101/pagos-rutas/crear",
+        "https://servicio-explococora.onrender.com/pagos-rutas/crear",
         {
           idRuta: parseInt(idRuta),
           cantidadPersonas: parseInt(formData.cantidadPersonas),

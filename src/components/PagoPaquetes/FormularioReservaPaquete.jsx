@@ -272,7 +272,7 @@ export const FormularioReservaPaquete = () => {
       const cargarInfoPaquete = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:10101/paquetes/${idPaquete}`
+            `https://servicio-explococora.onrender.com/paquetes/${idPaquete}`
           );
           if (response.data) {
             // Manejar la respuesta según la estructura real de tu API

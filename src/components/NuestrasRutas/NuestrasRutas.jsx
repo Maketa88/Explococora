@@ -28,7 +28,7 @@ export const NuestrasRutas = () => {
     window.scrollTo(0, 0);
     const fetchRutas = async () => {
       try {
-        const response = await axios.get('http://localhost:10101/rutas');
+        const response = await axios.get('https://servicio-explococora.onrender.com/rutas');
         if (Array.isArray(response.data)) {
           setRutas(response.data);
           
@@ -54,7 +54,7 @@ export const NuestrasRutas = () => {
 
   const obtenerFotosRuta = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:10101/rutas/fotos-publicas/${id}`);
+      const response = await axios.get(`https://servicio-explococora.onrender.com/rutas/fotos-publicas/${id}`);
       if (response.data?.fotos?.[0]) {
         const fotos = response.data.fotos[0]
           .filter(item => item?.foto)

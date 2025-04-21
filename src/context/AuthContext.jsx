@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:10101/iniciar-sesion",
+        "https://servicio-explococora.onrender.com/iniciar-sesion",
         {
           email: credentials.email,
           contrasenia: credentials.contrasenia,
@@ -101,7 +101,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:10101/auth/verificar-otp",
+        "https://servicio-explococora.onrender.com/auth/verificar-otp",
         {
           userId,
           otp,

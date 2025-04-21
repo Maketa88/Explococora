@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaLock, FaUserShield, FaCookieBite, FaClipboardList } from 'react-icons/fa';
 import { RiFilePaper2Line, RiShieldUserFill } from 'react-icons/ri';

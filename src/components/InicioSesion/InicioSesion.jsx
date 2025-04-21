@@ -63,7 +63,7 @@ export const InicioSesion = () => {
     setEstadoRecuperacion({ mensaje: '', error: false });
     
     try {
-      const response = await axios.post('http://localhost:10101/enviar-correo', {
+      const response = await axios.post('https://servicio-explococora.onrender.com/enviar-correo', {
         email: emailRecuperacion
       });
       

@@ -314,7 +314,7 @@ export const FormularioReservaRuta = () => {
       const cargarInfoRuta = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:10101/rutas/${idRuta}`
+            `https://servicio-explococora.onrender.com/rutas/${idRuta}`
           );
           if (response.data) {
             // Manejar la respuesta según la estructura real de tu API

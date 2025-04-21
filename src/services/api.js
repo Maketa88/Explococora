@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:10101'
+  baseURL: 'https://servicio-explococora.onrender.com'
 });
 
 // Interceptor para agregar el token a todas las peticiones

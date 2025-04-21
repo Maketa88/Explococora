@@ -302,7 +302,7 @@ export const ServiciosAdicionales = ({
 
         // Obtener categorías
         const resCategorias = await axios.get(
-          "http://localhost:10101/servicios-adicionales/categorias"
+          "https://servicio-explococora.onrender.com/servicios-adicionales/categorias"
         );
 
         if (resCategorias.data.success) {
@@ -319,7 +319,7 @@ export const ServiciosAdicionales = ({
 
         // Obtener todos los servicios
         const resServicios = await axios.get(
-          "http://localhost:10101/servicios-adicionales"
+          "https://servicio-explococora.onrender.com/servicios-adicionales"
         );
 
         if (resServicios.data.success) {

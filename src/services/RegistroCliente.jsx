@@ -3,7 +3,7 @@ import axios from "axios";
 export const RegistroCliente = async (formData) => {
   try {
     const response = await axios.post(
-      "http://localhost:10101/registrar",
+      "https://servicio-explococora.onrender.com/registrar",
       formData
     );
     return response.data; // Devuelve los datos del backend en caso de éxito

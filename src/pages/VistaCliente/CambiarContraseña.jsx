@@ -88,7 +88,7 @@ const CambiarContraseña = () => {
         return;
       }
 
-      await axios.patch(`http://localhost:10101/cliente/cambiar-contrasenia/${cedula}`, 
+      await axios.patch(`https://servicio-explococora.onrender.com/cliente/cambiar-contrasenia/${cedula}`, 
         { contrasenia },
         { 
           headers: {
