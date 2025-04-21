@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import DashboardLayout from '../../../layouts/DashboardLayout';
 import axios from 'axios';
-import { Users, UserCheck, UserMinus, RefreshCw, Clock, Eye, X } from 'lucide-react';
+import { Users, UserCheck, UserMinus, RefreshCw, Clock, Eye } from 'lucide-react';
 
 const Products = () => {
   const [guias, setGuias] = useState([]);
@@ -50,8 +50,28 @@ const Products = () => {
   };
 
   // Función para obtener contadores de estados
-  const obtenerContadores = async () => {
+  const obtenerContadores = async (forzarActualizacion = false) => {
     try {
+      // Verificar última actualización en localStorage
+      const ultimaActualizacionContadoresGuardada = localStorage.getItem('ultimaActualizacionContadoresGuiasAdmin');
+      const ahora = new Date().getTime();
+      
+      // Si no es una actualización forzada, verificar si debemos actualizar
+      if (!forzarActualizacion && ultimaActualizacionContadoresGuardada) {
+        const tiempoTranscurrido = ahora - parseInt(ultimaActualizacionContadoresGuardada);
+        
+        // Si han pasado menos de 60 segundos desde la última actualización
+        if (tiempoTranscurrido < 60000) {
+          // Cargar contadores del localStorage si existen
+          const contadoresGuardados = localStorage.getItem('contadoresDataAdmin');
+          
+          if (contadoresGuardados) {
+            setContadores(JSON.parse(contadoresGuardados));
+            return;
+          }
+        }
+      }
+      
       const token = localStorage.getItem('token');
       if (!token) return;
       
@@ -82,6 +102,10 @@ const Products = () => {
         // Calcular total
         nuevoConteo.total = nuevoConteo.disponibles + nuevoConteo.ocupados + nuevoConteo.inactivos;
         
+        // Guardar en localStorage
+        localStorage.setItem('ultimaActualizacionContadoresGuiasAdmin', ahora.toString());
+        localStorage.setItem('contadoresDataAdmin', JSON.stringify(nuevoConteo));
+        
         setContadores(nuevoConteo);
       }
     } catch (err) {
@@ -89,8 +113,35 @@ const Products = () => {
     }
   };
 
-  const obtenerEstadosGuias = async () => {
+  const obtenerEstadosGuias = async (forzarActualizacion = false) => {
     try {
+      // Verificar última actualización en localStorage
+      const ultimaActualizacionGuardada = localStorage.getItem('ultimaActualizacionGuiasAdmin');
+      const ahora = new Date().getTime();
+      
+      // Si no es una actualización forzada, verificar si debemos actualizar
+      if (!forzarActualizacion && ultimaActualizacionGuardada) {
+        const tiempoTranscurrido = ahora - parseInt(ultimaActualizacionGuardada);
+        
+        // Si han pasado menos de 60 segundos desde la última actualización
+        if (tiempoTranscurrido < 60000) {
+          console.log(`Usando datos en caché. Próxima actualización en ${Math.floor((60000 - tiempoTranscurrido) / 1000)} segundos`);
+          
+          // Cargar datos del localStorage si existen
+          const guiasGuardados = localStorage.getItem('guiasDataAdmin');
+          
+          if (guiasGuardados) {
+            setGuias(JSON.parse(guiasGuardados));
+            setLoading(false);
+            setUltimaActualizacion(new Date(parseInt(ultimaActualizacionGuardada)));
+            
+            // También cargar contadores guardados
+            obtenerContadores(false);
+            return;
+          }
+        }
+      }
+      
       setActualizando(true);
       setLoading(true);
       
@@ -102,6 +153,7 @@ const Products = () => {
       }
       
       const urlCompleta = `${API_URL}${API_PATH}`;
+      console.log('Intentando conectar a:', urlCompleta);
       
       const response = await axios.get(urlCompleta, {
         headers: {
@@ -154,11 +206,15 @@ const Products = () => {
       
       const guiasActualizados = await Promise.all(guiasPromises);
       
+      // Guardar en localStorage la marca de tiempo actual y los datos
+      localStorage.setItem('ultimaActualizacionGuiasAdmin', ahora.toString());
+      localStorage.setItem('guiasDataAdmin', JSON.stringify(guiasActualizados));
+      
       setGuias(guiasActualizados);
-      await obtenerContadores();
+      await obtenerContadores(true);
       
       setError(null);
-      setUltimaActualizacion(new Date());
+      setUltimaActualizacion(new Date(ahora));
     } catch (err) {
       console.error("Error al obtener estados de guías:", err);
       
@@ -181,15 +237,22 @@ const Products = () => {
   };
 
   useEffect(() => {
-    obtenerEstadosGuias();
-
-    // Actualización en tiempo real cada 10 segundos
+    // Al montar el componente, inicializamos los contadores desde localStorage
+    const contadoresGuardados = localStorage.getItem('contadoresDataAdmin');
+    if (contadoresGuardados) {
+      setContadores(JSON.parse(contadoresGuardados));
+    }
+    
+    // Luego cargamos los datos completos
+    obtenerEstadosGuias(false);
+    
+    // Configurar intervalo para actualizar cada minuto
     const intervalo = setInterval(() => {
-      obtenerEstadosGuias();
-    }, 10000);
-
+      obtenerEstadosGuias(true); // Forzar actualización al cumplirse el intervalo
+    }, 60000);
+    
     return () => clearInterval(intervalo);
-  }, []); 
+  }, []);
 
   // Función para abrir el modal de detalles
   const verDetalles = (guia) => {
@@ -199,6 +262,11 @@ const Products = () => {
   // Función para cerrar el modal
   const cerrarModal = () => {
     setGuiaSeleccionado(null);
+  };
+
+  // Función para actualizar manualmente (botón "Actualizar ahora")
+  const actualizarManualmente = () => {
+    obtenerEstadosGuias(true); // Forzar actualización
   };
 
   return (
@@ -219,8 +287,8 @@ const Products = () => {
                   <p className="text-gray-500 text-sm">Total</p>
                   <h2 className="text-3xl font-bold text-gray-800 mt-1">{contadores.total}</h2>
                 </div>
-                <div className="h-12 w-12 rounded-lg bg-teal-100 flex items-center justify-center">
-                  <Users className="h-6 w-6 text-teal-600" />
+                <div className="h-12 w-12 rounded-lg bg-emerald-100 flex items-center justify-center">
+                  <Users className="h-6 w-6 text-emerald-600" />
                 </div>
               </div>
             </div>
@@ -268,10 +336,10 @@ const Products = () => {
           <div className="px-6 py-3 bg-gray-50 flex justify-between items-center text-sm text-gray-500">
             <div className="flex items-center">
               <Clock className="h-4 w-4 mr-1" />
-              <span>Actualización automática cada 10s</span>
+              <span>Actualización automática cada 1m</span>
             </div>
             <button 
-              onClick={obtenerEstadosGuias}
+              onClick={actualizarManualmente}
               disabled={actualizando}
               className={`
                 inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium
@@ -308,7 +376,7 @@ const Products = () => {
             </div>
             <div className="p-4 bg-gray-50">
               <button 
-                onClick={obtenerEstadosGuias}
+                onClick={actualizarManualmente}
                 className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
@@ -429,7 +497,7 @@ const Products = () => {
             <h3 className="text-lg font-medium text-gray-900 mb-1">No hay guías disponibles</h3>
             <p className="text-gray-500 mb-4">No se encontraron guías registrados en el sistema.</p>
             <button 
-              onClick={obtenerEstadosGuias}
+              onClick={actualizarManualmente}
               className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
             >
               <RefreshCw className="w-4 h-4 mr-2" />
@@ -449,7 +517,9 @@ const Products = () => {
                 onClick={cerrarModal}
                 className="text-white hover:text-gray-200 bg-emerald-800 hover:bg-emerald-900 rounded-full p-1.5 transition-colors"
               >
-                <X className="w-5 h-5" />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
             <div className="p-6">
@@ -550,4 +620,4 @@ const Products = () => {
   );
 };
 
-export default Products; 
+export default Products;
