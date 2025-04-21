@@ -15,6 +15,8 @@ const CertificadoGuia = () => {
   const [uploading, setUploading] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
   const [fileName, setFileName] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [certificadoToDelete, setCertificadoToDelete] = useState(null);
   const { token } = useAuth();
   const navigate = useNavigate();
 
@@ -102,23 +104,27 @@ const CertificadoGuia = () => {
     }
   };
 
-  const handleDelete = async (idCertificado) => {
-    if (window.confirm('¿Está seguro que desea eliminar este certificado?')) {
-      try {
-        const token = localStorage.getItem("token");
-        
-        await axios.delete(`https://servicio-explococora.onrender.com/guia/certificado/${idCertificado}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        
-        toast.success('Certificado eliminado exitosamente');
-        fetchCertificados();
-      } catch (error) {
-        console.error('Error al eliminar certificado:', error);
-        toast.error('Error al eliminar el certificado');
-      }
+  const handleDeleteConfirmation = (idCertificado) => {
+    setCertificadoToDelete(idCertificado);
+    setModalVisible(true);
+  };
+
+  const handleDelete = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      
+      await axios.delete(`https://servicio-explococora.onrender.com/guia/certificado/${certificadoToDelete}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      toast.success('Certificado eliminado exitosamente');
+      fetchCertificados();
+      setModalVisible(false);
+    } catch (error) {
+      console.error('Error al eliminar certificado:', error);
+      toast.error('Error al eliminar el certificado');
     }
   };
 
@@ -205,6 +211,47 @@ const CertificadoGuia = () => {
   const renderContent = () => {
     return (
       <div className="p-3 sm:p-6">
+        {/* Modal de confirmación de eliminación */}
+        {modalVisible && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-fadeIn">
+              <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 p-5 text-white relative">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-red-100/20 rounded-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                      <line x1="12" y1="9" x2="12" y2="13"></line>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold">Confirmar eliminación</h3>
+                </div>
+              </div>
+              
+              <div className="p-6">
+                <p className="text-gray-700 mb-6">
+                  ¿Está seguro que desea eliminar este certificado? Esta acción no se puede deshacer.
+                </p>
+                
+                <div className="flex gap-3 justify-end">
+                  <button 
+                    onClick={() => setModalVisible(false)}
+                    className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    onClick={handleDelete}
+                    className="px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white transition-all shadow-lg hover:shadow-red-200/50"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Card principal con diseño innovador */}
         <div className="bg-gradient-to-br from-white to-emerald-50 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
           {/* Header con estilo moderno */}
@@ -382,7 +429,7 @@ const CertificadoGuia = () => {
                           </button>
                           <button 
                             className="p-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition-colors shadow-md hover:shadow-lg"
-                            onClick={() => handleDelete(cert.id)}
+                            onClick={() => handleDeleteConfirmation(cert.id)}
                             title="Eliminar certificado"
                           >
                             <FaTrash className="w-3.5 h-3.5" />
