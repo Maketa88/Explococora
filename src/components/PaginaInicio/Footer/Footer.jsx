@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { FaFacebookSquare, FaInstagram, FaTiktok } from "react-icons/fa";
-import logo from "../../../assets/Images/logoBlanco.webp";
+import logo from "../../../assets/Images/LogoBlanco.webp";
 import { FooterSeccion } from "./FooterSeccion";
 import { IconoRedes } from "./IconoRedes";
 import { LinkFooter } from "./LinkFooter";
