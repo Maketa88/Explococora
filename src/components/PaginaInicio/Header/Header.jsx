@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaBars, FaTimes } from "react-icons/fa";
-import Colombia from "../../../assets/Images/Colombia.png";
-import Usa from "../../../assets/Images/Usa.png";
+import Colombia from "../../../assets/Images/colombia.png";
+import Usa from "../../../assets/Images/usa.png";
 import { useAlternarMenu } from "../../../hooks/MenuHamburguesa";
 import { NavItem } from "./Lista";
 import { Logo } from "./Logo";
