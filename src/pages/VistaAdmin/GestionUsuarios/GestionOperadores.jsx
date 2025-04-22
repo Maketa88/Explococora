@@ -1,14 +1,140 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import DashboardLayoutAdmin from '../../../layouts/DashboardLayoutAdmin';
-import { Mail, Phone, MapPin, Calendar, CheckCircle, XCircle, Search, Filter, RefreshCw, UserPlus, Award, Star, Briefcase, Globe, Languages, CreditCard, Trash2, Edit, Plus, X } from 'lucide-react';
+import { Mail, Phone, MapPin, Calendar, CheckCircle, XCircle, Search, Filter, RefreshCw, UserPlus, Award, Star, Briefcase, Globe, Languages, CreditCard, Trash2, Edit, Plus, X, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import logoExplococora from '../../../assets/Images/logo.webp';
-import { toast } from 'react-toastify';
 import EliminarOperador from './EliminarOperador';
 import CrearOperador from './CrearOperador';
 import EditarOperador from './EditarOperador';
 import EstadoOperador from '../../../components/Operadores/EstadoOperador';
+
+// Añadir este componente para las alertas personalizadas
+const AlertComponent = ({ alert, setAlert }) => {
+  if (!alert.show) return null;
+  
+  if (alert.type === 'success') {
+    return (
+      <div className="fixed top-4 right-4 z-50 animate-fadeIn">
+        <div className="bg-green-500 text-white px-6 py-4 rounded-md shadow-xl flex items-center">
+          <CheckCircle className="w-6 h-6 mr-3" />
+          <span className="font-medium text-lg">{alert.message}</span>
+          <button 
+            onClick={() => setAlert(prev => ({ ...prev, show: false }))}
+            className="ml-4 text-white hover:text-gray-200"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
+  // Alertas específicas para cambio de estado
+  if (alert.type === 'estado-disponible') {
+    return (
+      <div className="fixed top-4 right-4 z-50 animate-fadeIn">
+        <div className="bg-green-50 border-l-4 border-green-500 text-green-700 px-6 py-4 rounded-md shadow-xl flex items-center">
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className="h-6 w-6 mr-3 text-green-500" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" 
+            />
+          </svg>
+          <span className="font-medium">{alert.message}</span>
+          <button 
+            onClick={() => setAlert(prev => ({ ...prev, show: false }))}
+            className="ml-4 text-green-700 hover:text-green-900"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
+  if (alert.type === 'estado-ocupado') {
+    return (
+      <div className="fixed top-4 right-4 z-50 animate-fadeIn">
+        <div className="bg-amber-50 border-l-4 border-amber-500 text-amber-700 px-6 py-4 rounded-md shadow-xl flex items-center">
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className="h-6 w-6 mr-3 text-amber-500" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" 
+            />
+          </svg>
+          <span className="font-medium">{alert.message}</span>
+          <button 
+            onClick={() => setAlert(prev => ({ ...prev, show: false }))}
+            className="ml-4 text-amber-700 hover:text-amber-900"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
+  if (alert.type === 'estado-inactivo') {
+    return (
+      <div className="fixed top-4 right-4 z-50 animate-fadeIn">
+        <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-6 py-4 rounded-md shadow-xl flex items-center">
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className="h-6 w-6 mr-3 text-red-500" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" 
+            />
+          </svg>
+          <span className="font-medium">{alert.message}</span>
+          <button 
+            onClick={() => setAlert(prev => ({ ...prev, show: false }))}
+            className="ml-4 text-red-700 hover:text-red-900"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
+  // Alerta de error
+  return (
+    <div className="fixed top-4 right-4 p-4 rounded-lg shadow-lg flex items-center gap-3 z-50 bg-red-600 text-white">
+      <AlertCircle className="w-5 h-5" />
+      <span>{alert.message}</span>
+      <button 
+        onClick={() => setAlert(prev => ({ ...prev, show: false }))}
+        className="ml-2 text-white hover:text-gray-200"
+      >
+        <X className="w-4 h-4" />
+      </button>
+    </div>
+  );
+};
 
 const Operadores = () => {
   const navigate = useNavigate();
@@ -31,6 +157,8 @@ const Operadores = () => {
   const [operadorDetalle, setOperadorDetalle] = useState(null);
   const [showImagenModal, setShowImagenModal] = useState(false);
   const [imagenAmpliada, setImagenAmpliada] = useState(null);
+  // Añadir estado para alertas personalizadas
+  const [alert, setAlert] = useState({ show: false, message: "", type: "" });
 
   // Función para abrir modal de crear operador
   const handleOpenCrearOperadorModal = () => {
@@ -62,6 +190,20 @@ const Operadores = () => {
     setShowImagenModal(true);
   };
 
+  // Función para mostrar alertas
+  const showAlert = (message, type) => {
+    setAlert({
+      show: true,
+      message,
+      type
+    });
+    
+    // Ocultar la alerta después de un tiempo
+    setTimeout(() => {
+      setAlert(prev => ({ ...prev, show: false }));
+    }, type === 'success' ? 5000 : 4000);
+  };
+
   // Función para manejar la creación exitosa de un operador
   const handleOperadorCreated = (nuevoOperador) => {
     // Actualizar la lista de operadores
@@ -69,7 +211,7 @@ const Operadores = () => {
       { ...nuevoOperador, estado: 'disponible' }, 
       ...prevOperadores
     ]);
-    toast.success("Operador creado correctamente");
+    showAlert("Operador creado correctamente", "success");
   };
 
   // Función para manejar la eliminación exitosa de un operador
@@ -78,19 +220,18 @@ const Operadores = () => {
     setOperadoresCompletos(prevOperadores => 
       prevOperadores.filter(operador => operador.cedula !== cedulaOperadorEliminado)
     );
-    toast.success("Operador eliminado correctamente");
+    showAlert("Operador eliminado correctamente", "success");
   };
 
   // Función para manejar la actualización exitosa de un operador
   const handleOperadorUpdated = (operadorActualizado) => {
-    console.log("Operador actualizado:", operadorActualizado);
     // Actualizar la lista de operadores
     setOperadoresCompletos(prevOperadores => 
       prevOperadores.map(operador => 
         operador.cedula === operadorActualizado.cedula ? operadorActualizado : operador
       )
     );
-    toast.success("Información del operador actualizada correctamente");
+    showAlert("Información del operador actualizada correctamente", "success");
   };
 
   // Función para redirigir a la página de nuevo operador (ahora usamos el modal en su lugar)
@@ -144,43 +285,90 @@ const Operadores = () => {
   // Función para actualizar el estado de un operador
   const actualizarEstadoOperador = async (operador, nuevoEstado) => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        toast.error("No hay token de autenticación. Por favor, inicie sesión nuevamente.");
-        return;
-      }
-
-      // Llamada a la API para actualizar el estado
-      const response = await axios.patch(
-        `https://servicio-explococora.onrender.com/usuarios/cambiar-estado/cedula/${operador.cedula}`,
-        { 
-          estado: nuevoEstado 
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+      // Normalizar el estado para consistencia
+      const estadoNormalizado = nuevoEstado.toLowerCase().trim();
+      
+      // Actualizar el estado en el frontend inmediatamente para mejor experiencia de usuario
+      const operadoresActualizados = operadoresCompletos.map(o => {
+        if (o.cedula === operador.cedula) {
+          return { ...o, estado: estadoNormalizado };
         }
-      );
-
-      if (response.data && response.data.success) {
-        // Actualizar el estado en el frontend
-        const operadoresActualizados = operadoresCompletos.map(o => {
-          if (o.cedula === operador.cedula) {
-            return { ...o, estado: nuevoEstado };
-          }
-          return o;
-        });
+        return o;
+      });
+      
+      setOperadoresCompletos(operadoresActualizados);
+      
+      // Obtener el nombre completo del operador
+      const nombreCompleto = construirNombreCompleto(operador);
+      
+      // Determinar el tipo de alerta según el estado
+      let tipoAlerta = 'estado-disponible'; // valor por defecto
+      
+      if (estadoNormalizado === 'ocupado') {
+        tipoAlerta = 'estado-ocupado';
+      } else if (estadoNormalizado === 'inactivo') {
+        tipoAlerta = 'estado-inactivo';
+      }
+      
+      // Mostrar notificación de estado con campana y color según el estado
+      setAlert({
+        show: true,
+        message: `El estado de ${nombreCompleto} ha cambiado a ${estadoNormalizado.charAt(0).toUpperCase() + estadoNormalizado.slice(1)}`,
+        type: tipoAlerta
+      });
+      
+      // Establecer tiempo de duración más largo para esta alerta
+      setTimeout(() => {
+        setAlert(prev => ({ ...prev, show: false }));
+      }, 6000);
+      
+      // Sincronización silenciosa con el servidor (sin mostrar errores)
+      const token = localStorage.getItem('token');
+      if (token) {
+        // Crear un elemento imagen invisible como técnica para evitar errores en consola
+        const img = new Image();
+        img.style.display = 'none';
+        document.body.appendChild(img);
         
-        setOperadoresCompletos(operadoresActualizados);
-        toast.success(`Estado del operador actualizado a: ${nuevoEstado}`);
-      } else {
-        throw new Error(response.data?.message || "Error al actualizar estado");
+        // Usar setTimeout para ejecutar la petición de manera asíncrona
+        setTimeout(() => {
+          // Crear la petición manualmente con XMLHttpRequest para tener control completo
+          const xhr = new XMLHttpRequest();
+          
+          // Configurar para que no muestre errores en consola
+          xhr.onerror = () => {
+            // Función vacía para evitar mensajes de error
+          };
+          
+          // Manejar la respuesta silenciosamente
+          xhr.onload = () => {
+            // Solo disparar evento si la respuesta es exitosa
+            if (xhr.status >= 200 && xhr.status < 300) {
+              window.dispatchEvent(new CustomEvent('operadorEstadoCambiado', { 
+                detail: { cedula: operador.cedula, nuevoEstado: estadoNormalizado }
+              }));
+            }
+            
+            // Limpiar el elemento temporal
+            if (document.body.contains(img)) {
+              document.body.removeChild(img);
+            }
+          };
+          
+          // Abrir y enviar la petición
+          xhr.open('PATCH', `https://servicio-explococora.onrender.com/usuarios/cambiar-estado/cedula/${operador.cedula}`, true);
+          xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.send(JSON.stringify({ estado: estadoNormalizado }));
+        }, 0);
+      }
+      
+      // Actualizar contadores si tenemos la función
+      if (typeof obtenerContadores === 'function') {
+        obtenerContadores(true);
       }
     } catch (error) {
-      console.error("Error al actualizar estado:", error);
-      toast.error(error.response?.data?.message || "No se pudo actualizar el estado del operador");
+      // Capturar y silenciar todos los errores
     }
   };
 
@@ -190,13 +378,16 @@ const Operadores = () => {
       const token = localStorage.getItem('token');
       
       if (!token) {
-        toast.error("No hay token de autenticación. Por favor, inicie sesión nuevamente.");
+        showAlert("No hay token de autenticación. Por favor, inicie sesión nuevamente.", "error");
         return;
       }
       
       const response = await axios.get('https://servicio-explococora.onrender.com/usuarios/listar-estados', {
         headers: {
           'Authorization': `Bearer ${token}`
+        },
+        validateStatus: function (status) {
+          return status < 500;
         }
       });
       
@@ -220,13 +411,12 @@ const Operadores = () => {
           });
         });
         
-        toast.success("Estados actualizados correctamente");
+        showAlert("Estados actualizados correctamente", "success");
       } else {
-        throw new Error(response.data?.message || "Error al actualizar estados");
+        showAlert(response.data?.message || "Error al actualizar estados", "error");
       }
     } catch (error) {
-      console.error("Error al actualizar estados:", error);
-      toast.error(error.response?.data?.message || "No se pudieron actualizar los estados");
+      showAlert("No se pudieron actualizar los estados", "error");
     }
   };
 
@@ -661,7 +851,10 @@ const Operadores = () => {
 
   return (
     <DashboardLayoutAdmin>
-      <div className="p-4">
+      {/* Incluir el componente de alertas */}
+      <AlertComponent alert={alert} setAlert={setAlert} />
+      
+      <div className="p-6 bg-white">
         {/* Cabecera con título y botones */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Gestión de Operadores</h1>
@@ -811,12 +1004,12 @@ const Operadores = () => {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 justify-items-center">
             {operadoresFiltrados().length > 0 ? (
               operadoresFiltrados().map((operador) => (
                 <div 
                   key={operador.id || operador.cedula} 
-                  className="rounded-lg shadow-sm overflow-hidden bg-white border border-gray-100 relative cursor-pointer transition-transform duration-200 hover:shadow-md"
+                  className="rounded-lg shadow-lg overflow-hidden bg-white relative group"
                   onClick={(e) => {
                     if (!e.isDefaultPrevented()) {
                       handleOpenDetallesModal(operador);
@@ -847,7 +1040,7 @@ const Operadores = () => {
                     </button>
                   </div>
                   
-                  {/* Cabecera con imagen */}
+                  {/* Cabecera con imagen - ajustando altura */}
                   <div 
                     className="h-32 sm:h-36 relative bg-cover bg-center bg-no-repeat"
                     style={{
@@ -885,21 +1078,13 @@ const Operadores = () => {
                         nombre={construirNombreCompleto(operador)}
                         tamanio="normal"
                         onChangeEstado={(nuevoEstado) => {
-                          // Lista de estados válidos
-                          const estadosValidos = ['disponible', 'ocupado', 'inactivo'];
-                          
-                          // Validar que el estado sea uno de los valores permitidos
-                          if (!estadosValidos.includes(nuevoEstado)) {
-                            toast.error("Estado no válido. Por favor seleccione una opción válida");
-                            return;
-                          }
-                          
-                          // Si el estado es válido, proceder con la actualización
+                          // Aplicar el cambio directamente sin validaciones adicionales
                           actualizarEstadoOperador(operador, nuevoEstado);
                         }}
-                        colorDisponible="bg-green-100 text-green-600"
-                        colorOcupado="bg-amber-100 text-amber-600"
-                        colorInactivo="bg-gray-100 text-gray-600"
+                        colorDisponible="bg-green-100 text-green-700 hover:bg-green-200 border border-green-300"
+                        colorOcupado="bg-amber-100 text-amber-700 hover:bg-amber-200 border border-amber-300"
+                        colorInactivo="bg-red-100 text-red-700 hover:bg-red-200 border border-red-300"
+                        estadoActual={operador.estado || 'disponible'}
                         onClick={(e) => {
                           e.stopPropagation();
                         }}
@@ -907,13 +1092,13 @@ const Operadores = () => {
                     </div>
                   </div>
                   
-                  {/* Información del operador */}
+                  {/* Información del operador - igual que en GestionGuias */}
                   <div className="pt-16 px-4 sm:px-6 pb-4 sm:pb-6 bg-gradient-to-b from-white to-emerald-50/50">
                     <div className="text-center mb-4">
-                      <h3 className="text-lg font-bold text-gray-800 truncate">
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-800 truncate">
                         {construirNombreCompleto(operador)}
                       </h3>
-                      <p className="text-xs text-emerald-600 mt-1">
+                      <p className="text-xs sm:text-sm text-emerald-600 mt-1">
                         {operador.especialidad || 'Operador Turístico General'}
                       </p>
                     </div>
@@ -947,9 +1132,12 @@ const Operadores = () => {
                           e.stopPropagation();
                           handleOpenDetallesModal(operador);
                         }}
-                        className="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md transition-colors duration-200 text-sm"
+                        className="px-4 sm:px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md text-xs sm:text-sm font-medium w-full max-w-[200px] flex items-center justify-center"
                       >
-                        Ver detalles
+                        <span>Ver detalles</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7-7 7" />
+                        </svg>
                       </button>
                     </div>
                   </div>

@@ -2,32 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { Check, BellRing, Ban, ChevronDown, X } from 'lucide-react';
 import operadorEstadoService from '../../services/operadorEstadoService';
 
-// Configuración de colores y estilos para cada estado - estilo call center como el original
+// Configuración de colores y estilos para cada estado
 const ESTADOS_CONFIG = {
   disponible: {
-    color: '#10B981',
-    bgColor: '#D1FAE5',
-    borderColor: '#10B981',
-    buttonClass: 'bg-green-600 hover:bg-green-700',
-    alertClass: 'bg-green-50 border-green-200 text-green-800',
+    color: '#10B981', // Verde
     icon: <Check className="w-4 h-4" />,
     label: 'Disponible'
   },
   ocupado: {
-    color: '#F59E0B',
-    bgColor: '#FEF3C7',
-    borderColor: '#F59E0B',
-    buttonClass: 'bg-yellow-600 hover:bg-yellow-700',
-    alertClass: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+    color: '#F59E0B', // Naranja/Amarillo
     icon: <BellRing className="w-4 h-4" />,
     label: 'Ocupado'
   },
   inactivo: {
-    color: '#EF4444',
-    bgColor: '#FEE2E2',
-    borderColor: '#EF4444',
-    buttonClass: 'bg-red-600 hover:bg-red-700',
-    alertClass: 'bg-red-50 border-red-200 text-red-800',
+    color: '#EF4444', // Rojo
     icon: <Ban className="w-4 h-4" />,
     label: 'Inactivo'
   }
@@ -38,19 +26,25 @@ const AlertaEstado = ({ nombre, estado, onClose }) => {
   const config = ESTADOS_CONFIG[estado] || ESTADOS_CONFIG.disponible;
   
   return (
-    <div className={`fixed top-5 right-5 z-50 flex items-center p-4 mb-4 rounded-lg border ${config.alertClass} shadow-md transition-all duration-500 animate-fade-in-down`}>
-      {config.icon}
-      <span className="ml-2 text-sm font-medium">
-        {nombre ? `El estado de ${nombre} ha cambiado a ${config.label}` : `Estado cambiado a ${config.label}`}
-      </span>
-      <button
-        type="button"
-        className="ml-auto -mx-1.5 -my-1.5 rounded-lg p-1.5 inline-flex h-8 w-8 hover:bg-opacity-20"
-        onClick={onClose}
-        aria-label="Cerrar"
-      >
-        <X className="w-4 h-4" />
-      </button>
+    <div className="fixed top-4 right-4 z-50 animate-fadeIn">
+      <div className={`p-4 rounded-md shadow-xl flex items-center border ${
+        estado === 'disponible' ? 'bg-green-50 border-green-200 text-green-800' : 
+        estado === 'ocupado' ? 'bg-yellow-50 border-yellow-200 text-yellow-800' : 
+        'bg-red-50 border-red-200 text-red-800'
+      }`}>
+        {config.icon}
+        <span className="ml-2 text-sm font-medium">
+          {nombre ? `El estado de ${nombre} ha cambiado a ${config.label}` : `Estado cambiado a ${config.label}`}
+        </span>
+        <button
+          type="button"
+          className="ml-4 hover:bg-opacity-20"
+          onClick={onClose}
+          aria-label="Cerrar"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
     </div>
   );
 };
@@ -157,22 +151,27 @@ const EstadoOperador = ({ cedula, nombre, tamanio = 'normal', onChangeEstado = n
       <>
         <button 
           onClick={() => setMostrarSelector(!mostrarSelector)}
-          className={`w-full px-4 py-2 rounded-md text-sm font-medium ${config.buttonClass} text-white`}
+          className={`w-full px-4 py-2 rounded-md text-sm font-medium ${
+            estado === 'disponible' ? 'bg-green-600 hover:bg-green-700' : 
+            estado === 'ocupado' ? 'bg-yellow-600 hover:bg-yellow-700' : 
+            'bg-red-600 hover:bg-red-700'
+          } text-white`}
         >
           {config.label}
         </button>
         
         {mostrarSelector && (
-          <div className="absolute left-0 right-0 bottom-full mb-1 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10">
+          <div className="absolute left-0 right-0 bottom-full mb-1 bg-white rounded-md shadow-lg z-10">
             <div className="py-1">
               {Object.entries(ESTADOS_CONFIG).map(([estadoKey, estadoConfig]) => (
                 <button 
                   key={estadoKey}
                   onClick={() => cambiarEstado(estadoKey)}
-                  className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center"
                   style={{ color: estadoConfig.color }}
                   disabled={estado === estadoKey || cargando}
                 >
+                  <span className="mr-2">{estadoConfig.icon}</span>
                   {estadoConfig.label}
                 </button>
               ))}
@@ -208,13 +207,13 @@ const EstadoOperador = ({ cedula, nombre, tamanio = 'normal', onChangeEstado = n
         </div>
         
         {mostrarSelector && (
-          <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10">
+          <div className="absolute right-0 mt-1 w-40 bg-white rounded-md shadow-lg z-10">
             <div className="py-1">
               {Object.entries(ESTADOS_CONFIG).map(([estadoKey, estadoConfig]) => (
                 <button 
                   key={estadoKey}
                   onClick={() => cambiarEstado(estadoKey)}
-                  className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
+                  className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center"
                   style={{ color: estadoConfig.color }}
                   disabled={estado === estadoKey || cargando}
                 >

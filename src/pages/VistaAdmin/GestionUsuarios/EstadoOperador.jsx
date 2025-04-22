@@ -136,22 +136,27 @@ const EstadoOperador = () => {
             setUltimaActualizacion(new Date(parseInt(ultimaActualizacionGuardada)));
             
             // También cargar contadores guardados
-            obtenerContadores(false);
+            const contadoresGuardados = localStorage.getItem('contadoresOperadoresAdmin');
+            if (contadoresGuardados) {
+              setContadores(JSON.parse(contadoresGuardados));
+            }
             return;
           }
         }
       }
       
       setActualizando(true);
-      setLoading(true);
-      
+      setError(null);
       const token = localStorage.getItem('token');
+      
       if (!token) {
-        setError('No hay token de autenticación disponible');
-        setOperadores([]);
+        setError("No hay token de autenticación. Por favor, inicie sesión nuevamente.");
+        setLoading(false);
+        setActualizando(false);
         return;
       }
       
+      // URL para obtener operadores
       const urlCompleta = `${API_URL}${API_PATH}`;
       console.log('Intentando conectar a:', urlCompleta);
       
@@ -167,9 +172,13 @@ const EstadoOperador = () => {
         operadoresData = response.data.usuarios;
       } else if (response.data && Array.isArray(response.data)) {
         operadoresData = response.data;
+      } else if (response.data && (response.data.operadores || response.data.data)) {
+        operadoresData = response.data.operadores || response.data.data;
       } else {
-        setOperadores([]);
         setError('La respuesta del servidor no tiene el formato esperado');
+        setOperadores([]);
+        setLoading(false);
+        setActualizando(false);
         return;
       }
       
@@ -181,7 +190,7 @@ const EstadoOperador = () => {
             const cedulaOId = operador.cedula || operador.documento || operador._id || operador.id;
             
             try {
-              const perfilResponse = await axios.get(`${API_URL}/operador/perfil-completo/${cedulaOId}`, {
+              const perfilResponse = await axios.get(`${API_URL}/operador-turistico/perfil-completo/${cedulaOId}`, {
                 headers: {
                   Authorization: `Bearer ${token}`
                 }
@@ -210,18 +219,40 @@ const EstadoOperador = () => {
       localStorage.setItem('ultimaActualizacionOperadoresAdmin', ahora.toString());
       localStorage.setItem('operadoresDataAdmin', JSON.stringify(operadoresActualizados));
       
+      // Actualizar contadores
+      const disponibles = operadoresActualizados.filter(op => op.estado === 'disponible' || op.estado === 'activo').length;
+      const ocupados = operadoresActualizados.filter(op => op.estado === 'ocupado').length;
+      const inactivos = operadoresActualizados.filter(op => op.estado === 'inactivo').length;
+      const total = operadoresActualizados.length;
+      
+      const nuevosContadores = {
+        disponibles,
+        ocupados,
+        inactivos,
+        total
+      };
+      
+      // Guardar contadores en localStorage
+      localStorage.setItem('contadoresOperadoresAdmin', JSON.stringify(nuevosContadores));
+      
+      // Actualizar estados
       setOperadores(operadoresActualizados);
-      await obtenerContadores(true);
+      setContadores(nuevosContadores);
+      setUltimaActualizacion(new Date());
+      setLoading(false);
+      setActualizando(false);
       
-      setError(null);
-      setUltimaActualizacion(new Date(ahora));
+      return operadoresActualizados;
     } catch (err) {
-      console.error("Error al obtener estados de operadores:", err);
+      console.error('Error al obtener operadores:', err);
       
-      let mensajeError = 'Error al cargar los datos. Por favor, intenta de nuevo.';
+      let mensajeError = 'Error al conectar con el servidor';
       
       if (err.response) {
-        mensajeError = `Error ${err.response.status}: ${err.response.statusText}`;
+        mensajeError = `Error del servidor: ${err.response.status}`;
+        if (err.response.data && err.response.data.message) {
+          mensajeError = err.response.data.message;
+        }
       } else if (err.request) {
         mensajeError = 'No se recibió respuesta del servidor';
       } else {

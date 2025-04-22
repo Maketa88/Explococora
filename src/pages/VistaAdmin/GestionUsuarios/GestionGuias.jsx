@@ -19,13 +19,6 @@ const Guias = () => {
   const [ordenarPor, setOrdenarPor] = useState('nombre'); // nombre, fecha, experiencia
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
   
-  // Contadores de estados
-  const [contadores, setContadores] = useState({
-    total: 0,
-    disponibles: 0,
-    ocupados: 0,
-    inactivos: 0
-  });
 
   const [guiaAEliminar, setGuiaAEliminar] = useState(null);
   const [showEliminarModal, setShowEliminarModal] = useState(false);
