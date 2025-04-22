@@ -168,7 +168,7 @@ const RecuperarContrasena = () => {
               className="absolute animate-float z-0 opacity-60"
               style={{
                 left: leaf.left,
-                top: leaf.top,
+                // top: leaf.top,
                 animationDelay: `${leaf.delay}s`,
                 animationDuration: `${leaf.duration}s`
               }}
@@ -254,7 +254,7 @@ const RecuperarContrasena = () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center pt-0 overflow-hidden relative font-nunito">
+    <div className="min-h-screen w-full flex flex-col items-center justify-start -mt-0 overflow-hidden relative font-nunito">
       {/* Background decorative elements */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-emerald-50 to-white"></div>
