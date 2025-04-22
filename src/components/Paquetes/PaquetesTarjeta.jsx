@@ -30,6 +30,41 @@ const PaquetesTarjeta = ({ onPaqueteSeleccionado, paqueteActualId }) => {
   // Referencia para evitar recargas innecesarias
   const inicializadoRef = useRef(false);
 
+  // Primero, agrega estas variables de estado y referencia
+  const [desplazamiento, setDesplazamiento] = useState(false);
+  const sliderRef = useRef(null);
+
+  // Luego, agrega esta función para manejar el desplazamiento
+  const desplazarSlider = (direccion) => {
+    if (!sliderRef.current || desplazamiento) return;
+    
+    setDesplazamiento(true);
+    
+    const carousel = sliderRef.current;
+    
+    // Ancho total de cada tarjeta (incluyendo margen/gap)
+    const tarjetaWidth = 230 + 24; // 230px de ancho + 24px de gap (6*4)
+    
+    // Calcular el índice actual aproximado
+    const scrollPosition = carousel.scrollLeft;
+    const currentIndex = Math.round(scrollPosition / tarjetaWidth);
+    
+    // Determinar el nuevo índice
+    const newIndex = direccion === 'derecha' ? currentIndex + 1 : currentIndex - 1;
+    
+    // Calcular la nueva posición de scroll exacta
+    const newScrollPosition = newIndex * tarjetaWidth;
+    
+    // Scroll a la posición exacta
+    carousel.scrollTo({
+      left: newScrollPosition,
+      behavior: 'smooth'
+    });
+    
+    // Desactivar el desplazamiento por un momento para evitar clics rápidos
+    setTimeout(() => setDesplazamiento(false), 500);
+  };
+
   // Función para obtener la lista de paquetes
   const fetchPaquetes = async () => {
     // Si ya está cargando, no hacer nada
@@ -231,13 +266,6 @@ const PaquetesTarjeta = ({ onPaqueteSeleccionado, paqueteActualId }) => {
     }
   }, []);
 
-  // Función para manejar el clic en un paquete
-  const handlePaqueteClick = (paquete) => {
-    if (onPaqueteSeleccionado) {
-      onPaqueteSeleccionado(paquete);
-    }
-  };
-
   // Función para mostrar precio formateado
   const mostrarPrecio = (precio) => {
     if (!precio) return '$0';
@@ -378,189 +406,230 @@ const PaquetesTarjeta = ({ onPaqueteSeleccionado, paqueteActualId }) => {
             </div>
           </div>
         ) : paquetes.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 justify-items-center mx-auto p-4">
-            {paquetes.map((paquete, index) => (
-              <div
-                key={`paquete-${paquete.idPaquete || paquete.id || index}`}
-                className={`group bg-white rounded-lg shadow-sm overflow-hidden border border-emerald-100 hover:shadow-md hover:-translate-y-1 transition-all duration-300 relative flex flex-col h-full w-full max-w-[200px] cursor-pointer ${
-                  paqueteActualId === paquete.idPaquete ? 'ring-2 ring-teal-500 shadow-lg shadow-teal-200/50 z-10' : ''
-                }`}
-                onClick={() => handlePaqueteClick(paquete)}
-              >
-                {/* Cinta decorativa en la esquina */}
-                <div className="absolute -right-6 -top-1 w-20 h-6 bg-teal-600 text-white text-[10px] font-bold px-0 py-1 shadow-md transform rotate-45 z-10 flex items-center justify-center">
-                  <span className="text-white tracking-wider uppercase">
-                    Paquete
-                  </span>
-                </div>
-        
-                {/* Encabezado de la carta */}
-                <div className="bg-gradient-to-r from-teal-800 to-teal-700 text-white p-1.5 relative overflow-hidden h-12 flex flex-col justify-center">
-                  <h2 className="text-sm font-bold relative z-10 line-clamp-1">
-                    {paquete.nombrePaquete}
-                  </h2>
-                  <div className="flex items-center space-x-1 relative z-10">
-                    <span className="inline-block px-1 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-200 text-emerald-800">
-                      {paquete.rutasAsociadas?.length || 0} rutas
-                    </span>
-                    {paquete.descuento > 0 && (
-                      <span className="inline-block px-1 py-0.5 rounded-full text-[10px] font-semibold bg-amber-200 text-amber-800">
-                        {paquete.descuento}% desc
-                      </span>
-                    )}
-                  </div>
-                </div>
-      
-                {/* Imagen */}
-                <div className="relative h-24 overflow-hidden">
-                  {cargandoFotos[paquete.idPaquete] ? (
-                    <div className="flex justify-center items-center h-full bg-gray-100">
-                      <div className="animate-pulse flex space-x-1">
-                        <div className="h-1.5 w-1.5 bg-emerald-600 rounded-full animate-bounce"></div>
-                        <div className="h-1.5 w-1.5 bg-emerald-600 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-                        <div className="h-1.5 w-1.5 bg-emerald-600 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></div>
-                      </div>
-                    </div>
-                  ) : paquetesConFotos[paquete.idPaquete] && paquetesConFotos[paquete.idPaquete].length > 0 ? (
-                    <div className="h-full relative">
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10"></div>
-                      {/* Estrellas de calificación */}
-                      <div className="absolute bottom-1 right-1 z-20 bg-white/40 rounded-full px-1.5 py-0.5 flex items-center"><div className="flex">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                         
-                        </div>
-                      </div>
-                      <img
-                        src={paquetesConFotos[paquete.idPaquete][0].url}
-                        alt={`Foto de ${paquete.nombrePaquete}`}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = "https://via.placeholder.com/300x200?text=Imagen+no+disponible";
-                        }}
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-emerald-50 relative">
-                      {/* Estrellas de calificación para tarjetas sin imágenes */}
-                      <div className="absolute bottom-1 right-1 z-20 bg-teal-100/80 rounded-full px-1.5 py-0.5 flex items-center">
-                        <div className="flex">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                        </div>
-                      </div>
-                      <Package size={24} className="text-emerald-600" />
-                    </div>
-                  )}
-                </div>
-                  
-                {/* Contenido de la carta */}
-                <div className="p-1.5 relative flex-grow flex flex-col">
-                  {/* Información destacada */}
-                  <div className="grid grid-cols-2 gap-1 mb-2 relative z-10">
-                    <div className="flex flex-col items-center p-1 bg-emerald-50 rounded-md shadow-sm">
-                      <Clock className="h-3 w-3 text-emerald-700 mb-0.5" />
-                      <span className="text-emerald-800 text-[9px]  font-medium truncate w-full text-center">
-                        Duración
-                      </span>
-                      <span className="text-emerald-900 text-[8px] font-bold truncate w-full text-center">
-                        {calcularDuracionTotalPaquete(paquete)}
+          <div className="relative max-w-full mx-auto px-0">
+            {/* Botón de navegación izquierda separado */}
+            <button
+              onClick={() => desplazarSlider('izquierda')}
+              className="absolute -left-5 top-1/2 -translate-y-1/2 z-20 bg-teal-600/80 hover:bg-teal-700 text-white p-2 rounded-full shadow-md transition-all duration-300"
+              aria-label="Anterior"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            
+            {/* Contenedor del slider con ajustes de padding */}
+            <div 
+              ref={sliderRef} 
+              className="flex overflow-x-auto pb-8 pt-4 gap-6 snap-x snap-mandatory px-16 mx-auto" 
+              style={{ 
+                scrollbarWidth: 'none', 
+                msOverflowStyle: 'none',
+                scrollSnapType: 'x mandatory',
+                scrollPaddingLeft: '10px',
+                scrollPaddingRight: '10px',
+                maxWidth: 'calc(100% - 40px)'  // Un poco menos que el ancho total para que se vea centrado
+              }}
+            >
+              {paquetes.map((paquete, index) => (
+                <div
+                  key={`paquete-${paquete.idPaquete || paquete.id || index}`}
+                  className="flex-shrink-0 flex-grow-0 snap-center"
+                  style={{ width: '230px' }}
+                  onClick={() => onPaqueteSeleccionado && onPaqueteSeleccionado(paquete)}
+                >
+                  <div
+                    className={`group bg-white rounded-lg shadow-sm overflow-hidden border border-teal-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative flex flex-col h-full w-full max-w-[230px] cursor-pointer ${
+                      paqueteActualId === paquete.idPaquete ? 'ring-2 ring-teal-500 shadow-lg shadow-teal-200/50 z-10' : ''
+                    }`}
+                  >
+                    {/* Cinta decorativa en la esquina */}
+                    <div className="absolute -right-6 -top-1 w-20 h-6 bg-teal-600 text-white text-[10px] font-bold px-0 py-1 shadow-md transform rotate-45 z-10 flex items-center justify-center">
+                      <span className="text-white tracking-wider uppercase">
+                        Paquete
                       </span>
                     </div>
-                    <div className="flex flex-col items-center p-1 bg-emerald-50 rounded-md shadow-sm">
-                      <DollarSign className="h-3 w-3 text-emerald-700 mb-0.5" />
-                      <span className="text-emerald-800 text-[9px]  font-medium truncate w-full text-center">
-                        Precio
-                      </span>
-                      <span className="text-emerald-900 text-[8px] font-bold truncate w-full text-center">
-                        {mostrarPrecio(paquete.precio)}
-                      </span>
-                    </div>
-                  </div>
-                      
-                  {/* Descripción */}
-                  <div className="mb-2 relative z-10">
-                    <h3 className="text-emerald-800 text-[10px] font-semibold mb-0.5 flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-2.5 w-2.5 mr-0.5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      Descripción
-                    </h3>
-                    <div className="bg-white bg-opacity-70 p-1 rounded-md shadow-inner">
-                      <p className="text-gray-700 text-[9px] line-clamp-2 italic">
-                        {paquete.descripcion}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Detalles adicionales condensados */}
-                  <div className="flex flex-col space-y-1 mb-2 relative z-10">
-                    <div className="flex items-center bg-white p-1 rounded-md">
-                      <Map className="h-2.5 w-2.5 text-emerald-700 mr-1" />
-                      <span className="text-gray-700 text-[9px]">
-                        <span className="font-medium">Rutas:</span>{" "}
-                        {paquete.rutasAsociadas?.length || 0}
-                      </span>
-                    </div>
-                    {paquete.descuento > 0 && (
-                      <div className="flex items-center bg-white p-1 rounded-md">
-                        <DollarSign className="h-2.5 w-2.5 text-emerald-700 mr-1" />
-                        <span className="text-gray-700 text-[9px]">
-                          <span className="font-medium">Final:</span>{" "}
-                          ${(paquete.precio * (1 - paquete.descuento / 100)).toFixed(0)}
+            
+                    {/* Encabezado de la carta */}
+                    <div className="bg-gradient-to-r from-teal-700 to-teal-600 text-white p-1.5 relative overflow-hidden h-12 flex flex-col justify-center">
+                      <h2 className="text-sm font-bold relative z-10 line-clamp-1">
+                        {paquete.nombrePaquete}
+                      </h2>
+                      <div className="flex items-center space-x-1 relative z-10">
+                        <span className="inline-block px-1 py-0.5 rounded-full text-[10px] font-semibold bg-teal-200 text-teal-800">
+                          {paquete.rutasAsociadas?.length || 0} rutas
                         </span>
+                        {paquete.descuento > 0 && (
+                          <span className="inline-block px-1 py-0.5 rounded-full text-[10px] font-semibold bg-amber-200 text-amber-800">
+                            {paquete.descuento}% desc
+                          </span>
+                        )}
                       </div>
-                    )}
-                  </div>
+                    </div>
+          
+                    {/* Imagen */}
+                    <div className="relative h-24 overflow-hidden">
+                      {cargandoFotos[paquete.idPaquete] ? (
+                        <div className="flex justify-center items-center h-full bg-gray-100">
+                          <div className="animate-pulse flex space-x-1">
+                            <div className="h-1.5 w-1.5 bg-emerald-600 rounded-full animate-bounce"></div>
+                            <div className="h-1.5 w-1.5 bg-emerald-600 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                            <div className="h-1.5 w-1.5 bg-emerald-600 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></div>
+                          </div>
+                        </div>
+                      ) : paquetesConFotos[paquete.idPaquete] && paquetesConFotos[paquete.idPaquete].length > 0 ? (
+                        <div className="h-full relative">
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10"></div>
+                          {/* Estrellas de calificación */}
+                          <div className="absolute bottom-1 right-1 z-20 bg-white/40 rounded-full px-1.5 py-0.5 flex items-center"><div className="flex">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                             
+                            </div>
+                          </div>
+                          <img
+                            src={paquetesConFotos[paquete.idPaquete][0].url}
+                            alt={`Foto de ${paquete.nombrePaquete}`}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = "https://via.placeholder.com/300x200?text=Imagen+no+disponible";
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-emerald-50 relative">
+                          {/* Estrellas de calificación para tarjetas sin imágenes */}
+                          <div className="absolute bottom-1 right-1 z-20 bg-teal-100/80 rounded-full px-1.5 py-0.5 flex items-center">
+                            <div className="flex">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                            </div>
+                          </div>
+                          <Package size={24} className="text-emerald-600" />
+                        </div>
+                      )}
+                    </div>
                       
-                  {/* Botón para reservar - Envuelto en ButtonWrapper para detener propagación */}
-                  <ButtonWrapper>
-                    <BotonPagoPaquete
-                      paquete={paquete}
-                      className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-1.5 px-2 rounded-md transition-all duration-300 shadow-sm hover:shadow flex items-center justify-center mt-auto"
-                    />
-                  </ButtonWrapper>
+                    {/* Contenido de la carta */}
+                    <div className="p-1.5 relative flex-grow flex flex-col">
+                      {/* Información destacada */}
+                      <div className="grid grid-cols-2 gap-1 mb-2 relative z-10">
+                        <div className="flex flex-col items-center p-1 bg-emerald-50 rounded-md shadow-sm">
+                          <Clock className="h-3 w-3 text-emerald-700 mb-0.5" />
+                          <span className="text-emerald-800 text-[9px]  font-medium truncate w-full text-center">
+                            Duración
+                          </span>
+                          <span className="text-emerald-900 text-[8px] font-bold truncate w-full text-center">
+                            {calcularDuracionTotalPaquete(paquete)}
+                          </span>
+                        </div>
+                        <div className="flex flex-col items-center p-1 bg-emerald-50 rounded-md shadow-sm">
+                          <DollarSign className="h-3 w-3 text-emerald-700 mb-0.5" />
+                          <span className="text-emerald-800 text-[9px]  font-medium truncate w-full text-center">
+                            Precio
+                          </span>
+                          <span className="text-emerald-900 text-[8px] font-bold truncate w-full text-center">
+                            {mostrarPrecio(paquete.precio)}
+                          </span>
+                        </div>
+                      </div>
+                          
+                      {/* Descripción */}
+                      <div className="mb-2 relative z-10">
+                        <h3 className="text-emerald-800 text-[10px] font-semibold mb-0.5 flex items-center">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-2.5 w-2.5 mr-0.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          Descripción
+                        </h3>
+                        <div className="bg-white bg-opacity-70 p-1 rounded-md shadow-inner">
+                          <p className="text-gray-700 text-[9px] line-clamp-2 italic">
+                            {paquete.descripcion}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Detalles adicionales condensados */}
+                      <div className="flex flex-col space-y-1 mb-2 relative z-10">
+                        <div className="flex items-center bg-white p-1 rounded-md">
+                          <Map className="h-2.5 w-2.5 text-emerald-700 mr-1" />
+                          <span className="text-gray-700 text-[9px]">
+                            <span className="font-medium">Rutas:</span>{" "}
+                            {paquete.rutasAsociadas?.length || 0}
+                          </span>
+                        </div>
+                        {paquete.descuento > 0 && (
+                          <div className="flex items-center bg-white p-1 rounded-md">
+                            <DollarSign className="h-2.5 w-2.5 text-emerald-700 mr-1" />
+                            <span className="text-gray-700 text-[9px]">
+                              <span className="font-medium">Final:</span>{" "}
+                              ${(paquete.precio * (1 - paquete.descuento / 100)).toFixed(0)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                          
+                      {/* Botón para reservar - Envuelto en ButtonWrapper para detener propagación */}
+                      <ButtonWrapper>
+                        <BotonPagoPaquete
+                          paquete={paquete}
+                          className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-1.5 px-2 rounded-md transition-all duration-300 shadow-sm hover:shadow flex items-center justify-center mt-auto"
+                        />
+                      </ButtonWrapper>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            
+            {/* Botón de navegación derecha separado */}
+            <button
+              onClick={() => desplazarSlider('derecha')}
+              className="absolute -right-5 top-1/2 -translate-y-1/2 z-20 bg-teal-600/80 hover:bg-teal-700 text-white p-2 rounded-full shadow-md transition-all duration-300"
+              aria-label="Siguiente"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
         ) : (
           <div className="bg-emerald-50 text-center p-6 rounded-lg border border-emerald-100">

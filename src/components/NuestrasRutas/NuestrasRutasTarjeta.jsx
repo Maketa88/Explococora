@@ -349,7 +349,7 @@ export const NuestrasRutasTarjeta = ({ onRutaSeleccionada, rutaActualId }) => {
                 {/* Botón de desplazamiento izquierdo - posicionado fuera del slider */}
                 <button
                   onClick={() => desplazamiento > 0 && desplazarSlider('izquierda')}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-teal-600/80 hover:bg-teal-700 text-white p-2 rounded-full shadow-md transition-all duration-300 -translate-x-1/2"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-teal-600/80 hover:bg-teal-700 text-white p-2 rounded-full shadow-md transition-all duration-300 -translate-x-1/2"
                   aria-label="Desplazar a la izquierda"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -360,7 +360,7 @@ export const NuestrasRutasTarjeta = ({ onRutaSeleccionada, rutaActualId }) => {
                 {/* Botón de desplazamiento derecho - posicionado fuera del slider */}
                 <button
                   onClick={() => desplazamiento < rutas.length - 4 && desplazarSlider('derecha')}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-teal-600/80 hover:bg-teal-700 text-white p-2 rounded-full shadow-md transition-all duration-300 translate-x-1/2"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-teal-600/80 hover:bg-teal-700 text-white p-2 rounded-full shadow-md transition-all duration-300 translate-x-1/2"
                   aria-label="Desplazar a la derecha"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
