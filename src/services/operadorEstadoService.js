@@ -10,10 +10,7 @@ class OperadorEstadoService {
     // Inicializar escucha de eventos
     this.inicializarEventos();
     
-    // Realizar sincronización inicial (con delay para asegurar que el token esté listo)
-    setTimeout(() => {
-      this.sincronizarEstados().catch(console.error);
-    }, 1000);
+
   }
   
   // Obtener estado de un operador específico
@@ -112,7 +109,6 @@ class OperadorEstadoService {
         return false;
       }
     } catch (error) {
-      console.error('Error al sincronizar estados de operadores:', error);
       return false;
     }
   }
@@ -127,10 +123,7 @@ class OperadorEstadoService {
       this.estados.set(cedula, estado);
     });
     
-    // Sincronizar periódicamente
-    setInterval(() => {
-      this.sincronizarEstados().catch(console.error);
-    }, 30000); // Cada 30 segundos
+
     
     // Sincronizar cuando la ventana recupere el foco
     window.addEventListener('focus', () => {
