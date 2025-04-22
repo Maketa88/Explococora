@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { FaEnvelope, FaIdCard, FaUser, FaLock } from "react-icons/fa";
-import { CheckCircle, AlertCircle, X } from 'lucide-react';
+import { X, CheckCircle, Shield, Eye, EyeOff } from 'lucide-react';
 import axios from 'axios';
 import { RegistroCliente } from "../../../services/RegistroCliente";
+import { toast } from 'react-toastify';
 
 const CrearOperador = ({ onClose, onOperadorCreated }) => {
   const [submitting, setSubmitting] = useState(false);
@@ -18,59 +19,139 @@ const CrearOperador = ({ onClose, onOperadorCreated }) => {
     cedula: ''
   });
   
-  const [alert, setAlert] = useState({ show: false, message: '', type: '' });
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [cedulaError, setCedulaError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [requisitosContrasena, setRequisitosContrasena] = useState({
+    longitud: false,
+    mayuscula: false,
+    minuscula: false,
+    especial: false
+  });
+
+  const verificarRequisitos = (contrasena) => {
+    setRequisitosContrasena({
+      longitud: contrasena.length >= 8,
+      mayuscula: /[A-Z]/.test(contrasena),
+      minuscula: /[a-z]/.test(contrasena),
+      especial: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(contrasena)
+    });
+  };
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [id]: value
-    }));
-  };
-
-  // Función para mostrar alertas (solo la flotante)
-  const showAlert = (message, type) => {
-    setAlert({
-      show: true,
-      message,
-      type
-    });
     
-    // Ocultar la alerta después de 5 segundos
-    setTimeout(() => {
-      setAlert(prev => ({ ...prev, show: false }));
-    }, 5000);
-  };
-
-  // Componente de alerta flotante
-  const AlertComponent = () => {
-    if (!alert.show) return null;
-    
-    return (
-      <div className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg flex items-center gap-3 z-50 ${
-        alert.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'
-      }`}>
-        {alert.type === 'success' ? (
-          <CheckCircle className="w-5 h-5" />
-        ) : (
-          <AlertCircle className="w-5 h-5" />
-        )}
-        <span>{alert.message}</span>
-        <button 
-          onClick={() => setAlert(prev => ({ ...prev, show: false }))}
-          className="ml-2 text-white hover:text-gray-200"
-        >
-          <X className="w-4 h-4" />
-        </button>
-      </div>
-    );
+    // Validación específica para la cédula
+    if (id === 'cedula') {
+      // Permitir solo dígitos
+      const onlyDigits = value.replace(/\D/g, '');
+      
+      // Actualizar el valor con solo dígitos
+      setFormData(prev => ({
+        ...prev,
+        [id]: onlyDigits
+      }));
+      
+      // Validar longitud
+      if (onlyDigits.length > 0 && onlyDigits.length !== 10) {
+        setCedulaError('La cédula debe tener exactamente 10 dígitos');
+      } else {
+        setCedulaError('');
+      }
+    } else if (id === 'contrasenia') {
+      // Actualizar el valor de la contraseña
+      setFormData(prev => ({
+        ...prev,
+        [id]: value
+      }));
+      
+      // Verificar requisitos de la contraseña
+      verificarRequisitos(value);
+      
+      // Validar la contraseña
+      if (value.length > 0) {
+        let errors = [];
+        
+        // Verificar longitud mínima
+        if (value.length < 8) {
+          errors.push('La contraseña debe tener al menos 8 caracteres');
+        }
+        
+        // Verificar si contiene al menos una letra mayúscula
+        if (!/[A-Z]/.test(value)) {
+          errors.push('La contraseña debe contener al menos una letra mayúscula');
+        }
+        
+        // Verificar si contiene al menos una letra minúscula
+        if (!/[a-z]/.test(value)) {
+          errors.push('La contraseña debe contener al menos una letra minúscula');
+        }
+        
+        // Verificar si contiene al menos un carácter especial (incluyendo el punto)
+        if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(value)) {
+          errors.push('La contraseña debe contener al menos un carácter especial');
+        }
+        
+        // Establecer el mensaje de error o limpiar si no hay errores
+        if (errors.length > 0) {
+          setPasswordError(errors.join('. '));
+        } else {
+          setPasswordError('');
+        }
+      } else {
+        setPasswordError('');
+      }
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [id]: value
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validar cédula antes de enviar
+    if (formData.cedula.length !== 10) {
+      setCedulaError('La cédula debe tener exactamente 10 dígitos');
+      return;
+    }
+    
+    // Validar que la contraseña cumpla con todos los requisitos
+    let passwordValid = true;
+    let passwordErrors = [];
+    
+    // Verificar longitud mínima
+    if (formData.contrasenia.length < 8) {
+      passwordValid = false;
+      passwordErrors.push('La contraseña debe tener al menos 8 caracteres');
+    }
+    
+    // Verificar si contiene al menos una letra mayúscula
+    if (!/[A-Z]/.test(formData.contrasenia)) {
+      passwordValid = false;
+      passwordErrors.push('La contraseña debe contener al menos una letra mayúscula');
+    }
+    
+    // Verificar si contiene al menos una letra minúscula
+    if (!/[a-z]/.test(formData.contrasenia)) {
+      passwordValid = false;
+      passwordErrors.push('La contraseña debe contener al menos una letra minúscula');
+    }
+    
+    // Verificar si contiene al menos un carácter especial (incluyendo el punto)
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(formData.contrasenia)) {
+      passwordValid = false;
+      passwordErrors.push('La contraseña debe contener al menos un carácter especial');
+    }
+    
+    if (!passwordValid) {
+      setPasswordError(passwordErrors.join('. '));
+      return;
+    }
+    
     setSubmitting(true);
-    setAlert({ show: false, message: '', type: '' });
     setErrors([]);
     
     try {
@@ -87,23 +168,21 @@ const CrearOperador = ({ onClose, onOperadorCreated }) => {
       
       const response = await RegistroCliente(operadorData);
       
-      // Mostrar alerta flotante de éxito
-      showAlert("¡Operador registrado exitosamente!", "success");
+      // Cerrar el modal inmediatamente
+      onClose();
+      
+      // Mostrar notificación toast de éxito
+      toast.success("¡Operador registrado exitosamente!");
       
       // Notificar al componente padre
       if (onOperadorCreated) {
         onOperadorCreated(response.data || operadorData);
       }
-      
-      // Cerrar el modal después de un breve retraso
-      setTimeout(() => {
-        onClose();
-      }, 2000);
     } catch (error) {
       console.error('Error al registrar operador:', error);
       
-      // Mostrar la alerta flotante de error
-      showAlert(error.message || 'Error al registrar el operador. Por favor, intente nuevamente.', "error");
+      // Mostrar notificación toast de error
+      toast.error(error.message || 'Error al registrar el operador. Por favor, intente nuevamente.');
       
       // Mostrar errores en el formulario si es necesario
       if (error.response && error.response.data && error.response.data.errors) {
@@ -133,9 +212,6 @@ const CrearOperador = ({ onClose, onOperadorCreated }) => {
         </div>
         
         <div className="p-6">
-          {/* Alerta flotante */}
-          <AlertComponent />
-          
           {errors.length > 0 && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
               {errors.map((error, index) => (
@@ -156,13 +232,17 @@ const CrearOperador = ({ onClose, onOperadorCreated }) => {
                 <input
                   type="text"
                   id="cedula"
-                  placeholder="Ingrese la cédula o documento de identidad"
+                  placeholder="Ingrese la cédula (10 dígitos)"
                   value={formData.cedula}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-3 py-2 bg-gray-50 text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  maxLength={10}
+                  className={`w-full pl-10 pr-3 py-2 bg-gray-50 text-gray-800 border ${cedulaError ? 'border-red-500' : 'border-gray-300'} rounded focus:outline-none focus:ring-2 focus:ring-emerald-500`}
                   required
                 />
               </div>
+              {cedulaError && (
+                <p className="text-red-500 text-xs mt-1">{cedulaError}</p>
+              )}
             </div>
             
             <div className="mb-4">
@@ -274,30 +354,50 @@ const CrearOperador = ({ onClose, onOperadorCreated }) => {
                 <input
                   type={passwordVisible ? "text" : "password"}
                   id="contrasenia"
-                  placeholder="Ingrese una contraseña segura"
+                  placeholder="Mín. 8 caracteres, mayúscula, minúscula y carácter especial"
                   value={formData.contrasenia}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-3 py-2 bg-gray-50 text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className={`w-full pl-10 pr-10 py-2 bg-gray-50 text-gray-800 border ${passwordError ? 'border-red-500' : 'border-gray-300'} rounded focus:outline-none focus:ring-2 focus:ring-emerald-500`}
                   required
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
                   onClick={() => setPasswordVisible(!passwordVisible)}
                 >
-                  {passwordVisible ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                      <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                    </svg>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
-                      <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
-                    </svg>
-                  )}
+                  {passwordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+              
+              {/* Requisitos de contraseña */}
+              {formData.contrasenia.length > 0 && (
+                <div className="bg-emerald-50 rounded-lg p-3 mt-2 border border-emerald-100">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Shield className="w-4 h-4 text-emerald-600" />
+                    <h3 className="text-xs font-medium text-emerald-700">
+                      Requisitos de la contraseña
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div className={`flex items-center gap-2 ${requisitosContrasena.longitud ? 'text-emerald-600' : 'text-gray-500'}`}>
+                      <CheckCircle className={`w-3 h-3 ${requisitosContrasena.longitud ? 'opacity-100' : 'opacity-50'}`} />
+                      <span className="text-xs">8 caracteres</span>
+                    </div>
+                    <div className={`flex items-center gap-2 ${requisitosContrasena.mayuscula ? 'text-emerald-600' : 'text-gray-500'}`}>
+                      <CheckCircle className={`w-3 h-3 ${requisitosContrasena.mayuscula ? 'opacity-100' : 'opacity-50'}`} />
+                      <span className="text-xs">Al menos una mayúscula</span>
+                    </div>
+                    <div className={`flex items-center gap-2 ${requisitosContrasena.minuscula ? 'text-emerald-600' : 'text-gray-500'}`}>
+                      <CheckCircle className={`w-3 h-3 ${requisitosContrasena.minuscula ? 'opacity-100' : 'opacity-50'}`} />
+                      <span className="text-xs">Al menos una minúscula</span>
+                    </div>
+                    <div className={`flex items-center gap-2 ${requisitosContrasena.especial ? 'text-emerald-600' : 'text-gray-500'}`}>
+                      <CheckCircle className={`w-3 h-3 ${requisitosContrasena.especial ? 'opacity-100' : 'opacity-50'}`} />
+                      <span className="text-xs">Al menos un carácter especial</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             
             <div className="col-span-2 flex justify-end space-x-3 mt-4 pt-4 border-t border-gray-200">
@@ -310,8 +410,17 @@ const CrearOperador = ({ onClose, onOperadorCreated }) => {
               </button>
               <button
                 type="submit"
-                disabled={submitting}
-                className={`px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded flex items-center gap-2 transition-colors duration-300 ${submitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                disabled={submitting || cedulaError || passwordError || 
+                  !requisitosContrasena.longitud || 
+                  !requisitosContrasena.mayuscula || 
+                  !requisitosContrasena.minuscula || 
+                  !requisitosContrasena.especial}
+                className={`px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded flex items-center gap-2 transition-colors duration-300 ${
+                  (submitting || cedulaError || passwordError || 
+                  !requisitosContrasena.longitud || 
+                  !requisitosContrasena.mayuscula || 
+                  !requisitosContrasena.minuscula || 
+                  !requisitosContrasena.especial) ? 'opacity-70 cursor-not-allowed' : ''}`}
               >
                 {submitting ? (
                   <>

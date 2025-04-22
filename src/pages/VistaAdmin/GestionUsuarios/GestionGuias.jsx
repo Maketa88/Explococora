@@ -23,9 +23,6 @@ const Guias = () => {
   const [guiaAEliminar, setGuiaAEliminar] = useState(null);
   const [showEliminarModal, setShowEliminarModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [countdownActive, setCountdownActive] = useState(false);
-  const [countdown, setCountdown] = useState(2);
-  const countdownRef = useRef(null);
   const [showDetallesModal, setShowDetallesModal] = useState(false);
   const [guiaDetalle, setGuiaDetalle] = useState(null);
   const [showEditarModal, setShowEditarModal] = useState(false);
@@ -127,9 +124,7 @@ const Guias = () => {
           conteo.disponibles++;
       }
     });
-    
-    setContadores(conteo);
-  };
+      };
 
   // Función para filtrar guías según búsqueda y filtros
   const guiasFiltrados = () => {
@@ -172,43 +167,15 @@ const Guias = () => {
     setShowEliminarModal(true);
   };
 
-  // Función para iniciar la cuenta regresiva
-  const startCountdown = () => {
-    setCountdownActive(true);
-    setCountdown(2);
-    
-    countdownRef.current = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) {
-          clearInterval(countdownRef.current);
-          setCountdownActive(false);
-          handleActualDelete();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
-  // Función para cancelar la cuenta regresiva
-  const cancelCountdown = () => {
-    if (countdownRef.current) {
-      clearInterval(countdownRef.current);
-      setCountdownActive(false);
-    }
-  };
-
   // Función para eliminar un guía
-  const handleActualDelete = async () => {
-    if (!guiaAEliminar) return;
-    
+  const eliminarGuia = async () => {
     try {
       setIsDeleting(true);
-      const token = localStorage.getItem('token');
       
+      const token = localStorage.getItem('token');
       if (!token) {
+        console.error("No hay token de autenticación");
         setIsDeleting(false);
-        setShowEliminarModal(false);
         return;
       }
 
@@ -706,7 +673,7 @@ const Guias = () => {
         
         
         {/* Lista de guías - sin efectos de zoom */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 sm:gap-4">
           {loading ? (
             <div className="col-span-full p-8 flex flex-col items-center justify-center">
               <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4"></div>
@@ -1002,7 +969,7 @@ const Guias = () => {
       {showEliminarModal && guiaAEliminar && (
         <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-0">
           <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md shadow-2xl border border-gray-200 transform transition-all m-2">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 border-b border-emerald-100 pb-2 bg-emerald-50 p-2 sm:p-3 -mt-4 -mx-4 sm:-mx-6 rounded-t-lg">Confirmar Eliminación</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-white mb-4 border-b border-emerald-100 pb-2 bg-emerald-700 sm:p-3 sm:-mx-6 rounded-t-lg -m-6">Confirmar Eliminación</h2>
             <div className="flex items-center gap-4 mb-6 p-4 bg-emerald-50 rounded-lg border border-emerald-100">
               <div className="relative">
                 {guiaAEliminar.foto ? (
@@ -1034,21 +1001,9 @@ const Guias = () => {
                 </div>
               </div>
             </div>
-            <p className="text-gray-700 mb-6 bg-emerald-50 border-l-4 border-emerald-500 pl-3 py-2 italic">
+            <p className="text-gray-700 mb-6 bg-emerald-50 border-l-4 border-red-500 pl-3 py-2 italic">
               ¿Está seguro que desea eliminar este guía? Esta acción no se puede deshacer.
             </p>
-            
-            {countdownActive && (
-              <div className="mb-6 bg-red-100 border border-red-500 rounded-lg p-4 text-center">
-                <p className="text-gray-800 mb-2">Eliminando en <span className="font-bold text-2xl text-red-500">{countdown}</span> segundos</p>
-                <button 
-                  onClick={cancelCountdown}
-                  className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium"
-                >
-                  Cancelar eliminación
-                </button>
-              </div>
-            )}
             
             <div className="flex flex-col sm:flex-row justify-end gap-2 sm:space-x-3 mt-4">
               <button
@@ -1057,21 +1012,14 @@ const Guias = () => {
                   setGuiaAEliminar(null);
                 }}
                 className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2.5 px-5 rounded-lg transition-all duration-300"
-                disabled={isDeleting || countdownActive}
+                disabled={isDeleting}
               >
                 Cancelar
               </button>
               <button
-                onClick={handleActualDelete}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2.5 px-5 rounded-lg transition-all duration-300"
-                disabled={isDeleting || countdownActive}
-              >
-                Eliminar sin conteo
-              </button>
-              <button
-                onClick={startCountdown}
+                onClick={eliminarGuia}
                 className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-2.5 px-5 rounded-lg transition-all duration-300 flex items-center justify-center"
-                disabled={isDeleting || countdownActive}
+                disabled={isDeleting}
               >
                 {isDeleting ? (
                   <>

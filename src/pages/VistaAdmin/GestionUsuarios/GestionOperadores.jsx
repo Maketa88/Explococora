@@ -1004,12 +1004,12 @@ const Operadores = () => {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 justify-items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 sm:gap-6 justify-items-center">
             {operadoresFiltrados().length > 0 ? (
               operadoresFiltrados().map((operador) => (
                 <div 
                   key={operador.id || operador.cedula} 
-                  className="rounded-lg shadow-lg overflow-hidden bg-white relative group"
+                  className="rounded-lg shadow-lg overflow-hidden bg-white relative group w-full"
                   onClick={(e) => {
                     if (!e.isDefaultPrevented()) {
                       handleOpenDetallesModal(operador);

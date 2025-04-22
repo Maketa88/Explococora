@@ -6,35 +6,8 @@ const EliminarGuia = ({ guia, onClose, onDeleteSuccess }) => {
   // Replace the placeholder with a Base64 encoded image
   const placeholderImage = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIj48cmVjdCB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiM2QjcyODAiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSIxMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgYWxpZ25tZW50LWJhc2VsaW5lPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmaWxsPSIjRkZGRkZGIj5ObyBGb3RvPC90ZXh0Pjwvc3ZnPg==";
   const [isDeleting, setIsDeleting] = useState(false);
-  const [countdownActive, setCountdownActive] = useState(false);
-  const [countdown, setCountdown] = useState(2);
-  const countdownRef = useRef(null);
 
-  const startCountdown = () => {
-    setCountdownActive(true);
-    setCountdown(2);
-    
-    countdownRef.current = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) {
-          clearInterval(countdownRef.current);
-          setCountdownActive(false);
-          handleActualDelete();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
-  const cancelCountdown = () => {
-    if (countdownRef.current) {
-      clearInterval(countdownRef.current);
-      setCountdownActive(false);
-    }
-  };
-
-  const handleActualDelete = async () => {
+  const handleDelete = async () => {
     try {
       setIsDeleting(true);
       const token = localStorage.getItem('token');
@@ -46,52 +19,37 @@ const EliminarGuia = ({ guia, onClose, onDeleteSuccess }) => {
 
       const cedula = guia.cedula;
       
-      // Lista de posibles endpoints para probar
-      const endpoints = [
-        `https://servicio-explococora.onrender.com/guia/eliminar/${cedula}`
-      ];
-      
-      let success = false;
-      
-      // Probar cada endpoint hasta encontrar uno que funcione
-      for (const endpoint of endpoints) {
-        try {
-          console.log(`Intentando eliminar guía con endpoint: ${endpoint}`);
-          const response = await axios.delete(endpoint, {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          });
-          
-          if (response.status === 200 || response.status === 204) {
-            success = true;
-            break;
+      // Simplificar la lógica de eliminación - usar un solo endpoint
+      try {
+        const endpoint = `https://servicio-explococora.onrender.com/guia/eliminar/${cedula}`;
+        console.log(`Eliminando guía con endpoint: ${endpoint}`);
+        
+        const response = await axios.delete(endpoint, {
+          headers: {
+            Authorization: `Bearer ${token}`
           }
-        } catch (err) {
-          console.warn(`Error con endpoint ${endpoint}:`, err.message);
-        }
-      }
-      
-      if (success) {
+        });
+        
+        // Si llegamos aquí, la eliminación fue exitosa
         toast.success("Guía eliminado correctamente");
+        
         // Llamar a la función de éxito pasada como prop
         if (onDeleteSuccess) {
           onDeleteSuccess(cedula);
         }
+        
+        // Cerrar inmediatamente la vista
         onClose();
-      } else {
-        toast.error("No se pudo eliminar el guía. Intente nuevamente.");
+      } catch (err) {
+        console.error(`Error al eliminar guía:`, err);
+        toast.error(err.response?.data?.message || "Error al eliminar el guía. Intente nuevamente.");
       }
     } catch (error) {
-      console.error("Error al eliminar guía:", error);
-      toast.error(error.response?.data?.message || "Error al eliminar el guía");
+      console.error("Error general al eliminar guía:", error);
+      toast.error("Ocurrió un error inesperado. Por favor, intente nuevamente.");
     } finally {
       setIsDeleting(false);
     }
-  };
-
-  const handleDelete = () => {
-    startCountdown();
   };
 
   return (
@@ -119,41 +77,22 @@ const EliminarGuia = ({ guia, onClose, onDeleteSuccess }) => {
             </div>
           </div>
         </div>
-        <p className="text-gray-700 mb-6 bg-yellow-50 border-l-4 border-yellow-400 pl-3 py-2 italic">
+        <p className="text-gray-700 mb-6 bg-yellow-50 border-l-4 border-red-400 pl-3 py-2 italic">
           ¿Está seguro que desea eliminar este guía? Esta acción no se puede deshacer.
         </p>
-        
-        {countdownActive && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-            <p className="text-gray-800 mb-2">Eliminando en <span className="font-bold text-2xl text-red-500">{countdown}</span> segundos</p>
-            <button 
-              onClick={cancelCountdown}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium"
-            >
-              Cancelar eliminación
-            </button>
-          </div>
-        )}
         
         <div className="flex justify-end space-x-3">
           <button
             onClick={onClose}
             className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2.5 px-5 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300"
-            disabled={isDeleting || countdownActive}
+            disabled={isDeleting}
           >
             Cancelar
           </button>
           <button
-            onClick={handleActualDelete}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2.5 px-5 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-400"
-            disabled={isDeleting || countdownActive}
-          >
-            Eliminar sin conteo
-          </button>
-          <button
             onClick={handleDelete}
             className="bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-5 rounded-lg transition-all duration-300 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-red-500"
-            disabled={isDeleting || countdownActive}
+            disabled={isDeleting}
           >
             {isDeleting ? (
               <>
