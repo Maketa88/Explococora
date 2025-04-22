@@ -291,6 +291,13 @@ const DashboardLayoutAdmin = ({ children }) => {
       section: "Usuarios"
     },
     {
+      title: "Estado de Operadores",
+      icon: <Users className="w-5 h-5" />,
+      path: "/VistaAdmin/EstadoOperadores",
+      section: "Usuarios"
+    },
+
+    {
       title: "Gestión de Rutas",
       icon: <BarChart2 className="w-5 h-5" />,
       path: "/VistaAdmin/GestionRutas",

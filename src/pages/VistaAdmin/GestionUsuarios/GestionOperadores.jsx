@@ -252,13 +252,9 @@ const Operadores = () => {
     // Suscribirse al evento global de cambio de estado
     window.addEventListener('operadorEstadoCambiado', handleEstadoCambiado);
     
-    // Configurar intervalo para actualizar estados cada 30 segundos
-    const intervalId = setInterval(actualizarEstados, 30000);
-    
     // Limpieza al desmontar
     return () => {
       window.removeEventListener('operadorEstadoCambiado', handleEstadoCambiado);
-      clearInterval(intervalId);
     };
   }, []);
 
@@ -534,21 +530,22 @@ const Operadores = () => {
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
         <div className="relative w-full max-w-4xl bg-white text-gray-800 rounded-lg shadow-xl max-h-[90vh] overflow-y-auto">
           {/* Cabecera del modal */}
-          <div className="flex justify-between items-center p-4 bg-emerald-600 text-white">
-            <h2 className="text-xl font-bold">Perfil completo del operador</h2>
+          <div className="bg-emerald-600 text-white px-6 py-4 flex justify-between items-center">
+            <h2 className="text-xl font-bold">Perfil de Operador</h2>
             <button 
               onClick={onClose}
-              className="text-white hover:text-gray-200"
+              className="text-white hover:bg-emerald-700 rounded-full p-1"
             >
               <X className="w-6 h-6" />
             </button>
           </div>
           
           {/* Contenido del modal */}
-          <div className="p-6">
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-shrink-0">
-                <div className="w-36 h-36 rounded-full overflow-hidden border-4 border-emerald-500 mx-auto">
+          <div className="p-3 sm:p-6 bg-emerald-50/30">
+            <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
+              {/* Columna izquierda - foto y estado */}
+              <div className="flex flex-col items-center mx-auto md:mx-0 mb-6 md:mb-0">
+                <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-emerald-500 mb-4">
                   <img
                     src={
                       operador.foto
@@ -564,115 +561,94 @@ const Operadores = () => {
                   />
                 </div>
                 
-                <div className="mt-4 text-center">
-                  <div className="inline-block px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium">
-                    Disponible
-                  </div>
+                <div className="px-4 py-2 bg-emerald-500 text-white rounded-md text-center w-full max-w-[180px]">
+                  {operador.estado || 'Disponible'}
                 </div>
               </div>
               
-              <div className="flex-grow">
-                <h1 className="text-2xl font-bold mb-1 text-gray-800">{construirNombreCompleto(operador)}</h1>
-                <p className="text-gray-600 mb-6">
+              {/* Columna derecha - información */}
+              <div className="flex-1">
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1 text-center md:text-left">
+                  {construirNombreCompleto(operador)}
+                </h3>
+                <p className="text-gray-500 mb-6 text-center md:text-left">
                   {operador.especialidad || 'Operador Turístico General'}
                 </p>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 w-8 h-8 mr-2">
-                      <div className="w-8 h-8 flex items-center justify-center text-emerald-600">
-                        <span className="text-lg">#</span>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 text-sm">Cédula:</p>
-                      <p className="text-gray-800">{operador.cedula || 'No disponible'}</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6">
+                  <div className="flex items-start space-x-2">
+                    <CreditCard className="w-5 h-5 text-emerald-500 mt-1 flex-shrink-0" />
+                    <div className="p-2 bg-emerald-50 rounded-lg border border-emerald-100 w-full">
+                      <p className="text-xs text-gray-500">Cédula:</p>
+                      <p className="text-sm text-gray-800">{operador.cedula || 'No disponible'}</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 w-8 h-8 mr-2">
-                      <div className="w-8 h-8 flex items-center justify-center text-emerald-600">
-                        <Mail className="w-5 h-5" />
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 text-sm">Email:</p>
-                      <p className="text-gray-800">{operador.email || 'No disponible'}</p>
+                  <div className="flex items-start space-x-2">
+                    <Mail className="w-5 h-5 text-emerald-500 mt-1 flex-shrink-0" />
+                    <div className="p-2 bg-emerald-50 rounded-lg border border-emerald-100 w-full">
+                      <p className="text-xs text-gray-500">Email:</p>
+                      <p className="text-sm text-gray-800">{operador.email || 'No disponible'}</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 w-8 h-8 mr-2">
-                      <div className="w-8 h-8 flex items-center justify-center text-emerald-600">
-                        <Phone className="w-5 h-5" />
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 text-sm">Teléfono:</p>
-                      <p className="text-gray-800">{operador.telefono || operador.numeroCelular || operador.numero_celular || 'No disponible'}</p>
+                  <div className="flex items-start space-x-2">
+                    <Phone className="w-5 h-5 text-emerald-500 mt-1 flex-shrink-0" />
+                    <div className="p-2 bg-emerald-50 rounded-lg border border-emerald-100 w-full">
+                      <p className="text-xs text-gray-500">Teléfono:</p>
+                      <p className="text-sm text-gray-800">{operador.telefono || operador.numeroCelular || operador.numero_celular || 'No disponible'}</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 w-8 h-8 mr-2">
-                      <div className="w-8 h-8 flex items-center justify-center text-emerald-600">
-                        <MapPin className="w-5 h-5" />
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 text-sm">Ubicación:</p>
-                      <p className="text-gray-800">{operador.ubicacion || 'No especificada'}</p>
+                  <div className="flex items-start space-x-2">
+                    <MapPin className="w-5 h-5 text-emerald-500 mt-1 flex-shrink-0" />
+                    <div className="p-2 bg-emerald-50 rounded-lg border border-emerald-100 w-full">
+                      <p className="text-xs text-gray-500">Ubicación:</p>
+                      <p className="text-sm text-gray-800">{operador.ubicacion || 'No especificada'}</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 w-8 h-8 mr-2">
-                      <div className="w-8 h-8 flex items-center justify-center text-emerald-600">
-                        <Calendar className="w-5 h-5" />
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 text-sm">Fecha de registro:</p>
-                      <p className="text-gray-800">{new Date(operador.fecha_registro || Date.now()).toLocaleDateString()}</p>
+                  <div className="flex items-start space-x-2">
+                    <Calendar className="w-5 h-5 text-emerald-500 mt-1 flex-shrink-0" />
+                    <div className="p-2 bg-emerald-50 rounded-lg border border-emerald-100 w-full">
+                      <p className="text-xs text-gray-500">Fecha de registro:</p>
+                      <p className="text-sm text-gray-800">{new Date(operador.fecha_registro || Date.now()).toLocaleDateString()}</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 w-8 h-8 mr-2">
-                      <div className="w-8 h-8 flex items-center justify-center text-emerald-600">
-                        <Globe className="w-5 h-5" />
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 text-sm">Idiomas:</p>
-                      <p className="text-gray-800">{operador.idiomas || 'No especificados'}</p>
+                  <div className="flex items-start space-x-2">
+                    <Languages className="w-5 h-5 text-emerald-500 mt-1 flex-shrink-0" />
+                    <div className="p-2 bg-emerald-50 rounded-lg border border-emerald-100 w-full">
+                      <p className="text-xs text-gray-500">Idiomas:</p>
+                      <p className="text-sm text-gray-800">{operador.idiomas || 'No especificados'}</p>
                     </div>
                   </div>
                 </div>
                 
                 {operador.descripcion && (
-                  <div className="mt-8">
-                    <h3 className="text-lg font-semibold mb-2 text-gray-800">Descripción</h3>
-                    <p className="text-gray-700 bg-green-50 p-4 rounded-lg border border-green-100">{operador.descripcion}</p>
+                  <div className="mt-6 col-span-full">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Descripción:</h4>
+                    <div className="p-3 bg-white rounded-lg border border-emerald-100">
+                      <p className="text-sm text-gray-700">{operador.descripcion}</p>
+                    </div>
                   </div>
                 )}
               </div>
             </div>
             
-            <div className="mt-8 flex justify-end gap-3">
+            <div className="flex flex-wrap justify-end gap-2 mt-6">
               <button
                 onClick={() => {
                   onClose();
                   handleOpenEditarOperadorModal(operador);
                 }}
-                className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg"
+                className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md transition-colors duration-200"
               >
                 Editar información
               </button>
               <button
-                onClick={onClose}
-                className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg"
+                onClick={() => onClose()}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md transition-colors duration-200"
               >
                 Cerrar
               </button>
@@ -686,52 +662,59 @@ const Operadores = () => {
   return (
     <DashboardLayoutAdmin>
       <div className="p-4">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+        {/* Cabecera con título y botones */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Gestión de Operadores</h1>
           
-          <div className="flex items-center gap-3 mt-4 md:mt-0">
-            <div className="relative">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
+            {/* Barra de búsqueda adaptativa */}
+            <div className="relative flex items-center w-full sm:w-auto">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-emerald-600" />
+              </div>
               <input
                 type="text"
                 placeholder="Buscar por nombre, cédula o email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 rounded-lg border border-gray-200 w-64 md:w-80 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="pl-10 w-full sm:w-[280px] md:w-[350px] py-2 px-4 rounded-lg bg-white text-gray-800 border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               />
-              <Search className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
             </div>
             
-            <button
-              onClick={() => setMostrarFiltros(!mostrarFiltros)}
-              className="px-4 py-2 rounded-lg border border-gray-200 flex items-center gap-2 hover:bg-gray-50"
-            >
-              <Filter className="w-5 h-5 text-emerald-600" />
-              <span className="text-gray-700">Filtros</span>
-            </button>
-            
-            <button
-              onClick={handleAddOperador}
-              className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white flex items-center gap-2"
-            >
-              <UserPlus className="w-5 h-5" />
-              <span>Nuevo operador</span>
-            </button>
+            {/* Botones adaptables */}
+            <div className="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+              <button
+                onClick={() => setMostrarFiltros(!mostrarFiltros)}
+                className={`py-2 px-4 flex-1 sm:flex-initial bg-white border border-gray-200 text-emerald-600 rounded-lg flex items-center justify-center hover:bg-gray-50 ${mostrarFiltros ? 'border-emerald-500' : ''}`}
+              >
+                <Filter className="w-5 h-5 mr-2" />
+                Filtros
+              </button>
+              
+              <button
+                onClick={handleAddOperador}
+                className="py-2 px-4 flex-1 sm:flex-initial bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg flex items-center justify-center"
+              >
+                <UserPlus className="w-5 h-5 mr-2" />
+                Nuevo operador
+              </button>
+            </div>
           </div>
         </div>
         
         {/* Panel de filtros */}
         {mostrarFiltros && (
-          <div className="mb-6 p-4 rounded-lg bg-white shadow-sm border border-gray-100">
+          <div className="mb-6 p-4 rounded-lg bg-gradient-to-r from-white to-emerald-50 border border-emerald-100 shadow-lg transition-all duration-300 ease-in-out animate-fadeIn">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <h3 className="text-sm font-medium mb-2 text-gray-700">Estado</h3>
-                <div className="flex space-x-2">
+                <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => setFiltroEstado('todos')}
                     className={`px-3 py-1 text-sm rounded-md ${
                       filtroEstado === 'todos' 
                         ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
-                        : 'bg-gray-100 text-gray-700 border border-gray-200'
+                        : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200'
                     }`}
                   >
                     Todos
@@ -741,7 +724,7 @@ const Operadores = () => {
                     className={`px-3 py-1 text-sm rounded-md ${
                       filtroEstado === 'disponible' 
                         ? 'bg-green-100 text-green-800 border border-green-200' 
-                        : 'bg-gray-100 text-gray-700 border border-gray-200'
+                        : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200'
                     }`}
                   >
                     Disponible
@@ -751,7 +734,7 @@ const Operadores = () => {
                     className={`px-3 py-1 text-sm rounded-md ${
                       filtroEstado === 'ocupado' 
                         ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' 
-                        : 'bg-gray-100 text-gray-700 border border-gray-200'
+                        : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200'
                     }`}
                   >
                     Ocupado
@@ -761,7 +744,7 @@ const Operadores = () => {
                     className={`px-3 py-1 text-sm rounded-md ${
                       filtroEstado === 'inactivo' 
                         ? 'bg-red-100 text-red-800 border border-red-200' 
-                        : 'bg-gray-100 text-gray-700 border border-gray-200'
+                        : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200'
                     }`}
                   >
                     Inactivo
@@ -771,13 +754,13 @@ const Operadores = () => {
               
               <div>
                 <h3 className="text-sm font-medium mb-2 text-gray-700">Ordenar por</h3>
-                <div className="flex space-x-2">
+                <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => setOrdenarPor('nombre')}
                     className={`px-3 py-1 text-sm rounded-md ${
                       ordenarPor === 'nombre' 
                         ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
-                        : 'bg-gray-100 text-gray-700 border border-gray-200'
+                        : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200'
                     }`}
                   >
                     Nombre
@@ -787,7 +770,7 @@ const Operadores = () => {
                     className={`px-3 py-1 text-sm rounded-md ${
                       ordenarPor === 'fecha' 
                         ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
-                        : 'bg-gray-100 text-gray-700 border border-gray-200'
+                        : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200'
                     }`}
                   >
                     Más recientes
@@ -802,7 +785,7 @@ const Operadores = () => {
                     setFiltroEstado('todos');
                     setOrdenarPor('nombre');
                   }}
-                  className="px-3 py-1 text-sm rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200"
+                  className="px-3 py-1 text-sm rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200 transition-colors duration-200"
                 >
                   Limpiar filtros
                 </button>
@@ -810,57 +793,6 @@ const Operadores = () => {
             </div>
           </div>
         )}
-
-        {/* Tarjetas de estadísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="p-4 rounded-lg bg-emerald-50 border-l-4 border-emerald-500 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-emerald-700">Total de Operadores</p>
-              <p className="text-2xl font-bold text-emerald-800">
-                {operadoresCompletos.length}
-              </p>
-            </div>
-            <div className="p-3 rounded-full bg-emerald-100">
-              <UserPlus className="w-6 h-6 text-emerald-500" />
-            </div>
-          </div>
-          
-          <div className="p-4 rounded-lg bg-green-50 border-l-4 border-green-500 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-green-700">Operadores Disponibles</p>
-              <p className="text-2xl font-bold text-green-800">
-                {operadoresCompletos.filter(o => o.estado === 'disponible').length}
-              </p>
-            </div>
-            <div className="p-3 rounded-full bg-green-100">
-              <CheckCircle className="w-6 h-6 text-green-500" />
-            </div>
-          </div>
-
-          <div className="p-4 rounded-lg bg-yellow-50 border-l-4 border-yellow-500 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-yellow-700">Operadores Ocupados</p>
-              <p className="text-2xl font-bold text-yellow-800">
-                {operadoresCompletos.filter(o => o.estado === 'ocupado').length}
-              </p>
-            </div>
-            <div className="p-3 rounded-full bg-yellow-100">
-              <Briefcase className="w-6 h-6 text-yellow-500" />
-            </div>
-          </div>
-
-          <div className="p-4 rounded-lg bg-red-50 border-l-4 border-red-500 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-red-700">Operadores Inactivos</p>
-              <p className="text-2xl font-bold text-red-800">
-                {operadoresCompletos.filter(o => o.estado === 'inactivo').length}
-              </p>
-            </div>
-            <div className="p-3 rounded-full bg-red-100">
-              <XCircle className="w-6 h-6 text-red-500" />
-            </div>
-          </div>
-        </div>
 
         {/* Lista de operadores */}
         {loading ? (
@@ -884,151 +816,147 @@ const Operadores = () => {
               operadoresFiltrados().map((operador) => (
                 <div 
                   key={operador.id || operador.cedula} 
-                  className="rounded-lg shadow-sm overflow-hidden bg-white border border-gray-100 relative cursor-pointer"
-                  onClick={() => handleOpenDetallesModal(operador)}
+                  className="rounded-lg shadow-sm overflow-hidden bg-white border border-gray-100 relative cursor-pointer transition-transform duration-200 hover:shadow-md"
+                  onClick={(e) => {
+                    if (!e.isDefaultPrevented()) {
+                      handleOpenDetallesModal(operador);
+                    }
+                  }}
                 >
+                  <div className="absolute top-2 left-2 flex space-x-2 z-10">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenEliminarOperadorModal(operador);
+                      }}
+                      className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg"
+                      title="Eliminar operador"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenEditarOperadorModal(operador);
+                      }}
+                      className="p-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg"
+                      title="Editar operador"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                  </div>
+                  
                   {/* Cabecera con imagen */}
                   <div 
-                    className="h-28 relative bg-cover bg-center bg-no-repeat"
+                    className="h-32 sm:h-36 relative bg-cover bg-center bg-no-repeat"
                     style={{
                       backgroundImage: `url(${logoExplococora})`,
-                      backgroundSize: '150px',
+                      backgroundSize: '200px',
                       backgroundPosition: 'center',
-                      backgroundColor: '#10b981', // emerald-500
+                      backgroundColor: '#10b981',
                       backgroundBlendMode: 'soft-light',
                       opacity: '0.9'
                     }}
                   >
-                    {/* Botones de acción */}
-                    <div className="absolute top-2 left-2 flex space-x-2">
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenEliminarOperadorModal(operador);
-                        }}
-                        className="p-2 bg-white hover:bg-red-50 text-red-500 rounded-full shadow-sm"
-                        title="Eliminar operador"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                      
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenEditarOperadorModal(operador);
-                        }}
-                        className="p-2 bg-white hover:bg-emerald-50 text-emerald-500 rounded-full shadow-sm"
-                        title="Actualizar información"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                    </div>
-                    
-                    {/* Foto de perfil */}
-                    <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2">
-                      <div className="w-20 h-20 rounded-full bg-white p-1 shadow-sm overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-t from-emerald-700 to-emerald-400/30 opacity-40"></div>
+                    <div className="absolute -bottom-14 left-1/2 transform -translate-x-1/2">
+                      <div className="w-28 h-28 rounded-full border-4 border-white overflow-hidden bg-emerald-200 shadow-lg">
                         <img
                           src={
                             operador.foto
                               ? (operador.foto.startsWith('http') ? operador.foto : `https://servicio-explococora.onrender.com/uploads/images/${operador.foto}`)
-                              : "https://i.pinimg.com/736x/8d/37/31/8d3731a57b8209114c08488eeb0b6a64.jpg"
+                              : `https://ui-avatars.com/api/?name=${operador.primerNombre ? operador.primerNombre.charAt(0) : ''}${operador.primerApellido ? operador.primerApellido.charAt(0) : ''}&background=0D8ABC&color=fff&size=128`
                           }
                           alt={`Foto de ${operador.primerNombre || ''} ${operador.primerApellido || ''}`}
-                          className="w-full h-full object-cover rounded-full"
+                          className="w-full h-full object-cover"
                           onError={(e) => {
                             e.target.onerror = null;
-                            e.target.src = "https://i.pinimg.com/736x/8d/37/31/8d3731a57b8209114c08488eeb0b6a64.jpg";
+                            e.target.src = `https://ui-avatars.com/api/?name=${operador.primerNombre ? operador.primerNombre.charAt(0) : ''}${operador.primerApellido ? operador.primerApellido.charAt(0) : ''}&background=0D8ABC&color=fff&size=128`;
                           }}
                         />
                       </div>
                     </div>
                     
-                    {/* Insignia de estado */}
-                    <div className="absolute top-2 right-2">
-                      <div className={`px-3 py-1 rounded-full text-xs font-medium flex items-center ${
-                        operador.estado === 'disponible' ? 'bg-green-100 text-green-800' : 
-                        operador.estado === 'ocupado' ? 'bg-yellow-100 text-yellow-800' : 
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {operador.estado === 'disponible' ? (
-                          <>
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            Disponible
-                          </>
-                        ) : operador.estado === 'ocupado' ? (
-                          <>
-                            <Clock className="w-3 h-3 mr-1" />
-                            Ocupado
-                          </>
-                        ) : (
-                          <>
-                            <XCircle className="w-3 h-3 mr-1" />
-                            Inactivo
-                          </>
-                        )}
-                      </div>
+                    {/* Estado del operador con manejo especial de eventos */}
+                    <div className="absolute top-2 right-2 z-10" onClick={(e) => e.preventDefault()}>
+                      <EstadoOperador 
+                        cedula={operador.cedula} 
+                        nombre={construirNombreCompleto(operador)}
+                        tamanio="normal"
+                        onChangeEstado={(nuevoEstado) => {
+                          // Lista de estados válidos
+                          const estadosValidos = ['disponible', 'ocupado', 'inactivo'];
+                          
+                          // Validar que el estado sea uno de los valores permitidos
+                          if (!estadosValidos.includes(nuevoEstado)) {
+                            toast.error("Estado no válido. Por favor seleccione una opción válida");
+                            return;
+                          }
+                          
+                          // Si el estado es válido, proceder con la actualización
+                          actualizarEstadoOperador(operador, nuevoEstado);
+                        }}
+                        colorDisponible="bg-green-100 text-green-600"
+                        colorOcupado="bg-amber-100 text-amber-600"
+                        colorInactivo="bg-gray-100 text-gray-600"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                      />
                     </div>
                   </div>
                   
                   {/* Información del operador */}
-                  <div className="pt-12 px-4 pb-4">
-                    <div className="text-center mb-3">
+                  <div className="pt-16 px-4 sm:px-6 pb-4 sm:pb-6 bg-gradient-to-b from-white to-emerald-50/50">
+                    <div className="text-center mb-4">
                       <h3 className="text-lg font-bold text-gray-800 truncate">
                         {construirNombreCompleto(operador)}
                       </h3>
-                      <p className="text-xs text-emerald-600">
+                      <p className="text-xs text-emerald-600 mt-1">
                         {operador.especialidad || 'Operador Turístico General'}
                       </p>
                     </div>
                     
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center">
-                        <Mail className="w-4 h-4 mr-2 text-emerald-500 flex-shrink-0" />
-                        <span className="text-gray-600 truncate">{operador.email}</span>
+                    <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
+                      <div className="flex items-center p-2 rounded-md hover:bg-emerald-100 transition-colors duration-200">
+                        <Mail className="w-4 h-4 mr-2 sm:mr-3 text-emerald-500 flex-shrink-0" />
+                        <span className="text-xs sm:text-sm truncate text-gray-700">{operador.email}</span>
                       </div>
-                      <div className="flex items-center">
-                        <Phone className="w-4 h-4 mr-2 text-emerald-500 flex-shrink-0" />
-                        <span className="text-gray-600 truncate">{operador.telefono || operador.numeroCelular || operador.numero_celular || 'No disponible'}</span>
+                      <div className="flex items-center p-2 rounded-md hover:bg-emerald-100 transition-colors duration-200">
+                        <Phone className="w-4 h-4 mr-3 text-emerald-500 flex-shrink-0" />
+                        <span className="text-xs sm:text-sm text-gray-700">{operador.telefono || operador.numeroCelular || operador.numero_celular || 'No disponible'}</span>
                       </div>
-                      <div className="flex items-center">
-                        <MapPin className="w-4 h-4 mr-2 text-emerald-500 flex-shrink-0" />
-                        <span className="text-gray-600 truncate">{operador.ubicacion || 'No especificada'}</span>
+                      <div className="flex items-center p-2 rounded-md hover:bg-emerald-100 transition-colors duration-200">
+                        <MapPin className="w-4 h-4 mr-3 text-emerald-500 flex-shrink-0" />
+                        <span className="text-xs sm:text-sm text-gray-700">{operador.ubicacion || 'No especificada'}</span>
                       </div>
-                      <div className="flex items-center">
-                        <Calendar className="w-4 h-4 mr-2 text-emerald-500 flex-shrink-0" />
-                        <span className="text-gray-600 truncate">Desde {new Date(operador.fecha_registro || Date.now()).toLocaleDateString()}</span>
+                      <div className="flex items-center p-2 rounded-md hover:bg-emerald-100 transition-colors duration-200">
+                        <Calendar className="w-4 h-4 mr-3 text-emerald-500 flex-shrink-0" />
+                        <span className="text-xs sm:text-sm text-gray-700">Desde {new Date(operador.fecha_registro || Date.now()).toLocaleDateString()}</span>
+                      </div>
+                      <div className="flex items-center p-2 rounded-md hover:bg-emerald-100 transition-colors duration-200">
+                        <CreditCard className="w-4 h-4 mr-3 text-emerald-500 flex-shrink-0" />
+                        <span className="text-xs sm:text-sm text-gray-700">{operador.cedula || 'No disponible'}</span>
                       </div>
                     </div>
                     
-                    {/* Botones de acción */}
-                    <div className="flex justify-center gap-2 mt-3">
+                    <div className="flex justify-center">
                       <button 
                         onClick={(e) => {
                           e.stopPropagation();
                           handleOpenDetallesModal(operador);
                         }}
-                        className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md text-xs font-medium flex-1"
+                        className="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md transition-colors duration-200 text-sm"
                       >
                         Ver detalles
                       </button>
-                      
-                      {/* Menú desplegable para cambiar estado */}
-                      <div className="relative flex-1">
-                        <EstadoOperador 
-                          cedula={operador.cedula} 
-                          nombre={construirNombreCompleto(operador)}
-                          tamanio="boton"
-                          onChangeEstado={(nuevoEstado) => {
-                            actualizarEstadoOperador(operador, nuevoEstado);
-                          }}
-                        />
-                      </div>
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="col-span-4 text-center py-12 text-gray-600">
+              <div className="col-span-full text-center py-12 text-gray-600">
                 <div className="flex flex-col items-center">
                   <XCircle className="w-16 h-16 mb-4 text-gray-300" />
                   <h3 className="text-xl font-semibold mb-2">No se encontraron operadores</h3>
@@ -1057,15 +985,22 @@ const Operadores = () => {
         )}
       </div>
       
-      {/* Modal para crear operador */}
+      {/* Modal para ver detalles completos del operador - actualizado */}
+      {showDetallesModal && operadorDetalle && (
+        <DetallesOperadorModal 
+          operador={operadorDetalle}
+          onClose={() => setShowDetallesModal(false)}
+        />
+      )}
+      
+      {/* Los demás modales se mantienen igual */}
       {showCrearOperadorModal && (
         <CrearOperador 
           onClose={() => setShowCrearOperadorModal(false)} 
-          onGuiaCreated={handleOperadorCreated}
+          onOperadorCreated={handleOperadorCreated}
         />
       )}
 
-      {/* Modal para eliminar operador */}
       {showEliminarOperadorModal && operadorSeleccionado && (
         <EliminarOperador 
           operador={operadorSeleccionado}
@@ -1074,7 +1009,6 @@ const Operadores = () => {
         />
       )}
 
-      {/* Modal para editar operador */}
       {showEditarOperadorModal && operadorParaEditar && (
         <EditarOperador 
           operador={operadorParaEditar}
@@ -1086,15 +1020,6 @@ const Operadores = () => {
         />
       )}
 
-      {/* Modal para ver detalles completos del operador */}
-      {showDetallesModal && operadorDetalle && (
-        <DetallesOperadorModal 
-          operador={operadorDetalle}
-          onClose={() => setShowDetallesModal(false)}
-        />
-      )}
-
-      {/* Modal para mostrar imagen ampliada */}
       {showImagenModal && (
         <ImagenAmpliadaModal 
           imagenUrl={imagenAmpliada}
