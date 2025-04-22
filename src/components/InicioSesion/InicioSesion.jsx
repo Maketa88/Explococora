@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
-import { FaEnvelope } from "react-icons/fa";
+import { FaEnvelope, FaIdCard } from "react-icons/fa";
 import { useAuth } from '../../context/AuthContext';
 import { HookContrasenia } from "../../hooks/HookContrasenia";
 import { IconoExplo } from "./IconoExplo";
@@ -58,13 +58,22 @@ export const InicioSesion = () => {
       });
       return;
     }
+
+    if (!cedulaRecuperacion) {
+      setEstadoRecuperacion({ 
+        mensaje: 'Por favor, ingresa tu número de cédula', 
+        error: true 
+      });
+      return;
+    }
     
     setEnviandoRecuperacion(true);
     setEstadoRecuperacion({ mensaje: '', error: false });
     
     try {
       const response = await axios.post('https://servicio-explococora.onrender.com/enviar-correo', {
-        email: emailRecuperacion
+        email: emailRecuperacion,
+        cedula: cedulaRecuperacion
       });
       
       setEstadoRecuperacion({
@@ -72,6 +81,7 @@ export const InicioSesion = () => {
         error: false
       });
       
+      // Opcional: Limpiar campos después de éxito
       setEmailRecuperacion('');
       setCedulaRecuperacion('');
     } catch (error) {
@@ -85,6 +95,118 @@ export const InicioSesion = () => {
     }
   };
 
+  // Pantalla de recuperación de contraseña
+  if (mostrarRecuperacion) {
+    return (
+      <div className="min-h-screen w-full overflow-hidden">
+        {/* Fondo con árboles (simplificado) */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-emerald-50 to-white"></div>
+          <div className="absolute top-0 left-0 w-full h-full opacity-10">
+            <svg viewBox="0 0 1200 600" className="w-full h-full" preserveAspectRatio="xMidYMid slice">
+              <path d="M0,600 L300,200 L400,300 L500,150 L600,250 L800,100 L1000,300 L1200,200 L1200,600 Z" fill="#047857" opacity="0.3" />
+              <path d="M200,600 L200,400 L150,400 L200,350 L170,350 L220,300 L190,300 L240,250 L210,250 L250,200 L230,200 L270,150 L250,150 L280,100 L310,150 L290,150 L330,200 L310,200 L350,250 L320,250 L370,300 L340,300 L390,350 L360,350 L410,400 L360,400 L360,600 Z" fill="#047857" opacity="0.7" />
+              <path d="M600,600 L600,350 C600,350 550,300 570,250 C590,200 630,220 650,180 C670,140 700,160 720,130 C740,100 780,120 800,150 C820,180 850,160 870,200 C890,240 930,220 950,270 C970,320 920,350 920,350 L920,600 Z" fill="#047857" opacity="0.7" />
+            </svg>
+          </div>
+        </div>
+        
+        <div className="flex flex-col items-center pt-12">
+          {/* Logo y título (más compacto) */}
+          <div className="mb-4">
+            <IconoExplo />
+          </div>
+          <h1 className="text-2xl font-bold text-emerald-800 mb-1 text-center">
+            Recuperar Contraseña
+          </h1>
+          <p className="text-emerald-700 text-sm max-w-md text-center mb-3">
+            Ingresa tu correo electrónico para recuperar tu contraseña
+          </p>
+          
+          {/* Formulario (más compacto) */}
+          <div className="max-w-md w-full px-4">
+            <div className="bg-white/90 backdrop-blur-md p-5 rounded-xl border border-emerald-200 shadow-lg">
+              {estadoRecuperacion.mensaje && (
+                <div className={`${estadoRecuperacion.error ? 'bg-red-50 text-red-600 border-red-200' : 'bg-green-50 text-green-600 border-green-200'} p-3 rounded-lg mb-4 border text-sm`}>
+                  {estadoRecuperacion.mensaje}
+                </div>
+              )}
+              
+              <form onSubmit={solicitarRecuperacion} className="space-y-4">
+                <div>
+                  <label className="block text-emerald-700 text-sm font-medium mb-1">
+                    Correo electrónico
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-2.5 text-emerald-400">
+                      <FaEnvelope />
+                    </span>
+                    <input
+                      type="email"
+                      value={emailRecuperacion}
+                      onChange={(e) => setEmailRecuperacion(e.target.value)}
+                      className="pl-10 w-full p-2.5 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 text-emerald-800 placeholder-emerald-300"
+                      placeholder="Ingresa tu correo electrónico"
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-emerald-700 text-sm font-medium mb-1">
+                    Número de cédula
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-2.5 text-emerald-400">
+                      <FaIdCard />
+                    </span>
+                    <input
+                      type="text"
+                      value={cedulaRecuperacion}
+                      onChange={(e) => setCedulaRecuperacion(e.target.value)}
+                      className="pl-10 w-full p-2.5 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 text-emerald-800 placeholder-emerald-300"
+                      placeholder="Ingresa tu número de cédula"
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <button
+                  type="submit"
+                  className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-all duration-300 hover:shadow-lg shadow-emerald-300/30 text-sm font-semibold"
+                  disabled={enviandoRecuperacion}
+                >
+                  {enviandoRecuperacion ? (
+                    <span className="flex items-center justify-center">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Procesando...
+                    </span>
+                  ) : (
+                    'Recuperar contraseña'
+                  )}
+                </button>
+                
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => setMostrarRecuperacion(false)}
+                    className="text-emerald-600 hover:text-emerald-800 transition-colors duration-300 text-sm"
+                  >
+                    Volver al inicio de sesión
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Aquí continúa el resto del componente InicioSesion (formulario de login)
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-start pt-0 overflow-hidden relative font-nunito">
       {/* Background decorative elements - pushed to back with z-index */}
@@ -239,182 +361,100 @@ export const InicioSesion = () => {
           <IconoExplo />
         </div>
         <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-emerald-800 text-center mb-1">
-          {mostrarRecuperacion ? "Recuperar Contraseña" : t('bienvenidoExplococora')}
+          {t('bienvenidoExplococora')}
         </h1>
         <p className="text-emerald-700/90 text-center max-w-lg text-sm">
-          {mostrarRecuperacion 
-            ? "Ingresa tu correo electrónico para recuperar tu contraseña" 
-            : t('iniciaSesion')
-          }
+          {t('iniciaSesion')}
         </p>
       </div>
 
       {/* Main content - properly spaced from header */}
       <div className="w-full max-w-4xl z-10 px-4 py-2 -mt-32 flex-1 flex items-center justify-center">
-        {!mostrarRecuperacion ? (
-          // Login form
-          <div className="mx-auto max-w-md w-full">
-            <div className="opacity-70 border-r-4 border-l-4 border-emerald-600 bg-white/80 backdrop-blur-md p-5 rounded-xl border  shadow-lg overflow-hidden relative">
-             
-              
-              <form onSubmit={handleSubmit} className="space-y-3">
-                <div className="mb-3">
-                  <label className="block text-emerald-700 text-base mb-1">
-                    {t('correoElectronico')}
-                  </label>
-                  <div className="relative group">
-                    <span className="absolute left-3 top-3 text-emerald-400 group-hover:text-emerald-600 transition-colors duration-300">
-                      <FaEnvelope />
-                    </span>
-                    <input
-                      type="email"
-                      name="email"
-                      value={credentials.email}
-                      onChange={handleChange}
-                      placeholder={t('ingresaCorreo')}
-                      className="w-full p-2 pl-9 bg-white border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent text-emerald-800 placeholder-emerald-300 transition-all duration-300"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="mb-3">
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="block text-emerald-700 text-base">
-                      {t('Contraseña')}
-                    </label>
-                  </div>
-                  <HookContrasenia
-                    name="contrasenia"
-                    value={credentials.contrasenia}
+        <div className="mx-auto max-w-md w-full">
+          <div className="opacity-70 border-r-4 border-l-4 border-emerald-600 bg-white/80 backdrop-blur-md p-5 rounded-xl border  shadow-lg overflow-hidden relative">
+           
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <div className="mb-3">
+                <label className="block text-emerald-700 text-base mb-1">
+                  {t('correoElectronico')}
+                </label>
+                <div className="relative group">
+                  <span className="absolute left-3 top-3 text-emerald-400 group-hover:text-emerald-600 transition-colors duration-300">
+                    <FaEnvelope />
+                  </span>
+                  <input
+                    type="email"
+                    name="email"
+                    value={credentials.email}
                     onChange={handleChange}
-                    placeholder={t('ingresaContrasenia')}
-                    className="w-full p-3 pl-9 bg-white border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent text-emerald-800 placeholder-emerald-300 transition-all duration-300"
+                    placeholder={t('ingresaCorreo')}
+                    className="w-full p-2 pl-9 bg-white border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent text-emerald-800 placeholder-emerald-300 transition-all duration-300"
                     required
                   />
                 </div>
-                {errorMessage && (
-                <div className={`p-3 mb-3 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm ${isAnimating ? 'shake' : ''}`}>
-                  {errorMessage}
-                </div>
-              )}
-                
-                <button
-                  type="submit"
-                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-all duration-300 hover:shadow-lg shadow-emerald-300/30 text-sm font-semibold"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <span className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      <span className="ml-2 tracking-widest">{t('Cargando')}</span>
-                    </span>
-                  ) : t('iniciarSesion')}
-                </button>
-                
-                <div className="flex justify-center">
-                  <button
-                    type="button"
-                    onClick={() => setMostrarRecuperacion(true)}
-                    className="text-emerald-600 hover:text-emerald-800 transition-colors duration-300 text-sm mt-1"
-                  >
-                    ¿Olvidaste tu contraseña?
-                  </button>
-                </div>
-                
-                <div className="mt-2 text-center">
-                  <p className="text-emerald-700 text-sm">
-                    {t('noTienesCuenta')} 
-                    <a
-                      href="/Registro"
-                      className="text-emerald-800 hover:text-emerald-900 ml-1 font-bold transition-colors duration-300 hover:underline"
-                    >
-                      {t('aqui')}
-                    </a>
-                  </p>
-                </div>
-              </form>
-            </div>
-          </div>
-        ) : (
-          // Recuperación de contraseña
-          <div className="mx-auto max-w-md w-full">
-            <div className="bg-white/90 backdrop-blur-md p-5 rounded-xl border border-emerald-200 shadow-lg overflow-hidden relative">
-              <form onSubmit={solicitarRecuperacion} className="space-y-3">
-                <div className="mb-3">
-                  <label className="block text-emerald-700 text-base mb-1">
-                    Correo electrónico
+              </div>
+              
+              <div className="mb-3">
+                <div className="flex justify-between items-center mb-1">
+                  <label className="block text-emerald-700 text-base">
+                    {t('Contraseña')}
                   </label>
-                  <div className="relative group">
-                    <span className="absolute left-3 top-3 text-emerald-400 group-hover:text-emerald-600 transition-colors duration-300">
-                      <FaEnvelope />
-                    </span>
-                    <input
-                      type="email"
-                      value={emailRecuperacion}
-                      onChange={(e) => setEmailRecuperacion(e.target.value)}
-                      placeholder="Ingresa tu correo electrónico"
-                      className="w-full p-3 pl-9 bg-white border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent text-emerald-800 placeholder-emerald-300 transition-all duration-300"
-                      required
-                    />
-                  </div>
                 </div>
-                
-                <div className="mb-3">
-                  <label className="block text-emerald-700 text-base mb-1">
-                    Número de cédula
-                  </label>
-                  <div className="relative group">
-                    <span className="absolute left-3 top-3 text-emerald-400 group-hover:text-emerald-600 transition-colors duration-300">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 2a3 3 0 100 6 3 3 0 000-6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                      </svg>
-                    </span>
-                    <input
-                      type="text"
-                      value={cedulaRecuperacion}
-                      onChange={(e) => setCedulaRecuperacion(e.target.value)}
-                      placeholder="Ingresa tu número de cédula"
-                      className="w-full p-3 pl-9 bg-white border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent text-emerald-800 placeholder-emerald-300 transition-all duration-300"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                {estadoRecuperacion.mensaje && (
-                  <div className={`p-3 mb-3 rounded-lg ${estadoRecuperacion.error ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-green-50 text-green-600 border border-green-200'} animate-pulse text-sm`}>
-                    {estadoRecuperacion.mensaje}
-                  </div>
-                )}
-                
-                <button
-                  type="submit"
-                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-all duration-300 hover:shadow-lg shadow-emerald-300/30 text-sm font-semibold mb-2"
-                  disabled={enviandoRecuperacion}
-                >
-                  <span className="relative z-10">
-                    {enviandoRecuperacion ? 'Enviando...' : 'Recuperar contraseña'}
+                <HookContrasenia
+                  name="contrasenia"
+                  value={credentials.contrasenia}
+                  onChange={handleChange}
+                  placeholder={t('ingresaContrasenia')}
+                  className="w-full p-3 pl-9 bg-white border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent text-emerald-800 placeholder-emerald-300 transition-all duration-300"
+                  required
+                />
+              </div>
+              {errorMessage && (
+              <div className={`p-3 mb-3 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm ${isAnimating ? 'shake' : ''}`}>
+                {errorMessage}
+              </div>
+            )}
+              
+              <button
+                type="submit"
+                className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-all duration-300 hover:shadow-lg shadow-emerald-300/30 text-sm font-semibold"
+                disabled={loading}
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span className="ml-2 tracking-widest">{t('Cargando')}</span>
                   </span>
-                  <span className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-green-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                </button>
-                
+                ) : t('iniciarSesion')}
+              </button>
+              
+              <div className="flex justify-center">
                 <button
                   type="button"
-                  onClick={() => {
-                    setMostrarRecuperacion(false);
-                    setEstadoRecuperacion({ mensaje: '', error: false });
-                  }}
-                  className="w-full py-2 border border-emerald-200 hover:bg-emerald-50 text-emerald-700 font-medium rounded-lg transition-all duration-300 text-sm"
+                  onClick={() => setMostrarRecuperacion(true)}
+                  className="text-emerald-600 hover:text-emerald-800 transition-colors duration-300 text-sm mt-1"
                 >
-                  Volver al inicio de sesión
+                  ¿Olvidaste tu contraseña?
                 </button>
-              </form>
-            </div>
+              </div>
+              
+              <div className="mt-2 text-center">
+                <p className="text-emerald-700 text-sm">
+                  {t('noTienesCuenta')} 
+                  <a
+                    href="/Registro"
+                    className="text-emerald-800 hover:text-emerald-900 ml-1 font-bold transition-colors duration-300 hover:underline"
+                  >
+                    {t('aqui')}
+                  </a>
+                </p>
+              </div>
+            </form>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Responsive adjustments for different screen sizes */}
