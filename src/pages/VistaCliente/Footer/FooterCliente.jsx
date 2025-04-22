@@ -1,6 +1,6 @@
 import { FaFacebookSquare, FaInstagram } from "react-icons/fa";
 import { FaTiktok } from "react-icons/fa";
-import logo from "../../../assets/Images/logo.webp";
+import logo from "../../../assets/Images/logoBlanco.webp";
 import { IconoRedes } from "../../../components/PaginaInicio/Footer/IconoRedes";
 import { LinkFooter } from "../../../components/PaginaInicio/Footer/LinkFooter";
 import { FooterSeccion } from "../../../components/PaginaInicio/Footer/FooterSeccion";
@@ -45,19 +45,19 @@ export const FooterCliente = () => {
             <div className="flex gap-6 items-center">
               <IconoRedes
                 Icon={FaFacebookSquare}
-                href="https://facebook.com/valledelcocora"
+                href="https://www.facebook.com/profile.php?id=61572216023743"
                 label="Síguenos en Facebook"
                 color="#1877F2" // Color oficial de Facebook
               />
               <IconoRedes
                 Icon={FaInstagram}
-                href="https://instagram.com/valledelcocora"
+                href="https://www.instagram.com/explo.cocora?igsh=MWtuc2hvc2dkdHoydA=="
                 label="Síguenos en Instagram"
                 color="#E4405F" // Color oficial de Instagram
               />
               <IconoRedes
                 Icon={FaTiktok}
-                href="https://tiktok.com/@valledelcocora"
+                href="https://www.tiktok.com/@explo.cocora?_t=ZS-8vEnVtXqVeB&_r=1"
                 label="Síguenos en TikTok"
                 color="#000000" // Color oficial de TikTok
               />
