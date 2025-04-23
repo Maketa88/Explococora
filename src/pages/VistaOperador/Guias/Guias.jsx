@@ -177,7 +177,7 @@ const Guias = () => {
         // Actualizar contadores
         actualizarContadores(guiasCompletos.filter(g => g.cedula !== cedula));
         // Mostrar alerta de éxito
-        showAlert(`El guía ${nombreCompleto} ha sido eliminado correctamente`, 'success');
+        showAlert(`Guía eliminado correctamente`, 'success');
       } else {
         // No se pudo eliminar con ningún endpoint
         showAlert("No se pudo eliminar el guía. Intente nuevamente.", "error");
