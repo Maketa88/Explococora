@@ -8,6 +8,8 @@ import EstadoGuia from '../../../components/Guias/EstadoGuia';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2';
+import CrearGuia from './CrearGuia';
+import EliminarGuia from './EliminarGuia';
 
 const Guias = () => {
   const navigate = useNavigate();
@@ -18,20 +20,9 @@ const Guias = () => {
   const [ordenarPor, setOrdenarPor] = useState('nombre'); // nombre, fecha, experiencia
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
   
-  // Contadores de estados
-  const [contadores, setContadores] = useState({
-    total: 0,
-    disponibles: 0,
-    ocupados: 0,
-    inactivos: 0
-  });
 
   const [guiaAEliminar, setGuiaAEliminar] = useState(null);
   const [showEliminarModal, setShowEliminarModal] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [countdownActive, setCountdownActive] = useState(false);
-  const [countdown, setCountdown] = useState(2);
-  const countdownRef = useRef(null);
   const [showDetallesModal, setShowDetallesModal] = useState(false);
   const [guiaDetalle, setGuiaDetalle] = useState(null);
   const [showEditarModal, setShowEditarModal] = useState(false);
@@ -46,10 +37,32 @@ const Guias = () => {
   });
   const [updating, setUpdating] = useState(false);
   const [alert, setAlert] = useState({ show: false, message: "", type: "" });
+  const [showCrearGuiaModal, setShowCrearGuiaModal] = useState(false);
 
-  // Función para redirigir a la página de nuevo guía
+  // Función para mostrar el modal de Crear Guía en lugar de navegar
   const handleAddGuia = () => {
-    navigate('/VistaOperador/nuevo-guia');
+    setShowCrearGuiaModal(true);
+  };
+
+  // Función para cerrar el modal de Crear Guía
+  const handleCloseCrearGuiaModal = () => {
+    setShowCrearGuiaModal(false);
+  };
+
+  // Función para manejar la creación exitosa de un guía
+  const handleGuiaCreated = (newGuia) => {
+    // Actualizar la lista de guías sin tener que recargar la página
+    setGuiasCompletos(prevGuias => [newGuia, ...prevGuias]);
+    // Actualizar contadores
+    actualizarContadores([newGuia, ...guiasCompletos]);
+    // Mostrar notificación de éxito
+    toast.success("¡Guía creado exitosamente!");
+    // Cerrar el modal
+    setShowCrearGuiaModal(false);
+    // Recargar la lista de guías para asegurar que todos los datos estén actualizados
+    setTimeout(() => {
+      cargarGuias();
+    }, 1000);
   };
 
   // Función para construir nombre completo
@@ -111,9 +124,7 @@ const Guias = () => {
           conteo.disponibles++;
       }
     });
-    
-    setContadores(conteo);
-  };
+      };
 
   // Función para filtrar guías según búsqueda y filtros
   const guiasFiltrados = () => {
@@ -156,80 +167,19 @@ const Guias = () => {
     setShowEliminarModal(true);
   };
 
-  // Función para iniciar la cuenta regresiva
-  const startCountdown = () => {
-    setCountdownActive(true);
-    setCountdown(2);
-    
-    countdownRef.current = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) {
-          clearInterval(countdownRef.current);
-          setCountdownActive(false);
-          handleActualDelete();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
-  // Función para cancelar la cuenta regresiva
-  const cancelCountdown = () => {
-    if (countdownRef.current) {
-      clearInterval(countdownRef.current);
-      setCountdownActive(false);
-    }
-  };
-
-  // Función para eliminar un guía
-  const handleActualDelete = async () => {
-    if (!guiaAEliminar) return;
-    
-    try {
-      setIsDeleting(true);
-      const token = localStorage.getItem('token');
-      
-      if (!token) {
-        setIsDeleting(false);
-        setShowEliminarModal(false);
-        return;
-      }
-
-      const cedula = guiaAEliminar.cedula;
-      
-      const response = await axios.delete(`https://servicio-explococora.onrender.com/guia/eliminar/${cedula}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      
-      if (response.status === 200 || response.status === 204) {
-        // Remover el guía de la lista
-        setGuiasCompletos(prev => prev.filter(g => g.cedula !== cedula));
-        // Actualizar contadores
-        actualizarContadores(guiasCompletos.filter(g => g.cedula !== cedula));
-      }
-    } catch (error) {
-      console.error("Error al eliminar guía:", error);
-    } finally {
-      setIsDeleting(false);
-      setShowEliminarModal(false);
-      setGuiaAEliminar(null);
-    }
-  };
-
-  // Función para manejar cambios de estado
-  const handleCambioEstado = (cedula, nuevoEstado) => {
-    // Actualizar el estado en la UI inmediatamente
-    setGuiasCompletos(prev => prev.map(guia => 
-      guia.cedula === cedula ? {...guia, estado: nuevoEstado} : guia
-    ));
-    
+  // Función para manejar el éxito de la eliminación
+  const handleDeleteSuccess = (cedula) => {
+    // Remover el guía de la lista
+    setGuiasCompletos(prev => prev.filter(g => g.cedula !== cedula));
     // Actualizar contadores
-    actualizarContadores(guiasCompletos.map(guia => 
-      guia.cedula === cedula ? {...guia, estado: nuevoEstado} : guia
-    ));
+    actualizarContadores(guiasCompletos.filter(g => g.cedula !== cedula));
+    // Mostrar mensaje de éxito (ya se maneja en EliminarGuia)
+  };
+
+  // Función para cerrar el modal de eliminación
+  const handleCloseEliminarModal = () => {
+    setShowEliminarModal(false);
+    setGuiaAEliminar(null);
   };
 
   // Función para mostrar el modal de detalles y cargar los datos completos
@@ -537,6 +487,13 @@ const Guias = () => {
   return (
     <DashboardLayoutAdmin>
       <AlertComponent />
+      {/* Render the CrearGuia modal conditionally */}
+      {showCrearGuiaModal && (
+        <CrearGuia 
+          onClose={handleCloseCrearGuiaModal} 
+          onGuiaCreated={handleGuiaCreated}
+        />
+      )}
       <div className="p-6 bg-white">
         {/* Cabecera con título y botones */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -683,7 +640,7 @@ const Guias = () => {
         
         
         {/* Lista de guías - sin efectos de zoom */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 sm:gap-4">
           {loading ? (
             <div className="col-span-full p-8 flex flex-col items-center justify-center">
               <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4"></div>
@@ -975,101 +932,13 @@ const Guias = () => {
         </div>
       )}
       
-      {/* Modal de eliminación */}
+      {/* Modal de eliminación reemplazado por el componente EliminarGuia */}
       {showEliminarModal && guiaAEliminar && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-0">
-          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md shadow-2xl border border-gray-200 transform transition-all m-2">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 border-b border-emerald-100 pb-2 bg-emerald-50 p-2 sm:p-3 -mt-4 -mx-4 sm:-mx-6 rounded-t-lg">Confirmar Eliminación</h2>
-            <div className="flex items-center gap-4 mb-6 p-4 bg-emerald-50 rounded-lg border border-emerald-100">
-              <div className="relative">
-                {guiaAEliminar.foto ? (
-                  <img 
-                    src={guiaAEliminar.foto.startsWith('http') ? guiaAEliminar.foto : `https://servicio-explococora.onrender.com/uploads/images/${guiaAEliminar.foto}`} 
-                    alt={construirNombreCompleto(guiaAEliminar)}
-                    className="w-20 h-20 rounded-full object-cover border-2 border-red-500 shadow-lg"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = `https://ui-avatars.com/api/?name=No+Foto&background=6B7280&color=fff&size=128`;
-                    }}
-                  />
-                ) : (
-                  <div className="w-20 h-20 rounded-full bg-gray-200 border-2 border-red-500 flex items-center justify-center shadow-lg">
-                    <span className="text-gray-800 text-sm">No Foto</span>
-                  </div>
-                )}
-                <div className="absolute -top-1 -right-1 bg-red-500 w-6 h-6 rounded-full flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-4 h-4 text-white">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </div>
-              </div>
-              <div>
-                <p className="text-gray-800 font-bold text-lg">{construirNombreCompleto(guiaAEliminar)}</p>
-                <p className="text-gray-500 text-sm">Cédula: {guiaAEliminar.cedula}</p>
-                <div className="mt-1 inline-block px-2 py-1 bg-red-100 text-red-500 text-xs rounded-full">
-                  Será eliminado permanentemente
-                </div>
-              </div>
-            </div>
-            <p className="text-gray-700 mb-6 bg-emerald-50 border-l-4 border-emerald-500 pl-3 py-2 italic">
-              ¿Está seguro que desea eliminar este guía? Esta acción no se puede deshacer.
-            </p>
-            
-            {countdownActive && (
-              <div className="mb-6 bg-red-100 border border-red-500 rounded-lg p-4 text-center">
-                <p className="text-gray-800 mb-2">Eliminando en <span className="font-bold text-2xl text-red-500">{countdown}</span> segundos</p>
-                <button 
-                  onClick={cancelCountdown}
-                  className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium"
-                >
-                  Cancelar eliminación
-                </button>
-              </div>
-            )}
-            
-            <div className="flex flex-col sm:flex-row justify-end gap-2 sm:space-x-3 mt-4">
-              <button
-                onClick={() => {
-                  setShowEliminarModal(false);
-                  setGuiaAEliminar(null);
-                }}
-                className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2.5 px-5 rounded-lg transition-all duration-300"
-                disabled={isDeleting || countdownActive}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleActualDelete}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2.5 px-5 rounded-lg transition-all duration-300"
-                disabled={isDeleting || countdownActive}
-              >
-                Eliminar sin conteo
-              </button>
-              <button
-                onClick={startCountdown}
-                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-2.5 px-5 rounded-lg transition-all duration-300 flex items-center justify-center"
-                disabled={isDeleting || countdownActive}
-              >
-                {isDeleting ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Eliminando...
-                  </>
-                ) : (
-                  <>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Eliminar
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
+        <EliminarGuia 
+          guia={guiaAEliminar}
+          onClose={handleCloseEliminarModal}
+          onDeleteSuccess={handleDeleteSuccess}
+        />
       )}
       
       {/* Modal de edición del guía - Con botón X para cerrar */}

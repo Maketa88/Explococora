@@ -87,28 +87,10 @@ const Settings = () => {
         <div className="mb-10">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-700 mb-6 border-b border-emerald-100 pb-2">
             <Shield className="inline mr-2 text-emerald-500" size={20} />
-            Seguridad y Acceso
+            Acceso
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            {/* Tarjeta para notificaciones */}
-            <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-emerald-100">
-              <div className="p-5 sm:p-6">
-                <div className="mb-4 w-14 h-14 sm:w-16 sm:h-16 bg-amber-100 rounded-full flex items-center justify-center text-amber-600">
-                  <Bell size={28} />
-                </div>
-                <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2">Notificaciones</h3>
-                <p className="text-gray-600 mb-4 text-sm sm:text-base">Gestiona tus preferencias de notificación y alertas del sistema.</p>
-                <button 
-                  onClick={() => navigate('/VistaOperador/notificaciones')} 
-                  className="flex items-center text-white bg-amber-500 hover:bg-amber-600 px-4 py-2 rounded-lg transition-colors w-full justify-center"
-                >
-                  Configurar Notificaciones
-                  <ArrowRight size={16} className="ml-2 transition-transform duration-300 group-hover:translate-x-1" />
-                </button>
-              </div>
-            </div>
-
             {/* Tarjeta para cerrar sesión */}
             <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-emerald-100">
               <div className="p-5 sm:p-6">

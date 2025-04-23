@@ -415,7 +415,7 @@ const ActualizarDatosGuia = () => {
             />
             
             <p className="text-sm mt-2 text-gray-600">
-              Haz clic en el icono para cambiar tu foto
+              Haz click en el icono para cambiar tu foto
             </p>
           </div>
           

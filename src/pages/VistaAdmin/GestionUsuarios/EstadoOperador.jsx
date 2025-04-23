@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
-import DashboardLayout from '../../../layouts/DashboardLayout';
+import DashboardLayoutAdmin from '../../../layouts/DashboardLayoutAdmin';
 import axios from 'axios';
 import { Users, UserCheck, UserMinus, RefreshCw, Clock, Eye } from 'lucide-react';
 
-const Products = () => {
-  const [guias, setGuias] = useState([]);
+const EstadoOperador = () => {
+  const [operadores, setOperadores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [actualizando, setActualizando] = useState(false);
   const [ultimaActualizacion, setUltimaActualizacion] = useState(new Date());
-  const [guiaSeleccionado, setGuiaSeleccionado] = useState(null);
+  const [operadorSeleccionado, setOperadorSeleccionado] = useState(null);
   
   // Estado para los contadores
   const [contadores, setContadores] = useState({
@@ -21,39 +21,39 @@ const Products = () => {
   
   // Configuración para el servidor
   const API_URL = 'https://servicio-explococora.onrender.com';
-  const API_PATH = '/usuarios/listar-por-rol/guia';
+  const API_PATH = '/usuarios/listar-por-rol/operador';
   const API_CONTADOR_PATH = '/usuarios/contar-por-estado';
 
   // Función para construir nombre completo
-  const construirNombreCompleto = (guiaData) => {
-    if (!guiaData) return "Guía";
+  const construirNombreCompleto = (operadorData) => {
+    if (!operadorData) return "Operador";
     
     // Intentar obtener el nombre de todas las posibles propiedades
-    const primerNombre = guiaData.primerNombre || guiaData.nombre || guiaData.name || "";
-    const segundoNombre = guiaData.segundoNombre || "";
-    const primerApellido = guiaData.primerApellido || guiaData.apellido || guiaData.lastName || "";
-    const segundoApellido = guiaData.segundoApellido || "";
+    const primerNombre = operadorData.primerNombre || operadorData.nombre || operadorData.name || "";
+    const segundoNombre = operadorData.segundoNombre || "";
+    const primerApellido = operadorData.primerApellido || operadorData.apellido || operadorData.lastName || "";
+    const segundoApellido = operadorData.segundoApellido || "";
     
     // Si tenemos un nombre completo ya formateado, usarlo
-    if (guiaData.nombreCompleto) return guiaData.nombreCompleto;
+    if (operadorData.nombreCompleto) return operadorData.nombreCompleto;
     
     // Si tenemos un valor en nombre que ya podría ser el nombre completo
-    if (guiaData.nombre && guiaData.nombre.includes(" ") && !primerApellido) {
-      return guiaData.nombre;
+    if (operadorData.nombre && operadorData.nombre.includes(" ") && !primerApellido) {
+      return operadorData.nombre;
     }
     
     // Construir el nombre completo con los componentes individuales
     const nombreCompleto = `${primerNombre} ${segundoNombre} ${primerApellido} ${segundoApellido}`.replace(/\s+/g, ' ').trim();
     
-    // Si después de todo no tenemos un nombre, mostrar "Guía"
-    return nombreCompleto || "Guía";
+    // Si después de todo no tenemos un nombre, mostrar "Operador"
+    return nombreCompleto || "Operador";
   };
 
   // Función para obtener contadores de estados
   const obtenerContadores = async (forzarActualizacion = false) => {
     try {
       // Verificar última actualización en localStorage
-      const ultimaActualizacionContadoresGuardada = localStorage.getItem('ultimaActualizacionContadoresGuiasAdmin');
+      const ultimaActualizacionContadoresGuardada = localStorage.getItem('ultimaActualizacionContadoresOperadoresAdmin');
       const ahora = new Date().getTime();
       
       // Si no es una actualización forzada, verificar si debemos actualizar
@@ -63,7 +63,7 @@ const Products = () => {
         // Si han pasado menos de 60 segundos desde la última actualización
         if (tiempoTranscurrido < 60000) {
           // Cargar contadores del localStorage si existen
-          const contadoresGuardados = localStorage.getItem('contadoresDataAdmin');
+          const contadoresGuardados = localStorage.getItem('contadoresOperadoresAdmin');
           
           if (contadoresGuardados) {
             setContadores(JSON.parse(contadoresGuardados));
@@ -81,8 +81,8 @@ const Products = () => {
         }
       });
       
-      if (response.data && response.data.data && response.data.data.guias) {
-        const guiasData = response.data.data.guias;
+      if (response.data && response.data.data && response.data.data.operadores) {
+        const operadoresData = response.data.data.operadores;
         
         // Inicializar contadores en 0
         const nuevoConteo = {
@@ -93,7 +93,7 @@ const Products = () => {
         };
         
         // Actualizar contadores según los datos recibidos
-        guiasData.forEach(item => {
+        operadoresData.forEach(item => {
           if (item.estado === 'disponible') nuevoConteo.disponibles = item.cantidad;
           if (item.estado === 'ocupado') nuevoConteo.ocupados = item.cantidad;
           if (item.estado === 'inactivo') nuevoConteo.inactivos = item.cantidad;
@@ -103,8 +103,8 @@ const Products = () => {
         nuevoConteo.total = nuevoConteo.disponibles + nuevoConteo.ocupados + nuevoConteo.inactivos;
         
         // Guardar en localStorage
-        localStorage.setItem('ultimaActualizacionContadoresGuiasAdmin', ahora.toString());
-        localStorage.setItem('contadoresDataAdmin', JSON.stringify(nuevoConteo));
+        localStorage.setItem('ultimaActualizacionContadoresOperadoresAdmin', ahora.toString());
+        localStorage.setItem('contadoresOperadoresAdmin', JSON.stringify(nuevoConteo));
         
         setContadores(nuevoConteo);
       }
@@ -113,10 +113,10 @@ const Products = () => {
     }
   };
 
-  const obtenerEstadosGuias = async (forzarActualizacion = false) => {
+  const obtenerEstadosOperadores = async (forzarActualizacion = false) => {
     try {
       // Verificar última actualización en localStorage
-      const ultimaActualizacionGuardada = localStorage.getItem('ultimaActualizacionGuiasAdmin');
+      const ultimaActualizacionGuardada = localStorage.getItem('ultimaActualizacionOperadoresAdmin');
       const ahora = new Date().getTime();
       
       // Si no es una actualización forzada, verificar si debemos actualizar
@@ -128,30 +128,35 @@ const Products = () => {
           console.log(`Usando datos en caché. Próxima actualización en ${Math.floor((60000 - tiempoTranscurrido) / 1000)} segundos`);
           
           // Cargar datos del localStorage si existen
-          const guiasGuardados = localStorage.getItem('guiasDataAdmin');
+          const operadoresGuardados = localStorage.getItem('operadoresDataAdmin');
           
-          if (guiasGuardados) {
-            setGuias(JSON.parse(guiasGuardados));
+          if (operadoresGuardados) {
+            setOperadores(JSON.parse(operadoresGuardados));
             setLoading(false);
             setUltimaActualizacion(new Date(parseInt(ultimaActualizacionGuardada)));
             
             // También cargar contadores guardados
-            obtenerContadores(false);
+            const contadoresGuardados = localStorage.getItem('contadoresOperadoresAdmin');
+            if (contadoresGuardados) {
+              setContadores(JSON.parse(contadoresGuardados));
+            }
             return;
           }
         }
       }
       
       setActualizando(true);
-      setLoading(true);
-      
+      setError(null);
       const token = localStorage.getItem('token');
+      
       if (!token) {
-        setError('No hay token de autenticación disponible');
-        setGuias([]);
+        setError("No hay token de autenticación. Por favor, inicie sesión nuevamente.");
+        setLoading(false);
+        setActualizando(false);
         return;
       }
       
+      // URL para obtener operadores
       const urlCompleta = `${API_URL}${API_PATH}`;
       console.log('Intentando conectar a:', urlCompleta);
       
@@ -161,27 +166,31 @@ const Products = () => {
         }
       });
       
-      let guiasData = [];
+      let operadoresData = [];
       
       if (response.data && response.data.usuarios) {
-        guiasData = response.data.usuarios;
+        operadoresData = response.data.usuarios;
       } else if (response.data && Array.isArray(response.data)) {
-        guiasData = response.data;
+        operadoresData = response.data;
+      } else if (response.data && (response.data.operadores || response.data.data)) {
+        operadoresData = response.data.operadores || response.data.data;
       } else {
-        setGuias([]);
         setError('La respuesta del servidor no tiene el formato esperado');
+        setOperadores([]);
+        setLoading(false);
+        setActualizando(false);
         return;
       }
       
-      // Intentar obtener más información de cada guía
-      const guiasPromises = guiasData.map(async (guia) => {
+      // Intentar obtener más información de cada operador
+      const operadoresPromises = operadoresData.map(async (operador) => {
         try {
           // Intentar obtener el perfil completo si tenemos cédula o id
-          if (guia.cedula || guia.documento || guia._id || guia.id) {
-            const cedulaOId = guia.cedula || guia.documento || guia._id || guia.id;
+          if (operador.cedula || operador.documento || operador._id || operador.id) {
+            const cedulaOId = operador.cedula || operador.documento || operador._id || operador.id;
             
             try {
-              const perfilResponse = await axios.get(`${API_URL}/guia/perfil-completo/${cedulaOId}`, {
+              const perfilResponse = await axios.get(`${API_URL}/operador-turistico/perfil-completo/${cedulaOId}`, {
                 headers: {
                   Authorization: `Bearer ${token}`
                 }
@@ -189,7 +198,7 @@ const Products = () => {
               
               if (perfilResponse.data && (perfilResponse.data.data || perfilResponse.data)) {
                 const perfilData = perfilResponse.data.data || perfilResponse.data;
-                return {...guia, ...perfilData};
+                return {...operador, ...perfilData};
               }
             } catch (error) {
               // Si falla, continuamos con la información básica
@@ -197,31 +206,53 @@ const Products = () => {
             }
           }
           
-          return guia;
+          return operador;
         } catch {
           // En caso de error, devolvemos la información básica
-          return guia;
+          return operador;
         }
       });
       
-      const guiasActualizados = await Promise.all(guiasPromises);
+      const operadoresActualizados = await Promise.all(operadoresPromises);
       
       // Guardar en localStorage la marca de tiempo actual y los datos
-      localStorage.setItem('ultimaActualizacionGuiasAdmin', ahora.toString());
-      localStorage.setItem('guiasDataAdmin', JSON.stringify(guiasActualizados));
+      localStorage.setItem('ultimaActualizacionOperadoresAdmin', ahora.toString());
+      localStorage.setItem('operadoresDataAdmin', JSON.stringify(operadoresActualizados));
       
-      setGuias(guiasActualizados);
-      await obtenerContadores(true);
+      // Actualizar contadores
+      const disponibles = operadoresActualizados.filter(op => op.estado === 'disponible' || op.estado === 'activo').length;
+      const ocupados = operadoresActualizados.filter(op => op.estado === 'ocupado').length;
+      const inactivos = operadoresActualizados.filter(op => op.estado === 'inactivo').length;
+      const total = operadoresActualizados.length;
       
-      setError(null);
-      setUltimaActualizacion(new Date(ahora));
+      const nuevosContadores = {
+        disponibles,
+        ocupados,
+        inactivos,
+        total
+      };
+      
+      // Guardar contadores en localStorage
+      localStorage.setItem('contadoresOperadoresAdmin', JSON.stringify(nuevosContadores));
+      
+      // Actualizar estados
+      setOperadores(operadoresActualizados);
+      setContadores(nuevosContadores);
+      setUltimaActualizacion(new Date());
+      setLoading(false);
+      setActualizando(false);
+      
+      return operadoresActualizados;
     } catch (err) {
-      console.error("Error al obtener estados de guías:", err);
+      console.error('Error al obtener operadores:', err);
       
-      let mensajeError = 'Error al cargar los datos. Por favor, intenta de nuevo.';
+      let mensajeError = 'Error al conectar con el servidor';
       
       if (err.response) {
-        mensajeError = `Error ${err.response.status}: ${err.response.statusText}`;
+        mensajeError = `Error del servidor: ${err.response.status}`;
+        if (err.response.data && err.response.data.message) {
+          mensajeError = err.response.data.message;
+        }
       } else if (err.request) {
         mensajeError = 'No se recibió respuesta del servidor';
       } else {
@@ -229,7 +260,7 @@ const Products = () => {
       }
       
       setError(mensajeError);
-      setGuias([]);
+      setOperadores([]);
     } finally {
       setLoading(false);
       setActualizando(false);
@@ -238,49 +269,49 @@ const Products = () => {
 
   useEffect(() => {
     // Al montar el componente, inicializamos los contadores desde localStorage
-    const contadoresGuardados = localStorage.getItem('contadoresDataAdmin');
+    const contadoresGuardados = localStorage.getItem('contadoresOperadoresAdmin');
     if (contadoresGuardados) {
       setContadores(JSON.parse(contadoresGuardados));
     }
     
     // Luego cargamos los datos completos
-    obtenerEstadosGuias(false);
+    obtenerEstadosOperadores(false);
     
     // Configurar intervalo para actualizar cada minuto
     const intervalo = setInterval(() => {
-      obtenerEstadosGuias(true); // Forzar actualización al cumplirse el intervalo
+      obtenerEstadosOperadores(true); // Forzar actualización al cumplirse el intervalo
     }, 60000);
     
     return () => clearInterval(intervalo);
   }, []);
 
   // Función para abrir el modal de detalles
-  const verDetalles = (guia) => {
-    setGuiaSeleccionado(guia);
+  const verDetalles = (operador) => {
+    setOperadorSeleccionado(operador);
   };
 
   // Función para cerrar el modal
   const cerrarModal = () => {
-    setGuiaSeleccionado(null);
+    setOperadorSeleccionado(null);
   };
 
   // Función para actualizar manualmente (botón "Actualizar ahora")
   const actualizarManualmente = () => {
-    obtenerEstadosGuias(true); // Forzar actualización
+    obtenerEstadosOperadores(true); // Forzar actualización
   };
 
   return (
-    <DashboardLayout>
+    <DashboardLayoutAdmin>
       <div className="flex flex-col gap-6 transition-all duration-300 transform">
         {/* Panel superior con estadísticas */}
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
           <div className="px-6 py-4 bg-emerald-600">
-            <h1 className="text-2xl font-bold text-white">Estado de Guías</h1>
-            <p className="text-emerald-100 text-sm">Monitoreo y control de disponibilidad</p>
+            <h1 className="text-2xl font-bold text-white">Estado de Operadores</h1>
+            <p className="text-blue-100 text-sm">Monitoreo y control de disponibilidad</p>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4">
-            {/* Total de Guías */}
+            {/* Total de Operadores */}
             <div className="p-5 border-b md:border-b-0 md:border-r border-gray-200 hover:bg-gray-50 transition-colors duration-200">
               <div className="flex justify-between">
                 <div>
@@ -293,7 +324,7 @@ const Products = () => {
               </div>
             </div>
             
-            {/* Guías Disponibles */}
+            {/* Operadores Disponibles */}
             <div className="p-5 border-b md:border-b-0 md:border-r border-gray-200 hover:bg-gray-50 transition-colors duration-200">
               <div className="flex justify-between">
                 <div>
@@ -306,7 +337,7 @@ const Products = () => {
               </div>
             </div>
             
-            {/* Guías Ocupados */}
+            {/* Operadores Ocupados */}
             <div className="p-5 border-b md:border-b-0 md:border-r border-gray-200 hover:bg-gray-50 transition-colors duration-200">
               <div className="flex justify-between">
                 <div>
@@ -319,7 +350,7 @@ const Products = () => {
               </div>
             </div>
             
-            {/* Guías Inactivos */}
+            {/* Operadores Inactivos */}
             <div className="p-5 hover:bg-gray-50 transition-colors duration-200">
               <div className="flex justify-between">
                 <div>
@@ -358,7 +389,7 @@ const Products = () => {
         {loading && (
           <div className="bg-white rounded-lg shadow-md border border-gray-200 p-8 flex flex-col items-center justify-center">
             <div className="w-12 h-12 border-t-2 border-b-2 border-emerald-500 rounded-full animate-spin mb-4"></div>
-            <p className="text-gray-600">Cargando información de guías...</p>
+            <p className="text-gray-600">Cargando información de operadores...</p>
           </div>
         )}
 
@@ -386,12 +417,12 @@ const Products = () => {
           </div>
         )}
 
-        {/* Tabla de guías */}
-        {!loading && !error && guias.length > 0 && (
+        {/* Tabla de operadores */}
+        {!loading && !error && operadores.length > 0 && (
           <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-800">Listado de Guías</h2>
-              <p className="text-sm text-gray-500">Información detallada de guías disponibles</p>
+              <h2 className="text-lg font-semibold text-gray-800">Listado de Operadores</h2>
+              <p className="text-sm text-gray-500">Información detallada de operadores disponibles</p>
             </div>
             
             <div className="overflow-x-auto">
@@ -413,59 +444,59 @@ const Products = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {guias.map((guia) => (
-                    <tr key={guia._id || guia.id || `guia-${Math.random()}`} className="hover:bg-gray-50 transition-colors duration-150">
+                  {operadores.map((operador) => (
+                    <tr key={operador._id || operador.id || `operador-${Math.random()}`} className="hover:bg-gray-50 transition-colors duration-150">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold overflow-hidden">
-                            {guia.foto ? (
+                          <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold overflow-hidden">
+                            {operador.foto ? (
                               <img 
-                                src={guia.foto.startsWith('http') ? guia.foto : `https://servicio-explococora.onrender.com/uploads/images/${guia.foto}`} 
-                                alt={construirNombreCompleto(guia)}
+                                src={operador.foto.startsWith('http') ? operador.foto : `https://servicio-explococora.onrender.com/uploads/images/${operador.foto}`} 
+                                alt={construirNombreCompleto(operador)}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
                                   e.target.onerror = null;
-                                  e.target.src = `https://ui-avatars.com/api/?name=${guia.primerNombre || guia.nombre || 'G'}+${guia.primerApellido || ''}&background=0D8ABC&color=fff&size=128`;
+                                  e.target.src = `https://ui-avatars.com/api/?name=${operador.primerNombre || operador.nombre || 'O'}+${operador.primerApellido || ''}&background=0D8ABC&color=fff&size=128`;
                                 }}
                               />
                             ) : (
                               <>
-                                {(guia.primerNombre || guia.nombre || 'G').charAt(0)}
-                                {(guia.primerApellido || '').charAt(0)}
+                                {(operador.primerNombre || operador.nombre || 'O').charAt(0)}
+                                {(operador.primerApellido || '').charAt(0)}
                               </>
                             )}
                           </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">
-                              {construirNombreCompleto(guia)}
+                              {construirNombreCompleto(operador)}
                             </div>
                             <div className="text-xs text-gray-500 flex items-center">
-                              {guia.email || ''}
+                              {operador.email || ''}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {guia.cedula || guia.documento || 'No registrada'}
+                        {operador.cedula || operador.documento || 'No registrada'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          guia.estado === 'activo' || guia.estado === 'disponible' 
+                          operador.estado === 'activo' || operador.estado === 'disponible' 
                             ? 'bg-green-100 text-green-800'
-                            : guia.estado === 'inactivo' 
+                            : operador.estado === 'inactivo' 
                               ? 'bg-red-100 text-red-800'
-                              : guia.estado === 'ocupado' 
+                              : operador.estado === 'ocupado' 
                                 ? 'bg-yellow-100 text-yellow-800'
                                 : 'bg-gray-100 text-gray-800'
                         }`}>
-                          {guia.estado || 'Desconocido'}
+                          {operador.estado || 'Desconocido'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex justify-end space-x-2">
                           <button 
-                            onClick={() => verDetalles(guia)} 
-                            className="text-emerald-600 hover:text-emerald-900 p-1 rounded-full hover:bg-emerald-100 transition-colors duration-200"
+                            onClick={() => verDetalles(operador)} 
+                            className="text-emerald-600 hover:text-emerald-900 p-1 rounded-full hover:bg-blue-100 transition-colors duration-200"
                             title="Ver detalles"
                           >
                             <Eye className="h-4 w-4" />
@@ -483,19 +514,19 @@ const Products = () => {
                 <Clock className="h-4 w-4 mr-1" />
                 <span>Última actualización: {ultimaActualizacion.toLocaleTimeString()}</span>
               </div>
-              <div className="text-sm text-gray-500">{guias.length} guías encontrados</div>
+              <div className="text-sm text-gray-500">{operadores.length} operadores encontrados</div>
             </div>
           </div>
         )}
 
-        {/* Estado sin guías */}
-        {!loading && !error && guias.length === 0 && (
+        {/* Estado sin operadores */}
+        {!loading && !error && operadores.length === 0 && (
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
             <div className="w-16 h-16 mx-auto bg-gray-200 flex items-center justify-center rounded-full mb-4">
               <Users className="h-8 w-8 text-gray-500" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-1">No hay guías disponibles</h3>
-            <p className="text-gray-500 mb-4">No se encontraron guías registrados en el sistema.</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-1">No hay operadores disponibles</h3>
+            <p className="text-gray-500 mb-4">No se encontraron operadores registrados en el sistema.</p>
             <button 
               onClick={actualizarManualmente}
               className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
@@ -507,12 +538,12 @@ const Products = () => {
         )}
       </div>
 
-      {/* Modal de detalles del guía */}
-      {guiaSeleccionado && (
+      {/* Modal de detalles del operador */}
+      {operadorSeleccionado && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-md w-full">
             <div className="px-6 py-4 bg-emerald-700 flex justify-between items-center border-b border-emerald-600 rounded-t-lg">
-              <h3 className="text-lg font-medium text-white">Detalles del Guía</h3>
+              <h3 className="text-lg font-medium text-white">Detalles del Operador</h3>
               <button 
                 onClick={cerrarModal}
                 className="text-white hover:text-gray-200 bg-emerald-800 hover:bg-emerald-900 rounded-full p-1.5 transition-colors"
@@ -525,28 +556,28 @@ const Products = () => {
             <div className="p-6">
               <div className="flex items-center mb-6">
                 <div className="h-16 w-16 rounded-full overflow-hidden bg-emerald-600 flex items-center justify-center text-white text-xl font-bold">
-                  {guiaSeleccionado.foto ? (
+                  {operadorSeleccionado.foto ? (
                     <img 
-                      src={guiaSeleccionado.foto.startsWith('http') ? guiaSeleccionado.foto : `https://servicio-explococora.onrender.com/uploads/images/${guiaSeleccionado.foto}`} 
-                      alt={construirNombreCompleto(guiaSeleccionado)}
+                      src={operadorSeleccionado.foto.startsWith('http') ? operadorSeleccionado.foto : `https://servicio-explococora.onrender.com/uploads/images/${operadorSeleccionado.foto}`} 
+                      alt={construirNombreCompleto(operadorSeleccionado)}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = `https://ui-avatars.com/api/?name=${guiaSeleccionado.primerNombre || guiaSeleccionado.nombre || 'G'}+${guiaSeleccionado.primerApellido || ''}&background=0D8ABC&color=fff&size=128`;
+                        e.target.src = `https://ui-avatars.com/api/?name=${operadorSeleccionado.primerNombre || operadorSeleccionado.nombre || 'O'}+${operadorSeleccionado.primerApellido || ''}&background=0D8ABC&color=fff&size=128`;
                       }}
                     />
                   ) : (
                     <>
-                      {(guiaSeleccionado.primerNombre || guiaSeleccionado.nombre || 'G').charAt(0)}
-                      {(guiaSeleccionado.primerApellido || '').charAt(0)}
+                      {(operadorSeleccionado.primerNombre || operadorSeleccionado.nombre || 'O').charAt(0)}
+                      {(operadorSeleccionado.primerApellido || '').charAt(0)}
                     </>
                   )}
                 </div>
                 <div className="ml-4">
                   <h4 className="text-lg font-medium text-gray-900">
-                    {construirNombreCompleto(guiaSeleccionado)}
+                    {construirNombreCompleto(operadorSeleccionado)}
                   </h4>
-                  <p className="text-gray-500">{guiaSeleccionado.email || ''}</p>
+                  <p className="text-gray-500">{operadorSeleccionado.email || ''}</p>
                 </div>
               </div>
 
@@ -556,20 +587,20 @@ const Products = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-xs text-gray-500">Cédula</p>
-                      <p className="text-sm font-medium">{guiaSeleccionado.cedula || guiaSeleccionado.documento || 'No registrada'}</p>
+                      <p className="text-sm font-medium">{operadorSeleccionado.cedula || operadorSeleccionado.documento || 'No registrada'}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500">Estado</p>
                       <p className={`text-sm font-medium ${
-                        guiaSeleccionado.estado === 'activo' || guiaSeleccionado.estado === 'disponible' 
-                          ? 'text-emerald-600'
-                          : guiaSeleccionado.estado === 'inactivo' 
+                        operadorSeleccionado.estado === 'activo' || operadorSeleccionado.estado === 'disponible' 
+                          ? 'text-blue-600'
+                          : operadorSeleccionado.estado === 'inactivo' 
                             ? 'text-red-600'
-                            : guiaSeleccionado.estado === 'ocupado' 
+                            : operadorSeleccionado.estado === 'ocupado' 
                               ? 'text-amber-600'
                               : 'text-gray-600'
                       }`}>
-                        {guiaSeleccionado.estado || 'Desconocido'}
+                        {operadorSeleccionado.estado || 'Desconocido'}
                       </p>
                     </div>
                   </div>
@@ -579,16 +610,16 @@ const Products = () => {
                   <h5 className="text-sm font-medium text-gray-500 mb-2">Estadísticas</h5>
                   <div className="grid grid-cols-3 gap-4">
                     <div className="text-center p-2 bg-gray-50 rounded-lg">
-                      <p className="text-xs text-gray-500">Recorridos</p>
-                      <p className="text-lg font-medium text-gray-900">{guiaSeleccionado.recorridos || '0'}</p>
+                      <p className="text-xs text-gray-500">Reservas</p>
+                      <p className="text-lg font-medium text-gray-900">{operadorSeleccionado.reservas || '0'}</p>
                     </div>
                     <div className="text-center p-2 bg-gray-50 rounded-lg">
                       <p className="text-xs text-gray-500">Calificación</p>
-                      <p className="text-lg font-medium text-amber-600">{guiaSeleccionado.calificacion || '5.0'}</p>
+                      <p className="text-lg font-medium text-amber-600">{operadorSeleccionado.calificacion || '5.0'}</p>
                     </div>
                     <div className="text-center p-2 bg-gray-50 rounded-lg">
                       <p className="text-xs text-gray-500">Experiencia</p>
-                      <p className="text-lg font-medium text-teal-600">{guiaSeleccionado.experiencia || 'N/A'}</p>
+                      <p className="text-lg font-medium text-emerald-600">{operadorSeleccionado.experiencia || 'N/A'}</p>
                     </div>
                   </div>
                 </div>
@@ -616,8 +647,8 @@ const Products = () => {
           animation: fadeIn 0.3s ease-out forwards;
         }
       `}} />
-    </DashboardLayout>
+    </DashboardLayoutAdmin>
   );
 };
 
-export default Products;
+export default EstadoOperador;

@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import DashboardLayoutAdmin from '../../../layouts/DashboardLayoutAdmin';
 import axios from 'axios';
 import { 
-  Plus, Search, Filter, RefreshCw, Eye, 
-  Package, Calendar, Map, Clock, DollarSign, Pencil, X,
-  ChevronLeft, ChevronRight
+  Plus, Search, Filter, Eye, 
+  Package, Calendar, Map, Clock, DollarSign, Pencil, Trash, X, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import CrearPaquetes from './CrearPaquetes';
 import ActualizarPaquetes from './ActualizarPaquetes';
 import EliminarPaquetes from './EliminarPaquetes';
+
+// Añadir esta línea para limpiar cualquier toast previo
+toast.dismiss();
 
 const GestionPaquetes = () => {
   // Estados para la gestión de paquetes
@@ -17,8 +20,6 @@ const GestionPaquetes = () => {
   const [paquetesFiltrados, setPaquetesFiltrados] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isDetailView, setIsDetailView] = useState(false);
-  const [activePaquete, setActivePaquete] = useState(null);
   const [rutasDisponibles, setRutasDisponibles] = useState([]);
   const [terminoBusqueda, setTerminoBusqueda] = useState('');
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
@@ -36,13 +37,21 @@ const GestionPaquetes = () => {
   
   // Estados para las imágenes
   const [paquetesConFotos, setPaquetesConFotos] = useState({});
-  const [cargandoFotos, setCargandoFotos] = useState({});
+
+  // Añadir estos estados para manejar alertas personalizadas
+  const [alertaPersonalizada, setAlertaPersonalizada] = useState({
+    visible: false,
+    mensaje: '',
+    tipo: '' // 'success', 'error', 'info'
+  });
+
+  // Añadir este estado para el modal de vista detallada
+  const [modalDetalleOpen, setModalDetalleOpen] = useState(false);
+
+  // Añadir estos estados para el lightbox
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [imagenesPreview, setImagenesPreview] = useState([]);
-  
-  // Token para autenticación
-  const token = localStorage.getItem('token');
 
   // Función para obtener la lista de paquetes
   const fetchPaquetes = async () => {
@@ -93,6 +102,11 @@ const GestionPaquetes = () => {
       console.error('Error al cargar paquetes:', err);
       setError('No se pudieron cargar los paquetes. Por favor, intente de nuevo más tarde.');
       setLoading(false);
+      
+      // Asegurar que se use el containerId correcto
+      toast.error('No se pudieron cargar los paquetes', {
+        containerId: 'gestion-paquetes'
+      });
     }
   };
 
@@ -103,15 +117,17 @@ const GestionPaquetes = () => {
       setRutasDisponibles(response.data);
     } catch (err) {
       console.error('Error al cargar rutas:', err);
-      toast.error('No se pudieron cargar las rutas disponibles');
+      
+      // Asegurar que se use el containerId correcto
+      toast.error('No se pudieron cargar las rutas disponibles', {
+        containerId: 'gestion-paquetes'
+      });
     }
   };
 
   // Función para obtener las fotos de un paquete
   const obtenerFotosPaquete = async (idPaquete) => {
     try {
-      setCargandoFotos(prev => ({ ...prev, [idPaquete]: true }));
-      
       const response = await axios.get(`https://servicio-explococora.onrender.com/paquete/fotos-publicas/${idPaquete}`);
       
       // Extraer los datos de las fotos según la estructura de la respuesta
@@ -161,13 +177,11 @@ const GestionPaquetes = () => {
           [idPaquete]: []
         }));
       }
-    } catch (error) {
+    } catch {
       setPaquetesConFotos(prev => ({
         ...prev,
         [idPaquete]: []
       }));
-    } finally {
-      setCargandoFotos(prev => ({ ...prev, [idPaquete]: false }));
     }
   };
 
@@ -178,7 +192,7 @@ const GestionPaquetes = () => {
       
       // Intentar obtener el paquete directamente por ID
       const response = await axios.get(`https://servicio-explococora.onrender.com/paquete/obtener-paquete/${idPaquete}`);
-      console.log('Respuesta completa de obtener-paquete:', response.data);
+      console.log('Respuesta de obtener-paquete:', response.data);
       
       // Verificar si la respuesta es un array
       if (response.data && Array.isArray(response.data)) {
@@ -187,18 +201,10 @@ const GestionPaquetes = () => {
         
         // Recorrer cada elemento del array para extraer información de rutas
         response.data.forEach(item => {
-          console.log('Analizando item de ruta:', item);
-          // Buscar el tipo de ruta en diferentes propiedades posibles
-          // El campo 'tipo' parece ser el correcto según la captura de pantalla
-          const tipoRuta = item.tipo || item.tipoRuta || item.type || item.categoria || 
-                           item.categoriaRuta || 'Cabalgata y Caminata';
-          
           // Agregar cada ruta del array sin filtrar por ID
           rutasInfo.push({
             idRuta: item.idRuta,
-            nombreRuta: item.nombreRuta || `Ruta ${item.idRuta}`,
-            tiempoEstimado: item.duracion || item.tiempoEstimado || null,
-            tipoRuta: tipoRuta
+            nombreRuta: item.nombreRuta || `Ruta ${item.idRuta}`
           });
         });
         
@@ -210,30 +216,19 @@ const GestionPaquetes = () => {
         
         // Verificar si el objeto tiene propiedades de ruta
         if (response.data.idRuta || response.data.nombreRuta) {
-          const tipoRuta = response.data.tipo || response.data.tipoRuta || response.data.type || 
-                           response.data.categoria || response.data.categoriaRuta || 'Cabalgata y Caminata';
-          
           rutasInfo.push({
             idRuta: response.data.idRuta,
-            nombreRuta: response.data.nombreRuta || `Ruta ${response.data.idRuta}`,
-            tiempoEstimado: response.data.duracion || response.data.tiempoEstimado || null,
-            tipoRuta: tipoRuta
+            nombreRuta: response.data.nombreRuta || `Ruta ${response.data.idRuta}`
           });
         }
         
         // Verificar si hay un array de rutas en alguna propiedad
         if (response.data.rutas && Array.isArray(response.data.rutas)) {
-          console.log('Array de rutas encontrado:', response.data.rutas);
           response.data.rutas.forEach(ruta => {
             if (!rutasInfo.some(r => r.idRuta === ruta.idRuta)) {
-              const tipoRuta = ruta.tipo || ruta.tipoRuta || ruta.type || 
-                               ruta.categoria || ruta.categoriaRuta || 'Cabalgata y Caminata';
-              
               rutasInfo.push({
                 idRuta: ruta.idRuta,
-                nombreRuta: ruta.nombreRuta || `Ruta ${ruta.idRuta}`,
-                tiempoEstimado: ruta.duracion || ruta.tiempoEstimado || null,
-                tipoRuta: tipoRuta
+                nombreRuta: ruta.nombreRuta || `Ruta ${ruta.idRuta}`
               });
             }
           });
@@ -260,8 +255,17 @@ const GestionPaquetes = () => {
 
   // Cargar paquetes y rutas al montar el componente
   useEffect(() => {
+    // Limpiar todas las notificaciones cuando se monte el componente
+    toast.dismiss();
+    
+    // Cargar paquetes y rutas al montar el componente
     fetchPaquetes();
     fetchRutas();
+    
+    // Función para limpiar al desmontar
+    return () => {
+      toast.dismiss();
+    };
   }, []);
 
   // Función para abrir el modal de creación
@@ -281,37 +285,10 @@ const GestionPaquetes = () => {
     setModalEliminarOpen(true);
   };
 
-  // Función para abrir la vista detallada
-  const openDetailView = async (paquete) => {
-    setActivePaquete(paquete);
-    setIsDetailView(true);
-    
-    // Si no tenemos fotos de este paquete, las obtenemos
-    if (!paquetesConFotos[paquete.idPaquete]) {
-      obtenerFotosPaquete(paquete.idPaquete);
-    }
-    
-    // Obtener rutas asociadas al paquete
-    const rutas = await obtenerRutasAsociadas(paquete.idPaquete);
-    
-    // Actualizar el paquete activo con las rutas obtenidas
-    setActivePaquete(prevPaquete => ({
-      ...prevPaquete,
-      rutasAsociadas: rutas
-    }));
-  };
-
-  // Función para cerrar la vista detallada
-  const closeDetailView = () => {
-    setIsDetailView(false);
-    setActivePaquete(null);
-  };
-
-  // Función para abrir el lightbox
-  const handleLightbox = (imagenes, index) => {
-    setImagenesPreview(imagenes);
-    setLightboxIndex(index);
-    setLightboxOpen(true);
+  // Función para abrir el modal de vista detallada
+  const handleOpenDetalleModal = (paquete) => {
+    setPaqueteSeleccionado(paquete);
+    setModalDetalleOpen(true);
   };
 
   // Función para aplicar filtros
@@ -368,15 +345,16 @@ const GestionPaquetes = () => {
     }
   };
 
-  // Función para mostrar el tipo de ruta
-  const mostrarTipoRuta = (paquete) => {
-    if (!paquete.rutasAsociadas || paquete.rutasAsociadas.length === 0) return 'Tipo no disponible';
+  // Función para formatear fechas
+  const formatearFecha = (fechaStr) => {
+    if (!fechaStr) return 'Fecha no disponible';
     
-    // Obtener todos los tipos de ruta únicos
-    const tiposUnicos = Array.from(new Set(paquete.rutasAsociadas.map(r => r.tipoRuta)));
-    
-    // Devolver los tipos separados por coma
-    return tiposUnicos.join(', ');
+    const fecha = new Date(fechaStr);
+    return fecha.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
   };
 
   // Función para mostrar precio formateado
@@ -385,18 +363,47 @@ const GestionPaquetes = () => {
     return `$${parseInt(precio).toLocaleString('es-CO')}`;
   };
 
-  // Función para obtener un ícono según el tipo de paquete
-  const getPackageIcon = () => {
-    return <Package className="w-16 h-16 text-emerald-600" />;
+  // Función para mostrar alertas personalizadas
+  const mostrarAlerta = (mensaje, tipo = 'success') => {
+    setAlertaPersonalizada({
+      visible: true,
+      mensaje,
+      tipo
+    });
+    
+    // Auto-ocultar después de 3 segundos
+    setTimeout(() => {
+      setAlertaPersonalizada(prev => ({...prev, visible: false}));
+    }, 3000);
   };
 
-  // Función para mostrar la vista detallada del paquete
-  const handleVerDetalle = (paquete) => {
-    setPaqueteSeleccionado(paquete);
-    setIsDetailView(true);
+  // Función para abrir el lightbox
+  const handleLightbox = (imagenes, index) => {
+    setImagenesPreview(imagenes);
+    setLightboxIndex(index);
+    setLightboxOpen(true);
   };
 
-  // Función para calcular la duración total de las rutas de un paquete
+  // Función para navegar entre imágenes en el lightbox
+  const navigateLightbox = (direction) => {
+    const newIndex = lightboxIndex + direction;
+    if (newIndex >= 0 && newIndex < imagenesPreview.length) {
+      setLightboxIndex(newIndex);
+    }
+  };
+
+  // Función para mostrar el tipo de ruta
+  const mostrarTipoRuta = (paquete) => {
+    if (!paquete.rutasAsociadas || paquete.rutasAsociadas.length === 0) return 'Tipo no disponible';
+    
+    // Obtener todos los tipos de ruta únicos
+    const tiposUnicos = Array.from(new Set(paquete.rutasAsociadas.map(r => r.tipoRuta || 'Cabalgata y Caminata')));
+    
+    // Devolver los tipos separados por coma
+    return tiposUnicos.join(', ');
+  };
+
+  // Calcular la duración total de las rutas de un paquete
   const calcularDuracionTotalPaquete = (paquete) => {
     if (!paquete.rutasAsociadas || !paquete.rutasAsociadas.length) return paquete.duracion || 'No especificada';
     
@@ -434,252 +441,6 @@ const GestionPaquetes = () => {
     return duracionTotal || paquete.duracion || 'No especificada';
   };
 
-  // Componente para renderizar la vista detallada
-  const DetallePaquete = ({ paquete, onClose, imagenes = [] }) => {
-    // Calcular duración total de las rutas
-    const calcularDuracionTotal = () => {
-      if (!paquete.rutasAsociadas || !paquete.rutasAsociadas.length) return paquete.duracion || 'No especificada';
-      
-      let duracionTotal = '';
-      let horasTotales = 0;
-      let minutosTotales = 0;
-      
-      paquete.rutasAsociadas.forEach(ruta => {
-        if (ruta.tiempoEstimado) {
-          const tiempo = ruta.tiempoEstimado.toLowerCase();
-          
-          // Extraer horas
-          const horasMatch = tiempo.match(/(\d+)\s*(?:h|hora|horas)/);
-          if (horasMatch) horasTotales += parseInt(horasMatch[1]);
-          
-          // Extraer minutos
-          const minutosMatch = tiempo.match(/(\d+)\s*(?:m|min|minuto|minutos)/);
-          if (minutosMatch) minutosTotales += parseInt(minutosMatch[1]);
-        }
-      });
-      
-      // Convertir minutos excedentes a horas
-      if (minutosTotales >= 60) {
-        horasTotales += Math.floor(minutosTotales / 60);
-        minutosTotales = minutosTotales % 60;
-      }
-      
-      // Formar el string de duración total
-      if (horasTotales > 0) duracionTotal += `${horasTotales} hora${horasTotales !== 1 ? 's' : ''}`;
-      if (minutosTotales > 0) {
-        if (duracionTotal) duracionTotal += ' ';
-        duracionTotal += `${minutosTotales} minuto${minutosTotales !== 1 ? 's' : ''}`;
-      }
-      
-      return duracionTotal || paquete.duracion || 'No especificada';
-    };
-
-    // Obtener nombres de rutas
-    const getNombresRutas = () => {
-      if (!paquete.rutasAsociadas || !paquete.rutasAsociadas.length) return 'Ninguna ruta asociada';
-      
-      return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-          {paquete.rutasAsociadas.map((ruta, index) => (
-            <div key={index} className="flex items-center gap-2 bg-emerald-100 p-2 rounded">
-              <Map size={16} className="text-emerald-400" />
-              <div>
-                <span className="font-medium">{ruta.nombreRuta}</span>
-                {ruta.tiempoEstimado && (
-                  <div className="text-xs text-emerald-700 flex items-center mt-1">
-                    <Clock size={12} className="mr-1" />
-                    <span>{ruta.tiempoEstimado}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      );
-    };
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 overflow-y-auto">
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl text-gray-800 animate-fadeIn max-h-[90vh] overflow-y-auto">
-          <div className="relative">
-            {/* Encabezado con fondo de imagen (si hay imágenes) */}
-            <div className="h-48 bg-emerald-100 rounded-t-lg overflow-hidden relative">
-              {imagenes && imagenes.length > 0 ? (
-                <div className="w-full h-full overflow-hidden">
-                  <img 
-                    src={imagenes[0].url} 
-                    alt={paquete.nombrePaquete}
-                    className="w-full h-full object-cover object-center opacity-60 cursor-pointer"
-                    onClick={() => handleLightbox(imagenes.map(img => img.url), 0)}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.parentNode.classList.add('flex', 'items-center', 'justify-center');
-                      const placeholder = document.createElement('div');
-                      placeholder.innerHTML = `
-                        <div class="text-emerald-400 text-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2">
-                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                          </svg>
-                          <p>Imagen no disponible</p>
-                        </div>
-                      `;
-                      e.target.parentNode.appendChild(placeholder);
-                    }}
-                  />
-                </div>
-              ) : (
-                <div className="flex items-center justify-center h-full">
-                  <Package size={64} className="text-emerald-200" />
-                </div>
-              )}
-              
-              {/* Botón de cierre */}
-              <button
-                onClick={onClose}
-                className="absolute top-4 right-4 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
-              >
-                <X size={24} />
-              </button>
-              
-              {/* Nombre del paquete */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white to-transparent">
-                <h2 className="text-3xl font-bold text-gray-800">{paquete.nombrePaquete}</h2>
-              </div>
-            </div>
-            
-            <div className="p-6">
-              {/* Información principal */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="col-span-2">
-                  <h3 className="text-xl font-semibold mb-2 text-emerald-600">Descripción</h3>
-                  <p className="text-gray-700 mb-6">{paquete.descripcion}</p>
-                  
-                  <h3 className="text-xl font-semibold mb-2 text-emerald-600">Rutas incluidas</h3>
-                  {getNombresRutas()}
-                </div>
-                
-                <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="text-emerald-700 font-medium mb-1">Duración</h4>
-                      <div className="flex items-center gap-2">
-                        <Clock size={18} className="text-emerald-600" />
-                        <span className="text-lg text-gray-800">{calcularDuracionTotal()}</span>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-emerald-700 font-medium mb-1">Tipo</h4>
-                      <div className="flex items-center gap-2">
-                        <Map size={18} className="text-emerald-600" />
-                        <span>{mostrarTipoRuta(paquete)}</span>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-emerald-700 font-medium mb-1">Precio</h4>
-                      <div className="flex items-center gap-2">
-                        <DollarSign size={18} className="text-emerald-600" />
-                        <div className="flex items-center">
-                          <span className="text-2xl font-bold text-gray-800">${paquete.precio}</span>
-                          {paquete.descuento > 0 && (
-                            <span className="ml-2 bg-emerald-600 text-white text-xs px-2 py-1 rounded-full">
-                              {paquete.descuento}% desc.
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      {paquete.descuento > 0 && (
-                        <div className="text-emerald-700 mt-1 text-sm">
-                          Precio final: ${(paquete.precio * (1 - paquete.descuento / 100)).toFixed(2)}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Galería de imágenes */}
-              {imagenes && imagenes.length > 0 && (
-                <div className="mt-8">
-                  <h3 className="text-xl font-semibold mb-3 text-emerald-700">Galería de imágenes</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                    {imagenes.map((imagen, index) => (
-                      <div 
-                        key={index} 
-                        className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
-                        onClick={() => handleLightbox(imagenes.map(img => img.url), index)}
-                      >
-                        <div className="w-full h-full overflow-hidden">
-                          <img 
-                            src={imagen.url} 
-                            alt={`Imagen ${index + 1} del paquete`}
-                            className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-300"
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.parentNode.innerHTML = `
-                                <div class="w-full h-full flex items-center justify-center bg-emerald-50">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="2" y="6" width="20" height="12" rx="2"/>
-                                    <circle cx="12" cy="12" r="2"/>
-                                  </svg>
-                                </div>
-                              `;
-                            }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              {/* Botones de acción */}
-              <div className="mt-8 flex justify-end space-x-4">
-                <button
-                  onClick={onClose}
-                  className="px-6 py-2 bg-emerald-100 hover:bg-emerald-200 text-gray-800 rounded-lg transition-colors shadow-md"
-                >
-                  Cerrar
-                </button>
-                <button
-                  onClick={() => {
-                    onClose();
-                    handleOpenActualizarModal(paquete);
-                  }}
-                  className="px-6 py-2 bg-emerald-100 hover:bg-emerald-200 text-gray-800 rounded-lg transition-colors shadow-md flex items-center gap-2"
-                >
-                  <Pencil size={16} />
-                  Editar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Componente para renderizar un placeholder para imágenes
-  const ImagePlaceholder = ({ text = "Imagen no disponible" }) => {
-    return (
-      <div className="bg-emerald-800 w-full h-full flex items-center justify-center">
-        <div className="text-emerald-400 text-center p-4">
-          <Package size={32} className="mx-auto mb-2" />
-          <p>{text}</p>
-        </div>
-      </div>
-    );
-  };
-
-  // Función para navegar entre imágenes en el lightbox
-  const navigateLightbox = (direction) => {
-    const newIndex = lightboxIndex + direction;
-    if (newIndex >= 0 && newIndex < imagenesPreview.length) {
-      setLightboxIndex(newIndex);
-    }
-  };
-
   return (
     <DashboardLayoutAdmin>
       <div className="min-h-screen text-gray-800">
@@ -696,41 +457,33 @@ const GestionPaquetes = () => {
                 placeholder="Buscar paquetes..."
                 value={terminoBusqueda}
                 onChange={handleSearchChange}
-                className="w-full md:w-64 px-4 py-2 bg-emerald-50 rounded text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400 placeholder-emerald-600"
+                className="pl-10 pr-4 py-2 w-full md:w-64 rounded-lg bg-white shadow-sm border border-emerald-200 text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
               />
-              <Search className="absolute right-3 top-2.5 text-emerald-600 w-5 h-5" />
+              <Search className="absolute left-3 top-2.5 text-emerald-500" size={18} />
             </div>
             
             <button
               onClick={() => setMostrarFiltros(!mostrarFiltros)}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-emerald-200 hover:bg-emerald-50 text-emerald-700 rounded shadow-sm transition-colors"
             >
               <Filter size={18} />
               Filtros
             </button>
             
             <button
-              onClick={fetchPaquetes}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded transition-colors"
-              title="Recargar paquetes"
-            >
-              <RefreshCw size={18} />
-            </button>
-            
-            <button
               onClick={handleOpenCrearModal}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white rounded transition-colors"
+              className="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-md shadow-sm flex items-center gap-2"
             >
-              <Plus size={18} />
-              Nuevo Paquete
+              <Plus size={20} />
+              <span>Nuevo Paquete</span>
             </button>
           </div>
         </div>
         
         {/* Panel de filtros */}
         {mostrarFiltros && (
-          <div className="mb-6 p-4 bg-emerald-50 rounded-lg border border-emerald-100">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Filtrar Paquetes</h2>
+          <div className="mb-6 p-4 bg-white rounded-lg shadow-sm border border-emerald-100">
+            <h2 className="text-xl font-semibold text-emerald-700 mb-4">Filtrar Paquetes</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
@@ -771,13 +524,13 @@ const GestionPaquetes = () => {
               <div className="flex items-end gap-2">
                 <button 
                   onClick={aplicarFiltros}
-                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white rounded transition-colors"
+                  className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded transition-colors"
                 >
                   Aplicar Filtros
                 </button>
                 <button 
                   onClick={limpiarFiltros}
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded transition-colors"
+                  className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded transition-colors"
                 >
                   Limpiar
                 </button>
@@ -786,150 +539,347 @@ const GestionPaquetes = () => {
           </div>
         )}
         
-        {/* Vista principal: Detalle o Lista */}
-        {isDetailView ? (
-          <DetallePaquete
-            paquete={activePaquete}
-            onClose={closeDetailView}
-            imagenes={paquetesConFotos[activePaquete.idPaquete] || []}
-          />
-        ) : (
-          <div>
-            {loading ? (
-              <div className="flex justify-center items-center py-12">
-                <div className="animate-spin w-12 h-12 border-4 border-emerald-400 border-t-transparent rounded-full"></div>
-              </div>
-            ) : error ? (
-              <div className="bg-rose-100 text-rose-700 p-4 rounded-lg border border-rose-200">
-                <p className="text-center">{error}</p>
-              </div>
-            ) : paquetesFiltrados.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {paquetesFiltrados.map(paquete => (
-                  <div 
-                    key={paquete.idPaquete} 
-                    className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow"
-                  >
-                    <div className="relative h-48">
-                      {loading ? (
-                        <div className="w-full h-full flex items-center justify-center bg-emerald-50">
-                          <div className="animate-spin w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full"></div>
-                        </div>
-                      ) : paquetesConFotos[paquete.idPaquete] && paquetesConFotos[paquete.idPaquete].length > 0 ? (
-                        <div className="w-full h-full overflow-hidden">
-                          <img
-                            src={paquetesConFotos[paquete.idPaquete][0].url}
-                            alt={paquete.nombrePaquete}
-                            className="w-full h-full object-cover object-center transform hover:scale-105 transition-transform duration-300"
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.parentNode.innerHTML = `
-                                <div class="w-full h-full flex items-center justify-center bg-emerald-50">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="2" y="6" width="20" height="12" rx="2"/>
-                                    <circle cx="12" cy="12" r="2"/>
-                                    <path d="M14.5 12l2.5 -2.5"/>
-                                    <path d="M14.5 12l2.5 2.5"/>
-                                  </svg>
-                                </div>
-                              `;
-                            }}
-                          />
-                        </div>
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-emerald-50">
-                          <Package size={64} className="text-emerald-500" />
-                        </div>
-                      )}
+        {/* Vista principal: Lista de paquetes */}
+        <div>
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin w-12 h-12 border-4 border-emerald-400 border-t-transparent rounded-full"></div>
+            </div>
+          ) : error ? (
+            <div className="bg-rose-100 text-rose-700 p-4 rounded-lg border border-rose-200">
+              <p className="text-center">{error}</p>
+            </div>
+          ) : paquetesFiltrados.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+              {paquetesFiltrados.map(paquete => (
+                <div 
+                  key={paquete.idPaquete} 
+                  className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow flex flex-col"
+                >
+                  <div className="relative h-52">
+                    {paquetesConFotos[paquete.idPaquete] && paquetesConFotos[paquete.idPaquete].length > 0 ? (
+                      <div className="w-full h-full overflow-hidden">
+                        <img
+                          src={paquetesConFotos[paquete.idPaquete][0].url}
+                          alt={paquete.nombrePaquete}
+                          className="w-full h-full object-cover object-center transform hover:scale-105 transition-transform duration-300"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.parentNode.innerHTML = `
+                              <div class="w-full h-full flex items-center justify-center bg-emerald-50">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#0D8ABC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                  <rect x="2" y="6" width="20" height="12" rx="2"/>
+                                  <circle cx="12" cy="12" r="2"/>
+                                  <path d="M14.5 12l2.5 -2.5"/>
+                                  <path d="M14.5 12l2.5 2.5"/>
+                                </svg>
+                              </div>
+                            `;
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-emerald-50">
+                        <Package size={64} className="text-emerald-700" />
+                      </div>
+                    )}
+                    
+                    <div className="absolute top-2 right-2 flex gap-1">
+                      <button
+                        onClick={() => handleOpenActualizarModal(paquete)}
+                        className="p-2 bg-white bg-opacity-90 hover:bg-emerald-50 text-emerald-700 rounded-full shadow-sm transition-colors"
+                        title="Editar paquete"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleOpenEliminarModal(paquete)}
+                        className="p-2 bg-white bg-opacity-90 hover:bg-red-50 text-red-600 rounded-full shadow-sm transition-colors"
+                        title="Eliminar paquete"
+                      >
+                        <Trash size={16} />
+                      </button>
+                    </div>
+                    
+                    <div className="absolute bottom-2 left-2">
+                      <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                        paquete.estado === 'Activo' ? 'bg-emerald-700 text-white' : 'bg-red-500 text-white'
+                      } shadow-sm`}>
+                        {paquete.estado}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="p-5 flex-grow">
+                    <h3 className="text-lg font-bold text-emerald-800 truncate">{paquete.nombrePaquete}</h3>
+                    
+                    <div className="mt-3 space-y-3">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Clock size={18} className="text-emerald-700" />
+                        <span>{paquete.duracion}</span>
+                      </div>
                       
-                      <div className="absolute top-2 right-2 flex gap-1">
-                        <button
-                          onClick={() => openDetailView(paquete)}
-                          className="p-2 bg-emerald-500 bg-opacity-80 hover:bg-emerald-400 text-white rounded-full"
-                          title="Ver detalles"
-                        >
-                          <Eye size={16} />
-                        </button>
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Calendar size={18} className="text-emerald-700" />
+                        <span>{formatearFecha(paquete.fechaInicio)} - {formatearFecha(paquete.fechaFin)}</span>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <DollarSign size={18} className="text-emerald-700" />
+                        <span>{mostrarPrecio(paquete.precio)}</span>
+                        {paquete.descuento > 0 && (
+                          <span className="bg-emerald-700 text-white text-xs px-1 rounded">
+                            {paquete.descuento}% desc.
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Map size={18} className="text-emerald-700" />
+                        <span>{paquete.rutasAsociadas?.length || 0} rutas incluidas</span>
                       </div>
                     </div>
                     
-                    <div className="p-4">
-                      <h3 className="text-lg font-bold text-gray-700 truncate">{paquete.nombrePaquete}</h3>
+                    <div className="mt-5">
+                      <button
+                        onClick={() => handleOpenDetalleModal(paquete)}
+                        className="w-full py-2.5 text-sm bg-emerald-700 hover:bg-emerald-800 text-white rounded transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Eye size={18} />
+                        Ver detalles
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-emerald-50 text-center p-8 rounded-lg border border-emerald-100">
+              <div className="flex justify-center mb-4">
+                <Package size={64} className="text-emerald-700" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">No hay paquetes disponibles</h3>
+              <p className="text-emerald-600 mb-6">No se encontraron paquetes turísticos. ¿Desea crear uno nuevo?</p>
+              <button
+                onClick={handleOpenCrearModal}
+                className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded transition-colors"
+              >
+                Crear Nuevo Paquete
+              </button>
+            </div>
+          )}
+        </div>
+        
+        {/* Modales para Crear, Actualizar y Eliminar */}
+        {modalCrearOpen && (
+          <CrearPaquetes
+            onClose={() => setModalCrearOpen(false)} 
+            onCreated={fetchPaquetes}
+            rutasDisponibles={rutasDisponibles}
+            mostrarAlerta={mostrarAlerta}
+          />
+        )}
+        
+        {modalActualizarOpen && paqueteSeleccionado && (
+          <ActualizarPaquetes
+            onClose={() => setModalActualizarOpen(false)}
+            onUpdated={fetchPaquetes}
+            paquete={paqueteSeleccionado}
+            rutasDisponibles={rutasDisponibles}
+            mostrarAlerta={mostrarAlerta}
+          />
+        )}
+        
+        {modalEliminarOpen && paqueteSeleccionado && (
+          <EliminarPaquetes
+            onClose={() => setModalEliminarOpen(false)}
+            onDeleted={fetchPaquetes}
+            paquete={paqueteSeleccionado}
+            mostrarAlerta={mostrarAlerta}
+          />
+        )}
+
+        {/* Reemplazar el modal existente con este componente DetallePaquete */}
+        {modalDetalleOpen && paqueteSeleccionado && (
+          <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl text-gray-800 animate-fadeIn max-h-[90vh] overflow-y-auto">
+              <div className="relative">
+                {/* Encabezado con fondo de imagen (si hay imágenes) */}
+                <div className="h-48 bg-emerald-100 rounded-t-lg overflow-hidden relative">
+                  {paquetesConFotos[paqueteSeleccionado.idPaquete] && paquetesConFotos[paqueteSeleccionado.idPaquete].length > 0 ? (
+                    <div className="w-full h-full overflow-hidden">
+                      <img 
+                        src={paquetesConFotos[paqueteSeleccionado.idPaquete][0].url} 
+                        alt={paqueteSeleccionado.nombrePaquete}
+                        className="w-full h-full object-cover object-center opacity-60 cursor-pointer"
+                        onClick={() => handleLightbox(paquetesConFotos[paqueteSeleccionado.idPaquete].map(img => img.url), 0)}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.parentNode.classList.add('flex', 'items-center', 'justify-center');
+                          const placeholder = document.createElement('div');
+                          placeholder.innerHTML = `
+                            <div class="text-emerald-400 text-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                              </svg>
+                              <p>Imagen no disponible</p>
+                            </div>
+                          `;
+                          e.target.parentNode.appendChild(placeholder);
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <Package size={64} className="text-emerald-200" />
+                    </div>
+                  )}
+                  
+                  {/* Botón de cierre */}
+                  <button
+                    onClick={() => setModalDetalleOpen(false)}
+                    className="absolute top-4 right-4 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
+                  >
+                    <X size={24} />
+                  </button>
+                  
+                  {/* Nombre del paquete */}
+                  <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white to-transparent">
+                    <h2 className="text-3xl font-bold text-gray-800">{paqueteSeleccionado.nombrePaquete}</h2>
+                  </div>
+                </div>
+                
+                <div className="p-6">
+                  {/* Información principal */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div className="col-span-2">
+                      <h3 className="text-xl font-semibold mb-2 text-emerald-600">Descripción</h3>
+                      <p className="text-gray-700 mb-6">{paqueteSeleccionado.descripcion}</p>
                       
-                      <div className="mt-2 space-y-2">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Clock size={16} className="text-emerald-500" />
-                          <span className="font-medium">Duración total: {calcularDuracionTotalPaquete(paquete)}</span>
-                        </div>
-                        
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Map size={16} className="text-emerald-500" />
-                          <span>{mostrarTipoRuta(paquete)}</span>
-                        </div>
-                        
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <DollarSign size={16} className="text-emerald-500" />
-                          <span>{mostrarPrecio(paquete.precio)}</span>
-                          {paquete.descuento > 0 && (
-                            <span className="bg-emerald-500 text-white text-xs px-1 rounded">
-                              {paquete.descuento}% desc.
-                            </span>
-                          )}
-                        </div>
-                        
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Map size={16} className="text-emerald-500" />
-                          <div className="flex flex-wrap gap-1 items-center">
-                            <span>{paquete.rutasAsociadas?.length || 0} rutas incluidas</span>
-                            {paquete.rutasAsociadas && paquete.rutasAsociadas.length > 0 && (
-                              <div className="flex gap-1 ml-1">
-                                {Array.from(new Set(paquete.rutasAsociadas.map(r => r.tipoRuta))).map((tipo, idx) => (
-                                  <span key={idx} className="bg-emerald-100 text-emerald-800 text-xs px-1.5 py-0.5 rounded">
-                                    {tipo}
-                                  </span>
-                                ))}
+                      <h3 className="text-xl font-semibold mb-2 text-emerald-600">Rutas incluidas</h3>
+                      {paqueteSeleccionado.rutasAsociadas && paqueteSeleccionado.rutasAsociadas.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                          {paqueteSeleccionado.rutasAsociadas.map((ruta, index) => (
+                            <div key={index} className="flex items-center gap-2 bg-emerald-100 p-2 rounded">
+                              <Map size={16} className="text-emerald-400" />
+                              <div>
+                                <span className="font-medium">{ruta.nombreRuta}</span>
+                                {ruta.tiempoEstimado && (
+                                  <div className="text-xs text-emerald-700 flex items-center mt-1">
+                                    <Clock size={12} className="mr-1" />
+                                    <span>{ruta.tiempoEstimado}</span>
+                                  </div>
+                                )}
                               </div>
-                            )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500">No hay rutas asociadas a este paquete.</p>
+                      )}
+                    </div>
+                    
+                    <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="text-emerald-700 font-medium mb-1">Duración</h4>
+                          <div className="flex items-center gap-2">
+                            <Clock size={18} className="text-emerald-600" />
+                            <span className="text-lg text-gray-800">{calcularDuracionTotalPaquete(paqueteSeleccionado)}</span>
                           </div>
                         </div>
-                      </div>
-                      
-                      <div className="mt-4 flex gap-2 justify-between">
-                        <button
-                          onClick={() => handleOpenActualizarModal(paquete)}
-                          className="flex-1 py-2 text-sm bg-emerald-500 hover:bg-emerald-400 text-white rounded transition-colors"
-                        >
-                          Actualizar
-                        </button>
-                        <button
-                          onClick={() => handleOpenEliminarModal(paquete)}
-                          className="flex-1 py-2 text-sm bg-rose-500 hover:bg-rose-400 text-white rounded transition-colors"
-                        >
-                          Eliminar
-                        </button>
+                        
+                        <div>
+                          <h4 className="text-emerald-700 font-medium mb-1">Tipo</h4>
+                          <div className="flex items-center gap-2">
+                            <Map size={18} className="text-emerald-600" />
+                            <span>{mostrarTipoRuta(paqueteSeleccionado)}</span>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <h4 className="text-emerald-700 font-medium mb-1">Precio</h4>
+                          <div className="flex items-center gap-2">
+                            <DollarSign size={18} className="text-emerald-600" />
+                            <div className="flex items-center">
+                              <span className="text-2xl font-bold text-gray-800">${paqueteSeleccionado.precio}</span>
+                              {paqueteSeleccionado.descuento > 0 && (
+                                <span className="ml-2 bg-emerald-600 text-white text-xs px-2 py-1 rounded-full">
+                                  {paqueteSeleccionado.descuento}% desc.
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          {paqueteSeleccionado.descuento > 0 && (
+                            <div className="text-emerald-700 mt-1 text-sm">
+                              Precio final: ${(paqueteSeleccionado.precio * (1 - paqueteSeleccionado.descuento / 100)).toFixed(2)}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="bg-emerald-50 text-center p-8 rounded-lg border border-emerald-100">
-                <div className="flex justify-center mb-4">
-                  <Package size={64} className="text-emerald-500" />
+                  
+                  {/* Galería de imágenes */}
+                  {paquetesConFotos[paqueteSeleccionado.idPaquete] && paquetesConFotos[paqueteSeleccionado.idPaquete].length > 0 && (
+                    <div className="mt-8">
+                      <h3 className="text-xl font-semibold mb-3 text-emerald-700">Galería de imágenes</h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                        {paquetesConFotos[paqueteSeleccionado.idPaquete].map((imagen, index) => (
+                          <div 
+                            key={index} 
+                            className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                            onClick={() => handleLightbox(paquetesConFotos[paqueteSeleccionado.idPaquete].map(img => img.url), index)}
+                          >
+                            <div className="w-full h-full overflow-hidden">
+                              <img 
+                                src={imagen.url} 
+                                alt={`Imagen ${index + 1} del paquete`}
+                                className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-300"
+                                onError={(e) => {
+                                  e.target.onerror = null;
+                                  e.target.parentNode.innerHTML = `
+                                    <div class="w-full h-full flex items-center justify-center bg-emerald-50">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="2" y="6" width="20" height="12" rx="2"/>
+                                        <circle cx="12" cy="12" r="2"/>
+                                      </svg>
+                                    </div>
+                                  `;
+                                }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Botones de acción */}
+                  <div className="mt-8 flex justify-end space-x-4">
+                    <button
+                      onClick={() => setModalDetalleOpen(false)}
+                      className="px-6 py-2 bg-emerald-100 hover:bg-emerald-200 text-gray-800 rounded-lg transition-colors shadow-md"
+                    >
+                      Cerrar
+                    </button>
+                    <button
+                      onClick={() => {
+                        setModalDetalleOpen(false);
+                        handleOpenActualizarModal(paqueteSeleccionado);
+                      }}
+                      className="px-6 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg transition-colors shadow-md flex items-center gap-2"
+                    >
+                      <Pencil size={16} />
+                      Editar
+                    </button>
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">No hay paquetes disponibles</h3>
-                <p className="text-emerald-600 mb-6">No se encontraron paquetes turísticos. ¿Desea crear uno nuevo?</p>
-                <button
-                  onClick={handleOpenCrearModal}
-                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white rounded transition-colors"
-                >
-                  Crear Nuevo Paquete
-                </button>
               </div>
-            )}
+            </div>
           </div>
         )}
-        
+
         {/* Lightbox para imágenes */}
         {lightboxOpen && (
           <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
@@ -967,32 +917,28 @@ const GestionPaquetes = () => {
             </div>
           </div>
         )}
-        
-        {/* Modales para Crear, Actualizar y Eliminar */}
-        {modalCrearOpen && (
-          <CrearPaquetes
-            onClose={() => setModalCrearOpen(false)} 
-            onCreated={fetchPaquetes}
-            rutasDisponibles={rutasDisponibles}
-          />
-        )}
-        
-        {modalActualizarOpen && paqueteSeleccionado && (
-          <ActualizarPaquetes
-            onClose={() => setModalActualizarOpen(false)}
-            onUpdated={fetchPaquetes}
-            paquete={paqueteSeleccionado}
-            rutasDisponibles={rutasDisponibles}
-            imagenes={paquetesConFotos[paqueteSeleccionado.idPaquete] || []}
-          />
-        )}
-        
-        {modalEliminarOpen && paqueteSeleccionado && (
-          <EliminarPaquetes
-            onClose={() => setModalEliminarOpen(false)}
-            onDeleted={fetchPaquetes}
-            paquete={paqueteSeleccionado}
-          />
+
+        {/* Alerta personalizada */}
+        {alertaPersonalizada.visible && (
+          <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg animate-fadeIn ${
+            alertaPersonalizada.tipo === 'success' ? 'bg-green-500 text-white' :
+            alertaPersonalizada.tipo === 'error' ? 'bg-red-500 text-white' :
+            'bg-blue-500 text-white'
+          }`}>
+            <div className="flex items-center gap-2">
+              {alertaPersonalizada.tipo === 'success' && (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              )}
+              {alertaPersonalizada.tipo === 'error' && (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              )}
+              <span>{alertaPersonalizada.mensaje}</span>
+            </div>
+          </div>
         )}
       </div>
     </DashboardLayoutAdmin>

@@ -342,7 +342,7 @@ export const InicioSesion = () => {
         ) : (
           // Recuperación de contraseña
           <div className="mx-auto max-w-md w-full">
-            <div className="bg-white/90 backdrop-blur-md p-5 rounded-xl border border-emerald-200 shadow-lg overflow-hidden relative">
+            <div className="opacity-70 border-r-4 border-l-4 border-emerald-600 bg-white/80 backdrop-blur-md p-5 rounded-xl border shadow-lg overflow-hidden relative">
               <form onSubmit={solicitarRecuperacion} className="space-y-3">
                 <div className="mb-3">
                   <label className="block text-emerald-700 text-base mb-1">
@@ -392,26 +392,34 @@ export const InicioSesion = () => {
                 
                 <button
                   type="submit"
-                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-all duration-300 hover:shadow-lg shadow-emerald-300/30 text-sm font-semibold mb-2"
+                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-all duration-300 hover:shadow-lg shadow-emerald-300/30 text-sm font-semibold"
                   disabled={enviandoRecuperacion}
                 >
-                  <span className="relative z-10">
-                    {enviandoRecuperacion ? 'Enviando...' : 'Recuperar contraseña'}
-                  </span>
-                  <span className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-green-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                  {enviandoRecuperacion ? (
+                    <span className="flex items-center justify-center">
+                      <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span className="ml-2 tracking-widest">Enviando...</span>
+                    </span>
+                  ) : 'Recuperar contraseña'}
                 </button>
-                
+              </form>
+
+              {/* Botón de volver FUERA del formulario */}
+              <div className="flex justify-center mt-2">
                 <button
                   type="button"
                   onClick={() => {
                     setMostrarRecuperacion(false);
                     setEstadoRecuperacion({ mensaje: '', error: false });
                   }}
-                  className="w-full py-2 border border-emerald-200 hover:bg-emerald-50 text-emerald-700 font-medium rounded-lg transition-all duration-300 text-sm"
+                  className="text-emerald-600 hover:text-emerald-800 transition-colors duration-300 text-sm"
                 >
                   Volver al inicio de sesión
                 </button>
-              </form>
+              </div>
             </div>
           </div>
         )}

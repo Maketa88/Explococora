@@ -432,12 +432,6 @@ const DashboardLayoutGuia = ({ children }) => {
       section: "Customers"
     },
     {
-      title: "Calendario de Citas",
-      icon: <UserCheck className="w-5 h-5" />,
-      path: "/VistaGuia/CalendarioCitas",
-      section: "Customers"
-    },  
-    {
       title: "CambiarContraseña",
       icon: <Users className="w-5 h-5" />,
       path: "/VistaGuia/CambiarContraseña",

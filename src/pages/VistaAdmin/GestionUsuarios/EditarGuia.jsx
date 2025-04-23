@@ -216,56 +216,62 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-8 w-full max-w-2xl max-h-screen overflow-y-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-800">
-            Actualizar Información del Guía
+    <div className="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-screen overflow-y-auto">
+        {/* Encabezado verde con botón X para cerrar */}
+        <div className="flex justify-between items-center p-4 sm:p-6 bg-emerald-700 rounded-t-lg border-b border-emerald-600">
+          <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+            <Edit className="w-6 h-6" />
+            Actualizar Información
           </h2>
           <button 
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 focus:outline-none"
+            className="text-white hover:text-gray-200 bg-emerald-800 hover:bg-emerald-900 rounded-full p-1.5"
           >
-            <X size={24} />
+            <X className="w-5 h-5" />
           </button>
         </div>
         
         {error && (
-          <div className="mb-6 p-4 bg-red-100 text-red-700 rounded-lg">
+          <div className="mx-6 mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
             {error}
           </div>
         )}
         
-        <form onSubmit={handleSubmit}>
-          {/* Sección para foto de perfil */}
-          <div className="flex flex-col items-center mb-8">
-            <div className="relative">
-              <div className="w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-emerald-500">
-                {previewFoto ? (
-                  <img
-                    src={previewFoto}
-                    alt="Foto de perfil"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = `https://ui-avatars.com/api/?name=${formData.primerNombre}+${formData.primerApellido}&background=10B981&color=fff`;
-                    }}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-emerald-600 text-white">
-                    <User size={64} />
-                  </div>
-                )}
+        <div className="p-4 sm:p-6">
+          <form onSubmit={handleSubmit}>
+            {/* Foto de perfil centrada */}
+            <div className="flex justify-center mb-6">
+              <div className="relative">
+                <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-white shadow-md">
+                  {previewFoto ? (
+                    <img
+                      src={previewFoto}
+                      alt="Foto de perfil"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = `https://ui-avatars.com/api/?name=${formData.primerNombre}+${formData.primerApellido}&background=10B981&color=fff`;
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-emerald-600 text-white">
+                      <User size={64} />
+                    </div>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSelectFoto}
+                  className="absolute bottom-0 right-0 bg-emerald-600 hover:bg-emerald-700 text-white p-2 rounded-full shadow-sm transition-colors"
+                  title="Cambiar foto"
+                >
+                  <Edit className="w-4 h-4" />
+                </button>
               </div>
-              
-              <button
-                type="button"
-                onClick={handleSelectFoto}
-                className="absolute bottom-2 right-0 p-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg"
-              >
-                <Edit size={20} />
-              </button>
             </div>
+            
+            <p className="text-center text-gray-500 text-sm mb-6">Haz clic en el ícono de lápiz para cambiar la foto</p>
             
             <input
               type="file"
@@ -275,96 +281,99 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
               className="hidden"
             />
             
-            <p className="text-sm mt-2 text-gray-600">
-              Haz clic en el icono para cambiar la foto
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Primer Nombre *
-              </label>
-              <input
-                type="text"
-                name="primerNombre"
-                value={formData.primerNombre}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
+            {/* Campos de formulario en grid responsivo */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6">
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700">
+                  Primer Nombre <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="primerNombre"
+                  value={formData.primerNombre}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2.5 bg-emerald-50 border border-emerald-100 rounded-lg text-gray-800 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Primer nombre"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700">
+                  Segundo Nombre
+                </label>
+                <input
+                  type="text"
+                  name="segundoNombre"
+                  value={formData.segundoNombre}
+                  onChange={handleChange}
+                  className="w-full p-2.5 bg-emerald-50 border border-emerald-100 rounded-lg text-gray-800 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Segundo nombre (opcional)"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700">
+                  Primer Apellido <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="primerApellido"
+                  value={formData.primerApellido}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2.5 bg-emerald-50 border border-emerald-100 rounded-lg text-gray-800 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Primer apellido"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700">
+                  Segundo Apellido
+                </label>
+                <input
+                  type="text"
+                  name="segundoApellido"
+                  value={formData.segundoApellido}
+                  onChange={handleChange}
+                  className="w-full p-2.5 bg-emerald-50 border border-emerald-100 rounded-lg text-gray-800 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Segundo apellido (opcional)"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700">
+                  Correo Electrónico <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2.5 bg-emerald-50 border border-emerald-100 rounded-lg text-gray-800 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="correo@ejemplo.com"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700">
+                  Teléfono <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  name="telefono"
+                  value={formData.telefono}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2.5 bg-emerald-50 border border-emerald-100 rounded-lg text-gray-800 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Número de teléfono"
+                />
+              </div>
             </div>
             
-            <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Segundo Nombre
-              </label>
-              <input
-                type="text"
-                name="segundoNombre"
-                value={formData.segundoNombre}
-                onChange={handleChange}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
-            </div>
-            
-            <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Primer Apellido *
-              </label>
-              <input
-                type="text"
-                name="primerApellido"
-                value={formData.primerApellido}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
-            </div>
-            
-            <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Segundo Apellido
-              </label>
-              <input
-                type="text"
-                name="segundoApellido"
-                value={formData.segundoApellido}
-                onChange={handleChange}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
-            </div>
-            
-            <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Correo Electrónico *
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
-            </div>
-            
-            <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Teléfono *
-              </label>
-              <input
-                type="tel"
-                name="telefono"
-                value={formData.telefono}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
-            </div>
-            
-            <div className="md:col-span-2">
-              <label className="block mb-2 text-sm font-medium text-gray-700">
+            <div className="mb-6">
+              <label className="block text-sm font-medium mb-1 text-gray-700">
                 Descripción
               </label>
               <textarea
@@ -372,40 +381,44 @@ const EditarGuia = ({ guia, onClose, onGuiaUpdated }) => {
                 value={formData.descripcion}
                 onChange={handleChange}
                 rows="4"
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                placeholder="Escribe una breve descripción sobre el guía, su experiencia y habilidades..."
+                className="w-full p-2.5 bg-emerald-50 border border-emerald-100 rounded-lg text-gray-800 focus:ring-emerald-500 focus:border-emerald-500"
+                placeholder="Breve descripción del guía..."
               ></textarea>
             </div>
-          </div>
-          
-          <div className="flex flex-wrap gap-4 mt-8">
-            <button
-              type="submit"
-              disabled={updating}
-              className={`py-2 px-6 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-colors duration-200 flex items-center gap-2 ${updating ? 'opacity-70 cursor-not-allowed' : ''}`}
-            >
-              {updating ? (
-                <>
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Actualizando...
-                </>
-              ) : (
-                "Guardar Cambios"
-              )}
-            </button>
             
-            <button
-              type="button"
-              onClick={onClose}
-              className="py-2 px-6 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium transition-colors duration-200"
-            >
-              Cancelar
-            </button>
-          </div>
-        </form>
+            {/* Botones de acción */}
+            <div className="flex flex-col sm:flex-row justify-end gap-3 mt-8">
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-full sm:w-auto px-5 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md order-2 sm:order-1 shadow-sm transition-colors"
+              >
+                Cancelar
+              </button>
+              
+              <button
+                type="submit"
+                disabled={updating}
+                className="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md flex items-center justify-center order-1 sm:order-2 mb-3 sm:mb-0 shadow-sm transition-colors"
+              >
+                {updating ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Guardando...
+                  </>
+                ) : (
+                  <>
+                    <Edit className="w-5 h-5 mr-2" />
+                    Guardar Cambios
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
         <ToastContainer />
       </div>
     </div>
