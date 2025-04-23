@@ -1,6 +1,6 @@
 import { FaFacebookSquare, FaInstagram } from "react-icons/fa";
 import { FaTiktok } from "react-icons/fa";
-import logo from "../../../assets/images/logoBlanco.webp";
+import logo from "../../../../public/images/LogoBlanco.webp";
 import { IconoRedes } from "../../../components/PaginaInicio/Footer/IconoRedes";
 import { LinkFooter } from "../../../components/PaginaInicio/Footer/LinkFooter";
 import { FooterSeccion } from "../../../components/PaginaInicio/Footer/FooterSeccion";
