@@ -300,6 +300,19 @@ const EstadoOperador = () => {
     obtenerEstadosOperadores(true); // Forzar actualización
   };
 
+  // Añadir esta función de normalización al inicio del componente
+  const normalizarEstadoTexto = (estado) => {
+    if (estado === 1 || estado === '1') return 'disponible';
+    if (estado === 2 || estado === '2') return 'ocupado';
+    if (estado === 0 || estado === '0') return 'inactivo';
+    
+    // Si ya es un string válido, devolverlo
+    if (['disponible', 'ocupado', 'inactivo'].includes(estado)) return estado;
+    
+    // Valor por defecto
+    return 'disponible';
+  };
+
   return (
     <DashboardLayoutAdmin>
       <div className="flex flex-col gap-6 transition-all duration-300 transform">
@@ -481,15 +494,15 @@ const EstadoOperador = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          operador.estado === 'activo' || operador.estado === 'disponible' 
+                          normalizarEstadoTexto(operador.estado) === 'disponible' 
                             ? 'bg-green-100 text-green-800'
-                            : operador.estado === 'inactivo' 
+                            : normalizarEstadoTexto(operador.estado) === 'inactivo' 
                               ? 'bg-red-100 text-red-800'
-                              : operador.estado === 'ocupado' 
+                              : normalizarEstadoTexto(operador.estado) === 'ocupado' 
                                 ? 'bg-yellow-100 text-yellow-800'
                                 : 'bg-gray-100 text-gray-800'
                         }`}>
-                          {operador.estado || 'Desconocido'}
+                          {normalizarEstadoTexto(operador.estado)}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
